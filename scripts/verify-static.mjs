@@ -67,4 +67,15 @@ if (missingCopy.length > 0) {
   throw new Error(`Missing expected copy: ${missingCopy.join(', ')}`);
 }
 
-console.log(`Verified ${requiredFiles.length} required files and ${refs.size} static references.`);
+const favicon = await readFile(path.join(root, 'favicon.svg'), 'utf8');
+if (!favicon.includes('viewBox="0 0 2272 2272"')) {
+  throw new Error('favicon.svg is not the canonical OpenCoven logo viewBox');
+}
+if (favicon.includes('currentColor')) {
+  throw new Error('favicon.svg still uses the generated/currentColor mark instead of canonical logo fills');
+}
+if (!favicon.includes('fill="#000000"') || !favicon.includes('fill="#FFFFFF"')) {
+  throw new Error('favicon.svg must be the white-on-black OpenCoven logo variant');
+}
+
+console.log(`Verified ${requiredFiles.length} required files, ${refs.size} static references, and canonical favicon logo.`);
