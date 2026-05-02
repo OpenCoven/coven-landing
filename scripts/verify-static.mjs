@@ -61,6 +61,8 @@ const requiredCopy = [
   'comux',
   'OpenMeow',
   'OpenClaw',
+  'https://discord.gg/opencoven',
+  'Join the Discord',
 ];
 const missingCopy = requiredCopy.filter((needle) => !html.includes(needle));
 if (missingCopy.length > 0) {
