@@ -67,15 +67,25 @@ if (missingCopy.length > 0) {
   throw new Error(`Missing expected copy: ${missingCopy.join(', ')}`);
 }
 
+const assertCanonicalLogoSvg = (content, label) => {
+  if (content.includes('currentColor')) {
+    throw new Error(`${label} still uses the generated/currentColor mark instead of canonical logo fills`);
+  }
+  if (!content.includes('fill="#000000"') || !content.includes('fill="#FFFFFF"')) {
+    throw new Error(`${label} must use the white-on-black OpenCoven logo variant`);
+  }
+};
+
 const favicon = await readFile(path.join(root, 'favicon.svg'), 'utf8');
 if (!favicon.includes('viewBox="0 0 2272 2272"')) {
   throw new Error('favicon.svg is not the canonical OpenCoven logo viewBox');
 }
-if (favicon.includes('currentColor')) {
-  throw new Error('favicon.svg still uses the generated/currentColor mark instead of canonical logo fills');
-}
-if (!favicon.includes('fill="#000000"') || !favicon.includes('fill="#FFFFFF"')) {
-  throw new Error('favicon.svg must be the white-on-black OpenCoven logo variant');
-}
+assertCanonicalLogoSvg(favicon, 'favicon.svg');
 
-console.log(`Verified ${requiredFiles.length} required files, ${refs.size} static references, and canonical favicon logo.`);
+const og = await readFile(path.join(root, 'og.svg'), 'utf8');
+if (!og.includes('Canonical OpenCoven logo from brand/logo/opencoven-logo.svg')) {
+  throw new Error('og.svg does not document the canonical OpenCoven logo source');
+}
+assertCanonicalLogoSvg(og, 'og.svg');
+
+console.log(`Verified ${requiredFiles.length} required files, ${refs.size} static references, canonical favicon logo, and canonical OG logo.`);
