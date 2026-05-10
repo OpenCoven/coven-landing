@@ -62,7 +62,8 @@
       <div class="header-inner">
         <a
           class="brand"
-          href="#top"
+          href="#"
+          id="brand-home-link"
           aria-label="OpenCoven home">
           <span class="brand-mark"
             ><img
@@ -92,7 +93,10 @@
         <!-- hero logo -->
         <div class="hero-logo-block">
           <div class="hero-logo-ring">
-            <img src="./apple-touch-icon.png" alt="OpenCoven" class="hero-logo-img" />
+            <img
+              src="./apple-touch-icon.png"
+              alt="OpenCoven"
+              class="hero-logo-img" />
           </div>
         </div>
 
@@ -139,7 +143,7 @@
         <div class="hero-actions">
           <a
             href="https://discord.gg/opencoven"
-            class="hero-btn hero-btn-primary">
+            class="hero-btn hero-btn-discord">
             <svg
               class="hero-btn-icon"
               viewBox="0 0 127.14 96.36"
@@ -418,5 +422,13 @@
         </p>
       </div>
     </footer>
+    <script>
+      document
+        .getElementById("brand-home-link")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    </script>
   </body>
 </html>
