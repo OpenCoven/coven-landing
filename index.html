@@ -81,76 +81,151 @@
     </header>
 
     <main id="top">
-      <section class="hero section-frame">
-        <div class="hero-copy reveal">
-          <p class="kicker">OPENCOVEN · LOCAL AGENT RUNTIME</p>
+      <section
+        class="hero"
+        id="hero-top">
+        <!-- ambient radial glow -->
+        <div
+          class="hero-radial"
+          aria-hidden="true"></div>
+
+        <!-- top badge -->
+        <div class="hero-badge-wrap">
+          <a
+            href="https://github.com/OpenCoven"
+            class="hero-badge">
+            <span class="hero-badge-dot"></span>
+            <span class="hero-badge-label"
+              >OPENCOVEN &middot; LOCAL AGENT RUNTIME</span
+            >
+            <svg
+              class="hero-badge-arrow"
+              width="12"
+              height="12"
+              viewBox="0 0 12 12"
+              fill="none"
+              aria-hidden="true">
+              <path
+                d="M4 2.5L8 6L4 9.5"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </a>
+        </div>
+
+        <!-- main heading -->
+        <div class="hero-text">
           <h1>
-            Controlled multi-agent
-            <span>orchestration.</span>
+            <span class="hero-h1-nowrap">Controlled multi-agent </span
+            ><span class="hero-h1-faded">orchestration</span>
           </h1>
-          <p class="lede">
+          <p class="hero-sub">
             Coven gives Codex, Claude Code, and future harnesses a shared local
             room: explicit project boundaries, attachable sessions, durable
             history, and one authority layer for execution.
           </p>
-          <div
-            class="actions"
-            aria-label="Primary actions">
-            <a
-              class="button button-primary button-discord"
-              href="https://discord.gg/opencoven">
-              <svg
-                class="discord-icon"
-                aria-hidden="true"
-                viewBox="0 0 127.14 96.36"
-                focusable="false">
-                <path
-                  d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21A105.73 105.73 0 0 0 32.71 96.36a77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.05 12.69-11.43 12.69Z" />
-              </svg>
-              Join the Discord
-            </a>
-            <a
-              class="button button-secondary"
-              href="https://github.com/OpenCoven/coven">
-              View on GitHub
-            </a>
-            <a
-              class="button button-secondary"
-              href="./README.md"
-              >Read the docs</a
-            >
-          </div>
         </div>
 
-        <aside
-          class="console-card"
-          aria-label="Coven session preview">
-          <div class="console-topline">
-            <span class="status-dot"></span>
-            <span>coven daemon · ready</span>
-          </div>
-          <div
-            class="sigil-orbit"
-            aria-hidden="true">
-            <img
-              src="./favicon.svg"
-              alt="" />
-          </div>
-          <div
-            class="terminal-lines"
-            aria-hidden="true">
-            <p><span>$</span> coven run codex "stabilize plugin release"</p>
-            <p><span>root</span> /Users/val/OpenClaw</p>
-            <p><span>session</span> project-scoped · attachable · logged</p>
-          </div>
-        </aside>
+        <!-- CTA buttons -->
+        <div class="hero-actions">
+          <a
+            href="https://discord.gg/opencoven"
+            class="hero-btn hero-btn-primary">
+            <svg
+              class="hero-btn-icon"
+              viewBox="0 0 127.14 96.36"
+              fill="currentColor"
+              aria-hidden="true">
+              <path
+                d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21A105.73 105.73 0 0 0 32.71 96.36a77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.05 12.69-11.43 12.69Z" />
+            </svg>
+            Join the Discord
+          </a>
+          <a
+            href="https://github.com/OpenCoven/coven"
+            class="hero-btn hero-btn-secondary">
+            <svg
+              class="hero-btn-icon"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true">
+              <path
+                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+            View on GitHub
+          </a>
+          <a
+            href="./README.md"
+            class="hero-btn hero-btn-ghost">
+            Read the docs
+            <svg
+              class="hero-btn-arrow"
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              aria-hidden="true">
+              <path
+                d="M3 7h8M8 4.5L10.5 7 8 9.5"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </a>
+        </div>
 
-        <div
-          class="hero-footer"
-          aria-label="Status notes">
-          <span>RUST AUTHORITY LAYER</span>
-          <span>LOCAL DAEMON API</span>
-          <span>PTY SESSIONS</span>
+        <!-- terminal preview card -->
+        <div class="hero-terminal-wrap">
+          <div class="hero-terminal">
+            <!-- terminal top bar -->
+            <div class="ht-topbar">
+              <div class="ht-dots">
+                <span class="ht-dot ht-dot-red"></span>
+                <span class="ht-dot ht-dot-yellow"></span>
+                <span class="ht-dot ht-dot-green"></span>
+              </div>
+              <div class="ht-title">
+                <span class="ht-status-dot"></span>
+                coven daemon &middot; ready
+              </div>
+              <div class="ht-spacer"></div>
+            </div>
+
+            <!-- terminal body -->
+            <div class="ht-body">
+              <div class="ht-line">
+                <span class="ht-prompt">$</span>
+                <span class="ht-cmd"
+                  >coven run codex
+                  <span class="ht-string"
+                    >&quot;stabilize plugin release&quot;</span
+                  ></span
+                >
+              </div>
+              <div class="ht-line">
+                <span class="ht-key">root</span>
+                <span class="ht-val">/Users/val/OpenClaw</span>
+              </div>
+              <div class="ht-line">
+                <span class="ht-key">session</span>
+                <span class="ht-val"
+                  >project-scoped
+                  <span class="ht-sep">&middot;</span> attachable
+                  <span class="ht-sep">&middot;</span> logged</span
+                >
+              </div>
+            </div>
+
+            <!-- terminal footer tags -->
+            <div class="ht-footer">
+              <span class="ht-tag">RUST AUTHORITY LAYER</span>
+              <span class="ht-tag">LOCAL DAEMON API</span>
+              <span class="ht-tag">PTY SESSIONS</span>
+            </div>
+          </div>
         </div>
       </section>
 
