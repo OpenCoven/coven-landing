@@ -79,7 +79,9 @@
             <span>coven daemon · ready</span>
           </div>
           <div class="sigil-orbit" aria-hidden="true">
-            <img src="./favicon.svg" alt="" />
+            <div class="hero-logo-ring">
+              <img class="hero-logo-img" src="./apple-touch-icon.png" alt="" />
+            </div>
           </div>
           <div class="terminal-lines" aria-hidden="true">
             <p><span>$</span> coven run codex "stabilize plugin release"</p>
@@ -223,11 +225,25 @@
     </main>
 
     <footer class="site-footer">
-      <div class="footer-brand">
-        <span class="brand-mark small"><img src="./favicon.svg" alt="" /></span>
-        <span>OpenCoven</span>
+      <div class="footer-shell">
+        <a class="footer-brand" href="#top" aria-label="OpenCoven home">
+          <span class="brand-mark small"><img src="./favicon.svg" alt="" /></span>
+          <span>OpenCoven</span>
+        </a>
+
+        <nav class="footer-nav" aria-label="Footer links">
+          <a href="#top">About</a>
+          <a href="#how">Features</a>
+          <a href="#harnesses">Solution</a>
+          <a href="#control">Control</a>
+          <a href="https://github.com/OpenCoven">GitHub</a>
+          <a href="https://discord.gg/opencoven">Discord</a>
+        </nav>
+
+        <p class="footer-copy">
+          Collective intelligence under intentional local control.
+        </p>
       </div>
-      <p>Collective intelligence under intentional local control.</p>
     </footer>
   </body>
 </html>
