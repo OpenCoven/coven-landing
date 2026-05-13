@@ -131,7 +131,7 @@ nav a:focus-visible,
   letter-spacing: .18em;
 }
 .kicker,
-.card-kicker { margin: 0 0 18px; color: var(--label); font-size: 11px; font-weight: 800; }
+.card-kicker { margin: 0 0 18px; color: var(--label); font-size: 12px; font-weight: 800; }
 
 h1, h2, h3, p { margin-top: 0; }
 h1 {
@@ -160,8 +160,8 @@ h1 span { display: block; color: rgba(255, 255, 255, 0.52); }
 .button-primary { background: var(--purple); border: 1px solid var(--line); box-shadow: 0 12px 42px rgba(110, 75, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.16); color: var(--white); }
 .button-secondary { background: var(--surface); border: 1px solid var(--line); color: rgba(255, 255, 255, 0.76); }
 .button-discord { gap: 10px; }
-.button:hover,
-.button:focus-visible { border-color: var(--line); box-shadow: var(--oc-hover-glow, 0 0 36px rgba(124, 92, 255, 0.26)); filter: brightness(1.15); transform: translateY(-1px); }
+.button:hover { border-color: var(--line); box-shadow: var(--oc-hover-glow, 0 0 36px rgba(124, 92, 255, 0.26)); filter: brightness(1.15); transform: translateY(-1px); }
+.button:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(167,139,255,.42); border-radius: 10px; }
 .discord-icon { width: 18px; height: 18px; flex: 0 0 auto; fill: currentColor; }
 
 .console-card {
@@ -176,7 +176,7 @@ h1 span { display: block; color: rgba(255, 255, 255, 0.52); }
   overflow: hidden;
 }
 .console-card::before { content: ""; position: absolute; inset: 12%; border-radius: 50%; border: 1px solid rgba(167, 139, 255, 0.12); box-shadow: 0 0 120px rgba(138, 99, 255, 0.18); }
-.console-topline { position: absolute; left: 28px; right: 28px; top: 26px; display: flex; align-items: center; gap: 10px; color: rgba(255, 255, 255, 0.56); font-size: 11px; }
+.console-topline { position: absolute; left: 28px; right: 28px; top: 26px; display: flex; align-items: center; gap: 10px; color: rgba(255, 255, 255, 0.56); font-size: 12px; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 18px rgba(48, 209, 88, 0.62); }
 .sigil-orbit { position: absolute; inset: 0; display: grid; place-items: center; }
 .hero-logo-ring {
@@ -213,10 +213,10 @@ h1 span { display: block; color: rgba(255, 255, 255, 0.52); }
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-7px); }
 }
-.terminal-lines { position: absolute; left: 28px; right: 28px; bottom: 28px; border: 1px solid var(--line); border-radius: 24px; background: var(--black-glass); padding: 20px; color: rgba(255, 255, 255, 0.58); font-size: 10px; text-transform: none; letter-spacing: .04em; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.terminal-lines { position: absolute; left: 28px; right: 28px; bottom: 28px; border: 1px solid var(--line); border-radius: 24px; background: var(--black-glass); padding: 20px; color: rgba(255, 255, 255, 0.58); font-size: 12px; text-transform: none; letter-spacing: .04em; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
 .terminal-lines p { margin: 0; line-height: 1.9; }
 .terminal-lines span { color: var(--label-strong); margin-right: 10px; }
-.hero-footer { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 16px; color: var(--faint); font-size: 10px; }
+.hero-footer { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 16px; color: var(--faint); font-size: 12px; }
 
 .content-section { padding: var(--section-padding) 0; }
 .section-heading { max-width: 760px; margin-bottom: 48px; }
@@ -256,7 +256,7 @@ h1 span { display: block; color: rgba(255, 255, 255, 0.52); }
 .split-section { display: grid; grid-template-columns: .84fr 1.16fr; gap: 44px; align-items: start; }
 .harness-stack { display: grid; gap: 16px; }
 .harness-card { padding: 24px; }
-.harness-card span { display: inline-flex; margin-bottom: 12px; color: var(--label); font-size: 10px; font-weight: 800; }
+.harness-card span { display: inline-flex; margin-bottom: 12px; color: var(--label); font-size: 12px; font-weight: 800; }
 .harness-card.muted-card { opacity: .78; }
 
 .ecosystem { padding-bottom: 88px; }
