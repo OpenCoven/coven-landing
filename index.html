@@ -37,7 +37,28 @@
           <span class="brand-mark"><img src="./favicon.svg" alt="" /></span>
           <span>OPEN COVEN</span>
         </a>
-        <nav>
+        <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-nav" hidden>
+          <span class="hamburger">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+          </span>
+        </button>
+        <nav id="mobile-nav" class="mobile-nav-overlay" hidden>
+          <div class="mobile-nav-container">
+            <button class="mobile-nav-close" aria-label="Close menu" style="display:none">
+              <span class="close-icon">×</span>
+            </button>
+            <nav class="mobile-nav-links">
+              <a href="#how">How it works</a>
+              <a href="#harnesses">Harnesses</a>
+              <a href="#control">Control</a>
+              <a href="#ecosystem">Ecosystem</a>
+              <a href="https://discord.gg/opencoven" class="mobile-nav-cta">Join Discord</a>
+            </nav>
+          </div>
+        </nav>
+        <nav class="desktop-nav">
           <a href="#how">How it works</a>
           <a href="#harnesses">Harnesses</a>
           <a href="#control">Control</a>
