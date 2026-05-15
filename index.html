@@ -37,7 +37,7 @@
           <span class="brand-mark"><img src="./favicon.svg" alt="" /></span>
           <span>OpenCoven</span>
         </a>
-        <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-nav" hidden>
+        <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-nav">
           <span class="hamburger">
             <span class="line"></span>
             <span class="line"></span>
@@ -63,6 +63,7 @@
           <a href="#harnesses">Harnesses</a>
           <a href="#control">Control</a>
           <a href="#ecosystem">Ecosystem</a>
+          <a href="https://discord.gg/opencoven" class="btn-nav-discord">Join Discord</a>
         </nav>
       </div>
     </header>
@@ -266,5 +267,37 @@
         </p>
       </div>
     </footer>
+
+    <script>
+      const toggle = document.querySelector('.mobile-menu-toggle');
+      const nav = document.getElementById('mobile-nav');
+      const close = document.querySelector('.mobile-nav-close');
+
+      function openNav() {
+        nav.classList.add('is-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+        if (close) close.style.display = '';
+      }
+
+      function closeNav() {
+        nav.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+        if (close) close.style.display = 'none';
+      }
+
+      toggle.addEventListener('click', () => {
+        nav.classList.contains('is-open') ? closeNav() : openNav();
+      });
+
+      if (close) close.addEventListener('click', closeNav);
+
+      nav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeNav));
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && nav.classList.contains('is-open')) closeNav();
+      });
+    </script>
   </body>
 </html>
