@@ -3,15 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>OpenCoven — Controlled multi-agent orchestration</title>
+    <title>OpenCoven — Persistent AI Familiars</title>
     <meta
       name="description"
-      content="OpenCoven is the local orchestration substrate for project-scoped AI harness sessions: Codex, Claude Code, OpenClaw, OpenMeow, comux, and the tools that come next."
+      content="OpenCoven is an open ecosystem for persistent AI familiars: named agents with memory, tools, identity, roles, continuity, and local runtime control."
     />
     <meta property="og:title" content="OpenCoven" />
     <meta
       property="og:description"
-      content="Controlled multi-agent orchestration for local harness sessions, shared cockpits, and explicit project boundaries."
+      content="An open ecosystem for persistent AI familiars that remember, coordinate, and belong to you."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://opencoven.ai/" />
@@ -19,7 +19,7 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#050409" />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <link rel="stylesheet" href="./brand.css" />
@@ -50,8 +50,8 @@
               <span class="close-icon">×</span>
             </button>
             <nav class="mobile-nav-links">
-              <a href="#how">How it works</a>
-              <a href="#harnesses">Harnesses</a>
+              <a href="#how">Familiars</a>
+              <a href="#harnesses">Runtime</a>
               <a href="#control">Control</a>
               <a href="#ecosystem">Ecosystem</a>
               <a href="https://discord.gg/opencoven" class="mobile-nav-cta">Join Discord</a>
@@ -59,8 +59,8 @@
           </div>
         </nav>
         <nav class="desktop-nav">
-          <a href="#how">How it works</a>
-          <a href="#harnesses">Harnesses</a>
+          <a href="#how">Familiars</a>
+          <a href="#harnesses">Runtime</a>
           <a href="#control">Control</a>
           <a href="#ecosystem">Ecosystem</a>
           <a href="https://discord.gg/opencoven" class="btn-nav-discord">Join Discord</a>
@@ -70,16 +70,16 @@
 
     <main id="top">
       <section class="hero section-frame">
-        <div class="hero-copy reveal">
-          <p class="kicker">OPENCOVEN · LOCAL AGENT RUNTIME</p>
+        <div class="hero-copy">
+          <p class="kicker">OPENCOVEN · PERSISTENT AI FAMILIARS</p>
           <h1>
-            Controlled multi-agent
-            <span>orchestration.</span>
+            OpenCoven
+            <span>turns AI into a living workspace.</span>
           </h1>
           <p class="lede">
-            Coven gives Codex, Claude Code, and future harnesses a shared local
-            room: explicit project boundaries, attachable sessions, durable
-            history, and one authority layer for execution.
+            Summon named agents with memory, tools, identity, roles, and continuity.
+            OpenCoven gives them a local runtime, shared project context, and a
+            place to coordinate without becoming opaque.
           </p>
           <div class="actions" aria-label="Primary actions">
             <a class="button button-primary button-discord" href="https://discord.gg/opencoven">
@@ -91,69 +91,97 @@
             <a class="button button-secondary" href="https://github.com/OpenCoven/coven">
               View on GitHub
             </a>
-            <a class="button button-secondary" href="./README.md">Read the docs</a>
+            <a class="button button-secondary" href="./README.md">Read the field notes</a>
           </div>
         </div>
 
-        <aside class="console-card" aria-label="Coven session preview">
-          <div class="console-topline">
-            <span class="status-dot"></span>
-            <span>coven daemon · ready</span>
-          </div>
-          <div class="sigil-orbit" aria-hidden="true">
-            <div class="hero-logo-ring">
-              <img class="hero-logo-img" src="./apple-touch-icon.png" alt="" />
+        <aside class="workspace-card" aria-label="OpenCoven familiar workspace preview">
+          <div class="workspace-header">
+            <div class="workspace-title">
+              <span class="status-dot"></span>
+              <span>coven runtime · local</span>
             </div>
+            <span class="workspace-pill">OWNED</span>
           </div>
-          <div class="terminal-lines" aria-hidden="true">
-            <p><span>$</span> coven run codex "stabilize plugin release"</p>
-            <p><span>root</span> /Users/val/OpenClaw</p>
-            <p><span>session</span> project-scoped · attachable · logged</p>
+          <div class="familiar-board" aria-hidden="true">
+            <div class="familiar-rail">
+              <div class="rail-label">Familiars</div>
+              <div class="agent-row active"><span class="agent-sigil">F</span><strong>Forge</strong><small>code steward</small></div>
+              <div class="agent-row"><span class="agent-sigil">C</span><strong>Charm</strong><small>voice + presence</small></div>
+              <div class="agent-row"><span class="agent-sigil">O</span><strong>OpenClaw</strong><small>gateway + tools</small></div>
+            </div>
+            <div class="workspace-main">
+              <div class="mini-window">
+                <div class="mini-topline">
+                  <span></span><span></span><span></span>
+                  <strong>weekly-open-coven</strong>
+                </div>
+                <div class="log-line"><b>memory</b><span>May 17 runbook loaded</span></div>
+                <div class="log-line"><b>tools</b><span>codex, docs, discord, git</span></div>
+                <div class="log-line"><b>role</b><span>make technical work legible</span></div>
+                <div class="command-line"><span>$</span> coven attach charm --project ./opencoven</div>
+              </div>
+              <div class="workspace-chips">
+                <span>memory</span>
+                <span>identity</span>
+                <span>tools</span>
+                <span>roles</span>
+              </div>
+            </div>
           </div>
         </aside>
 
         <div class="hero-footer" aria-label="Status notes">
-          <span>RUST AUTHORITY LAYER</span>
-          <span>LOCAL DAEMON API</span>
-          <span>PTY SESSIONS</span>
+          <span>NAMED AGENTS</span>
+          <span>LOCAL RUNTIME</span>
+          <span>DURABLE MEMORY</span>
+          <span>INSPECTABLE TOOLS</span>
         </div>
+      </section>
+
+      <section class="proof-strip section-frame" aria-label="OpenCoven proof points">
+        <article class="proof-card"><strong>AI that can stay</strong><span>Familiars keep a name, role, memory, and place in the work.</span></article>
+        <article class="proof-card"><strong>Local runtime substrate</strong><span>Coven keeps execution bounded to explicit projects and tools.</span></article>
+        <article class="proof-card"><strong>Shared ecosystem</strong><span>OpenClaw, OpenMeow, CastCodes, dashboards, and docs fit together.</span></article>
+        <article class="proof-card"><strong>Owned by builders</strong><span>Open framework, inspectable architecture, practical extension points.</span></article>
       </section>
 
       <section id="how" class="content-section">
         <div class="section-heading">
-          <p class="kicker">HOW IT WORKS</p>
-          <h2>Three states, one substrate.</h2>
+          <p class="kicker">FAMILIARS</p>
+          <h2>From blank chatbox to agent workspace.</h2>
           <p>
-            OpenCoven keeps agent work visible and bounded. The harness may be
-            powerful; the project boundary remains explicit.
+            A familiar is not a faceless bot. It has a name, purpose, memory,
+            toolset, voice, role, and place in a workflow that can continue
+            after a single chat ends.
           </p>
         </div>
         <div class="card-grid three">
           <article class="glass-card">
-            <p class="card-kicker">01 · BOUNDARY</p>
-            <h3>Start inside a project root.</h3>
+            <p class="card-kicker">01 · IDENTITY</p>
+            <h3>Name the agent and define the work.</h3>
             <p>
-              Every launch is tied to a real repository path. Cwd, input,
-              process control, and file-sensitive operations stay inside the
-              local boundary Coven validates.
+              Give each familiar a clear purpose, tone, tools, and operating
+              rules so it can show up as the right collaborator instead of a
+              blank assistant every time.
             </p>
           </article>
           <article class="glass-card">
-            <p class="card-kicker">02 · SESSION</p>
-            <h3>Run a harness, not a mystery.</h3>
+            <p class="card-kicker">02 · MEMORY</p>
+            <h3>Keep the context that matters.</h3>
             <p>
-              Codex, Claude Code, and future adapters run through a neutral PTY
-              contract with session records, titles, events, input, attach, and
-              kill semantics.
+              Project history, decisions, preferences, and working notes can
+              persist across sessions, making continuity explicit instead of
+              trapped in a temporary chat transcript.
             </p>
           </article>
           <article class="glass-card">
-            <p class="card-kicker">03 · COCKPIT</p>
-            <h3>Expose one local API.</h3>
+            <p class="card-kicker">03 · TOOLS</p>
+            <h3>Let agents act through known surfaces.</h3>
             <p>
-              comux, OpenMeow, OpenClaw, and purpose-built clients can all read
-              the same session state instead of inventing separate orchestration
-              loops.
+              Familiars connect to terminals, code workspaces, docs, messaging,
+              dashboards, and local runtimes through inspectable tool contracts
+              you can review and replace.
             </p>
           </article>
         </div>
@@ -161,29 +189,34 @@
 
       <section id="harnesses" class="content-section split-section">
         <div class="section-heading compact">
-          <p class="kicker">HARNESSES</p>
-          <h2>Bring your agents. Keep the room.</h2>
+          <p class="kicker">RUNTIME</p>
+          <h2>The local substrate underneath the Coven.</h2>
           <p>
-            Coven does not replace the agent. It gives each agent a controlled
-            execution chamber that the rest of the OpenCoven ecosystem can
-            observe, attach to, and coordinate around.
+            OpenCoven is not one app. It is the shared architecture for agents
+            that remember, coordinate, use tools, and run inside boundaries
+            builders can inspect.
           </p>
         </div>
         <div class="harness-stack">
           <article class="harness-card">
-            <span>/CODEX</span>
-            <strong>Repository workhorse</strong>
-            <p>Launch coding tasks in a project-scoped PTY with visible output and durable session history.</p>
+            <span>/COVEN</span>
+            <strong>Project-scoped runtime</strong>
+            <p>Launch and attach to agent work inside local repositories with visible output, history, and lifecycle control.</p>
           </article>
           <article class="harness-card">
-            <span>/CLAUDE</span>
-            <strong>Deep reasoning lane</strong>
-            <p>Run Claude Code where it belongs: inside the chosen repo, under Coven-managed lifecycle control.</p>
+            <span>/OPENCLAW</span>
+            <strong>Tool gateway for familiars</strong>
+            <p>Give agents controlled access to messages, sessions, memory, cron, media, web search, and local execution.</p>
+          </article>
+          <article class="harness-card">
+            <span>/CASTCODES</span>
+            <strong>Terminal and code workspace</strong>
+            <p>Keep the command surface local-first, open, and aligned with the agents working beside you.</p>
           </article>
           <article class="harness-card muted-card">
             <span>/NEXT</span>
             <strong>Adapter-ready future</strong>
-            <p>The runtime shape stays harness-neutral so new agent CLIs can join without rewriting clients.</p>
+            <p>The system stays harness-neutral so new agent CLIs and client surfaces can join without rewriting the whole room.</p>
           </article>
         </div>
       </section>
@@ -191,31 +224,31 @@
       <section id="control" class="content-section">
         <div class="section-heading">
           <p class="kicker">WHY LOCAL CONTROL</p>
-          <h2>Powerful, not loose.</h2>
+          <h2>Powerful without becoming opaque.</h2>
         </div>
         <div class="card-grid three">
           <article class="glass-card icon-card">
-            <div class="icon-node">⌁</div>
-            <h3>Rust authority boundary.</h3>
+            <div class="icon-node">01</div>
+            <h3>Boundaries stay explicit.</h3>
             <p>
-              The daemon is the final validator for launch, cwd, input, kill,
-              and path-sensitive requests. Clients can suggest; Coven decides.
+              Agents can be useful without getting loose. Projects, commands,
+              files, and tool access pass through visible local contracts.
             </p>
           </article>
           <article class="glass-card icon-card">
-            <div class="icon-node">◌</div>
-            <h3>Attachable by design.</h3>
+            <div class="icon-node">02</div>
+            <h3>Coordination is shared.</h3>
             <p>
-              Sessions are not disposable logs. They can be listed, replayed,
-              followed, and reattached from the CLI or a first-party cockpit.
+              Dashboards, terminals, desktop surfaces, and familiars can look
+              at the same session state instead of inventing separate loops.
             </p>
           </article>
           <article class="glass-card icon-card">
-            <div class="icon-node">▣</div>
-            <h3>History that survives.</h3>
+            <div class="icon-node">03</div>
+            <h3>History can survive.</h3>
             <p>
-              SQLite-backed metadata and event logs preserve context across
-              daemon restarts without handing your project loop to a cloud queue.
+              Memory and logs turn useful work into continuity, while still
+              keeping the system inspectable, local, and yours to change.
             </p>
           </article>
         </div>
@@ -224,12 +257,12 @@
       <section id="ecosystem" class="content-section ecosystem">
         <div class="ecosystem-panel">
           <p class="kicker">ECOSYSTEM</p>
-          <h2>The shared room for OpenCoven.</h2>
+          <h2>A living workspace of agents that belong to you.</h2>
           <p>
-            comux becomes the visual cockpit. OpenMeow can surface session
-            status and intake from the desktop. OpenClaw integrates through an
-            external plugin, while the Discord gives builders a shared place to
-            compare harnesses, coordinate releases, and grow the community.
+            OpenCoven turns AI from a blank chatbox into a durable workspace:
+            familiars with memory and tools, local runtime control, open
+            dashboards, desktop surfaces, and an ecosystem builders can inspect,
+            customize, and own.
           </p>
           <div class="ecosystem-links">
             <a class="community-link" href="https://discord.gg/opencoven">
@@ -238,9 +271,9 @@
               </svg>
               Join Discord
             </a>
-            <a href="https://github.com/OpenCoven/coven">Coven CLI</a>
+            <a href="https://github.com/OpenCoven/coven">Coven runtime</a>
             <a href="https://github.com/OpenCoven/open-meow">OpenMeow</a>
-            <a href="https://github.com/BunsDev/comux">comux</a>
+            <a href="https://github.com/OpenCoven/cast-codes">CastCodes</a>
           </div>
         </div>
       </section>

@@ -52,15 +52,17 @@ if (broken.length > 0) {
 }
 
 const requiredCopy = [
-  'Controlled multi-agent',
-  'Rust authority boundary',
-  'attachable',
-  'SQLite-backed',
-  'Codex',
-  'Claude Code',
-  'comux',
-  'OpenMeow',
+  'Persistent AI Familiars',
+  'turns AI into a living workspace',
+  'AI that can stay',
+  'local runtime',
+  'memory',
+  'identity',
+  'tools',
+  'familiars',
   'OpenClaw',
+  'OpenMeow',
+  'CastCodes',
   'https://discord.gg/opencoven',
   'Join the Discord',
 ];
@@ -85,8 +87,8 @@ if (!favicon.includes('viewBox="0 0 2272 2272"')) {
 assertCanonicalLogoSvg(favicon, 'favicon.svg');
 
 const og = await readFile(path.join(root, 'og.svg'), 'utf8');
-if (!og.includes('Canonical OpenCoven logo from brand/logo/opencoven-logo.svg')) {
-  throw new Error('og.svg does not document the canonical OpenCoven logo source');
+if (!og.includes('Approved OpenCoven logo treatment: white icon on black')) {
+  throw new Error('og.svg does not document the approved OpenCoven logo treatment');
 }
 assertCanonicalLogoSvg(og, 'og.svg');
 
