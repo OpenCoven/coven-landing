@@ -305,7 +305,13 @@
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .card-familiar:last-child { border-bottom: none; }
-    .card-familiar.active { background: transparent; }
+    .card-familiar.active .familiar-sigil {
+      border-color: rgba(142,61,255,0.55);
+      background: rgba(142,61,255,0.22);
+      color: #E8DBFF;
+      box-shadow: 0 0 0 1px rgba(142,61,255,0.15), 0 0 14px rgba(142,61,255,0.18);
+    }
+    .card-familiar.active .familiar-name { color: #fff; }
     .familiar-sigil {
       width: 32px; height: 32px;
       border-radius: 6px;
@@ -314,6 +320,7 @@
       display: grid; place-items: center;
       font-size: 11px; font-weight: 800;
       color: rgba(201,167,255,0.9);
+      transition: background 0.2s, border-color 0.2s;
     }
     .familiar-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
     .familiar-name { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.9); letter-spacing: 0.02em; }
@@ -325,6 +332,52 @@
     }
     .badge-active { background: rgba(74,222,128,0.1); color: rgba(74,222,128,0.8); border: 1px solid rgba(74,222,128,0.2); }
     .badge-idle   { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.08); }
+    .hero-card-memory {
+      padding: 14px 20px 16px;
+      border-top: 1px solid rgba(142,61,255,0.12);
+      background: linear-gradient(180deg, rgba(142,61,255,0.04) 0%, rgba(142,61,255,0.015) 100%);
+      display: flex; flex-direction: column; gap: 7px;
+    }
+    .memory-header {
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(201,167,255,0.55);
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 4px;
+    }
+    .memory-header::before {
+      content: ''; display: inline-block;
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(201,167,255,0.55);
+      box-shadow: 0 0 6px rgba(201,167,255,0.4);
+    }
+    .memory-header .memory-count {
+      margin-left: auto;
+      color: rgba(255,255,255,0.25);
+      font-weight: 500;
+      letter-spacing: 0.1em;
+    }
+    .memory-note {
+      display: flex; align-items: baseline; gap: 8px;
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.005em;
+      line-height: 1.4;
+    }
+    .memory-note::before {
+      content: '◇';
+      color: rgba(201,167,255,0.55);
+      font-size: 8.5px;
+      flex-shrink: 0;
+      transform: translateY(-1px);
+    }
+    .memory-note .memory-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .memory-note .memory-meta {
+      color: rgba(255,255,255,0.28);
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      flex-shrink: 0;
+    }
     .hero-card-footer {
       padding: 12px 20px;
       border-top: 1px solid rgba(142,61,255,0.1);
@@ -577,6 +630,11 @@
       .mobile-toggle { display: flex; }
       .btn-join { display: none; }
 
+      /* Consistent 20px gutter across header, sections, footer */
+      .header-inner { padding: 0 20px; }
+      .testimonial-strip { padding: 32px 20px; }
+      footer { padding: 32px 20px; }
+
       /* Hero: stack vertically, image fills nicely */
       .hero {
         grid-template-columns: 1fr;
@@ -595,10 +653,16 @@
       .proof-grid { grid-template-columns: repeat(2, 1fr); }
       .card-grid.three, .card-grid.four { grid-template-columns: repeat(2, 1fr); }
 
-      /* Sections */
+      /* Sections — uniform 20px gutter (matches hero) */
       .content-section, .proof-section { padding: 48px 20px; }
-      .ecosystem-section { padding: 48px 20px; }
-      .ecosystem-inner { padding: 32px 24px; gap: 24px; }
+      /* Ecosystem card spans edge-to-edge so its inner 20px gutter aligns
+         with other sections instead of double-indenting */
+      .ecosystem-section { padding: 48px 0; }
+      .ecosystem-inner {
+        padding: 32px 20px; gap: 24px;
+        border-radius: 0;
+        border-left: none; border-right: none;
+      }
 
       /* Footer */
       .footer-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
@@ -623,10 +687,14 @@
     @media (max-width: 400px) {
       h1 { font-size: 34px; }
       .kicker { font-size: 9px; }
+      /* Uniform 16px gutter at smallest viewports */
       .header-inner { padding: 0 16px; }
+      .testimonial-strip { padding: 28px 16px; }
+      footer { padding: 28px 16px; }
       .hero { padding: 0 16px; }
       .content-section, .proof-section { padding: 40px 16px; }
-      .ecosystem-section { padding: 40px 16px; }
+      .ecosystem-section { padding: 40px 0; }
+      .ecosystem-inner { padding: 24px 16px; }
     }
   </style>
 </head>
@@ -678,7 +746,7 @@
 <section class="hero" id="top" aria-label="Hero">
   <div class="hero-copy">
     <p class="kicker">OPENCOVEN · PERSISTENT AI FAMILIARS</p>
-    <h1>Where <em>AI</em><br>Meets<br>Continuity.</h1>
+    <h1>Where <em>AI</em> Meets<br>Continuity.</h1>
     <p class="hero-lede">
       Named familiars with memory, tools, identity, and continuity —
       running locally, inside your projects, on your terms.
@@ -751,6 +819,20 @@
             <span class="familiar-role">gateway · orchestration</span>
           </div>
           <span class="familiar-badge badge-idle">idle</span>
+        </div>
+      </div>
+      <div class="hero-card-memory">
+        <div class="memory-header">
+          <span>memory · forge</span>
+          <span class="memory-count">3 notes</span>
+        </div>
+        <div class="memory-note">
+          <span class="memory-text">resumed feat/runtime-attach · 4 files staged</span>
+          <span class="memory-meta">2h ago</span>
+        </div>
+        <div class="memory-note">
+          <span class="memory-text">prefers terse PR summaries, no trailing recap</span>
+          <span class="memory-meta">persisted</span>
         </div>
       </div>
       <div class="hero-card-footer">
