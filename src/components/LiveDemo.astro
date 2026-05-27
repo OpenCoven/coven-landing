@@ -55,7 +55,7 @@ const script = [
   <div class="section-header" data-reveal>
     <p class="section-kicker">Live Demo</p>
     <h2 id="livedemo-heading">A real Coven session, end to end.</h2>
-    <p>Watch the runtime check harnesses, launch a familiar, detach, list sessions, and resume. Hover the terminal to pause.</p>
+    <p>Watch the runtime check harnesses, launch a familiar, detach, list sessions, and resume. Use the pause control to stop at any step.</p>
   </div>
 
   <div class="livedemo-frame" data-reveal>
@@ -238,7 +238,8 @@ const script = [
       nextStep();
     });
 
-    // Hover pause
+    // Hover / focus pause — keyboard users tabbing into the controls deserve
+    // the same pause behavior mouse users get on hover.
     if (card) {
       card.addEventListener('mouseenter', () => {
         hoverPaused = true;
@@ -246,6 +247,19 @@ const script = [
         setStatus('paused');
       });
       card.addEventListener('mouseleave', () => {
+        if (card.contains(document.activeElement)) return; // still focused
+        hoverPaused = false;
+        if (!userPaused) { setStatus('running'); nextStep(); }
+      });
+      card.addEventListener('focusin', () => {
+        hoverPaused = true;
+        pauseAll();
+        setStatus('paused');
+      });
+      card.addEventListener('focusout', (e) => {
+        // Only resume when focus actually leaves the card subtree.
+        if (e.relatedTarget && card.contains(e.relatedTarget)) return;
+        if (card.matches(':hover')) return;
         hoverPaused = false;
         if (!userPaused) { setStatus('running'); nextStep(); }
       });
@@ -372,7 +386,7 @@ const script = [
     color: #fff;
     border-color: rgba(142, 61, 255, 0.4);
   }
-  .ld-control:focus-visible { border-color: rgba(201, 167, 255, 0.6); }
+  .ld-control:focus-visible { outline: 2px solid #E8DBFF; outline-offset: 2px; }
 
   .ld-body {
     min-height: 320px;

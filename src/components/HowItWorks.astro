@@ -96,7 +96,7 @@ const toolGates = [
       <div class="howit-copy">
         <p class="card-kicker">Memory</p>
         <h3>Continuity that survives the chat window.</h3>
-        <p>Project context, decisions, and preferences accumulate per familiar across sessions. Scrub through the timeline on the right to see how a familiar's working memory grows from one session to the next.</p>
+        <p>Project context, decisions, and preferences accumulate per familiar across sessions. Step through the timeline on the right to see how a familiar's working memory grows from one session to the next.</p>
       </div>
       <div class="howit-widget memory-widget">
         <div class="memory-scrubber" role="radiogroup" aria-label="Session in the timeline">
@@ -140,11 +140,11 @@ const toolGates = [
         <p>Each harness run is a session record bound to a directory and a familiar. Filter the list on the right to see how Coven tracks running, idle, and archived work — all visible, never abandoned.</p>
       </div>
       <div class="howit-widget sessions-widget">
-        <div class="sessions-filters" role="radiogroup" aria-label="Filter sessions by status">
-          <button class="sessions-filter is-active" type="button" role="radio" data-filter="all"      aria-checked="true">All</button>
-          <button class="sessions-filter"           type="button" role="radio" data-filter="running"  aria-checked="false">Running</button>
-          <button class="sessions-filter"           type="button" role="radio" data-filter="idle"     aria-checked="false">Idle</button>
-          <button class="sessions-filter"           type="button" role="radio" data-filter="archived" aria-checked="false">Archived</button>
+        <div class="sessions-filters" role="group" aria-label="Filter sessions by status">
+          <button class="sessions-filter is-active" type="button" data-filter="all"      aria-pressed="true">All</button>
+          <button class="sessions-filter"           type="button" data-filter="running"  aria-pressed="false">Running</button>
+          <button class="sessions-filter"           type="button" data-filter="idle"     aria-pressed="false">Idle</button>
+          <button class="sessions-filter"           type="button" data-filter="archived" aria-pressed="false">Archived</button>
         </div>
         <ul class="sessions-list">
           {sessionsData.map((s) => (
@@ -196,7 +196,7 @@ const toolGates = [
                   {h.name}
                   {h.vendor && <span class="harness-vendor">{h.vendor}</span>}
                 </span>
-                <span class={`harness-status status-${h.status}`}>{h.status === 'adapter' ? 'adapter' : h.status}</span>
+                <span class={`harness-status status-${h.status}`}>{h.status}</span>
                 <span class="harness-meta">{h.meta}</span>
               </button>
             </li>
@@ -299,6 +299,34 @@ const toolGates = [
       });
     });
 
+    // Arrow-key navigation helper for radio-style groups.
+    // `attr` is the aria attribute that tracks selection ('aria-checked' for
+    // role=radio, 'aria-pressed' for toggle buttons).
+    function wireRadioGroup(buttons, attr, onSelect) {
+      const order = Array.from(buttons);
+      buttons.forEach((btn) => {
+        btn.addEventListener('click', () => onSelect(btn));
+        btn.addEventListener('keydown', (e) => {
+          const i = order.indexOf(btn);
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            const next = order[(i + 1) % order.length];
+            next.focus(); onSelect(next);
+          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prev = order[(i - 1 + order.length) % order.length];
+            prev.focus(); onSelect(prev);
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            order[0].focus(); onSelect(order[0]);
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            order[order.length - 1].focus(); onSelect(order[order.length - 1]);
+          }
+        });
+      });
+    }
+
     // ── Memory scrubber ──────────────────────────────────────
     const memoryTimeline = window.__HOWIT__?.memoryTimeline || [];
     const memoryButtons = root.querySelectorAll('[data-memory-step]');
@@ -306,25 +334,31 @@ const toolGates = [
     function paintMemory(stepIdx) {
       const data = memoryTimeline[stepIdx];
       if (!data || !memoryBoard) return;
-      memoryBoard.innerHTML = data.notes
-        .map(
-          (n) =>
-            `<div class="memory-note-row"><span class="memory-note-tag">${n.meta}</span><span class="memory-note-text">${n.text}</span></div>`,
-        )
-        .join('');
+      // Build rows via DOM construction (safe vs. arbitrary text in notes).
+      memoryBoard.replaceChildren();
+      data.notes.forEach((n) => {
+        const row = document.createElement('div');
+        row.className = 'memory-note-row';
+        const tag = document.createElement('span');
+        tag.className = 'memory-note-tag';
+        tag.textContent = n.meta;
+        const text = document.createElement('span');
+        text.className = 'memory-note-text';
+        text.textContent = n.text;
+        row.append(tag, text);
+        memoryBoard.appendChild(row);
+      });
       memoryButtons.forEach((b) => {
         const match = Number(b.getAttribute('data-memory-step')) === stepIdx;
         b.classList.toggle('is-active', match);
         b.setAttribute('aria-checked', match ? 'true' : 'false');
       });
     }
-    memoryButtons.forEach((b) => {
-      b.addEventListener('click', () =>
-        paintMemory(Number(b.getAttribute('data-memory-step'))),
-      );
+    wireRadioGroup(memoryButtons, 'aria-checked', (b) => {
+      paintMemory(Number(b.getAttribute('data-memory-step')));
     });
 
-    // ── Sessions filter ──────────────────────────────────────
+    // ── Sessions filter (toggle buttons, not radios) ─────────
     const filters = root.querySelectorAll('.sessions-filter');
     const rows = root.querySelectorAll('.sessions-row');
     filters.forEach((f) => {
@@ -333,7 +367,7 @@ const toolGates = [
         filters.forEach((other) => {
           const match = other === f;
           other.classList.toggle('is-active', match);
-          other.setAttribute('aria-checked', match ? 'true' : 'false');
+          other.setAttribute('aria-pressed', match ? 'true' : 'false');
         });
         rows.forEach((r) => {
           const match = filter === 'all' || r.getAttribute('data-status') === filter;
@@ -346,39 +380,37 @@ const toolGates = [
     const harnessRows = window.__HOWIT__?.harnessRows || [];
     const harnessButtons = root.querySelectorAll('[data-harness]');
     const harnessDetail = root.querySelector('.harness-detail-text');
-    harnessButtons.forEach((b) => {
-      b.addEventListener('click', () => {
-        const id = b.getAttribute('data-harness');
-        const data = harnessRows.find((h) => h.id === id);
-        if (!data) return;
-        if (harnessDetail) harnessDetail.textContent = data.detail;
-        harnessButtons.forEach((other) => {
-          const match = other === b;
-          other.classList.toggle('is-active', match);
-          other.setAttribute('aria-checked', match ? 'true' : 'false');
-        });
+    function selectHarness(b) {
+      const id = b.getAttribute('data-harness');
+      const data = harnessRows.find((h) => h.id === id);
+      if (!data) return;
+      if (harnessDetail) harnessDetail.textContent = data.detail;
+      harnessButtons.forEach((other) => {
+        const match = other === b;
+        other.classList.toggle('is-active', match);
+        other.setAttribute('aria-checked', match ? 'true' : 'false');
       });
-    });
+    }
+    wireRadioGroup(harnessButtons, 'aria-checked', selectHarness);
 
     // ── Tools picker ────────────────────────────────────────
     const toolGates = window.__HOWIT__?.toolGates || [];
     const toolButtons = root.querySelectorAll('[data-tool]');
     const toolTitle = root.querySelector('.tool-rule-title');
     const toolText = root.querySelector('.tool-rule-text');
-    toolButtons.forEach((b) => {
-      b.addEventListener('click', () => {
-        const id = b.getAttribute('data-tool');
-        const data = toolGates.find((t) => t.id === id);
-        if (!data) return;
-        if (toolTitle) toolTitle.textContent = data.title;
-        if (toolText)  toolText.textContent  = data.rule;
-        toolButtons.forEach((other) => {
-          const match = other === b;
-          other.classList.toggle('is-active', match);
-          other.setAttribute('aria-checked', match ? 'true' : 'false');
-        });
+    function selectTool(b) {
+      const id = b.getAttribute('data-tool');
+      const data = toolGates.find((t) => t.id === id);
+      if (!data) return;
+      if (toolTitle) toolTitle.textContent = data.title;
+      if (toolText)  toolText.textContent  = data.rule;
+      toolButtons.forEach((other) => {
+        const match = other === b;
+        other.classList.toggle('is-active', match);
+        other.setAttribute('aria-checked', match ? 'true' : 'false');
       });
-    });
+    }
+    wireRadioGroup(toolButtons, 'aria-checked', selectTool);
   })();
 </script>
 
@@ -414,7 +446,9 @@ const toolGates = [
   }
   .howit-tab:hover { color: var(--white); }
   .howit-tab:focus-visible {
-    border-color: rgba(201,167,255,0.5);
+    outline: 2px solid #E8DBFF;
+    outline-offset: 2px;
+    border-color: rgba(201,167,255,0.6);
   }
   .howit-tab.is-active {
     background: rgba(142,61,255,0.16);
@@ -476,7 +510,7 @@ const toolGates = [
     outline: none;
   }
   .memory-step:hover { background: rgba(142,61,255,0.06); color: var(--white); }
-  .memory-step:focus-visible { border-color: rgba(201,167,255,0.6); }
+  .memory-step:focus-visible { outline: 2px solid #E8DBFF; outline-offset: 2px; }
   .memory-step.is-active {
     background: rgba(142,61,255,0.18);
     border-color: rgba(201,167,255,0.5);
@@ -548,7 +582,7 @@ const toolGates = [
     transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
   }
   .sessions-filter:hover { color: var(--white); }
-  .sessions-filter:focus-visible { border-color: rgba(201,167,255,0.6); }
+  .sessions-filter:focus-visible { outline: 2px solid #E8DBFF; outline-offset: 2px; }
   .sessions-filter.is-active {
     background: rgba(142,61,255,0.18);
     border-color: rgba(201,167,255,0.5);
@@ -630,7 +664,7 @@ const toolGates = [
     transition: background 0.18s ease, border-color 0.18s ease;
   }
   .harness-row:hover { background: rgba(20,16,32,0.7); }
-  .harness-row:focus-visible { border-color: rgba(201,167,255,0.6); }
+  .harness-row:focus-visible { outline: 2px solid #E8DBFF; outline-offset: 2px; }
   .harness-row.is-active {
     background: rgba(142,61,255,0.14);
     border-color: rgba(201,167,255,0.45);
@@ -747,7 +781,7 @@ const toolGates = [
     transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
   }
   .tool-pill:hover { color: var(--white); }
-  .tool-pill:focus-visible { border-color: rgba(201,167,255,0.6); }
+  .tool-pill:focus-visible { outline: 2px solid #E8DBFF; outline-offset: 2px; }
   .tool-pill.is-active {
     background: rgba(142,61,255,0.18);
     border-color: rgba(201,167,255,0.5);
