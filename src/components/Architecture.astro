@@ -5,34 +5,105 @@
 const nodes = [
   // Harness layer
   { id: 'codex',      label: 'Codex',        layer: 'harness', x: 80,  y: 30,  w: 160, h: 70,
-    title: 'Codex',           detail: 'OpenAI’s coding agent, driven through Coven instead of run loose against your filesystem. Every command it issues is bounded to the project you launched in and captured as a session record, so you can see exactly what it did, replay it later, or hand the session off to another familiar without losing context.' },
+    title: 'Codex',
+    intro: 'OpenAI’s coding agent, driven through Coven instead of run loose against your filesystem.',
+    bullets: [
+      'Every command bounded to the project you launched in',
+      'Captured as an inspectable, replayable session record',
+      'Hand sessions off to another familiar without losing context',
+    ] },
   { id: 'claude',     label: 'Claude Code',  layer: 'harness', x: 320, y: 30,  w: 160, h: 70,
-    title: 'Claude Code',     detail: 'Anthropic’s official CLI, wired into the same neutral adapter interface as every other supported harness. Coven doesn’t care which agent drives the work — Claude Code gets the same session lifecycle, the same scoped tool access, and the same persistent memory as anything else you plug in. Swap harnesses mid-project; the runtime stays the same.' },
+    title: 'Claude Code',
+    intro: 'Anthropic’s official CLI, wired into the same neutral adapter as every other supported harness.',
+    bullets: [
+      'Identical session lifecycle and scoped tool access',
+      'Shares the same persistent memory layer',
+      'Swap harnesses mid-project — runtime stays the same',
+    ] },
   { id: 'future',     label: '+ Future',     layer: 'harness', x: 560, y: 30,  w: 160, h: 70,
-    title: 'Future harnesses', detail: 'Adapter-ready by design. New agent CLIs join the runtime by implementing one neutral interface — not by forcing Coven to be rewritten or by leaking harness-specific quirks into the rest of the system. The harness layer is intentionally pluggable so the ecosystem can evolve without breaking the projects already running on top of it.' },
+    title: 'Future harnesses',
+    intro: 'Adapter-ready by design. New agent CLIs plug in without rewriting Coven.',
+    bullets: [
+      'One neutral interface, not bespoke integrations',
+      'Harness quirks stay contained at the boundary',
+      'Existing projects keep running as the ecosystem grows',
+    ] },
 
   // Coven runtime sub-nodes (inside the boundary box)
   { id: 'sessions',   label: 'Sessions',     layer: 'coven',   x: 60,  y: 220, w: 150, h: 110,
-    title: 'Sessions',        detail: 'Every harness run is captured as a first-class, project-scoped session record. Each session is inspectable while it runs, replayable after it ends, and addressable from the CLI or the session browser — with full output history, lifecycle controls (start, pause, detach, resume, terminate), and visible state instead of an opaque background process.' },
+    title: 'Sessions',
+    intro: 'Every harness run is a first-class, project-scoped session record.',
+    bullets: [
+      'Inspectable live; replayable after it ends',
+      'Lifecycle controls: start, pause, detach, resume, terminate',
+      'Full output history — no opaque background processes',
+    ] },
   { id: 'memory',     label: 'Memory',       layer: 'coven',   x: 230, y: 220, w: 150, h: 110,
-    title: 'Memory',          detail: 'Notes, decisions, preferences, and project-specific context persist per familiar across sessions. Continuity is explicit and inspectable — not trapped inside a single chat window or scattered across throwaway temp files. Familiars carry forward what they’ve learned about your codebase, your conventions, and the work in flight, instead of starting cold every time.' },
+    title: 'Memory',
+    intro: 'Notes, decisions, and preferences persist per familiar across sessions.',
+    bullets: [
+      'Continuity is explicit and inspectable, not buried in chat',
+      'Familiars carry forward conventions and in-flight context',
+      'No more starting cold every conversation',
+    ] },
   { id: 'adapter',    label: 'Adapter',      layer: 'coven',   x: 400, y: 220, w: 150, h: 110,
-    title: 'Harness adapter', detail: 'Translates each harness’s native protocol — Codex’s streaming format, Claude Code’s tool calls, whatever comes next — into one neutral runtime interface. The rest of the system stays harness-agnostic, which means sessions, memory, and the tool gateway never need to know which CLI is driving them. New harnesses slot in here without ripple effects elsewhere.' },
+    title: 'Harness adapter',
+    intro: 'Translates each harness’s native protocol into one neutral runtime interface.',
+    bullets: [
+      'Codex streams, Claude Code tool calls, whatever comes next',
+      'Sessions, memory, and tools stay harness-agnostic',
+      'New harnesses slot in without ripple effects elsewhere',
+    ] },
   { id: 'tools',      label: 'Tool gateway', layer: 'coven',   x: 570, y: 220, w: 150, h: 110,
-    title: 'Tool gateway',    detail: 'Mediates every tool call a familiar makes — filesystem reads and writes, git operations, terminal commands, web fetches — through inspectable contracts with explicit boundaries. No silent privilege escalation, no surprise out-of-tree access, no hidden network calls. You can audit what was attempted, what was allowed, and what was actually executed for any session, after the fact.' },
+    title: 'Tool gateway',
+    intro: 'Mediates every tool call through inspectable contracts with explicit boundaries.',
+    bullets: [
+      'Filesystem, git, terminal, and web access in one place',
+      'No silent privilege escalation or out-of-tree surprises',
+      'Audit what was attempted, allowed, and executed',
+    ] },
 
   // Project layer
   { id: 'filesystem', label: 'Filesystem',   layer: 'project', x: 60,  y: 430, w: 150, h: 60,
-    title: 'Filesystem',      detail: 'Reads and writes are scoped to the project directory you launched the session in — not your whole machine. Out-of-tree access requires an explicit grant, surfaced at the moment it’s requested rather than buried in a config file, so a familiar can’t quietly wander into your home directory or a sibling repo while you’re looking elsewhere.' },
+    title: 'Filesystem',
+    intro: 'Reads and writes scoped to the project directory you launched in — not your whole machine.',
+    bullets: [
+      'Out-of-tree access requires an explicit, in-moment grant',
+      'No quiet wandering into your home or sibling repos',
+      'Permission prompts are surfaced, not buried in config',
+    ] },
   { id: 'git',        label: 'Git',          layer: 'project', x: 230, y: 430, w: 150, h: 60,
-    title: 'Git',             detail: 'Branches, commits, diffs, and history are visible to the session as ordinary project state. Coven never force-pushes, never rewrites history, and never bypasses signing or hooks on your behalf — every git-touching action shows up in the session record where you can review it, so you keep the final say on what actually lands on a branch.' },
+    title: 'Git',
+    intro: 'Branches, commits, diffs, and history visible to the session as ordinary project state.',
+    bullets: [
+      'No force-pushes or history rewrites on your behalf',
+      'Signing and hooks are never bypassed',
+      'Every git-touching action shows up in the session record',
+    ] },
   { id: 'terminals',  label: 'Terminals',    layer: 'project', x: 400, y: 430, w: 150, h: 60,
-    title: 'Terminals',       detail: 'Managed PTY surfaces with full scrollback and output history attached to the session. Detach from a long-running command, walk away, and rejoin it later from any session browser — the terminal keeps running, the output keeps streaming, and you don’t lose state because you closed the window or your laptop went to sleep.' },
+    title: 'Terminals',
+    intro: 'Managed PTY surfaces with full scrollback attached to the session.',
+    bullets: [
+      'Detach from a long-running command and walk away',
+      'Rejoin from any session browser — output keeps streaming',
+      'Survives window close, sleep, and disconnects',
+    ] },
   { id: 'docs',       label: 'Docs',         layer: 'project', x: 570, y: 430, w: 150, h: 60,
-    title: 'Docs',            detail: 'Markdown, source code, and structured project documentation are exposed as first-class session context — readable by familiars during a run without separate ingestion steps. By default they’re read-only: a familiar can cite, summarize, or reason over your docs, but it can’t silently mutate them unless you explicitly grant write access.' },
+    title: 'Docs',
+    intro: 'Markdown, source, and structured docs exposed as first-class session context.',
+    bullets: [
+      'Readable by familiars during a run, no extra ingestion',
+      'Read-only by default — cite, summarize, reason without mutating',
+      'Write access requires an explicit grant',
+    ] },
 ];
 
-const DEFAULT_DETAIL = 'Pick any node to inspect it. Commands flow down from the harness layer at the top, through Coven’s runtime in the middle, and into your project at the bottom — while output, state, and memory flow back up the right-hand return path. Every boundary in the diagram is enforced at runtime, not just drawn here for explanation.';
+const DEFAULT_INTRO = 'Pick any node to inspect how it fits into the runtime.';
+const DEFAULT_BULLETS = [
+  'Commands flow down: harness → runtime → your project',
+  'Output, state, and memory flow back up the return path',
+  'Every boundary is enforced at runtime, not just drawn here',
+];
 ---
 
 <section class="architecture-section content-section" id="architecture" aria-labelledby="architecture-heading">
@@ -104,7 +175,10 @@ const DEFAULT_DETAIL = 'Pick any node to inspect it. Commands flow down from the
       <div class="arch-detail-inner">
         <p class="arch-detail-kicker"><span class="arch-detail-dot"></span><span class="arch-detail-tag">pick a node</span></p>
         <h3 class="arch-detail-title">How Coven fits into your stack</h3>
-        <p class="arch-detail-body">{DEFAULT_DETAIL}</p>
+        <p class="arch-detail-body">{DEFAULT_INTRO}</p>
+        <ul class="arch-detail-bullets">
+          {DEFAULT_BULLETS.map((b) => <li>{b}</li>)}
+        </ul>
       </div>
     </div>
   </div>
@@ -114,31 +188,29 @@ const DEFAULT_DETAIL = 'Pick any node to inspect it. Commands flow down from the
   (function () {
     const nodes = document.querySelectorAll('.arch-node[data-node]');
     if (!nodes.length) return;
-    const titleEl = document.querySelector('.arch-detail-title');
-    const bodyEl  = document.querySelector('.arch-detail-body');
-    const tagEl   = document.querySelector('.arch-detail-tag');
-    const kickerEl = document.querySelector('.arch-detail-kicker');
-
-    // Pull copy out of the markup so the data lives in one place (the SVG nodes)
-    // and the detail panel reflects whatever the component renders.
-    const details = {};
-    nodes.forEach((node) => {
-      const id = node.getAttribute('data-node');
-      const titleAttr = node.getAttribute('aria-label') || id;
-      details[id] = {
-        title: titleAttr,
-        body: node.getAttribute('data-body') || node.querySelector('title')?.textContent || '',
-      };
-    });
+    const titleEl   = document.querySelector('.arch-detail-title');
+    const bodyEl    = document.querySelector('.arch-detail-body');
+    const bulletsEl = document.querySelector('.arch-detail-bullets');
+    const tagEl     = document.querySelector('.arch-detail-tag');
+    const kickerEl  = document.querySelector('.arch-detail-kicker');
 
     function select(node) {
       nodes.forEach((n) => n.classList.toggle('is-selected', n === node));
       const id = node.getAttribute('data-node');
       const layer = Array.from(node.classList).find((c) => c.startsWith('arch-node--'))?.replace('arch-node--', '');
       const data = window.__ARCH_NODES__?.[id];
-      if (titleEl && data) titleEl.textContent = data.title;
-      if (bodyEl  && data) bodyEl.textContent  = data.detail;
-      if (tagEl)  tagEl.textContent  = layer || 'node';
+      if (!data) return;
+      if (titleEl) titleEl.textContent = data.title;
+      if (bodyEl)  bodyEl.textContent  = data.intro;
+      if (bulletsEl) {
+        bulletsEl.innerHTML = '';
+        (data.bullets || []).forEach((b) => {
+          const li = document.createElement('li');
+          li.textContent = b;
+          bulletsEl.appendChild(li);
+        });
+      }
+      if (tagEl)    tagEl.textContent = layer || 'node';
       if (kickerEl) kickerEl.classList.add('is-active');
     }
 
@@ -231,7 +303,7 @@ const DEFAULT_DETAIL = 'Pick any node to inspect it. Commands flow down from the
   }
   .arch-node text {
     fill: rgba(232, 224, 240, 0.92);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
     font-size: 13px;
     font-weight: 600;
     pointer-events: none;
@@ -297,16 +369,43 @@ const DEFAULT_DETAIL = 'Pick any node to inspect it. Commands flow down from the
     box-shadow: 0 0 8px rgba(201, 167, 255, 0.45);
   }
   .arch-detail-title {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--white);
-    line-height: 1.3;
-    letter-spacing: -0.01em;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
   }
   .arch-detail-body {
-    font-size: 13px;
-    line-height: 1.65;
-    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(232, 224, 240, 0.82);
+    margin-bottom: 4px;
+  }
+  .arch-detail-bullets {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .arch-detail-bullets li {
+    position: relative;
+    padding-left: 22px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(232, 224, 240, 0.72);
+  }
+  .arch-detail-bullets li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 0.65em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(201, 167, 255, 0.55);
+    box-shadow: 0 0 8px rgba(142, 61, 255, 0.45);
   }
 
   @media (max-width: 1100px) {
@@ -317,7 +416,8 @@ const DEFAULT_DETAIL = 'Pick any node to inspect it. Commands flow down from the
   }
   @media (max-width: 640px) {
     .arch-detail { padding: 18px; }
-    .arch-detail-title { font-size: 16px; }
-    .arch-detail-body { font-size: 12.5px; }
+    .arch-detail-title { font-size: 19px; }
+    .arch-detail-body { font-size: 14px; }
+    .arch-detail-bullets li { font-size: 13.5px; }
   }
 </style>

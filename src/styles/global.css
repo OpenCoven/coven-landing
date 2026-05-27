@@ -17,7 +17,7 @@
     body {
       background: var(--bg);
       color: var(--white);
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       min-height: 100vh;
       overflow-x: hidden;
