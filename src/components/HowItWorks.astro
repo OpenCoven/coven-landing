@@ -48,9 +48,9 @@ const sessionsData = [
 
 // Harness widget data
 const harnessRows = [
-  { id: 'claude', name: 'Claude Code', detail: "Anthropic's official CLI. Streamed output, tool-use protocol, long-context first.", status: 'active',   meta: 'in use · 12 sessions' },
-  { id: 'codex',  name: 'Codex',       detail: 'OpenAI coding agent. Inline edits, project-scoped runs, sandboxed tool calls.',     status: 'idle',     meta: 'last used 2h ago'      },
-  { id: 'future', name: '+ Future',    detail: 'New agent CLIs join by implementing one adapter contract — no rewriting Coven.',    status: 'adapter', meta: 'open spec'             },
+  { id: 'claude', name: 'Claude Code', vendor: 'Anthropic', logo: '/logos/anthropic.svg', detail: "Anthropic's official CLI. Streamed output, tool-use protocol, long-context first.", status: 'active',   meta: 'in use · 12 sessions' },
+  { id: 'codex',  name: 'Codex',       vendor: 'OpenAI',    logo: '/logos/openai.svg',    detail: 'OpenAI coding agent. Inline edits, project-scoped runs, sandboxed tool calls.',     status: 'idle',     meta: 'last used 2h ago'      },
+  { id: 'future', name: '+ Future',    vendor: null,        logo: null,                   detail: 'New agent CLIs join by implementing one adapter contract — no rewriting Coven.',    status: 'adapter', meta: 'open spec'             },
 ];
 
 // Tools widget data — categories + their gate contract
@@ -185,7 +185,17 @@ const toolGates = [
                 data-harness={h.id}
                 aria-checked={i === 0 ? 'true' : 'false'}
               >
-                <span class="harness-name">{h.name}</span>
+                <span class="harness-logo" aria-hidden="true">
+                  {h.logo ? (
+                    <img src={h.logo} alt="" width="22" height="22" />
+                  ) : (
+                    <span class="harness-logo-placeholder">+</span>
+                  )}
+                </span>
+                <span class="harness-name">
+                  {h.name}
+                  {h.vendor && <span class="harness-vendor">{h.vendor}</span>}
+                </span>
                 <span class={`harness-status status-${h.status}`}>{h.status === 'adapter' ? 'adapter' : h.status}</span>
                 <span class="harness-meta">{h.meta}</span>
               </button>
@@ -610,9 +620,10 @@ const toolGates = [
     padding: 10px 14px;
     border-radius: 6px;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: 'name status' 'meta meta';
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    grid-template-areas: 'logo name status' 'logo meta meta';
     gap: 4px 12px;
+    align-items: center;
     text-align: left;
     cursor: pointer;
     outline: none;
@@ -624,7 +635,49 @@ const toolGates = [
     background: rgba(142,61,255,0.14);
     border-color: rgba(201,167,255,0.45);
   }
-  .harness-name { grid-area: name; font-size: 13px; font-weight: 700; }
+  .harness-logo {
+    grid-area: logo;
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(232,224,240,0.92);
+  }
+  .harness-logo img {
+    display: block;
+    width: 16px;
+    height: 16px;
+  }
+  .harness-logo-placeholder {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(201,167,255,0.6);
+    line-height: 1;
+  }
+  .harness-row.is-active .harness-logo {
+    background: rgba(142,61,255,0.18);
+    border-color: rgba(201,167,255,0.35);
+  }
+  .harness-name {
+    grid-area: name;
+    font-size: 13px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .harness-vendor {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgba(201,167,255,0.55);
+    text-transform: lowercase;
+  }
   .harness-status {
     grid-area: status;
     font-family: var(--mono);
