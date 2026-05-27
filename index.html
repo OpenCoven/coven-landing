@@ -803,6 +803,10 @@
       .card-grid.three { grid-template-columns: repeat(2, 1fr); }
       .card-grid.four  { grid-template-columns: repeat(2, 1fr); }
       .proof-grid { grid-template-columns: repeat(2, 1fr); }
+      /* Three-card grids in 2-col mode: span the last card across both
+         columns so the empty grid cell doesn't expose the container's
+         border-color background as an orphan quadrant. */
+      .card-grid.three > :nth-child(3):last-child { grid-column: 1 / -1; }
       /* Tighter section spacing */
       .content-section, .proof-section, .ecosystem-section { padding: 56px 24px; }
       .ecosystem-inner { padding: 44px 48px; }
