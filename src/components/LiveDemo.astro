@@ -1,0 +1,442 @@
+---
+// Live demo: a scripted, auto-playing terminal that walks through a real
+// Coven session — doctor → run → detach → sessions → rejoin. Pauses when
+// out of viewport, on hover, or when prefers-reduced-motion is set.
+
+// Script structure — each step is one of:
+//   { type: 'cmd',    text }    — typed at the prompt
+//   { type: 'out',    lines, tone? }  — output lines; tone = 'ok' | 'meta' | 'agent'
+//   { type: 'detach', text }    — dimmed system notice
+//   { type: 'pause',  ms }      — delay before next step
+const script = [
+  { type: 'cmd',    text: 'coven doctor' },
+  { type: 'out',    tone: 'ok',    lines: [
+    '✓ harness · claude (claude-code v0.1.4)',
+    '✓ harness · codex  (codex v2.0.1)',
+    '✓ daemon  · running on /run/coven',
+    '✓ project · ~/work/opencoven',
+    'ready in 84ms',
+  ] },
+  { type: 'pause',  ms: 600 },
+
+  { type: 'cmd',    text: 'coven run claude "polish the landing UI"' },
+  { type: 'out',    tone: 'meta',  lines: [
+    '▸ session s-1 started · familiar=forge · harness=claude',
+  ] },
+  { type: 'out',    tone: 'agent', lines: [
+    '│ reading src/components/HowItWorks.astro …',
+    '│ found 4 tabs · 4 widgets',
+    '│ proposed: scroll-snap on mobile tab strip',
+    '│ patch ready · 1 file · 6 lines',
+  ] },
+  { type: 'pause',  ms: 700 },
+  { type: 'detach', text: '⎈  ctrl-b · detached — session s-1 keeps running' },
+  { type: 'pause',  ms: 900 },
+
+  { type: 'cmd',    text: 'coven sessions' },
+  { type: 'out',    tone: 'meta',  lines: [
+    'ID    PROJECT          HARNESS   STATUS    AGE',
+    's-1   opencoven        claude    running   8s',
+    's-2   open-meow        codex     idle      38m',
+    's-3   coven-dash       claude    idle      4h',
+  ] },
+  { type: 'pause',  ms: 600 },
+
+  { type: 'cmd',    text: 'coven rejoin s-1' },
+  { type: 'out',    tone: 'ok',    lines: [
+    '▸ rejoined s-1 · context restored',
+    '│ 6 lines staged · awaiting confirm',
+  ] },
+  { type: 'pause',  ms: 1400 },
+];
+---
+
+<section class="livedemo-section content-section" id="demo" aria-labelledby="livedemo-heading">
+  <div class="section-header" data-reveal>
+    <p class="section-kicker">Live Demo</p>
+    <h2 id="livedemo-heading">A real Coven session, end to end.</h2>
+    <p>Watch the runtime check harnesses, launch a familiar, detach, list sessions, and resume. Hover the terminal to pause.</p>
+  </div>
+
+  <div class="livedemo-frame" data-reveal>
+    <div class="ld-card" aria-label="Coven live session demo">
+      <div class="ld-topbar">
+        <div class="ld-dots"><span></span><span></span><span></span></div>
+        <span class="ld-label">coven · live session</span>
+        <div class="ld-controls">
+          <span class="ld-status">
+            <span class="ld-status-dot" aria-hidden="true"></span>
+            <span class="ld-status-text">running</span>
+          </span>
+          <button type="button" class="ld-control" data-action="toggle" aria-label="Pause demo">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <rect x="6"  y="5" width="4" height="14" rx="1" />
+              <rect x="14" y="5" width="4" height="14" rx="1" />
+            </svg>
+          </button>
+          <button type="button" class="ld-control" data-action="restart" aria-label="Restart demo">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="ld-body" aria-live="off">
+        <!-- JS injects rendered lines here. SR fallback below provides the
+             same content statically. -->
+      </div>
+
+      <p class="sr-only">
+        Demo transcript:
+        coven doctor finds Claude Code and Codex harnesses and confirms the daemon is running.
+        coven run claude "polish the landing UI" starts session s-1 under familiar Forge, reads HowItWorks.astro, and stages a patch.
+        The user detaches with Ctrl-B; the session keeps running.
+        coven sessions lists three sessions across opencoven, open-meow, and coven-dash.
+        coven rejoin s-1 restores the context and the staged patch.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ script }}>
+  window.__LIVEDEMO_SCRIPT__ = script;
+</script>
+
+<script>
+  (function () {
+    const root = document.querySelector('.livedemo-section');
+    if (!root) return;
+    const body = root.querySelector('.ld-body');
+    const toggleBtn = root.querySelector('[data-action="toggle"]');
+    const restartBtn = root.querySelector('[data-action="restart"]');
+    const statusText = root.querySelector('.ld-status-text');
+    const statusDot  = root.querySelector('.ld-status-dot');
+    const card = root.querySelector('.ld-card');
+    const script = window.__LIVEDEMO_SCRIPT__ || [];
+
+    const motionOn = document.documentElement.classList.contains('motion-on');
+
+    let stepIdx = 0;
+    let inViewport = false;
+    let userPaused = false;
+    let hoverPaused = false;
+    let typingTimer = null;
+    let stepTimer = null;
+    let running = false;
+
+    function reset() {
+      stepIdx = 0;
+      if (body) body.innerHTML = '';
+    }
+
+    function addLine(text, tone) {
+      if (!body) return null;
+      const el = document.createElement('div');
+      el.className = `ld-line${tone ? ' ld-line--' + tone : ''}`;
+      el.textContent = text;
+      body.appendChild(el);
+      body.scrollTop = body.scrollHeight;
+      return el;
+    }
+
+    function addPrompt(text) {
+      if (!body) return null;
+      const el = document.createElement('div');
+      el.className = 'ld-prompt-line';
+      const promptSpan = document.createElement('span');
+      promptSpan.className = 'ld-prompt';
+      promptSpan.textContent = '$';
+      const cmdSpan = document.createElement('span');
+      cmdSpan.className = 'ld-cmd';
+      el.appendChild(promptSpan);
+      el.appendChild(cmdSpan);
+      body.appendChild(el);
+      body.scrollTop = body.scrollHeight;
+      return cmdSpan;
+    }
+
+    function typeInto(el, text, done) {
+      if (!motionOn) {
+        el.textContent = text;
+        done && done();
+        return;
+      }
+      let i = 0;
+      function step() {
+        if (i >= text.length) { done && done(); return; }
+        el.textContent += text.charAt(i++);
+        if (body) body.scrollTop = body.scrollHeight;
+        const delay = 22 + Math.random() * 24;
+        typingTimer = setTimeout(step, delay);
+      }
+      step();
+    }
+
+    function setStatus(state) {
+      if (!statusText || !statusDot) return;
+      statusText.textContent = state;
+      statusDot.dataset.state = state;
+    }
+
+    function nextStep() {
+      if (!running || userPaused || hoverPaused || !inViewport) return;
+      if (stepIdx >= script.length) {
+        // Loop back to the start after a longer pause
+        stepTimer = setTimeout(() => {
+          if (!running) return;
+          reset();
+          nextStep();
+        }, 2200);
+        return;
+      }
+
+      const s = script[stepIdx++];
+      if (s.type === 'cmd') {
+        const cmdEl = addPrompt(s.text);
+        if (!cmdEl) return;
+        typeInto(cmdEl, s.text, () => {
+          stepTimer = setTimeout(nextStep, 220);
+        });
+      } else if (s.type === 'out') {
+        let i = 0;
+        const playLine = () => {
+          if (!running || userPaused || hoverPaused || !inViewport) return;
+          if (i >= s.lines.length) {
+            stepTimer = setTimeout(nextStep, 120);
+            return;
+          }
+          addLine(s.lines[i++], s.tone);
+          if (!motionOn) { playLine(); return; }
+          stepTimer = setTimeout(playLine, 90 + Math.random() * 50);
+        };
+        playLine();
+      } else if (s.type === 'detach') {
+        addLine(s.text, 'detach');
+        stepTimer = setTimeout(nextStep, 220);
+      } else if (s.type === 'pause') {
+        stepTimer = setTimeout(nextStep, motionOn ? s.ms : 0);
+      }
+    }
+
+    function start() {
+      running = true;
+      setStatus(userPaused || hoverPaused || !inViewport ? 'paused' : 'running');
+      nextStep();
+    }
+    function pauseAll() {
+      if (typingTimer) { clearTimeout(typingTimer); typingTimer = null; }
+      if (stepTimer)   { clearTimeout(stepTimer);   stepTimer   = null; }
+    }
+
+    // Toggle (user pause/play)
+    toggleBtn?.addEventListener('click', () => {
+      userPaused = !userPaused;
+      toggleBtn.setAttribute('aria-label', userPaused ? 'Play demo' : 'Pause demo');
+      toggleBtn.innerHTML = userPaused
+        ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4" /></svg>'
+        : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="6"  y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>';
+      if (userPaused) { pauseAll(); setStatus('paused'); }
+      else            { setStatus('running'); nextStep(); }
+    });
+
+    // Restart
+    restartBtn?.addEventListener('click', () => {
+      pauseAll();
+      reset();
+      setStatus('running');
+      userPaused = false;
+      nextStep();
+    });
+
+    // Hover pause
+    if (card) {
+      card.addEventListener('mouseenter', () => {
+        hoverPaused = true;
+        pauseAll();
+        setStatus('paused');
+      });
+      card.addEventListener('mouseleave', () => {
+        hoverPaused = false;
+        if (!userPaused) { setStatus('running'); nextStep(); }
+      });
+    }
+
+    // Viewport pause via IntersectionObserver
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          const wasIn = inViewport;
+          inViewport = e.isIntersecting;
+          if (inViewport && !wasIn && running && !userPaused && !hoverPaused) {
+            setStatus('running');
+            nextStep();
+          } else if (!inViewport) {
+            pauseAll();
+            setStatus('paused');
+          }
+        });
+      }, { threshold: 0.3 });
+      io.observe(card);
+    } else {
+      inViewport = true;
+    }
+
+    if (motionOn) {
+      // Start; nextStep gates on viewport visibility
+      start();
+    } else {
+      // Reduced motion: render the whole script statically and stop
+      running = true;
+      script.forEach((s) => {
+        if (s.type === 'cmd')    { const el = addPrompt(s.text); if (el) el.textContent = s.text; }
+        if (s.type === 'out')    s.lines.forEach((l) => addLine(l, s.tone));
+        if (s.type === 'detach') addLine(s.text, 'detach');
+      });
+      setStatus('static');
+    }
+  })();
+</script>
+
+<style>
+  .livedemo-frame {
+    display: flex;
+    justify-content: center;
+  }
+  .ld-card {
+    width: 100%;
+    max-width: 820px;
+    background: rgba(8, 6, 14, 0.92);
+    border: 1px solid rgba(142, 61, 255, 0.22);
+    border-radius: 12px;
+    overflow: hidden;
+    font-family: var(--mono);
+    box-shadow:
+      0 0 0 1px rgba(142, 61, 255, 0.06),
+      0 24px 80px rgba(0, 0, 0, 0.5);
+  }
+  .ld-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(142, 61, 255, 0.14);
+    background: rgba(5, 4, 9, 0.7);
+  }
+  .ld-dots { display: flex; gap: 6px; }
+  .ld-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .ld-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(201, 167, 255, 0.55);
+    margin-left: 4px;
+  }
+  .ld-controls {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ld-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  .ld-status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 6px rgba(74, 222, 128, 0.55);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .ld-status-dot[data-state="paused"] {
+    background: rgba(201, 167, 255, 0.7);
+    box-shadow: 0 0 6px rgba(201, 167, 255, 0.35);
+  }
+  .ld-status-dot[data-state="static"] {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: none;
+  }
+  .ld-control {
+    background: transparent;
+    border: 1px solid rgba(142, 61, 255, 0.18);
+    color: rgba(201, 167, 255, 0.7);
+    border-radius: 4px;
+    padding: 4px 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    outline: none;
+  }
+  .ld-control:hover {
+    background: rgba(142, 61, 255, 0.12);
+    color: #fff;
+    border-color: rgba(142, 61, 255, 0.4);
+  }
+  .ld-control:focus-visible { border-color: rgba(201, 167, 255, 0.6); }
+
+  .ld-body {
+    min-height: 320px;
+    max-height: 460px;
+    overflow-y: auto;
+    padding: 20px 22px;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: rgba(232, 224, 240, 0.85);
+    background:
+      linear-gradient(180deg, rgba(8, 6, 14, 0.0) 0%, rgba(5, 4, 9, 0.5) 100%),
+      radial-gradient(800px 320px at 50% 0%, rgba(142, 61, 255, 0.08) 0%, transparent 70%);
+    scroll-behavior: smooth;
+  }
+
+  .ld-prompt-line {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    margin-top: 10px;
+  }
+  .ld-prompt-line:first-child { margin-top: 0; }
+  .ld-prompt {
+    color: rgba(201, 167, 255, 0.55);
+    flex-shrink: 0;
+  }
+  .ld-cmd {
+    color: #fff;
+    word-break: break-word;
+  }
+
+  .ld-line {
+    color: rgba(232, 224, 240, 0.7);
+    padding-left: 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    position: relative;
+    opacity: 0;
+    animation: ld-fadein 0.25s ease forwards;
+  }
+  .ld-line--ok    { color: rgba(74, 222, 128, 0.82); }
+  .ld-line--meta  { color: rgba(201, 167, 255, 0.7); }
+  .ld-line--agent { color: rgba(232, 224, 240, 0.78); }
+  .ld-line--detach {
+    color: rgba(255, 255, 255, 0.42);
+    font-style: italic;
+    margin: 8px 0;
+  }
+  @keyframes ld-fadein { to { opacity: 1; } }
+
+  @media (max-width: 720px) {
+    .ld-body { font-size: 11.5px; padding: 16px 14px; min-height: 280px; }
+    .ld-status-text { display: none; }
+  }
+</style>

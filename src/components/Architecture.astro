@@ -1,0 +1,323 @@
+---
+// Interactive architecture diagram. SVG with clickable nodes; selecting a
+// node updates the detail panel below the diagram. State + keyboard
+// navigation are wired in the inline <script> at the bottom of this file.
+const nodes = [
+  // Harness layer
+  { id: 'codex',      label: 'Codex',        layer: 'harness', x: 80,  y: 30,  w: 160, h: 70,
+    title: 'Codex',           detail: 'OpenAI’s coding agent, driven through Coven instead of run loose against your filesystem. Every command it issues is bounded to the project you launched in and captured as a session record, so you can see exactly what it did, replay it later, or hand the session off to another familiar without losing context.' },
+  { id: 'claude',     label: 'Claude Code',  layer: 'harness', x: 320, y: 30,  w: 160, h: 70,
+    title: 'Claude Code',     detail: 'Anthropic’s official CLI, wired into the same neutral adapter interface as every other supported harness. Coven doesn’t care which agent drives the work — Claude Code gets the same session lifecycle, the same scoped tool access, and the same persistent memory as anything else you plug in. Swap harnesses mid-project; the runtime stays the same.' },
+  { id: 'future',     label: '+ Future',     layer: 'harness', x: 560, y: 30,  w: 160, h: 70,
+    title: 'Future harnesses', detail: 'Adapter-ready by design. New agent CLIs join the runtime by implementing one neutral interface — not by forcing Coven to be rewritten or by leaking harness-specific quirks into the rest of the system. The harness layer is intentionally pluggable so the ecosystem can evolve without breaking the projects already running on top of it.' },
+
+  // Coven runtime sub-nodes (inside the boundary box)
+  { id: 'sessions',   label: 'Sessions',     layer: 'coven',   x: 60,  y: 220, w: 150, h: 110,
+    title: 'Sessions',        detail: 'Every harness run is captured as a first-class, project-scoped session record. Each session is inspectable while it runs, replayable after it ends, and addressable from the CLI or the session browser — with full output history, lifecycle controls (start, pause, detach, resume, terminate), and visible state instead of an opaque background process.' },
+  { id: 'memory',     label: 'Memory',       layer: 'coven',   x: 230, y: 220, w: 150, h: 110,
+    title: 'Memory',          detail: 'Notes, decisions, preferences, and project-specific context persist per familiar across sessions. Continuity is explicit and inspectable — not trapped inside a single chat window or scattered across throwaway temp files. Familiars carry forward what they’ve learned about your codebase, your conventions, and the work in flight, instead of starting cold every time.' },
+  { id: 'adapter',    label: 'Adapter',      layer: 'coven',   x: 400, y: 220, w: 150, h: 110,
+    title: 'Harness adapter', detail: 'Translates each harness’s native protocol — Codex’s streaming format, Claude Code’s tool calls, whatever comes next — into one neutral runtime interface. The rest of the system stays harness-agnostic, which means sessions, memory, and the tool gateway never need to know which CLI is driving them. New harnesses slot in here without ripple effects elsewhere.' },
+  { id: 'tools',      label: 'Tool gateway', layer: 'coven',   x: 570, y: 220, w: 150, h: 110,
+    title: 'Tool gateway',    detail: 'Mediates every tool call a familiar makes — filesystem reads and writes, git operations, terminal commands, web fetches — through inspectable contracts with explicit boundaries. No silent privilege escalation, no surprise out-of-tree access, no hidden network calls. You can audit what was attempted, what was allowed, and what was actually executed for any session, after the fact.' },
+
+  // Project layer
+  { id: 'filesystem', label: 'Filesystem',   layer: 'project', x: 60,  y: 430, w: 150, h: 60,
+    title: 'Filesystem',      detail: 'Reads and writes are scoped to the project directory you launched the session in — not your whole machine. Out-of-tree access requires an explicit grant, surfaced at the moment it’s requested rather than buried in a config file, so a familiar can’t quietly wander into your home directory or a sibling repo while you’re looking elsewhere.' },
+  { id: 'git',        label: 'Git',          layer: 'project', x: 230, y: 430, w: 150, h: 60,
+    title: 'Git',             detail: 'Branches, commits, diffs, and history are visible to the session as ordinary project state. Coven never force-pushes, never rewrites history, and never bypasses signing or hooks on your behalf — every git-touching action shows up in the session record where you can review it, so you keep the final say on what actually lands on a branch.' },
+  { id: 'terminals',  label: 'Terminals',    layer: 'project', x: 400, y: 430, w: 150, h: 60,
+    title: 'Terminals',       detail: 'Managed PTY surfaces with full scrollback and output history attached to the session. Detach from a long-running command, walk away, and rejoin it later from any session browser — the terminal keeps running, the output keeps streaming, and you don’t lose state because you closed the window or your laptop went to sleep.' },
+  { id: 'docs',       label: 'Docs',         layer: 'project', x: 570, y: 430, w: 150, h: 60,
+    title: 'Docs',            detail: 'Markdown, source code, and structured project documentation are exposed as first-class session context — readable by familiars during a run without separate ingestion steps. By default they’re read-only: a familiar can cite, summarize, or reason over your docs, but it can’t silently mutate them unless you explicitly grant write access.' },
+];
+
+const DEFAULT_DETAIL = 'Pick any node to inspect it. Commands flow down from the harness layer at the top, through Coven’s runtime in the middle, and into your project at the bottom — while output, state, and memory flow back up the right-hand return path. Every boundary in the diagram is enforced at runtime, not just drawn here for explanation.';
+---
+
+<section class="architecture-section content-section" id="architecture" aria-labelledby="architecture-heading">
+  <div class="section-header" data-reveal>
+    <p class="section-kicker">Architecture</p>
+    <h2 id="architecture-heading">One neutral layer between the harness and your code.</h2>
+    <p>Coven sits between any supported agent CLI and the project you’re actually working in. Commands flow down, output and memory flow up, and every boundary is explicit.</p>
+  </div>
+
+  <div class="architecture-diagram" data-reveal>
+    <svg
+      class="arch-svg"
+      viewBox="0 0 800 520"
+      role="img"
+      aria-labelledby="arch-svg-title"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <title id="arch-svg-title">Coven architecture: harness, runtime, and project layers</title>
+
+      <defs>
+        <marker id="arch-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 Z" fill="rgba(201,167,255,0.55)" />
+        </marker>
+        <marker id="arch-arrow-up" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 Z" fill="rgba(74,222,128,0.55)" />
+        </marker>
+      </defs>
+
+      <text class="arch-layer-label" x="400" y="18" text-anchor="middle">harness layer</text>
+      <text class="arch-layer-label" x="400" y="155" text-anchor="middle">coven runtime</text>
+      <text class="arch-layer-label" x="400" y="418" text-anchor="middle">your project</text>
+
+      <rect class="arch-boundary" x="40" y="170" width="720" height="200" rx="10" />
+      <text class="arch-boundary-tag" x="56" y="190">project-scoped boundary</text>
+
+      <g class="arch-flow">
+        <line x1="160" y1="100" x2="160" y2="218" />
+        <line x1="400" y1="100" x2="400" y2="218" />
+        <line x1="640" y1="100" x2="500" y2="218" stroke-dasharray="4,4" />
+
+        <line x1="135" y1="330" x2="135" y2="428" />
+        <line x1="305" y1="330" x2="305" y2="428" />
+        <line x1="475" y1="330" x2="475" y2="428" />
+        <line x1="645" y1="330" x2="645" y2="428" />
+      </g>
+
+      <g class="arch-return">
+        <path d="M 730 480 Q 770 480 770 380 Q 770 200 770 60 L 720 60" stroke-dasharray="4,4" />
+      </g>
+      <text class="arch-return-label" x="780" y="270" transform="rotate(-90 780 270)" text-anchor="middle">output · memory</text>
+
+      <path class="arch-loop" d="M 305 260 q 0 -32 75 0" />
+
+      {nodes.map((n) => (
+        <g
+          class={`arch-node arch-node--${n.layer}`}
+          data-node={n.id}
+          role="button"
+          tabindex="0"
+          aria-label={n.title}
+        >
+          <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="8" />
+          <text x={n.x + n.w / 2} y={n.y + n.h / 2 + 5} text-anchor="middle">{n.label}</text>
+        </g>
+      ))}
+    </svg>
+
+    <div class="arch-detail" aria-live="polite">
+      <div class="arch-detail-inner">
+        <p class="arch-detail-kicker"><span class="arch-detail-dot"></span><span class="arch-detail-tag">pick a node</span></p>
+        <h3 class="arch-detail-title">How Coven fits into your stack</h3>
+        <p class="arch-detail-body">{DEFAULT_DETAIL}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const nodes = document.querySelectorAll('.arch-node[data-node]');
+    if (!nodes.length) return;
+    const titleEl = document.querySelector('.arch-detail-title');
+    const bodyEl  = document.querySelector('.arch-detail-body');
+    const tagEl   = document.querySelector('.arch-detail-tag');
+    const kickerEl = document.querySelector('.arch-detail-kicker');
+
+    // Pull copy out of the markup so the data lives in one place (the SVG nodes)
+    // and the detail panel reflects whatever the component renders.
+    const details = {};
+    nodes.forEach((node) => {
+      const id = node.getAttribute('data-node');
+      const titleAttr = node.getAttribute('aria-label') || id;
+      details[id] = {
+        title: titleAttr,
+        body: node.getAttribute('data-body') || node.querySelector('title')?.textContent || '',
+      };
+    });
+
+    function select(node) {
+      nodes.forEach((n) => n.classList.toggle('is-selected', n === node));
+      const id = node.getAttribute('data-node');
+      const layer = Array.from(node.classList).find((c) => c.startsWith('arch-node--'))?.replace('arch-node--', '');
+      const data = window.__ARCH_NODES__?.[id];
+      if (titleEl && data) titleEl.textContent = data.title;
+      if (bodyEl  && data) bodyEl.textContent  = data.detail;
+      if (tagEl)  tagEl.textContent  = layer || 'node';
+      if (kickerEl) kickerEl.classList.add('is-active');
+    }
+
+    nodes.forEach((node) => {
+      node.addEventListener('click', () => select(node));
+      node.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          select(node);
+        }
+      });
+    });
+  })();
+</script>
+
+<script is:inline define:vars={{ nodes }}>
+  // Bridge the server-rendered node data into the client script above.
+  window.__ARCH_NODES__ = Object.fromEntries(nodes.map((n) => [n.id, n]));
+</script>
+
+<style>
+  .architecture-diagram {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: stretch;
+  }
+  .arch-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .arch-layer-label {
+    fill: rgba(201, 167, 255, 0.55);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .arch-boundary {
+    fill: rgba(142, 61, 255, 0.04);
+    stroke: rgba(142, 61, 255, 0.22);
+    stroke-dasharray: 6, 5;
+  }
+  .arch-boundary-tag {
+    fill: rgba(201, 167, 255, 0.5);
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .arch-flow line {
+    stroke: rgba(201, 167, 255, 0.42);
+    stroke-width: 1.4;
+    marker-end: url(#arch-arrow);
+  }
+  .arch-return path {
+    fill: none;
+    stroke: rgba(74, 222, 128, 0.45);
+    stroke-width: 1.2;
+    marker-end: url(#arch-arrow-up);
+  }
+  .arch-return-label {
+    fill: rgba(74, 222, 128, 0.55);
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .arch-loop {
+    fill: none;
+    stroke: rgba(201, 167, 255, 0.35);
+    stroke-width: 1.1;
+    stroke-dasharray: 3, 4;
+    marker-end: url(#arch-arrow);
+  }
+
+  .arch-node {
+    cursor: pointer;
+    outline: none;
+  }
+  .arch-node rect {
+    fill: rgba(14, 11, 22, 0.85);
+    stroke: rgba(142, 61, 255, 0.28);
+    stroke-width: 1;
+    transition: fill 0.2s ease, stroke 0.2s ease, filter 0.2s ease;
+  }
+  .arch-node text {
+    fill: rgba(232, 224, 240, 0.92);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    pointer-events: none;
+    user-select: none;
+  }
+  .arch-node--harness rect { stroke: rgba(201, 167, 255, 0.32); }
+  .arch-node--project rect { stroke: rgba(74, 222, 128, 0.32); }
+
+  @media (hover: hover) {
+    .arch-node:hover rect {
+      fill: rgba(20, 16, 32, 0.95);
+      stroke: rgba(201, 167, 255, 0.55);
+    }
+  }
+  .arch-node:focus-visible rect {
+    stroke: rgba(201, 167, 255, 0.85);
+    stroke-width: 1.6;
+  }
+  .arch-node.is-selected rect {
+    fill: rgba(142, 61, 255, 0.16);
+    stroke: rgba(201, 167, 255, 0.9);
+    stroke-width: 1.6;
+    filter: drop-shadow(0 0 12px rgba(142, 61, 255, 0.35));
+  }
+  .arch-node.is-selected text {
+    fill: #fff;
+  }
+
+  /* Detail panel */
+  .arch-detail {
+    background: linear-gradient(180deg, rgba(14, 11, 22, 0.85) 0%, rgba(5, 4, 9, 0.7) 100%);
+    border: 1px solid rgba(142, 61, 255, 0.18);
+    border-radius: 10px;
+    padding: 24px;
+    display: flex;
+    align-items: stretch;
+  }
+  .arch-detail-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .arch-detail-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(201, 167, 255, 0.55);
+  }
+  .arch-detail-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(201, 167, 255, 0.4);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .arch-detail-kicker.is-active .arch-detail-dot {
+    background: var(--vtext);
+    box-shadow: 0 0 8px rgba(201, 167, 255, 0.45);
+  }
+  .arch-detail-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .arch-detail-body {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  @media (max-width: 1100px) {
+    .architecture-diagram {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+  @media (max-width: 640px) {
+    .arch-detail { padding: 18px; }
+    .arch-detail-title { font-size: 16px; }
+    .arch-detail-body { font-size: 12.5px; }
+  }
+</style>

@@ -1,0 +1,763 @@
+---
+// Tabbed deep-dives that replace the old Familiars + Runtime sections.
+// Four tabs (Memory / Sessions / Harnesses / Tools), each with descriptive
+// copy plus a small interactive widget on the right.
+
+const tabs = [
+  { id: 'memory',    label: 'Memory'    },
+  { id: 'sessions',  label: 'Sessions'  },
+  { id: 'harnesses', label: 'Harnesses' },
+  { id: 'tools',     label: 'Tools'     },
+];
+
+// Memory widget data — notes accumulating across three sessions
+const memoryTimeline = [
+  {
+    session: 'Session 1',
+    when: 'Mon · v0.1 spike',
+    notes: [
+      { text: 'project: opencoven · stack: astro + vanilla',     meta: 'context' },
+    ],
+  },
+  {
+    session: 'Session 2',
+    when: 'Wed · feature work',
+    notes: [
+      { text: 'project: opencoven · stack: astro + vanilla',     meta: 'context' },
+      { text: 'prefers terse PR summaries · no trailing recap',  meta: 'preference' },
+    ],
+  },
+  {
+    session: 'Session 3',
+    when: 'Fri · today',
+    notes: [
+      { text: 'project: opencoven · stack: astro + vanilla',     meta: 'context' },
+      { text: 'prefers terse PR summaries · no trailing recap',  meta: 'preference' },
+      { text: 'resumed feat/interactive-deep-dive · 4 files staged', meta: 'state' },
+    ],
+  },
+];
+
+// Sessions widget data
+const sessionsData = [
+  { id: 's-1', project: 'opencoven',       harness: 'claude',  status: 'running',  age: '2m'  },
+  { id: 's-2', project: 'open-meow',       harness: 'codex',   status: 'idle',     age: '38m' },
+  { id: 's-3', project: 'coven-dash',      harness: 'claude',  status: 'idle',     age: '4h'  },
+  { id: 's-4', project: 'castcodes',       harness: 'codex',   status: 'archived', age: '2d'  },
+];
+
+// Harness widget data
+const harnessRows = [
+  { id: 'claude', name: 'Claude Code', detail: "Anthropic's official CLI. Streamed output, tool-use protocol, long-context first.", status: 'active',   meta: 'in use · 12 sessions' },
+  { id: 'codex',  name: 'Codex',       detail: 'OpenAI coding agent. Inline edits, project-scoped runs, sandboxed tool calls.',     status: 'idle',     meta: 'last used 2h ago'      },
+  { id: 'future', name: '+ Future',    detail: 'New agent CLIs join by implementing one adapter contract — no rewriting Coven.',    status: 'adapter', meta: 'open spec'             },
+];
+
+// Tools widget data — categories + their gate contract
+const toolGates = [
+  { id: 'fs',    label: 'fs',        title: 'Filesystem',        rule: 'Reads + writes scoped to the project directory. Out-of-tree paths require an explicit grant.' },
+  { id: 'git',   label: 'git',       title: 'Git',               rule: 'Branches, commits, history. No force-push, no history rewrite without an explicit confirmation.' },
+  { id: 'exec',  label: 'exec',      title: 'Shell execution',   rule: 'Commands run inside a managed PTY. The session captures stdout/stderr and the exit code.' },
+  { id: 'fetch', label: 'web',       title: 'Web fetch',         rule: 'Outbound HTTP gated per-domain. Responses streamed back through the session log.' },
+];
+---
+
+<section class="howitworks-section content-section" id="how-it-works" aria-labelledby="how-it-works-heading">
+  <div class="section-header" data-reveal>
+    <p class="section-kicker">How It Works</p>
+    <h2 id="how-it-works-heading">Pick a layer. See what it actually does.</h2>
+    <p>Memory, sessions, harnesses, and tools are the four moving parts. Each tab is a working preview of how that piece behaves in a real Coven session.</p>
+  </div>
+
+  <div class="howit-frame" data-reveal>
+    <div class="howit-tabs" role="tablist" aria-label="Coven moving parts">
+      {tabs.map((t, i) => (
+        <button
+          class={`howit-tab${i === 0 ? ' is-active' : ''}`}
+          role="tab"
+          type="button"
+          data-tab={t.id}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-controls={`howit-panel-${t.id}`}
+          id={`howit-tab-${t.id}`}
+          tabindex={i === 0 ? '0' : '-1'}
+        >{t.label}</button>
+      ))}
+    </div>
+
+    <!-- Memory panel -->
+    <div
+      class="howit-panel is-active"
+      role="tabpanel"
+      id="howit-panel-memory"
+      aria-labelledby="howit-tab-memory"
+      data-panel="memory"
+    >
+      <div class="howit-copy">
+        <p class="card-kicker">Memory</p>
+        <h3>Continuity that survives the chat window.</h3>
+        <p>Project context, decisions, and preferences accumulate per familiar across sessions. Scrub through the timeline on the right to see how a familiar's working memory grows from one session to the next.</p>
+      </div>
+      <div class="howit-widget memory-widget">
+        <div class="memory-scrubber" role="radiogroup" aria-label="Session in the timeline">
+          {memoryTimeline.map((s, i) => (
+            <button
+              class={`memory-step${i === memoryTimeline.length - 1 ? ' is-active' : ''}`}
+              type="button"
+              role="radio"
+              data-memory-step={i}
+              aria-checked={i === memoryTimeline.length - 1 ? 'true' : 'false'}
+            >
+              <span class="memory-step-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="memory-step-label">{s.session}</span>
+              <span class="memory-step-when">{s.when}</span>
+            </button>
+          ))}
+        </div>
+        <div class="memory-board" aria-live="polite">
+          {memoryTimeline[memoryTimeline.length - 1].notes.map((n) => (
+            <div class="memory-note-row">
+              <span class="memory-note-tag">{n.meta}</span>
+              <span class="memory-note-text">{n.text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sessions panel -->
+    <div
+      class="howit-panel"
+      role="tabpanel"
+      id="howit-panel-sessions"
+      aria-labelledby="howit-tab-sessions"
+      data-panel="sessions"
+      hidden
+    >
+      <div class="howit-copy">
+        <p class="card-kicker">Sessions</p>
+        <h3>Project-scoped, lifecycle-aware, replayable.</h3>
+        <p>Each harness run is a session record bound to a directory and a familiar. Filter the list on the right to see how Coven tracks running, idle, and archived work — all visible, never abandoned.</p>
+      </div>
+      <div class="howit-widget sessions-widget">
+        <div class="sessions-filters" role="radiogroup" aria-label="Filter sessions by status">
+          <button class="sessions-filter is-active" type="button" role="radio" data-filter="all"      aria-checked="true">All</button>
+          <button class="sessions-filter"           type="button" role="radio" data-filter="running"  aria-checked="false">Running</button>
+          <button class="sessions-filter"           type="button" role="radio" data-filter="idle"     aria-checked="false">Idle</button>
+          <button class="sessions-filter"           type="button" role="radio" data-filter="archived" aria-checked="false">Archived</button>
+        </div>
+        <ul class="sessions-list">
+          {sessionsData.map((s) => (
+            <li class="sessions-row" data-status={s.status}>
+              <span class={`sessions-dot status-${s.status}`} aria-hidden="true"></span>
+              <span class="sessions-project">{s.project}</span>
+              <span class="sessions-harness">{s.harness}</span>
+              <span class={`sessions-status status-${s.status}`}>{s.status}</span>
+              <span class="sessions-age">{s.age}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Harnesses panel -->
+    <div
+      class="howit-panel"
+      role="tabpanel"
+      id="howit-panel-harnesses"
+      aria-labelledby="howit-tab-harnesses"
+      data-panel="harnesses"
+      hidden
+    >
+      <div class="howit-copy">
+        <p class="card-kicker">Harnesses</p>
+        <h3>One adapter contract. Many agent CLIs.</h3>
+        <p>Codex, Claude Code, and any future harness plug in through the same neutral interface. Click a harness on the right to see how it shows up inside the runtime.</p>
+      </div>
+      <div class="howit-widget harnesses-widget">
+        <ul class="harness-list" role="radiogroup" aria-label="Supported harness">
+          {harnessRows.map((h, i) => (
+            <li>
+              <button
+                class={`harness-row${i === 0 ? ' is-active' : ''}`}
+                type="button"
+                role="radio"
+                data-harness={h.id}
+                aria-checked={i === 0 ? 'true' : 'false'}
+              >
+                <span class="harness-name">{h.name}</span>
+                <span class={`harness-status status-${h.status}`}>{h.status === 'adapter' ? 'adapter' : h.status}</span>
+                <span class="harness-meta">{h.meta}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div class="harness-detail" aria-live="polite">
+          <p class="harness-detail-tag">contract</p>
+          <p class="harness-detail-text">{harnessRows[0].detail}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools panel -->
+    <div
+      class="howit-panel"
+      role="tabpanel"
+      id="howit-panel-tools"
+      aria-labelledby="howit-tab-tools"
+      data-panel="tools"
+      hidden
+    >
+      <div class="howit-copy">
+        <p class="card-kicker">Tools</p>
+        <h3>Every tool call passes through an inspectable gate.</h3>
+        <p>The tool gateway mediates filesystem, git, shell, and web access. Pick a tool category to see the contract Coven enforces before that tool ever runs.</p>
+      </div>
+      <div class="howit-widget tools-widget">
+        <div class="tool-pills" role="radiogroup" aria-label="Tool category">
+          {toolGates.map((t, i) => (
+            <button
+              class={`tool-pill${i === 0 ? ' is-active' : ''}`}
+              type="button"
+              role="radio"
+              data-tool={t.id}
+              aria-checked={i === 0 ? 'true' : 'false'}
+            >{t.label}</button>
+          ))}
+        </div>
+        <div class="tool-flow" aria-live="polite">
+          <div class="tool-flow-step">request</div>
+          <div class="tool-flow-arrow" aria-hidden="true">→</div>
+          <div class="tool-flow-step tool-flow-gate">gate</div>
+          <div class="tool-flow-arrow" aria-hidden="true">→</div>
+          <div class="tool-flow-step">execute</div>
+          <div class="tool-flow-arrow" aria-hidden="true">→</div>
+          <div class="tool-flow-step">result</div>
+        </div>
+        <div class="tool-rule">
+          <p class="tool-rule-title">{toolGates[0].title}</p>
+          <p class="tool-rule-text">{toolGates[0].rule}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ memoryTimeline, harnessRows, toolGates }}>
+  window.__HOWIT__ = { memoryTimeline, harnessRows, toolGates };
+</script>
+
+<script>
+  (function () {
+    const root = document.querySelector('.howitworks-section');
+    if (!root) return;
+
+    // ── Tab switching ────────────────────────────────────────
+    const tabs = root.querySelectorAll('.howit-tab');
+    const panels = root.querySelectorAll('.howit-panel');
+
+    function activateTab(id) {
+      tabs.forEach((t) => {
+        const match = t.getAttribute('data-tab') === id;
+        t.classList.toggle('is-active', match);
+        t.setAttribute('aria-selected', match ? 'true' : 'false');
+        t.setAttribute('tabindex', match ? '0' : '-1');
+      });
+      panels.forEach((p) => {
+        const match = p.getAttribute('data-panel') === id;
+        p.classList.toggle('is-active', match);
+        if (match) p.removeAttribute('hidden');
+        else p.setAttribute('hidden', '');
+      });
+    }
+    tabs.forEach((t) => {
+      t.addEventListener('click', () => activateTab(t.getAttribute('data-tab')));
+      t.addEventListener('keydown', (e) => {
+        const order = Array.from(tabs);
+        const i = order.indexOf(t);
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          const next = order[(i + 1) % order.length];
+          next.focus();
+          activateTab(next.getAttribute('data-tab'));
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const prev = order[(i - 1 + order.length) % order.length];
+          prev.focus();
+          activateTab(prev.getAttribute('data-tab'));
+        }
+      });
+    });
+
+    // ── Memory scrubber ──────────────────────────────────────
+    const memoryTimeline = window.__HOWIT__?.memoryTimeline || [];
+    const memoryButtons = root.querySelectorAll('[data-memory-step]');
+    const memoryBoard = root.querySelector('.memory-board');
+    function paintMemory(stepIdx) {
+      const data = memoryTimeline[stepIdx];
+      if (!data || !memoryBoard) return;
+      memoryBoard.innerHTML = data.notes
+        .map(
+          (n) =>
+            `<div class="memory-note-row"><span class="memory-note-tag">${n.meta}</span><span class="memory-note-text">${n.text}</span></div>`,
+        )
+        .join('');
+      memoryButtons.forEach((b) => {
+        const match = Number(b.getAttribute('data-memory-step')) === stepIdx;
+        b.classList.toggle('is-active', match);
+        b.setAttribute('aria-checked', match ? 'true' : 'false');
+      });
+    }
+    memoryButtons.forEach((b) => {
+      b.addEventListener('click', () =>
+        paintMemory(Number(b.getAttribute('data-memory-step'))),
+      );
+    });
+
+    // ── Sessions filter ──────────────────────────────────────
+    const filters = root.querySelectorAll('.sessions-filter');
+    const rows = root.querySelectorAll('.sessions-row');
+    filters.forEach((f) => {
+      f.addEventListener('click', () => {
+        const filter = f.getAttribute('data-filter');
+        filters.forEach((other) => {
+          const match = other === f;
+          other.classList.toggle('is-active', match);
+          other.setAttribute('aria-checked', match ? 'true' : 'false');
+        });
+        rows.forEach((r) => {
+          const match = filter === 'all' || r.getAttribute('data-status') === filter;
+          r.classList.toggle('is-dimmed', !match);
+        });
+      });
+    });
+
+    // ── Harnesses selector ──────────────────────────────────
+    const harnessRows = window.__HOWIT__?.harnessRows || [];
+    const harnessButtons = root.querySelectorAll('[data-harness]');
+    const harnessDetail = root.querySelector('.harness-detail-text');
+    harnessButtons.forEach((b) => {
+      b.addEventListener('click', () => {
+        const id = b.getAttribute('data-harness');
+        const data = harnessRows.find((h) => h.id === id);
+        if (!data) return;
+        if (harnessDetail) harnessDetail.textContent = data.detail;
+        harnessButtons.forEach((other) => {
+          const match = other === b;
+          other.classList.toggle('is-active', match);
+          other.setAttribute('aria-checked', match ? 'true' : 'false');
+        });
+      });
+    });
+
+    // ── Tools picker ────────────────────────────────────────
+    const toolGates = window.__HOWIT__?.toolGates || [];
+    const toolButtons = root.querySelectorAll('[data-tool]');
+    const toolTitle = root.querySelector('.tool-rule-title');
+    const toolText = root.querySelector('.tool-rule-text');
+    toolButtons.forEach((b) => {
+      b.addEventListener('click', () => {
+        const id = b.getAttribute('data-tool');
+        const data = toolGates.find((t) => t.id === id);
+        if (!data) return;
+        if (toolTitle) toolTitle.textContent = data.title;
+        if (toolText)  toolText.textContent  = data.rule;
+        toolButtons.forEach((other) => {
+          const match = other === b;
+          other.classList.toggle('is-active', match);
+          other.setAttribute('aria-checked', match ? 'true' : 'false');
+        });
+      });
+    });
+  })();
+</script>
+
+<style>
+  .howit-frame {
+    border: 1px solid var(--border-v);
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(14,11,22,0.7) 0%, rgba(5,4,9,0.5) 100%);
+    overflow: hidden;
+  }
+  .howit-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px;
+    border-bottom: 1px solid rgba(142,61,255,0.12);
+    background: rgba(5,4,9,0.6);
+  }
+  .howit-tab {
+    flex: 1;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 9px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+    transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  }
+  .howit-tab:hover { color: var(--white); }
+  .howit-tab:focus-visible {
+    border-color: rgba(201,167,255,0.5);
+  }
+  .howit-tab.is-active {
+    background: rgba(142,61,255,0.16);
+    color: #fff;
+    border-color: rgba(142,61,255,0.36);
+  }
+
+  .howit-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 28px;
+    padding: 32px;
+  }
+  .howit-panel[hidden] { display: none; }
+
+  .howit-copy h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    margin: 10px 0 12px;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+  }
+  .howit-copy p {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .howit-widget {
+    background: rgba(5,4,9,0.5);
+    border: 1px solid rgba(142,61,255,0.14);
+    border-radius: 8px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 220px;
+  }
+
+  /* ── Memory widget ─────────────────────────────────────── */
+  .memory-scrubber {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .memory-step {
+    background: transparent;
+    border: 1px solid rgba(142,61,255,0.16);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--muted);
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    outline: none;
+  }
+  .memory-step:hover { background: rgba(142,61,255,0.06); color: var(--white); }
+  .memory-step:focus-visible { border-color: rgba(201,167,255,0.6); }
+  .memory-step.is-active {
+    background: rgba(142,61,255,0.18);
+    border-color: rgba(201,167,255,0.5);
+    color: #fff;
+  }
+  .memory-step-num {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    color: rgba(201,167,255,0.55);
+  }
+  .memory-step-label {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .memory-step-when {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.04em;
+  }
+  .memory-board {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: rgba(232,224,240,0.7);
+    padding-top: 4px;
+  }
+  .memory-note-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 6px 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .memory-note-row:first-child { border-top: none; }
+  .memory-note-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(201,167,255,0.55);
+    flex-shrink: 0;
+    width: 60px;
+  }
+  .memory-note-text { flex: 1; }
+
+  /* ── Sessions widget ─────────────────────────────────────── */
+  .sessions-filters {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .sessions-filter {
+    background: transparent;
+    border: 1px solid rgba(142,61,255,0.16);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  }
+  .sessions-filter:hover { color: var(--white); }
+  .sessions-filter:focus-visible { border-color: rgba(201,167,255,0.6); }
+  .sessions-filter.is-active {
+    background: rgba(142,61,255,0.18);
+    border-color: rgba(201,167,255,0.5);
+    color: #fff;
+  }
+  .sessions-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .sessions-row {
+    display: grid;
+    grid-template-columns: 10px minmax(0, 1.4fr) minmax(0, 1fr) auto auto;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: rgba(5,4,9,0.5);
+    border: 1px solid rgba(255,255,255,0.04);
+    font-size: 12px;
+    transition: opacity 0.18s ease;
+  }
+  .sessions-row.is-dimmed { opacity: 0.22; }
+  .sessions-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+  }
+  .sessions-dot.status-running  { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.5); }
+  .sessions-dot.status-idle     { background: rgba(201,167,255,0.7); }
+  .sessions-dot.status-archived { background: rgba(255,255,255,0.18); }
+  .sessions-project { color: var(--white); font-weight: 600; }
+  .sessions-harness {
+    font-family: var(--mono);
+    color: rgba(201,167,255,0.55);
+    font-size: 11px;
+  }
+  .sessions-status {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .sessions-status.status-running  { color: #4ade80; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); }
+  .sessions-status.status-idle     { color: var(--vtext); background: rgba(201,167,255,0.08); border: 1px solid rgba(201,167,255,0.18); }
+  .sessions-status.status-archived { color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+  .sessions-age {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Harnesses widget ────────────────────────────────────── */
+  .harness-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .harness-row {
+    width: 100%;
+    background: rgba(5,4,9,0.5);
+    border: 1px solid rgba(255,255,255,0.05);
+    color: var(--white);
+    padding: 10px 14px;
+    border-radius: 6px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'name status' 'meta meta';
+    gap: 4px 12px;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
+  .harness-row:hover { background: rgba(20,16,32,0.7); }
+  .harness-row:focus-visible { border-color: rgba(201,167,255,0.6); }
+  .harness-row.is-active {
+    background: rgba(142,61,255,0.14);
+    border-color: rgba(201,167,255,0.45);
+  }
+  .harness-name { grid-area: name; font-size: 13px; font-weight: 700; }
+  .harness-status {
+    grid-area: status;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .harness-status.status-active  { color: #4ade80;        background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.2); }
+  .harness-status.status-idle    { color: var(--vtext);    background: rgba(201,167,255,0.08); border: 1px solid rgba(201,167,255,0.18); }
+  .harness-status.status-adapter { color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); }
+  .harness-meta {
+    grid-area: meta;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.42);
+    letter-spacing: 0.04em;
+  }
+  .harness-detail {
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(142,61,255,0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .harness-detail-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(201,167,255,0.55);
+  }
+  .harness-detail-text {
+    font-size: 12.5px !important;
+    line-height: 1.6 !important;
+    color: rgba(232,224,240,0.78) !important;
+  }
+
+  /* ── Tools widget ────────────────────────────────────────── */
+  .tool-pills {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .tool-pill {
+    background: transparent;
+    border: 1px solid rgba(142,61,255,0.16);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  }
+  .tool-pill:hover { color: var(--white); }
+  .tool-pill:focus-visible { border-color: rgba(201,167,255,0.6); }
+  .tool-pill.is-active {
+    background: rgba(142,61,255,0.18);
+    border-color: rgba(201,167,255,0.5);
+    color: #fff;
+  }
+  .tool-flow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .tool-flow-step {
+    flex: 1;
+    text-align: center;
+    padding: 8px 6px;
+    border: 1px solid rgba(142,61,255,0.2);
+    border-radius: 5px;
+    color: rgba(232,224,240,0.75);
+    background: rgba(5,4,9,0.5);
+  }
+  .tool-flow-step.tool-flow-gate {
+    color: var(--vtext);
+    border-color: rgba(201,167,255,0.45);
+    background: rgba(142,61,255,0.1);
+  }
+  .tool-flow-arrow {
+    color: rgba(201,167,255,0.5);
+    font-size: 14px;
+  }
+  .tool-rule {
+    padding-top: 8px;
+    border-top: 1px dashed rgba(142,61,255,0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .tool-rule-title {
+    font-size: 13px !important;
+    font-weight: 700;
+    color: var(--white) !important;
+  }
+  .tool-rule-text {
+    font-size: 12.5px !important;
+    line-height: 1.6 !important;
+    color: rgba(232,224,240,0.78) !important;
+  }
+
+  /* ── Responsive ──────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .howit-panel {
+      grid-template-columns: 1fr;
+      gap: 22px;
+      padding: 22px;
+    }
+    .howit-tab { font-size: 10px; padding: 8px 10px; }
+    .sessions-row { grid-template-columns: 10px minmax(0, 1fr) auto auto; }
+    .sessions-row .sessions-harness { display: none; }
+  }
+  @media (max-width: 520px) {
+    .howit-tabs { padding: 6px; gap: 2px; }
+    .howit-tab { padding: 7px 6px; font-size: 9px; letter-spacing: 0.08em; }
+    .memory-scrubber { grid-template-columns: 1fr; }
+    .tool-flow-arrow { display: none; }
+    .tool-flow { gap: 4px; }
+  }
+</style>

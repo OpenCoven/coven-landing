@@ -1,0 +1,316 @@
+---
+// Comparison strip: Coven vs. Raw harness vs. Other agent tools.
+// Click any row to expand its detail panel below the matrix.
+
+const columns = [
+  { id: 'raw',    label: 'Raw harness',   sub: 'Claude Code, Codex direct' },
+  { id: 'other',  label: 'Other tools',   sub: 'IDE-bound agents, suites' },
+  { id: 'coven',  label: 'Coven',         sub: 'this',                 highlight: true },
+];
+
+// status values: 'yes' | 'partial' | 'no'
+const rows = [
+  {
+    id: 'memory',
+    label: 'Cross-session memory',
+    cells: { raw: 'no', other: 'partial', coven: 'yes' },
+    detail:
+      'Raw harnesses lose state when the chat ends; bolt-on tools save chat history but not curated working memory per familiar. Coven stores explicit notes that persist and surface in the next session.',
+  },
+  {
+    id: 'scope',
+    label: 'Project-scoped boundary',
+    cells: { raw: 'partial', other: 'partial', coven: 'yes' },
+    detail:
+      'Most tools assume the current directory and trust you to remember. Coven binds every session to a project record — filesystem, git, terminals, and docs all scoped to that root.',
+  },
+  {
+    id: 'multi',
+    label: 'Multi-harness through one interface',
+    cells: { raw: 'no', other: 'partial', coven: 'yes' },
+    detail:
+      'A raw harness only knows itself; suites bundle one or two. Coven exposes a neutral adapter contract so Codex, Claude Code, and future CLIs all run the same way.',
+  },
+  {
+    id: 'tools',
+    label: 'Inspectable tool contracts',
+    cells: { raw: 'partial', other: 'partial', coven: 'yes' },
+    detail:
+      'Each harness has its own permission model and prompt style. Coven funnels every tool call through one auditable gateway: fs, git, exec, web — same contract, visible logs.',
+  },
+  {
+    id: 'resume',
+    label: 'Detach and resume any time',
+    cells: { raw: 'no', other: 'partial', coven: 'yes' },
+    detail:
+      'Raw harness sessions die with their terminal. Coven keeps the PTY alive in the runtime, so you can detach, reboot, and pick up exactly where the agent left off.',
+  },
+  {
+    id: 'open',
+    label: 'Open framework, locally owned',
+    cells: { raw: 'yes', other: 'no', coven: 'yes' },
+    detail:
+      "Raw harnesses already run locally; SaaS suites don't. Coven is open and inspectable end-to-end — you can read what it runs, swap the adapter, or replace the gateway.",
+  },
+];
+---
+
+<section class="compare-section content-section" id="compare" aria-labelledby="compare-heading">
+  <div class="section-header" data-reveal>
+    <p class="section-kicker">Compare</p>
+    <h2 id="compare-heading">Why Coven, not just a harness?</h2>
+    <p>Same agent CLIs, different substrate. Pick a row to see how each option actually behaves.</p>
+  </div>
+
+  <div class="compare-frame" data-reveal>
+    <table class="compare-table" aria-describedby="compare-heading">
+      <thead>
+        <tr>
+          <th scope="col" class="compare-th-spacer"><span class="sr-only">Capability</span></th>
+          {columns.map((c) => (
+            <th
+              scope="col"
+              class={`compare-col-head${c.highlight ? ' is-highlight' : ''}`}
+            >
+              <span class="compare-col-label">{c.label}</span>
+              <span class="compare-col-sub">{c.sub}</span>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r, i) => (
+          <tr
+            class={`compare-row${i === 0 ? ' is-selected' : ''}`}
+            data-row={r.id}
+            tabindex="0"
+            role="button"
+            aria-pressed={i === 0 ? 'true' : 'false'}
+          >
+            <th scope="row" class="compare-row-label">{r.label}</th>
+            {columns.map((c) => {
+              const v = r.cells[c.id];
+              const symbol = v === 'yes' ? '✓' : v === 'partial' ? '−' : '✗';
+              const aria = v === 'yes' ? 'Yes' : v === 'partial' ? 'Partial' : 'No';
+              return (
+                <td class={`compare-cell cell-${v}${c.highlight ? ' is-highlight' : ''}`}>
+                  <span class="compare-mark" aria-label={aria}>{symbol}</span>
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <div class="compare-detail" aria-live="polite">
+      <p class="compare-detail-kicker">
+        <span class="compare-detail-dot"></span>
+        <span class="compare-detail-tag">{rows[0].label}</span>
+      </p>
+      <p class="compare-detail-text">{rows[0].detail}</p>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ rows }}>
+  window.__COMPARE__ = rows;
+</script>
+
+<script>
+  (function () {
+    const root = document.querySelector('.compare-section');
+    if (!root) return;
+    const rows = root.querySelectorAll('.compare-row');
+    const tagEl = root.querySelector('.compare-detail-tag');
+    const textEl = root.querySelector('.compare-detail-text');
+    const data = window.__COMPARE__ || [];
+
+    function select(row) {
+      rows.forEach((r) => {
+        const match = r === row;
+        r.classList.toggle('is-selected', match);
+        r.setAttribute('aria-pressed', match ? 'true' : 'false');
+      });
+      const id = row.getAttribute('data-row');
+      const entry = data.find((d) => d.id === id);
+      if (entry && tagEl)  tagEl.textContent  = entry.label;
+      if (entry && textEl) textEl.textContent = entry.detail;
+    }
+
+    rows.forEach((row) => {
+      row.addEventListener('click', () => select(row));
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          select(row);
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const order = Array.from(rows);
+          const next = order[Math.min(order.indexOf(row) + 1, order.length - 1)];
+          next.focus();
+          select(next);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          const order = Array.from(rows);
+          const prev = order[Math.max(order.indexOf(row) - 1, 0)];
+          prev.focus();
+          select(prev);
+        }
+      });
+    });
+  })();
+</script>
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  }
+
+  .compare-frame {
+    border: 1px solid var(--border-v);
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(14,11,22,0.7) 0%, rgba(5,4,9,0.5) 100%);
+    overflow: hidden;
+  }
+
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .compare-table thead th {
+    text-align: left;
+    padding: 18px 16px 14px;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(142,61,255,0.16);
+  }
+  .compare-th-spacer { width: 38%; }
+  .compare-col-head {
+    width: calc(62% / 3);
+    color: var(--muted);
+    border-left: 1px solid rgba(255,255,255,0.04);
+  }
+  .compare-col-head.is-highlight {
+    color: var(--white);
+    background: linear-gradient(180deg, rgba(142,61,255,0.12) 0%, rgba(142,61,255,0.04) 100%);
+    border-left: 1px solid rgba(142,61,255,0.28);
+  }
+  .compare-col-label {
+    display: block;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+  .compare-col-sub {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.42);
+    text-transform: lowercase;
+  }
+  .compare-col-head.is-highlight .compare-col-sub {
+    color: var(--vtext);
+    opacity: 0.7;
+  }
+
+  .compare-row {
+    cursor: pointer;
+    outline: none;
+    transition: background 0.18s ease;
+  }
+  .compare-row th,
+  .compare-row td {
+    padding: 14px 16px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+  }
+  .compare-row td { text-align: center; border-left: 1px solid rgba(255,255,255,0.04); }
+  .compare-row td.is-highlight { border-left: 1px solid rgba(142,61,255,0.18); background: rgba(142,61,255,0.04); }
+  .compare-row-label {
+    text-align: left;
+    font-weight: 600;
+    color: var(--white);
+  }
+  .compare-row:hover { background: rgba(142,61,255,0.04); }
+  .compare-row:focus-visible { background: rgba(142,61,255,0.06); }
+  .compare-row.is-selected {
+    background: rgba(142,61,255,0.08);
+  }
+  .compare-row.is-selected td.is-highlight { background: rgba(142,61,255,0.14); }
+
+  .compare-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .cell-yes .compare-mark {
+    color: #4ade80;
+    background: rgba(74,222,128,0.10);
+    border: 1px solid rgba(74,222,128,0.28);
+  }
+  .cell-partial .compare-mark {
+    color: var(--vtext);
+    background: rgba(201,167,255,0.08);
+    border: 1px solid rgba(201,167,255,0.22);
+  }
+  .cell-no .compare-mark {
+    color: rgba(255,255,255,0.35);
+    background: rgba(255,255,255,0.04);
+    border: 1px dashed rgba(255,255,255,0.14);
+  }
+
+  .compare-detail {
+    padding: 18px 22px 22px;
+    border-top: 1px solid rgba(142,61,255,0.14);
+    background: rgba(5,4,9,0.45);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .compare-detail-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(201,167,255,0.6);
+  }
+  .compare-detail-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--vtext);
+    box-shadow: 0 0 8px rgba(201,167,255,0.45);
+  }
+  .compare-detail-text {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: rgba(232,224,240,0.78);
+  }
+
+  @media (max-width: 720px) {
+    .compare-table { font-size: 12px; }
+    .compare-th-spacer { width: 44%; }
+    .compare-col-sub { display: none; }
+    .compare-row th, .compare-row td { padding: 11px 8px; }
+    .compare-row-label { font-size: 12px; }
+    .compare-mark { width: 22px; height: 22px; font-size: 12px; }
+    .compare-detail { padding: 16px 18px; }
+    .compare-detail-text { font-size: 12.5px; }
+  }
+</style>
