@@ -69,6 +69,16 @@ import Footer      from '../components/Footer.astro';
       }
     })();
   </script>
+
+  <!-- OpenCoven Feedback widget -->
+  <script is:inline>
+    (function(w,d){if(w.OpenCovenFeedback)return;w.OpenCovenFeedback=function(){
+    (w.OpenCovenFeedback.q=w.OpenCovenFeedback.q||[]).push(arguments)};
+    var s=d.createElement('script');s.async=true;
+    s.src='https://feedback.opencoven.ai/api/widget/sdk.js';
+    d.head.appendChild(s)})(window,document);
+    OpenCovenFeedback('init');
+  </script>
 </head>
 <body>
   <Ambient />
