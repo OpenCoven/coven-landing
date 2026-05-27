@@ -136,13 +136,27 @@ const GLOSSARY: Record<string, { def: string; href?: string }> = {
 
 // Wrap matching terms in the bullet text with a <mark class="kw" data-*> span for the client to enhance.
 // Returns the string with placeholders; client replaces with the real DOM.
+// NOTE: this fn is intentionally NOT used for dynamic bullets — the client uses a safe DOM text-node
+// walker instead. It is only kept here for any future static SSR use.
 function markKeywords(text: string): string {
+  // Process longest terms first to avoid sub-term stomping.
+  const entries = Object.entries(GLOSSARY).sort(([a], [b]) => b.length - a.length);
+  // Use placeholder tokens to avoid re-matching inside generated HTML.
+  const placeholders: Array<{ token: string; html: string }> = [];
   let out = text;
-  for (const [term, meta] of Object.entries(GLOSSARY)) {
-    const re = new RegExp(`\\b(${term})\\b`, 'gi');
+  entries.forEach(([term, meta], i) => {
+    const re = new RegExp(`\\b(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\b`, 'gi');
+    const token = `\x00KW${i}\x00`;
     const href = meta.href ? ` data-href="${meta.href}"` : '';
-    out = out.replace(re, `<mark class="kw" data-def="${meta.def.replace(/"/g, '&quot;')}"${href}>$1</mark>`);
-  }
+    if (re.test(out)) {
+      out = out.replace(re, token);
+      placeholders.push({ token, html: `<mark class="kw" data-def="${meta.def.replace(/"/g, '&quot;')}"${href} tabindex="0">$<term></mark>` });
+    }
+  });
+  // Restore placeholders
+  placeholders.forEach(({ token, html }) => {
+    out = out.replace(token, html);
+  });
   return out;
 }
 ---
@@ -219,7 +233,7 @@ function markKeywords(text: string): string {
         <h3 class="arch-detail-title">How Coven fits into your stack</h3>
         <p class="arch-detail-body">{DEFAULT_INTRO}</p>
         <ul class="arch-detail-bullets">
-          {DEFAULT_BULLETS.map((b) => <li set:html={markKeywords(b)}></li>)}
+          {DEFAULT_BULLETS.map((b) => <li>{b}</li>)}
         </ul>
       </div>
     </div>
@@ -245,10 +259,52 @@ function markKeywords(text: string): string {
 
     const order = Array.from(nodes);
 
-    // ── Tooltip logic ──────────────────────────────────────────────
+    // ── Glossary + tooltip ────────────────────────────────────────────
     const glossary = window.__ARCH_GLOSSARY__ || {};
 
-    function showTooltip(mark, e) {
+    // Safe DOM text-node walker: only ever touches text nodes, never
+    // attribute values — no HTML corruption possible.
+    function markKeywordsInNode(container) {
+      const terms = Object.keys(glossary).sort((a, b) => b.length - a.length);
+      const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+      const textNodes = [];
+      let n;
+      while ((n = walker.nextNode())) textNodes.push(n);
+
+      textNodes.forEach((textNode) => {
+        const text = textNode.textContent;
+        const raw  = [];
+        terms.forEach((term) => {
+          const re = new RegExp('\\b(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')\\b', 'gi');
+          let m;
+          while ((m = re.exec(text)) !== null) {
+            raw.push({ index: m.index, end: m.index + m[0].length, term, matched: m[0] });
+          }
+        });
+        if (!raw.length) return;
+        raw.sort((a, b) => a.index - b.index);
+        const hits = [];
+        let cursor = 0;
+        raw.forEach((m) => { if (m.index >= cursor) { hits.push(m); cursor = m.end; } });
+        const frag = document.createDocumentFragment();
+        let last = 0;
+        hits.forEach((m) => {
+          if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+          const mark = document.createElement('mark');
+          mark.className = 'kw';
+          mark.setAttribute('data-def', glossary[m.term].def);
+          if (glossary[m.term].href) mark.setAttribute('data-href', glossary[m.term].href);
+          mark.setAttribute('tabindex', '0');
+          mark.textContent = m.matched;
+          frag.appendChild(mark);
+          last = m.end;
+        });
+        if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+        textNode.parentNode.replaceChild(frag, textNode);
+      });
+    }
+
+    function showTooltip(mark) {
       if (!tooltip) return;
       const def  = mark.getAttribute('data-def') || '';
       const href = mark.getAttribute('data-href');
@@ -263,9 +319,8 @@ function markKeywords(text: string): string {
           linkEl.style.display = 'none';
         }
       }
-      // Position near the mark
-      const rect = mark.getBoundingClientRect();
-      const panel = tooltip.closest('.arch-detail') || document.body;
+      const rect     = mark.getBoundingClientRect();
+      const panel    = tooltip.closest('.arch-detail') || document.body;
       const panelRect = panel.getBoundingClientRect();
       tooltip.style.left = (rect.left - panelRect.left) + 'px';
       tooltip.style.top  = (rect.bottom - panelRect.top + 6) + 'px';
@@ -280,16 +335,18 @@ function markKeywords(text: string): string {
 
     function wireKeywords(container) {
       container.querySelectorAll('mark.kw').forEach((mark) => {
-        mark.addEventListener('mouseenter', (e) => showTooltip(mark, e));
+        mark.addEventListener('mouseenter', () => showTooltip(mark));
         mark.addEventListener('mouseleave', hideTooltip);
-        mark.addEventListener('focusin',    (e) => showTooltip(mark, e));
+        mark.addEventListener('focusin',    () => showTooltip(mark));
         mark.addEventListener('focusout',   hideTooltip);
       });
     }
-    // Wire default bullets (already in DOM)
+
+    // Wire the default bullets that Astro SSR already put in the DOM
+    markKeywordsInNode(document.querySelector('.arch-detail-bullets') || document);
     wireKeywords(document);
 
-    // ── Node selection ──────────────────────────────────────────────
+    // ── Node selection ─────────────────────────────────────────────
     function focusNode(node) {
       order.forEach((n) => n.setAttribute('tabindex', n === node ? '0' : '-1'));
       node.focus();
@@ -305,7 +362,6 @@ function markKeywords(text: string): string {
       if (titleEl) titleEl.textContent = data.title;
       if (bodyEl)  bodyEl.textContent  = data.intro;
 
-      // Color accent on kicker dot + title based on node layer color
       const colorMap = { violet: '#C9A7FF', orchid: '#D26BFF', green: '#30D158' };
       const accent = colorMap[data.color] || '#C9A7FF';
       const dot = kickerEl?.querySelector('.arch-detail-dot');
@@ -316,10 +372,11 @@ function markKeywords(text: string): string {
         bulletsEl.replaceChildren();
         (data.bullets || []).forEach((b) => {
           const li = document.createElement('li');
-          // Run keyword markup
-          li.innerHTML = window.__ARCH_KW_FN__ ? window.__ARCH_KW_FN__(b) : b;
+          li.textContent = b; // plain text first
           bulletsEl.appendChild(li);
         });
+        // Walk text nodes and inject <mark> elements safely
+        markKeywordsInNode(bulletsEl);
         wireKeywords(bulletsEl);
       }
       if (tagEl)    tagEl.textContent = layer || 'node';
@@ -352,22 +409,9 @@ function markKeywords(text: string): string {
 </script>
 
 <script is:inline define:vars={{ nodes, GLOSSARY }}>
-  // Bridge the server-rendered node data into the client script above.
+  // Bridge server-rendered node data + glossary to the client script.
   window.__ARCH_NODES__    = Object.fromEntries(nodes.map((n) => [n.id, n]));
   window.__ARCH_GLOSSARY__ = GLOSSARY;
-
-  // Keyword markup fn — mirrors the server-side markKeywords() logic.
-  window.__ARCH_KW_FN__ = function(text) {
-    var out = text;
-    var terms = Object.keys(GLOSSARY).sort((a, b) => b.length - a.length);
-    terms.forEach(function(term) {
-      var meta = GLOSSARY[term];
-      var re   = new RegExp('\\b(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')\\b', 'gi');
-      var href = meta.href ? ' data-href="' + meta.href + '"' : '';
-      out = out.replace(re, '<mark class="kw" data-def="' + meta.def.replace(/"/g, '&quot;') + '"' + href + '>$1</mark>');
-    });
-    return out;
-  };
 </script>
 
 <style>
@@ -555,7 +599,8 @@ function markKeywords(text: string): string {
   }
 
   /* ── Keyword marks ─────────────────────────────── */
-  mark.kw {
+  /* :global() bypasses Astro scoped hash so JS-injected <mark> gets styles */
+  :global(mark.kw) {
     background: transparent;
     color: #C9A7FF;
     font-weight: 600;
@@ -563,11 +608,12 @@ function markKeywords(text: string): string {
     border-bottom: 1px dotted rgba(201, 167, 255, 0.45);
     transition: color 0.15s, border-color 0.15s;
   }
-  mark.kw:hover,
-  mark.kw:focus { color: #D26BFF; border-color: rgba(210, 107, 255, 0.7); outline: none; }
+  :global(mark.kw:hover),
+  :global(mark.kw:focus) { color: #D26BFF; border-color: rgba(210, 107, 255, 0.7); outline: none; }
 
   /* ── Tooltip ───────────────────────────────────── */
-  .arch-tooltip {
+  /* :global() needed — tooltip is outside the scoped component subtree */
+  :global(.arch-tooltip) {
     position: absolute;
     z-index: 200;
     max-width: 260px;
@@ -581,25 +627,25 @@ function markKeywords(text: string): string {
     transform: translateY(4px);
     transition: opacity 0.15s ease, transform 0.15s ease;
   }
-  .arch-tooltip.is-visible {
+  :global(.arch-tooltip.is-visible) {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
   }
-  .arch-tooltip-def {
+  :global(.arch-tooltip-def) {
     font-size: 12.5px;
     line-height: 1.55;
     color: rgba(232, 224, 240, 0.88);
     margin-bottom: 6px;
   }
-  .arch-tooltip-link {
+  :global(.arch-tooltip-link) {
     font-size: 11.5px;
     font-family: var(--mono);
     color: #C9A7FF;
     text-decoration: none;
     opacity: 0.8;
   }
-  .arch-tooltip-link:hover { opacity: 1; text-decoration: underline; }
+  :global(.arch-tooltip-link:hover) { opacity: 1; text-decoration: underline; }
 
   @media (max-width: 1100px) {
     .architecture-diagram {
