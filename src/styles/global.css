@@ -175,7 +175,7 @@
       transition: color 0.15s;
       letter-spacing: 0.01em;
     }
-    .desktop-nav a:hover { color: var(--white); }
+    .desktop-nav a:hover { color: var(--coven-violet-light); }
 
     .btn-join {
       flex-shrink: 0;
@@ -734,7 +734,7 @@
       color: var(--muted); text-decoration: none;
       transition: color 0.15s;
     }
-    .footer-nav a:hover { color: var(--white); }
+    .footer-nav a:hover { color: var(--coven-violet-light); }
     .footer-copy {
       font-size: 11px; color: var(--muted); opacity: 0.5;
     }
@@ -908,4 +908,15 @@
       .content-section, .proof-section { padding: 40px 16px; }
       .ecosystem-section { padding: 40px 0; }
       .ecosystem-inner { padding: 24px 16px; }
+    }
+
+    /* ── Active / current nav links (mirrors coven-docs globals.css) ── */
+    a[aria-current="page"],
+    a[data-active="true"] {
+      color: var(--coven-violet-dark);
+      font-weight: 600;
+    }
+    nav a:hover,
+    footer a:hover {
+      color: var(--coven-violet-light);
     }
