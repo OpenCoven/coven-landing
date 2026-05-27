@@ -31,11 +31,31 @@ import Footer      from '../components/Footer.astro';
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="theme-color" content="#050409" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://opencoven.ai/" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <script type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'OpenCoven',
+    alternateName: 'Coven',
+    description: 'An open ecosystem for persistent AI familiars: named agents with memory, tools, identity, roles, and continuity.',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'macOS, Linux, Windows',
+    url: 'https://opencoven.ai/',
+    downloadUrl: 'https://github.com/OpenCoven/coven',
+    softwareHelp: { '@type': 'CreativeWork', url: 'https://docs.opencoven.ai/' },
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    sameAs: [
+      'https://github.com/OpenCoven',
+      'https://discord.gg/opencoven',
+    ],
+  })} />
 
   <script is:inline>
     /* Runs before paint: marks <html> with js-on / motion-on so interactive
