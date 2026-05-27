@@ -582,6 +582,67 @@
       color: var(--muted);
     }
 
+    /* ── QUICK START ─────────────────────────────────────── */
+    .qs-step { display: flex; flex-direction: column; gap: 14px; }
+    .qs-codeblock {
+      position: relative;
+      background: rgba(5,4,9,0.72);
+      border: 1px solid rgba(142,61,255,0.18);
+      border-radius: 6px;
+      padding: 11px 44px 11px 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(232,224,240,0.92);
+      white-space: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .qs-codeblock::before {
+      content: '$';
+      color: rgba(201,167,255,0.5);
+      margin-right: 8px;
+      user-select: none;
+    }
+    .qs-codeblock code {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+    .qs-copy {
+      position: absolute;
+      top: 50%; right: 6px;
+      transform: translateY(-50%);
+      background: transparent;
+      border: 1px solid rgba(142,61,255,0.18);
+      color: rgba(201,167,255,0.7);
+      border-radius: 4px;
+      padding: 4px 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+    .qs-copy svg { display: block; width: 13px; height: 13px; }
+    .qs-copy.is-copied {
+      color: var(--green);
+      border-color: rgba(48,209,88,0.4);
+      background: rgba(48,209,88,0.06);
+    }
+    .qs-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    @media (hover: hover) {
+      .qs-copy:hover {
+        background: rgba(142,61,255,0.14);
+        color: #fff;
+        border-color: rgba(142,61,255,0.4);
+      }
+      .qs-copy:active { transform: translateY(-50%) scale(0.94); }
+    }
+
     /* ── ECOSYSTEM / CTA SECTION ─────────────────────────── */
     .ecosystem-section {
       position: relative; z-index: 1;
@@ -842,6 +903,7 @@
     <nav class="desktop-nav">
       <a href="#familiars">Familiars</a>
       <a href="#runtime">Runtime</a>
+      <a href="#quickstart">Quick Start</a>
       <a href="https://docs.opencoven.ai">Docs</a>
       <a href="#ecosystem">Ecosystem</a>
       <a href="https://discord.gg/opencoven">Community</a>
@@ -857,6 +919,7 @@
   <button class="mobile-nav-close" aria-label="Close menu">×</button>
   <a href="#familiars">Familiars</a>
   <a href="#runtime">Runtime</a>
+  <a href="#quickstart">Quick Start</a>
   <a href="https://docs.opencoven.ai">Docs</a>
   <a href="#ecosystem">Ecosystem</a>
   <a href="https://discord.gg/opencoven">Community</a>
@@ -1058,6 +1121,51 @@
   </div>
 </section>
 
+<!-- Quick Start -->
+<section class="content-section" id="quickstart" aria-labelledby="quickstart-heading">
+  <div class="section-header" data-reveal>
+    <p class="section-kicker">Quick Start</p>
+    <h2 id="quickstart-heading">Run your first familiar in three commands.</h2>
+    <p>Coven runs locally inside the projects you already have. Verify, start, and resume — memory persists across every session.</p>
+  </div>
+  <div class="card-grid three">
+    <div class="glass-card qs-step" data-reveal>
+      <p class="card-kicker">01 · Verify</p>
+      <div class="qs-codeblock">
+        <code>npx @opencoven/cli doctor</code>
+        <button class="qs-copy" type="button" aria-label="Copy command" data-copy="npx @opencoven/cli doctor">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
+      </div>
+      <p>Checks your environment and detects supported harnesses — Codex, Claude Code, and more.</p>
+    </div>
+    <div class="glass-card qs-step" data-reveal>
+      <p class="card-kicker">02 · Start a session</p>
+      <div class="qs-codeblock">
+        <code>coven run claude "fix the failing tests"</code>
+        <button class="qs-copy" type="button" aria-label="Copy command" data-copy='coven run claude "fix the failing tests"'>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
+      </div>
+      <p>Launches a project-scoped session through Coven's managed PTY, bound to the current working directory.</p>
+    </div>
+    <div class="glass-card qs-step" data-reveal>
+      <p class="card-kicker">03 · Resume anywhere</p>
+      <div class="qs-codeblock">
+        <code>coven sessions</code>
+        <button class="qs-copy" type="button" aria-label="Copy command" data-copy="coven sessions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
+      </div>
+      <p>Interactive browser to rejoin, summon, archive, or view logs — work picks up where you left off.</p>
+    </div>
+  </div>
+  <div class="qs-actions" data-reveal>
+    <a class="btn-primary" href="https://docs.opencoven.ai">Read the full docs</a>
+    <a class="btn-secondary" href="https://github.com/OpenCoven/coven">View on GitHub ↗</a>
+  </div>
+</section>
+
 <!-- Ecosystem / final CTA -->
 <section class="ecosystem-section" id="ecosystem" aria-labelledby="ecosystem-heading">
   <div class="ecosystem-inner" data-reveal>
@@ -1089,6 +1197,7 @@
     <nav class="footer-nav" aria-label="Footer">
       <a href="#familiars">Familiars</a>
       <a href="#runtime">Runtime</a>
+      <a href="#quickstart">Quick Start</a>
       <a href="#ecosystem">Ecosystem</a>
       <a href="https://docs.opencoven.ai">Docs</a>
       <a href="https://github.com/OpenCoven">GitHub</a>
@@ -1296,6 +1405,30 @@
     }
 
     if (motionOn) startRotate();
+  })();
+
+  // ── Quick Start: copy-to-clipboard ────────────────────────
+  (function () {
+    var buttons = document.querySelectorAll('.qs-copy[data-copy]');
+    if (!buttons.length || !navigator.clipboard) return;
+    var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+    buttons.forEach(function (btn) {
+      var originalHTML = btn.innerHTML;
+      var resetTimer = null;
+      btn.addEventListener('click', function () {
+        navigator.clipboard.writeText(btn.getAttribute('data-copy')).then(function () {
+          btn.classList.add('is-copied');
+          btn.innerHTML = CHECK_SVG;
+          btn.setAttribute('aria-label', 'Copied');
+          if (resetTimer) clearTimeout(resetTimer);
+          resetTimer = setTimeout(function () {
+            btn.classList.remove('is-copied');
+            btn.innerHTML = originalHTML;
+            btn.setAttribute('aria-label', 'Copy command');
+          }, 1400);
+        });
+      });
+    });
   })();
 </script>
 </body>
