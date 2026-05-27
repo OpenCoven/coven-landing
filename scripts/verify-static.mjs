@@ -60,7 +60,6 @@ const requiredCopy = [
   'identity',
   'tools',
   'familiars',
-  'OpenClaw',
   'CastCodes',
   'https://discord.gg/opencoven',
   'Join the Discord',

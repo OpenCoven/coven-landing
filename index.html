@@ -1001,11 +1001,11 @@
           </div>
           <span class="familiar-badge badge-idle">idle</span>
         </div>
-        <div class="card-familiar" data-familiar="openclaw" role="tab" tabindex="0" aria-selected="false">
-          <div class="familiar-sigil">O</div>
+        <div class="card-familiar" data-familiar="sage" role="tab" tabindex="0" aria-selected="false">
+          <div class="familiar-sigil">S</div>
           <div class="familiar-info">
-            <span class="familiar-name">OpenClaw</span>
-            <span class="familiar-role">gateway · orchestration</span>
+            <span class="familiar-name">Sage</span>
+            <span class="familiar-role">research · docs · long context</span>
           </div>
           <span class="familiar-badge badge-idle">idle</span>
         </div>
@@ -1058,7 +1058,7 @@
     <div class="proof-card" data-reveal>
       <div class="proof-num">03</div>
       <h3>Shared ecosystem</h3>
-      <p>OpenClaw, CastCodes, dashboards, and docs built to fit together.</p>
+      <p>Codex, Claude Code, CastCodes, dashboards, and docs built to fit together.</p>
     </div>
     <div class="proof-card" data-reveal>
       <div class="proof-num">04</div>
@@ -1108,9 +1108,9 @@
       <p>Launch and attach to agent work inside local repositories with visible output, history, and lifecycle control.</p>
     </div>
     <div class="glass-card" data-reveal>
-      <p class="card-kicker">/OpenClaw</p>
-      <h3>Tool gateway for familiars</h3>
-      <p>Give agents controlled access to messages, sessions, memory, cron, media, web search, and local execution.</p>
+      <p class="card-kicker">/Harnesses</p>
+      <h3>Pluggable harness adapters</h3>
+      <p>Run Codex, Claude Code, and future agent CLIs through one neutral interface — project-scoped sessions, visible output, and lifecycle control without rewriting per-harness.</p>
     </div>
     <div class="glass-card" data-reveal>
       <p class="card-kicker">/CastCodes</p>
@@ -1300,16 +1300,16 @@
           { text: 'tone: warm + concise — no exclamation marks', meta: 'persisted' }
         ]
       },
-      openclaw: {
-        name: 'OpenClaw',
-        command: 'coven attach openclaw --route messages.media',
+      sage: {
+        name: 'Sage',
+        command: 'coven attach sage --context ./docs --long',
         notes: [
-          { text: 'routed 23 tool calls in last session', meta: '1h ago' },
-          { text: 'budget cap: 500 calls/day · 81% used', meta: 'persisted' }
+          { text: 'loaded 4 docs into context · 18k tokens', meta: '40m ago' },
+          { text: 'model: long-context first, summarize before answer', meta: 'persisted' }
         ]
       }
     };
-    var order = ['forge', 'charm', 'openclaw'];
+    var order = ['forge', 'charm', 'sage'];
     var current = 'forge';
     var userTook = false;
     var rotateTimer = null;
