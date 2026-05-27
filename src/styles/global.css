@@ -24,6 +24,11 @@
       --oc-focus-ring:          0 0 0 2px rgba(154, 142, 205, 0.52), 0 0 32px rgba(154, 142, 205, 0.28);
       --oc-hover-glow:          0 0 36px rgba(154, 142, 205, 0.26);
 
+      /* ── Coven named violet tokens (mirrors coven-docs globals.css exactly) ── */
+      --coven-violet:       #9A8ECD;
+      --coven-violet-light: #B4AAEB;
+      --coven-violet-dark:  #7A6FB3;
+
       /* ── Semantic aliases (used throughout the landing) ── */
       --bg:      var(--oc-surface-0);
       --surface: var(--oc-surface-1);
@@ -51,10 +56,32 @@
       background: var(--bg);
       color: var(--white);
       font-family: var(--font-ui);
+      font-feature-settings: "rlig" 1, "calt" 1;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       min-height: 100vh;
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── Glassmorphism cards (mirrors coven-docs callout style) ── */
+    .glass-card {
+      background: rgba(154, 142, 205, 0.06);
+      border: 1px solid rgba(154, 142, 205, 0.15);
+      border-radius: var(--radius-md);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    /* ── Inline code (matches coven-docs dark code style) ── */
+    :not(pre) > code {
+      background: rgba(154, 142, 205, 0.1);
+      color: var(--coven-violet-light);
+      border: 1px solid rgba(154, 142, 205, 0.15);
+      border-radius: 4px;
+      padding: 0.15em 0.35em;
+      font-size: 0.875em;
+      font-family: var(--mono);
     }
 
     a, button { touch-action: manipulation; }
