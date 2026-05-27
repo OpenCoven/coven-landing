@@ -36,7 +36,10 @@ const assertCanonicalLogoSvg = (content, label) => {
       `${label} still uses the generated/currentColor mark instead of canonical logo fills`,
     );
   }
-  if (!content.includes('fill="#000000"') || !content.includes('fill="#FFFFFF"')) {
+  // Accept either the full hex form or SVGO's optimized shorthand.
+  const hasBlack = /fill="#0{3,6}"/i.test(content);
+  const hasWhite = /fill="#f{3,6}"/i.test(content) || /fill="#FFFFFF"/i.test(content);
+  if (!hasBlack || !hasWhite) {
     throw new Error(`${label} must use the white-on-black OpenCoven logo variant`);
   }
 };
