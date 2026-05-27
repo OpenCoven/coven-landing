@@ -2,10 +2,16 @@
   "name": "coven-landing",
   "version": "0.0.0",
   "private": true,
-  "description": "Standalone static landing page for OpenCoven/Coven.",
+  "description": "Standalone landing page for OpenCoven/Coven, built with Astro.",
   "type": "module",
   "scripts": {
-    "check": "node scripts/verify-static.mjs",
-    "preview": "python3 -m http.server 4173 --directory ."
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview --port 4173",
+    "astro": "astro",
+    "check": "node scripts/verify-static.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.0.0"
   }
 }

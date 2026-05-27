@@ -1,27 +1,41 @@
 # coven-landing
 
-Standalone static landing page for OpenCoven/Coven.
+Landing page for OpenCoven / Coven, built with [Astro](https://astro.build).
 
-## Preview
+## Develop
 
 ```sh
-npm run preview
+npm install
+npm run dev
 ```
 
-Then open <http://localhost:4173>.
+Then open <http://localhost:4321>.
+
+## Build + preview
+
+```sh
+npm run build      # outputs static site to dist/
+npm run preview    # serves dist/ on http://localhost:4173
+```
 
 ## Verify
 
 ```sh
-npm run check
+npm run check      # verify-static sanity checks (run after `npm run build`)
 ```
 
-The site is dependency-free: plain HTML/CSS plus static image assets, suitable for any static host.
+`verify-static.mjs` confirms required public assets exist, the canonical OpenCoven logo treatment is used in `favicon.svg` and `og.svg`, and that built HTML still contains load-bearing copy.
 
-## Files
+## Layout
 
-- `index.html` — landing page markup and metadata
-- `brand.css` — page styling
-- `assets/` — OpenCoven color and typography tokens
-- `favicon.svg`, `apple-touch-icon.png`, `og.svg`, `og.png` — brand/social assets
-- `scripts/verify-static.mjs` — local static sanity checks
+```
+public/         Static assets served at /        (favicon, og image, apple touch icon)
+src/
+  pages/        Astro routes                     (index.astro)
+  components/   Page sections                    (Hero, ProofGrid, Familiars, …)
+  scripts/      Client-side islands              (main.js — hero card, reveals, parallax, copy)
+  styles/       Global stylesheet                (global.css)
+scripts/        Build-time sanity checks         (verify-static.mjs)
+```
+
+Vercel auto-detects Astro and runs `npm run build`, serving `dist/`.
