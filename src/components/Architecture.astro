@@ -157,12 +157,13 @@ const DEFAULT_BULLETS = [
 
       <path class="arch-loop" d="M 305 260 q 0 -32 75 0" />
 
-      {nodes.map((n) => (
+      {nodes.map((n, i) => (
         <g
           class={`arch-node arch-node--${n.layer}`}
           data-node={n.id}
+          data-layer={n.layer}
           role="button"
-          tabindex="0"
+          tabindex={i === 0 ? '0' : '-1'}
           aria-label={n.title}
         >
           <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="8" />
@@ -194,16 +195,23 @@ const DEFAULT_BULLETS = [
     const tagEl     = document.querySelector('.arch-detail-tag');
     const kickerEl  = document.querySelector('.arch-detail-kicker');
 
+    const order = Array.from(nodes);
+
+    function focusNode(node) {
+      order.forEach((n) => n.setAttribute('tabindex', n === node ? '0' : '-1'));
+      node.focus();
+    }
+
     function select(node) {
       nodes.forEach((n) => n.classList.toggle('is-selected', n === node));
       const id = node.getAttribute('data-node');
-      const layer = Array.from(node.classList).find((c) => c.startsWith('arch-node--'))?.replace('arch-node--', '');
+      const layer = node.getAttribute('data-layer');
       const data = window.__ARCH_NODES__?.[id];
       if (!data) return;
       if (titleEl) titleEl.textContent = data.title;
       if (bodyEl)  bodyEl.textContent  = data.intro;
       if (bulletsEl) {
-        bulletsEl.innerHTML = '';
+        bulletsEl.replaceChildren();
         (data.bullets || []).forEach((b) => {
           const li = document.createElement('li');
           li.textContent = b;
@@ -217,9 +225,22 @@ const DEFAULT_BULLETS = [
     nodes.forEach((node) => {
       node.addEventListener('click', () => select(node));
       node.addEventListener('keydown', (e) => {
+        const i = order.indexOf(node);
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           select(node);
+        } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          focusNode(order[(i + 1) % order.length]);
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          focusNode(order[(i - 1 + order.length) % order.length]);
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          focusNode(order[0]);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          focusNode(order[order.length - 1]);
         }
       });
     });
@@ -244,7 +265,7 @@ const DEFAULT_BULLETS = [
     display: block;
   }
   .arch-layer-label {
-    fill: rgba(201, 167, 255, 0.55);
+    fill: rgba(201, 167, 255, 0.78);
     font-family: var(--mono);
     font-size: 10px;
     font-weight: 700;
@@ -257,7 +278,7 @@ const DEFAULT_BULLETS = [
     stroke-dasharray: 6, 5;
   }
   .arch-boundary-tag {
-    fill: rgba(201, 167, 255, 0.5);
+    fill: rgba(201, 167, 255, 0.72);
     font-family: var(--mono);
     font-size: 9px;
     font-weight: 700;
@@ -276,7 +297,7 @@ const DEFAULT_BULLETS = [
     marker-end: url(#arch-arrow-up);
   }
   .arch-return-label {
-    fill: rgba(74, 222, 128, 0.55);
+    fill: rgba(74, 222, 128, 0.78);
     font-family: var(--mono);
     font-size: 9px;
     font-weight: 700;
@@ -318,9 +339,15 @@ const DEFAULT_BULLETS = [
       stroke: rgba(201, 167, 255, 0.55);
     }
   }
+  .arch-node { outline: none; }
   .arch-node:focus-visible rect {
-    stroke: rgba(201, 167, 255, 0.85);
-    stroke-width: 1.6;
+    stroke: #E8DBFF;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 0 2px rgba(232, 219, 255, 0.45));
+  }
+  /* Halo for keyboard focus that's perceptible against the dark surface */
+  .arch-node:focus-visible {
+    filter: drop-shadow(0 0 8px rgba(201, 167, 255, 0.6));
   }
   .arch-node.is-selected rect {
     fill: rgba(142, 61, 255, 0.16);

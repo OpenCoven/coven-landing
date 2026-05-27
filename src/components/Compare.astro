@@ -5,7 +5,7 @@
 const columns = [
   { id: 'raw',    label: 'Raw harness',   sub: 'Claude Code, Codex direct' },
   { id: 'other',  label: 'Other tools',   sub: 'IDE-bound agents, suites' },
-  { id: 'coven',  label: 'Coven',         sub: 'this',                 highlight: true },
+  { id: 'coven',  label: 'Coven',         sub: 'this runtime',         highlight: true },
 ];
 
 // status values: 'yes' | 'partial' | 'no'
@@ -15,7 +15,7 @@ const rows = [
     label: 'Cross-session memory',
     cells: { raw: 'no', other: 'partial', coven: 'yes' },
     detail:
-      'Raw harnesses lose state when the chat ends; bolt-on tools save chat history but not curated working memory per familiar. Coven stores explicit notes that persist and surface in the next session.',
+      'Raw harnesses lose state when the chat ends; most other tools save chat history but not curated working memory per familiar. Coven stores explicit notes that persist and surface in the next session.',
   },
   {
     id: 'scope',
@@ -59,7 +59,7 @@ const rows = [
   <div class="section-header" data-reveal>
     <p class="section-kicker">Compare</p>
     <h2 id="compare-heading">Why Coven, not just a harness?</h2>
-    <p>Same agent CLIs, different substrate. Pick a row to see how each option actually behaves.</p>
+    <p>Same agent CLIs, different runtime around them. Pick a row to see how each option actually behaves.</p>
   </div>
 
   <div class="compare-frame" data-reveal>
@@ -83,11 +83,15 @@ const rows = [
           <tr
             class={`compare-row${i === 0 ? ' is-selected' : ''}`}
             data-row={r.id}
-            tabindex="0"
-            role="button"
-            aria-pressed={i === 0 ? 'true' : 'false'}
           >
-            <th scope="row" class="compare-row-label">{r.label}</th>
+            <th scope="row" class="compare-row-label">
+              <button
+                class="compare-row-button"
+                type="button"
+                data-row-button
+                aria-pressed={i === 0 ? 'true' : 'false'}
+              >{r.label}</button>
+            </th>
             {columns.map((c) => {
               const v = r.cells[c.id];
               const symbol = v === 'yes' ? '✓' : v === 'partial' ? '−' : '✗';
@@ -122,15 +126,16 @@ const rows = [
     const root = document.querySelector('.compare-section');
     if (!root) return;
     const rows = root.querySelectorAll('.compare-row');
+    const buttons = root.querySelectorAll('.compare-row-button');
     const tagEl = root.querySelector('.compare-detail-tag');
     const textEl = root.querySelector('.compare-detail-text');
     const data = window.__COMPARE__ || [];
 
     function select(row) {
-      rows.forEach((r) => {
-        const match = r === row;
-        r.classList.toggle('is-selected', match);
-        r.setAttribute('aria-pressed', match ? 'true' : 'false');
+      rows.forEach((r) => r.classList.toggle('is-selected', r === row));
+      buttons.forEach((b) => {
+        const match = b.closest('.compare-row') === row;
+        b.setAttribute('aria-pressed', match ? 'true' : 'false');
       });
       const id = row.getAttribute('data-row');
       const entry = data.find((d) => d.id === id);
@@ -138,24 +143,37 @@ const rows = [
       if (entry && textEl) textEl.textContent = entry.detail;
     }
 
+    // Mouse: anywhere on the row activates the row's select button.
     rows.forEach((row) => {
-      row.addEventListener('click', () => select(row));
-      row.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+      row.addEventListener('click', (e) => {
+        // Skip if the click was on the button itself — its own handler fires.
+        if (e.target.closest('.compare-row-button')) return;
+        select(row);
+      });
+    });
+
+    // Keyboard: real <button> handles Enter/Space natively; we add arrow nav.
+    const order = Array.from(buttons);
+    buttons.forEach((btn) => {
+      const row = btn.closest('.compare-row');
+      btn.addEventListener('click', () => select(row));
+      btn.addEventListener('keydown', (e) => {
+        const i = order.indexOf(btn);
+        if (e.key === 'ArrowDown') {
           e.preventDefault();
-          select(row);
-        } else if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          const order = Array.from(rows);
-          const next = order[Math.min(order.indexOf(row) + 1, order.length - 1)];
-          next.focus();
-          select(next);
+          const next = order[Math.min(i + 1, order.length - 1)];
+          next.focus(); select(next.closest('.compare-row'));
         } else if (e.key === 'ArrowUp') {
           e.preventDefault();
-          const order = Array.from(rows);
-          const prev = order[Math.max(order.indexOf(row) - 1, 0)];
-          prev.focus();
-          select(prev);
+          const prev = order[Math.max(i - 1, 0)];
+          prev.focus(); select(prev.closest('.compare-row'));
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          order[0].focus(); select(order[0].closest('.compare-row'));
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          order[order.length - 1].focus();
+          select(order[order.length - 1].closest('.compare-row'));
         }
       });
     });
@@ -239,8 +257,25 @@ const rows = [
     font-weight: 600;
     color: var(--white);
   }
+  .compare-row-button {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    outline: none;
+  }
+  .compare-row-button:focus-visible {
+    outline: 2px solid #E8DBFF;
+    outline-offset: 4px;
+    border-radius: 3px;
+  }
   .compare-row:hover { background: rgba(142,61,255,0.04); }
-  .compare-row:focus-visible { background: rgba(142,61,255,0.06); }
   .compare-row.is-selected {
     background: rgba(142,61,255,0.08);
   }
@@ -266,9 +301,9 @@ const rows = [
     border: 1px solid rgba(201,167,255,0.22);
   }
   .cell-no .compare-mark {
-    color: rgba(255,255,255,0.35);
+    color: rgba(255,255,255,0.62);
     background: rgba(255,255,255,0.04);
-    border: 1px dashed rgba(255,255,255,0.14);
+    border: 1px dashed rgba(255,255,255,0.22);
   }
 
   .compare-detail {
