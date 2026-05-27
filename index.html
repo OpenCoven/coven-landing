@@ -19,6 +19,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
+  <script>
+    /* Enables interactive-only CSS (reveals, parallax). Runs before paint so
+       no-JS visitors and reduced-motion users never see hidden content. */
+    (function () {
+      var html = document.documentElement;
+      html.classList.add('js-on');
+      if (!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        html.classList.add('motion-on');
+      }
+    })();
+  </script>
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -54,26 +66,52 @@
       pointer-events: none;
       z-index: 0;
       overflow: hidden;
+      /* JS-driven cursor offset (-0.5..0.5). Falls back to 0/0. */
+      --mx: 0;
+      --my: 0;
     }
     .ambient-glow {
       position: absolute;
       border-radius: 50%;
       filter: blur(120px);
+      transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+      will-change: transform;
     }
     .glow-left {
       width: 600px; height: 500px;
       top: -10%; left: -8%;
       background: radial-gradient(circle, rgba(59,22,79,0.55) 0%, transparent 70%);
+      transform: translate3d(calc(var(--mx) * 45px), calc(var(--my) * 30px), 0);
     }
     .glow-right {
       width: 700px; height: 600px;
       top: 5%; right: -15%;
       background: radial-gradient(circle, rgba(142,61,255,0.18) 0%, transparent 65%);
+      transform: translate3d(calc(var(--mx) * -55px), calc(var(--my) * -38px), 0);
     }
     .glow-bottom {
       width: 500px; height: 400px;
       bottom: 10%; left: 30%;
       background: radial-gradient(circle, rgba(59,22,79,0.3) 0%, transparent 70%);
+      transform: translate3d(calc(var(--mx) * 25px), calc(var(--my) * 22px), 0);
+    }
+    /* Touch devices: gentle keyframe drift instead of cursor tracking */
+    @media (hover: none) {
+      .glow-left   { animation: drift-a 18s ease-in-out infinite alternate; }
+      .glow-right  { animation: drift-b 22s ease-in-out infinite alternate; }
+      .glow-bottom { animation: drift-c 16s ease-in-out infinite alternate; }
+    }
+    @keyframes drift-a {
+      from { transform: translate3d(-18px, -10px, 0); }
+      to   { transform: translate3d( 14px,  12px, 0); }
+    }
+    @keyframes drift-b {
+      from { transform: translate3d( 22px,   8px, 0); }
+      to   { transform: translate3d(-26px, -14px, 0); }
+    }
+    @keyframes drift-c {
+      from { transform: translate3d(-14px,   6px, 0); }
+      to   { transform: translate3d( 16px,  -8px, 0); }
     }
 
     /* ── HEADER ──────────────────────────────────────────── */
@@ -203,17 +241,23 @@
       background: var(--bg);
       padding: 18px 14px 20px;
       display: flex; flex-direction: column; gap: 8px;
+      position: relative;
+      transition: background 0.25s ease;
     }
-    .feature-cell:hover { background: var(--surface); }
     .feature-icon {
       font-size: 18px; line-height: 1;
       margin-bottom: 2px;
+      display: inline-block;
+      transition: transform 0.25s ease, color 0.25s ease;
+      color: var(--vtext);
+      opacity: 0.85;
     }
     .feature-label {
       font-family: var(--mono);
       font-size: 9px; font-weight: 700;
       letter-spacing: 0.14em; text-transform: uppercase;
       color: var(--vtext);
+      transition: color 0.25s ease;
     }
     .feature-desc {
       font-size: 11px; line-height: 1.5;
@@ -305,6 +349,11 @@
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .card-familiar:last-child { border-bottom: none; }
+    .card-familiar { outline: none; user-select: none; }
+    .card-familiar:focus-visible {
+      box-shadow: inset 0 0 0 1px rgba(142,61,255,0.5);
+      border-radius: 4px;
+    }
     .card-familiar.active .familiar-sigil {
       border-color: rgba(142,61,255,0.55);
       background: rgba(142,61,255,0.22);
@@ -312,6 +361,11 @@
       box-shadow: 0 0 0 1px rgba(142,61,255,0.15), 0 0 14px rgba(142,61,255,0.18);
     }
     .card-familiar.active .familiar-name { color: #fff; }
+    /* Memory note swap fade — applied by JS when notes change */
+    .memory-note, .memory-title, .card-cmd { transition: opacity 0.2s ease; }
+    .memory-swap .memory-note,
+    .memory-swap .memory-title { opacity: 0.15; }
+    .familiar-badge { transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease; }
     .familiar-sigil {
       width: 32px; height: 32px;
       border-radius: 6px;
@@ -441,19 +495,22 @@
     .proof-card {
       background: var(--bg);
       padding: 28px 24px;
+      position: relative;
+      transition: background 0.25s ease;
     }
-    .proof-card:hover { background: var(--surface); }
     .proof-num {
       font-family: var(--mono);
       font-size: 10px; font-weight: 700;
       letter-spacing: 0.14em;
       color: var(--vtext); opacity: 0.6;
       margin-bottom: 14px;
+      transition: opacity 0.25s ease, color 0.25s ease;
     }
     .proof-card h3 {
       font-size: 14px; font-weight: 700;
       color: var(--white);
       line-height: 1.35; margin-bottom: 8px;
+      transition: color 0.25s ease;
     }
     .proof-card p {
       font-size: 12px; line-height: 1.6;
@@ -503,19 +560,22 @@
     .glass-card {
       background: var(--bg);
       padding: 28px 24px;
+      position: relative;
+      transition: background 0.25s ease;
     }
-    .glass-card:hover { background: var(--surface); }
     .card-kicker {
       font-family: var(--mono);
       font-size: 9px; font-weight: 700;
       letter-spacing: 0.16em;
       color: var(--vtext); opacity: 0.65;
       margin-bottom: 12px;
+      transition: opacity 0.25s ease, color 0.25s ease;
     }
     .glass-card h3 {
       font-size: 14px; font-weight: 700;
       color: var(--white); line-height: 1.3;
       margin-bottom: 10px;
+      transition: color 0.25s ease;
     }
     .glass-card p {
       font-size: 12px; line-height: 1.65;
@@ -609,6 +669,68 @@
       position: absolute; top: 20px; right: 24px;
       background: none; border: none; color: var(--muted);
       font-size: 28px; cursor: pointer;
+    }
+
+    /* ── UNIFIED CARD HOVER ──────────────────────────────── */
+    /* Hover states isolated to (hover: hover) so touch devices don't latch
+       sticky :hover state after a tap. Same easing/timing everywhere. */
+    @media (hover: hover) {
+      .feature-cell:hover,
+      .proof-card:hover,
+      .glass-card:hover {
+        background: linear-gradient(180deg, rgba(142,61,255,0.07) 0%, var(--surface) 100%);
+      }
+      .feature-cell:hover .feature-icon {
+        transform: scale(1.12);
+        color: #E8DBFF;
+      }
+      .feature-cell:hover .feature-label { color: #fff; }
+      .proof-card:hover .proof-num { opacity: 1; color: var(--vtext); }
+      .proof-card:hover h3 { color: var(--vtext); }
+      .glass-card:hover .card-kicker { opacity: 1; color: var(--vtext); }
+      .glass-card:hover h3 { color: #fff; }
+
+      /* Hero card familiar rows: subtle hover hint */
+      .card-familiar { transition: background 0.2s ease; cursor: pointer; }
+      .card-familiar:hover:not(.active) {
+        background: rgba(142,61,255,0.04);
+      }
+    }
+
+    /* ── SCROLL REVEALS ──────────────────────────────────── */
+    /* Hidden state only applies when JS+motion are on. Without JS,
+       content renders normally. */
+    .motion-on [data-reveal] {
+      opacity: 0;
+      transform: translateY(14px);
+      transition:
+        opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+      will-change: opacity, transform;
+    }
+    .motion-on [data-reveal].is-visible {
+      opacity: 1;
+      transform: none;
+    }
+    /* Stagger items within grids — same timing across every grid */
+    .motion-on .feature-grid [data-reveal]:nth-child(2),
+    .motion-on .proof-grid   [data-reveal]:nth-child(2),
+    .motion-on .card-grid    [data-reveal]:nth-child(2) { transition-delay: 0.08s; }
+    .motion-on .feature-grid [data-reveal]:nth-child(3),
+    .motion-on .proof-grid   [data-reveal]:nth-child(3),
+    .motion-on .card-grid    [data-reveal]:nth-child(3) { transition-delay: 0.16s; }
+    .motion-on .feature-grid [data-reveal]:nth-child(4),
+    .motion-on .proof-grid   [data-reveal]:nth-child(4),
+    .motion-on .card-grid    [data-reveal]:nth-child(4) { transition-delay: 0.24s; }
+
+    /* ── REDUCED MOTION ──────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
     }
 
     @media (max-width: 1100px) {
@@ -744,7 +866,7 @@
 
 <!-- Hero -->
 <section class="hero" id="top" aria-label="Hero">
-  <div class="hero-copy">
+  <div class="hero-copy" data-reveal>
     <p class="kicker">OPENCOVEN · PERSISTENT AI FAMILIARS</p>
     <h1>Where <em>AI</em> Meets<br>Continuity.</h1>
     <p class="hero-lede">
@@ -753,22 +875,22 @@
     </p>
 
     <div class="feature-grid" aria-label="Core capabilities">
-      <div class="feature-cell">
+      <div class="feature-cell" data-reveal>
         <div class="feature-icon">◈</div>
         <div class="feature-label">Remember</div>
         <div class="feature-desc">Memory and context that survives across sessions.</div>
       </div>
-      <div class="feature-cell">
+      <div class="feature-cell" data-reveal>
         <div class="feature-icon">⬡</div>
         <div class="feature-label">Coordinate</div>
         <div class="feature-desc">Multiple agents, one shared runtime.</div>
       </div>
-      <div class="feature-cell">
+      <div class="feature-cell" data-reveal>
         <div class="feature-icon">✦</div>
         <div class="feature-label">Act</div>
         <div class="feature-desc">Tools, terminals, and docs under local control.</div>
       </div>
-      <div class="feature-cell">
+      <div class="feature-cell" data-reveal>
         <div class="feature-icon">⊕</div>
         <div class="feature-label">Own</div>
         <div class="feature-desc">Open, inspectable, yours to extend.</div>
@@ -788,15 +910,15 @@
     </div>
   </div>
 
-  <div class="hero-visual" aria-hidden="true">
-    <div class="hero-card">
+  <div class="hero-visual" data-reveal>
+    <div class="hero-card" aria-label="Coven CLI preview">
       <div class="hero-card-topbar">
         <div class="hero-card-dots"><span></span><span></span><span></span></div>
-        <span class="hero-card-label">coven runtime</span>
+        <span class="hero-card-label">coven cli</span>
         <span class="hero-card-status">local · active</span>
       </div>
-      <div class="hero-card-body">
-        <div class="card-familiar active">
+      <div class="hero-card-body" role="tablist" aria-label="Active familiar">
+        <div class="card-familiar active" data-familiar="forge" role="tab" tabindex="0" aria-selected="true">
           <div class="familiar-sigil">F</div>
           <div class="familiar-info">
             <span class="familiar-name">Forge</span>
@@ -804,7 +926,7 @@
           </div>
           <span class="familiar-badge badge-active">active</span>
         </div>
-        <div class="card-familiar">
+        <div class="card-familiar" data-familiar="charm" role="tab" tabindex="0" aria-selected="false">
           <div class="familiar-sigil">C</div>
           <div class="familiar-info">
             <span class="familiar-name">Charm</span>
@@ -812,7 +934,7 @@
           </div>
           <span class="familiar-badge badge-idle">idle</span>
         </div>
-        <div class="card-familiar">
+        <div class="card-familiar" data-familiar="openclaw" role="tab" tabindex="0" aria-selected="false">
           <div class="familiar-sigil">O</div>
           <div class="familiar-info">
             <span class="familiar-name">OpenClaw</span>
@@ -821,9 +943,9 @@
           <span class="familiar-badge badge-idle">idle</span>
         </div>
       </div>
-      <div class="hero-card-memory">
+      <div class="hero-card-memory" aria-live="polite">
         <div class="memory-header">
-          <span>memory · forge</span>
+          <span class="memory-title">memory · forge</span>
           <span class="memory-count">3 notes</span>
         </div>
         <div class="memory-note">
@@ -846,7 +968,7 @@
 
 <!-- Testimonial strip -->
 <div class="testimonial-strip" role="note">
-  <div class="testimonial-inner">
+  <div class="testimonial-inner" data-reveal>
     <div class="testimonial-stars" aria-label="5 stars">★★★★★</div>
     <p class="testimonial-quote">"OpenCoven gave my agents memory, purpose, and a place to belong."</p>
     <span class="testimonial-attr">— A builder</span>
@@ -856,22 +978,22 @@
 <!-- Proof grid -->
 <section class="proof-section" aria-labelledby="proof-heading">
   <div class="proof-grid">
-    <div class="proof-card">
+    <div class="proof-card" data-reveal>
       <div class="proof-num">01</div>
       <h3>AI that can stay</h3>
       <p>Familiars keep a name, role, memory, and place in the work across every session.</p>
     </div>
-    <div class="proof-card">
+    <div class="proof-card" data-reveal>
       <div class="proof-num">02</div>
       <h3>Local runtime substrate</h3>
       <p>Coven keeps execution bounded to explicit projects and tools. Not a harness — the layer beneath.</p>
     </div>
-    <div class="proof-card">
+    <div class="proof-card" data-reveal>
       <div class="proof-num">03</div>
       <h3>Shared ecosystem</h3>
-      <p>OpenClaw, OpenMeow, CastCodes, dashboards, and docs built to fit together.</p>
+      <p>OpenClaw, CastCodes, dashboards, and docs built to fit together.</p>
     </div>
-    <div class="proof-card">
+    <div class="proof-card" data-reveal>
       <div class="proof-num">04</div>
       <h3>Owned by builders</h3>
       <p>Open framework, inspectable architecture, practical extension points — yours to modify.</p>
@@ -881,23 +1003,23 @@
 
 <!-- Familiars -->
 <section class="content-section" id="familiars" aria-labelledby="familiars-heading">
-  <div class="section-header">
+  <div class="section-header" data-reveal>
     <p class="section-kicker">Familiars</p>
     <h2 id="familiars-heading">From blank chatbox to agent workspace.</h2>
     <p>A familiar is not a faceless bot. It has a name, purpose, memory, toolset, voice, role, and a place in a workflow that continues after the chat ends.</p>
   </div>
   <div class="card-grid three">
-    <div class="glass-card">
+    <div class="glass-card" data-reveal>
       <p class="card-kicker">01 · Identity</p>
       <h3>Name the agent and define the work.</h3>
       <p>Give each familiar a clear purpose, tone, tools, and operating rules so it can show up as the right collaborator instead of a blank assistant.</p>
     </div>
-    <div class="glass-card">
+    <div class="glass-card" data-reveal>
       <p class="card-kicker">02 · Memory</p>
       <h3>Keep the context that matters.</h3>
       <p>Project history, decisions, preferences, and working notes persist across sessions — continuity that's explicit, not trapped in a temporary chat.</p>
     </div>
-    <div class="glass-card">
+    <div class="glass-card" data-reveal>
       <p class="card-kicker">03 · Tools</p>
       <h3>Let agents act through known surfaces.</h3>
       <p>Familiars connect to terminals, code workspaces, docs, messaging, and local runtimes through inspectable tool contracts you can review and replace.</p>
@@ -907,28 +1029,28 @@
 
 <!-- Runtime -->
 <section class="content-section" id="runtime" aria-labelledby="runtime-heading">
-  <div class="section-header">
+  <div class="section-header" data-reveal>
     <p class="section-kicker">Runtime</p>
     <h2 id="runtime-heading">The local substrate underneath the Coven.</h2>
     <p>OpenCoven is not one app. It is the shared architecture for agents that remember, coordinate, use tools, and run inside boundaries builders can inspect.</p>
   </div>
   <div class="card-grid four">
-    <div class="glass-card">
+    <div class="glass-card" data-reveal>
       <p class="card-kicker">/Coven</p>
       <h3>Project-scoped runtime</h3>
       <p>Launch and attach to agent work inside local repositories with visible output, history, and lifecycle control.</p>
     </div>
-    <div class="glass-card">
+    <div class="glass-card" data-reveal>
       <p class="card-kicker">/OpenClaw</p>
       <h3>Tool gateway for familiars</h3>
       <p>Give agents controlled access to messages, sessions, memory, cron, media, web search, and local execution.</p>
     </div>
-    <div class="glass-card">
+    <div class="glass-card" data-reveal>
       <p class="card-kicker">/CastCodes</p>
       <h3>Terminal and code workspace</h3>
       <p>Keep the command surface local-first, open, and aligned with the agents working beside you.</p>
     </div>
-    <div class="glass-card">
+    <div class="glass-card" data-reveal>
       <p class="card-kicker">/Next</p>
       <h3>Adapter-ready future</h3>
       <p>The system stays harness-neutral so new agent CLIs and client surfaces can join without rewriting the whole room.</p>
@@ -938,7 +1060,7 @@
 
 <!-- Ecosystem / final CTA -->
 <section class="ecosystem-section" id="ecosystem" aria-labelledby="ecosystem-heading">
-  <div class="ecosystem-inner">
+  <div class="ecosystem-inner" data-reveal>
     <div>
       <p class="section-kicker">Ecosystem</p>
       <h2 id="ecosystem-heading">A living workspace of agents that belong to you.</h2>
@@ -951,8 +1073,7 @@
         </svg>
         Join Discord
       </a>
-      <a class="eco-link" href="https://github.com/OpenCoven/coven">Coven runtime ↗</a>
-      <a class="eco-link" href="https://github.com/OpenCoven/open-meow">OpenMeow ↗</a>
+      <a class="eco-link" href="https://github.com/OpenCoven/coven">Coven CLI ↗</a>
       <a class="eco-link" href="https://cast.codes">CastCodes ↗</a>
       <a class="eco-link" href="https://docs.opencoven.ai">Read the Docs ↗</a>
     </div>
@@ -996,6 +1117,186 @@
   closeBtn.addEventListener('click', closeMobile);
   mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobile));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobile(); });
+
+  // ── Scroll reveals ────────────────────────────────────────
+  (function () {
+    var items = document.querySelectorAll('[data-reveal]');
+    if (!items.length) return;
+    var motionOn = document.documentElement.classList.contains('motion-on');
+    if (!motionOn || !('IntersectionObserver' in window)) {
+      items.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+    items.forEach(function (el) { io.observe(el); });
+  })();
+
+  // ── Ambient glow parallax (cursor-driven on desktop) ──────
+  (function () {
+    if (!document.documentElement.classList.contains('motion-on')) return;
+    if (!window.matchMedia || !matchMedia('(hover: hover)').matches) return;
+    var ambient = document.querySelector('.ambient');
+    if (!ambient) return;
+    var lastX = 0, lastY = 0, pending = false;
+    window.addEventListener('mousemove', function (e) {
+      lastX = e.clientX; lastY = e.clientY;
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(function () {
+        var mx = (lastX / window.innerWidth) - 0.5;
+        var my = (lastY / window.innerHeight) - 0.5;
+        ambient.style.setProperty('--mx', mx.toFixed(3));
+        ambient.style.setProperty('--my', my.toFixed(3));
+        pending = false;
+      });
+    }, { passive: true });
+  })();
+
+  // ── Hero card: live familiar state ────────────────────────
+  (function () {
+    var rows = document.querySelectorAll('.card-familiar[data-familiar]');
+    if (rows.length === 0) return;
+    var card       = document.querySelector('.hero-card');
+    var memBody    = document.querySelector('.hero-card-memory');
+    var memTitle   = document.querySelector('.memory-title');
+    var memNotes   = document.querySelectorAll('.memory-note');
+    var cliCmd     = document.querySelector('.card-cmd');
+    var motionOn   = document.documentElement.classList.contains('motion-on');
+
+    var FAMILIARS = {
+      forge: {
+        name: 'Forge',
+        command: 'coven attach forge --project ./opencoven',
+        notes: [
+          { text: 'resumed feat/runtime-attach · 4 files staged', meta: '2h ago' },
+          { text: 'prefers terse PR summaries, no trailing recap', meta: 'persisted' }
+        ]
+      },
+      charm: {
+        name: 'Charm',
+        command: 'coven attach charm --voice on --thread design-sync',
+        notes: [
+          { text: 'drafted reply for #design-sync · awaiting review', meta: '12m ago' },
+          { text: 'tone: warm + concise — no exclamation marks', meta: 'persisted' }
+        ]
+      },
+      openclaw: {
+        name: 'OpenClaw',
+        command: 'coven attach openclaw --route messages.media',
+        notes: [
+          { text: 'routed 23 tool calls in last session', meta: '1h ago' },
+          { text: 'budget cap: 500 calls/day · 81% used', meta: 'persisted' }
+        ]
+      }
+    };
+    var order = ['forge', 'charm', 'openclaw'];
+    var current = 'forge';
+    var userTook = false;
+    var rotateTimer = null;
+    var typeTimer = null;
+
+    function setBadge(badge, isActive) {
+      if (!badge) return;
+      badge.textContent = isActive ? 'active' : 'idle';
+      badge.classList.toggle('badge-active', isActive);
+      badge.classList.toggle('badge-idle', !isActive);
+    }
+
+    function typeCommand(cmd) {
+      if (typeTimer) { clearTimeout(typeTimer); typeTimer = null; }
+      if (!cliCmd) return;
+      if (!motionOn) { cliCmd.textContent = cmd; return; }
+      cliCmd.textContent = '';
+      var i = 0;
+      function step() {
+        if (i >= cmd.length) return;
+        cliCmd.textContent += cmd.charAt(i++);
+        typeTimer = setTimeout(step, 24 + Math.random() * 28);
+      }
+      step();
+    }
+
+    function paintNotes(data) {
+      if (memTitle) memTitle.textContent = 'memory · ' + data.name.toLowerCase();
+      for (var i = 0; i < memNotes.length; i++) {
+        var note = data.notes[i];
+        if (!note) continue;
+        var t = memNotes[i].querySelector('.memory-text');
+        var m = memNotes[i].querySelector('.memory-meta');
+        if (t) t.textContent = note.text;
+        if (m) m.textContent = note.meta;
+      }
+    }
+
+    function applyFamiliar(id, animate) {
+      if (!FAMILIARS[id]) return;
+      current = id;
+      rows.forEach(function (row) {
+        var isActive = row.getAttribute('data-familiar') === id;
+        row.classList.toggle('active', isActive);
+        row.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        row.setAttribute('tabindex', isActive ? '0' : '-1');
+        setBadge(row.querySelector('.familiar-badge'), isActive);
+      });
+      var data = FAMILIARS[id];
+      if (animate && memBody && motionOn) {
+        memBody.classList.add('memory-swap');
+        setTimeout(function () {
+          paintNotes(data);
+          memBody.classList.remove('memory-swap');
+        }, 200);
+      } else {
+        paintNotes(data);
+      }
+      typeCommand(data.command);
+    }
+
+    function rotate() {
+      var idx = order.indexOf(current);
+      var next = order[(idx + 1) % order.length];
+      applyFamiliar(next, true);
+    }
+    function startRotate() {
+      if (userTook) return;
+      stopRotate();
+      rotateTimer = setInterval(rotate, 6000);
+    }
+    function stopRotate() {
+      if (rotateTimer) { clearInterval(rotateTimer); rotateTimer = null; }
+    }
+
+    rows.forEach(function (row) {
+      row.addEventListener('click', function () {
+        userTook = true;
+        stopRotate();
+        applyFamiliar(row.getAttribute('data-familiar'), true);
+      });
+      row.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          userTook = true;
+          stopRotate();
+          applyFamiliar(row.getAttribute('data-familiar'), true);
+        }
+      });
+    });
+
+    if (card) {
+      card.addEventListener('mouseenter', stopRotate);
+      card.addEventListener('mouseleave', function () { if (!userTook) startRotate(); });
+      card.addEventListener('focusin', stopRotate);
+      card.addEventListener('focusout', function () { if (!userTook) startRotate(); });
+    }
+
+    if (motionOn) startRotate();
+  })();
 </script>
 </body>
 </html>
