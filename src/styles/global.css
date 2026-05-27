@@ -52,8 +52,19 @@
     }
 
     html { scroll-behavior: smooth; }
+    /* ── Page-level ambient glow (mirrors coven-docs deep violet night) ── */
+    html {
+      background: #050409;
+      /* Subtle fixed radial so the glow follows the viewport, not the scroll */
+      background-attachment: fixed;
+    }
     body {
-      background: var(--bg);
+      background:
+        radial-gradient(ellipse 80% 45% at 50% -8%, rgba(154, 142, 205, 0.18), transparent 52%),
+        radial-gradient(ellipse 55% 35% at 90% 15%, rgba(122, 111, 179, 0.08), transparent 55%),
+        radial-gradient(ellipse 40% 25% at 5%  80%, rgba(154, 142, 205, 0.05), transparent 60%),
+        #050409;
+      background-attachment: fixed;
       color: var(--white);
       font-family: var(--font-ui);
       font-feature-settings: "rlig" 1, "calt" 1;
