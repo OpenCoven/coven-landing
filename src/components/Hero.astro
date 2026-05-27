@@ -1,0 +1,105 @@
+---
+// Hero section: left copy column with feature grid and CTAs, right column
+// with the interactive "Coven CLI" runtime card. Auto-rotation and CLI typing
+// are driven by src/scripts/main.js.
+---
+<section class="hero" id="top" aria-label="Hero">
+  <div class="hero-copy" data-reveal>
+    <p class="kicker">OPENCOVEN · PERSISTENT AI FAMILIARS</p>
+    <h1>Where <em>AI</em> Meets<br>Continuity.</h1>
+    <p class="hero-lede">
+      Named familiars with memory, tools, identity, and continuity —
+      running locally, inside your projects, on your terms.
+    </p>
+
+    <div class="feature-grid" aria-label="Core capabilities">
+      <div class="feature-cell" data-reveal>
+        <div class="feature-icon">◈</div>
+        <div class="feature-label">Remember</div>
+        <div class="feature-desc">Memory and context that survives across sessions.</div>
+      </div>
+      <div class="feature-cell" data-reveal>
+        <div class="feature-icon">⬡</div>
+        <div class="feature-label">Coordinate</div>
+        <div class="feature-desc">Multiple agents, one shared runtime.</div>
+      </div>
+      <div class="feature-cell" data-reveal>
+        <div class="feature-icon">✦</div>
+        <div class="feature-label">Act</div>
+        <div class="feature-desc">Tools, terminals, and docs under local control.</div>
+      </div>
+      <div class="feature-cell" data-reveal>
+        <div class="feature-icon">⊕</div>
+        <div class="feature-label">Own</div>
+        <div class="feature-desc">Open, inspectable, yours to extend.</div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a class="btn-primary" href="https://discord.gg/opencoven">
+        <svg viewBox="0 0 127.14 96.36" aria-hidden="true">
+          <path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21A105.73 105.73 0 0 0 32.71 96.36a77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.05 12.69-11.43 12.69Z"/>
+        </svg>
+        Join the Coven
+      </a>
+      <a class="btn-secondary" href="https://docs.opencoven.ai">
+        Explore the Docs ↗
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-visual" data-reveal>
+    <div class="hero-card" aria-label="Coven CLI preview">
+      <div class="hero-card-topbar">
+        <div class="hero-card-dots"><span></span><span></span><span></span></div>
+        <span class="hero-card-label">coven cli</span>
+        <span class="hero-card-status">local · active</span>
+      </div>
+      <div class="hero-card-body" role="tablist" aria-label="Active familiar">
+        <div class="card-familiar active" data-familiar="forge" role="tab" tabindex="0" aria-selected="true">
+          <div class="familiar-sigil">F</div>
+          <div class="familiar-info">
+            <span class="familiar-name">Forge</span>
+            <span class="familiar-role">code steward · tools · git</span>
+          </div>
+          <span class="familiar-badge badge-active">active</span>
+        </div>
+        <div class="card-familiar" data-familiar="charm" role="tab" tabindex="0" aria-selected="false">
+          <div class="familiar-sigil">C</div>
+          <div class="familiar-info">
+            <span class="familiar-name">Charm</span>
+            <span class="familiar-role">voice · social · presence</span>
+          </div>
+          <span class="familiar-badge badge-idle">idle</span>
+        </div>
+        <div class="card-familiar" data-familiar="sage" role="tab" tabindex="0" aria-selected="false">
+          <div class="familiar-sigil">S</div>
+          <div class="familiar-info">
+            <span class="familiar-name">Sage</span>
+            <span class="familiar-role">research · docs · long context</span>
+          </div>
+          <span class="familiar-badge badge-idle">idle</span>
+        </div>
+      </div>
+      <div class="hero-card-memory" aria-live="polite">
+        <div class="memory-header">
+          <span class="memory-title">memory · forge</span>
+          <span class="memory-count">3 notes</span>
+        </div>
+        <div class="memory-note">
+          <span class="memory-text">resumed feat/runtime-attach · 4 files staged</span>
+          <span class="memory-meta">2h ago</span>
+        </div>
+        <div class="memory-note">
+          <span class="memory-text">prefers terse PR summaries, no trailing recap</span>
+          <span class="memory-meta">persisted</span>
+        </div>
+      </div>
+      <div class="hero-card-footer">
+        <span class="card-prompt">$</span>
+        <span class="card-cmd">coven attach forge --project ./opencoven</span>
+        <span class="card-cursor"></span>
+      </div>
+    </div>
+  </div>
+</section>
