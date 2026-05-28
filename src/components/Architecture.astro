@@ -238,8 +238,10 @@ function markKeywords(text: string): string {
       </div>
     </div>
 
-    <!-- Glossary tooltip (rendered by JS, positioned absolutely) -->
-    <div id="arch-tooltip" class="arch-tooltip" role="tooltip" aria-hidden="true">
+    <!-- Glossary tooltip (rendered by JS, positioned absolutely). `inert`
+         keeps the inner link out of the tab order and the a11y tree until
+         the tooltip is actually shown. -->
+    <div id="arch-tooltip" class="arch-tooltip" role="tooltip" inert>
       <p class="arch-tooltip-def"></p>
       <a class="arch-tooltip-link" href="#" target="_blank" rel="noopener">View in docs ↗</a>
     </div>
@@ -324,12 +326,12 @@ function markKeywords(text: string): string {
       const panelRect = panel.getBoundingClientRect();
       tooltip.style.left = (rect.left - panelRect.left) + 'px';
       tooltip.style.top  = (rect.bottom - panelRect.top + 6) + 'px';
-      tooltip.setAttribute('aria-hidden', 'false');
+      tooltip.removeAttribute('inert');
       tooltip.classList.add('is-visible');
     }
     function hideTooltip() {
       if (!tooltip) return;
-      tooltip.setAttribute('aria-hidden', 'true');
+      tooltip.setAttribute('inert', '');
       tooltip.classList.remove('is-visible');
     }
 
