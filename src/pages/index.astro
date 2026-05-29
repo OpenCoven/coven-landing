@@ -1,4 +1,10 @@
 ---
+// Self-host the variable-weight fonts to remove the render-blocking Google
+// Fonts chain (was costing ~1s of mobile LCP). Both packages ship one .woff2
+// per Unicode subset with font-display: swap, so text renders in a fallback
+// immediately and re-flows when the font arrives.
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
 import '../styles/global.css';
 
 import Ambient     from '../components/Ambient.astro';
@@ -35,9 +41,6 @@ import Footer      from '../components/Footer.astro';
   <link rel="canonical" href="https://opencoven.ai/" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <script type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
@@ -84,15 +87,17 @@ import Footer      from '../components/Footer.astro';
   <Ambient />
   <Header />
   <MobileNav />
-  <Hero />
-  <Testimonial />
-  <ProofGrid />
-  <Architecture />
-  <HowItWorks />
-  <Compare />
-  <LiveDemo />
-  <QuickStart />
-  <Ecosystem />
+  <main id="content">
+    <Hero />
+    <Testimonial />
+    <ProofGrid />
+    <Architecture />
+    <HowItWorks />
+    <Compare />
+    <LiveDemo />
+    <QuickStart />
+    <Ecosystem />
+  </main>
   <Footer />
 
   <script>
