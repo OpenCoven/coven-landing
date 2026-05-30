@@ -73,14 +73,41 @@ import Footer      from '../components/Footer.astro';
     })();
   </script>
 
-  <!-- OpenCoven Feedback widget -->
+  <!-- OpenCoven Feedback widget — stub queues calls immediately so any
+       caller can OpenCovenFeedback(...) before the SDK is loaded, but the
+       actual SDK fetch waits for the `load` event and then runs during
+       idle time. The widget was pulling in ~3.5 MB of admin-React assets
+       eagerly, regressing mobile Performance (89 vs 100 desktop) and
+       Best Practices (96 vs 100) on opencoven.ai. -->
   <script is:inline>
-    (function(w,d){if(w.OpenCovenFeedback)return;w.OpenCovenFeedback=function(){
-    (w.OpenCovenFeedback.q=w.OpenCovenFeedback.q||[]).push(arguments)};
-    var s=d.createElement('script');s.async=true;
-    s.src='https://feedback.opencoven.ai/api/widget/sdk.js';
-    d.head.appendChild(s)})(window,document);
-    OpenCovenFeedback('init');
+    (function (w, d) {
+      if (w.OpenCovenFeedback) return;
+      w.OpenCovenFeedback = function () {
+        (w.OpenCovenFeedback.q = w.OpenCovenFeedback.q || []).push(arguments);
+      };
+      OpenCovenFeedback('init');
+
+      function loadSdk() {
+        if (d.getElementById('opencoven-feedback-sdk')) return;
+        var s = d.createElement('script');
+        s.id = 'opencoven-feedback-sdk';
+        s.async = true;
+        s.src = 'https://feedback.opencoven.ai/api/widget/sdk.js';
+        d.head.appendChild(s);
+      }
+      function schedule() {
+        if (typeof w.requestIdleCallback === 'function') {
+          w.requestIdleCallback(loadSdk, { timeout: 2000 });
+        } else {
+          w.setTimeout(loadSdk, 1500);
+        }
+      }
+      if (d.readyState === 'complete') {
+        schedule();
+      } else {
+        w.addEventListener('load', schedule, { once: true });
+      }
+    })(window, document);
   </script>
 </head>
 <body>
