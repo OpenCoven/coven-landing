@@ -19,7 +19,6 @@ import Compare      from '../components/Compare.astro';
 import QuickStart   from '../components/QuickStart.astro';
 import Ecosystem      from '../components/Ecosystem.astro';
 import Footer         from '../components/Footer.astro';
-import FeedbackButton from '../components/FeedbackButton.astro';
 ---
 <!doctype html>
 <html lang="en">
@@ -73,23 +72,6 @@ import FeedbackButton from '../components/FeedbackButton.astro';
     })();
   </script>
 
-  <!-- OpenCoven Feedback widget — stub only. The SDK is NOT fetched on
-       page load. It loads on first interaction with the in-page feedback
-       button (see FeedbackButton.astro). Time-based deferral (#14) wasn't
-       enough: Lighthouse waits long enough for the SDK to boot during its
-       measurement window, so the widget's React-#418 hydration error +
-       3.5 MB of admin-React chunks still hit the mobile score. Gating on
-       interaction keeps the widget functional for real users while
-       leaving Lighthouse runs (which never click) clean. -->
-  <script is:inline>
-    (function (w) {
-      if (w.OpenCovenFeedback) return;
-      w.OpenCovenFeedback = function () {
-        (w.OpenCovenFeedback.q = w.OpenCovenFeedback.q || []).push(arguments);
-      };
-      OpenCovenFeedback('init');
-    })(window);
-  </script>
 </head>
 <body>
   <Ambient />
@@ -106,7 +88,6 @@ import FeedbackButton from '../components/FeedbackButton.astro';
     <Ecosystem />
   </main>
   <Footer />
-  <FeedbackButton />
 
   <script>
     import '../scripts/main.js';
