@@ -72,6 +72,42 @@ import Footer         from '../components/Footer.astro';
     })();
   </script>
 
+  <!-- OpenCoven Feedback widget — renders its own small circular launcher
+       in the corner. Stub queues calls immediately; the SDK fetch waits
+       for the `load` event and then runs during idle time so it doesn't
+       compete with the landing's LCP work (the SDK pulls in ~3.5 MB of
+       admin-React chunks). The custom FAB pill was removed; this is the
+       only feedback affordance on the page. -->
+  <script is:inline>
+    (function (w, d) {
+      if (w.OpenCovenFeedback) return;
+      w.OpenCovenFeedback = function () {
+        (w.OpenCovenFeedback.q = w.OpenCovenFeedback.q || []).push(arguments);
+      };
+      OpenCovenFeedback('init');
+
+      function loadSdk() {
+        if (d.getElementById('opencoven-feedback-sdk')) return;
+        var s = d.createElement('script');
+        s.id = 'opencoven-feedback-sdk';
+        s.async = true;
+        s.src = 'https://feedback.opencoven.ai/api/widget/sdk.js';
+        d.head.appendChild(s);
+      }
+      function schedule() {
+        if (typeof w.requestIdleCallback === 'function') {
+          w.requestIdleCallback(loadSdk, { timeout: 2000 });
+        } else {
+          w.setTimeout(loadSdk, 1500);
+        }
+      }
+      if (d.readyState === 'complete') {
+        schedule();
+      } else {
+        w.addEventListener('load', schedule, { once: true });
+      }
+    })(window, document);
+  </script>
 </head>
 <body>
   <Ambient />
