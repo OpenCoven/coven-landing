@@ -69,6 +69,28 @@
       border: 0;
     }
 
+    .skip-link {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 1000;
+      transform: translateY(-140%);
+      background: var(--oc-text);
+      color: var(--oc-black);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      box-shadow: var(--oc-focus-ring);
+      transition: transform 0.15s ease;
+    }
+
+    .skip-link:focus-visible {
+      transform: translateY(0);
+      outline: none;
+    }
+
     html { scroll-behavior: smooth; }
     /* ── Page-level ambient glow (mirrors coven-docs deep violet night) ── */
     html {

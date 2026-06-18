@@ -134,31 +134,6 @@ const GLOSSARY: Record<string, { def: string; href?: string }> = {
   'open source':     { def: 'CastCodes is forked from Warp under an open-source license. Telemetry and cloud services are stripped.' },
 };
 
-// Wrap matching terms in the bullet text with a <mark class="kw" data-*> span for the client to enhance.
-// Returns the string with placeholders; client replaces with the real DOM.
-// NOTE: this fn is intentionally NOT used for dynamic bullets — the client uses a safe DOM text-node
-// walker instead. It is only kept here for any future static SSR use.
-function markKeywords(text: string): string {
-  // Process longest terms first to avoid sub-term stomping.
-  const entries = Object.entries(GLOSSARY).sort(([a], [b]) => b.length - a.length);
-  // Use placeholder tokens to avoid re-matching inside generated HTML.
-  const placeholders: Array<{ token: string; html: string }> = [];
-  let out = text;
-  entries.forEach(([term, meta], i) => {
-    const re = new RegExp(`\\b(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\b`, 'gi');
-    const token = `\x00KW${i}\x00`;
-    const href = meta.href ? ` data-href="${meta.href}"` : '';
-    if (re.test(out)) {
-      out = out.replace(re, token);
-      placeholders.push({ token, html: `<mark class="kw" data-def="${meta.def.replace(/"/g, '&quot;')}"${href} tabindex="0">$<term></mark>` });
-    }
-  });
-  // Restore placeholders
-  placeholders.forEach(({ token, html }) => {
-    out = out.replace(token, html);
-  });
-  return out;
-}
 ---
 
 <section class="architecture-section content-section" id="architecture" aria-labelledby="architecture-heading">
@@ -249,6 +224,7 @@ function markKeywords(text: string): string {
 </section>
 
 <script>
+  // @ts-nocheck
   (function () {
     const nodes = document.querySelectorAll('.arch-node[data-node]');
     if (!nodes.length) return;

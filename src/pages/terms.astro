@@ -15,6 +15,7 @@ const breadcrumbs = [
   description="OpenCoven Terms of Service. Read the terms governing your use of the OpenCoven platform, tools, and ecosystem."
   canonicalPath="/terms"
   type="TermsOfService"
+  breadcrumbs={breadcrumbs}
   pageSchemas={[createBreadcrumbSchema(breadcrumbs, `${SITE.url}/terms`)]}
 >
   <DocPage
@@ -73,7 +74,7 @@ const breadcrumbs = [
 
     <section class="doc-panel">
       <h2>Contact</h2>
-      <p>Questions about these Terms? Reach us at <a href="val@viewdue.ai">hello@opencoven.ai</a> or open an issue on <a href="https://github.com/OpenCoven/coven" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
+      <p>Questions about these Terms? Reach us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a> or open an issue on <a href="https://github.com/OpenCoven/coven" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
     </section>
   </DocPage>
 </BaseLayout>

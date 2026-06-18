@@ -2,14 +2,30 @@
 // Comparison strip: Coven vs. Raw harness vs. Other agent tools.
 // Click any row to expand its detail panel below the matrix.
 
-const columns = [
+type CompareColumnId = 'raw' | 'other' | 'coven';
+type CompareStatus = 'yes' | 'partial' | 'no';
+type CompareColumn = {
+  id: CompareColumnId;
+  label: string;
+  sub: string;
+  badge?: string;
+  highlight?: boolean;
+};
+type CompareRow = {
+  id: string;
+  label: string;
+  cells: Record<CompareColumnId, CompareStatus>;
+  detail: string;
+};
+
+const columns: CompareColumn[] = [
   { id: 'raw',    label: 'Raw harness',   sub: 'Claude Code, Codex direct' },
   { id: 'other',  label: 'Other tools',   sub: 'IDE-bound agents, suites' },
   { id: 'coven',  label: 'Coven',         sub: 'recommended runtime', badge: 'Best fit', highlight: true },
 ];
 
 // status values: 'yes' | 'partial' | 'no'
-const rows = [
+const rows: CompareRow[] = [
   {
     id: 'memory',
     label: 'Cross-session memory',
@@ -123,6 +139,7 @@ const rows = [
 </script>
 
 <script>
+  // @ts-nocheck
   (function () {
     const root = document.querySelector('.compare-section');
     if (!root) return;

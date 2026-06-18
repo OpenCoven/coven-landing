@@ -151,7 +151,7 @@ export function createBreadcrumbSchema(items: BreadcrumbItem[], pageUrl: string)
   };
 }
 
-export function createFaqSchema(items: FaqItem[]): SchemaObject {
+export function createFaqSchema(items: readonly FaqItem[]): SchemaObject {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',

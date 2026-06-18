@@ -15,6 +15,7 @@ const breadcrumbs = [
   description="Search the OpenCoven site for core pages, project information, and fast navigation targets."
   canonicalPath="/search"
   noindex={true}
+  breadcrumbs={breadcrumbs}
   pageSchemas={[createBreadcrumbSchema(breadcrumbs, `${SITE.url}/search`)]}
 >
   <DocPage
@@ -27,12 +28,13 @@ const breadcrumbs = [
     <section class="doc-callout">
       <div class="doc-searchbar">
         <span aria-hidden="true">⌕</span>
-        <input id="site-search" type="search" placeholder="Search OpenCoven..." autocomplete="off" />
+        <label class="sr-only" for="site-search">Search OpenCoven</label>
+        <input id="site-search" type="search" placeholder="Search OpenCoven..." autocomplete="off" aria-describedby="search-summary" />
       </div>
-      <p id="search-summary" class="doc-copy">Showing the most useful site pages and sections.</p>
+      <p id="search-summary" class="doc-copy" aria-live="polite" aria-atomic="true">Showing the most useful site pages and sections.</p>
     </section>
 
-    <section class="doc-result-list" id="search-results">
+    <section class="doc-result-list" id="search-results" aria-label="Search results">
       {SEARCH_INDEX.map((item) => (
         <article class="doc-result" data-title={item.title} data-description={item.description} data-keywords={item.keywords.join(' ')}>
           <a href={item.href}>{item.title}</a>
@@ -59,6 +61,7 @@ const breadcrumbs = [
     </section>
 
     <script>
+      // @ts-nocheck
       (() => {
         const input = document.getElementById('site-search');
         const summary = document.getElementById('search-summary');

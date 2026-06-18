@@ -86,10 +86,11 @@ const schemas = [
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={absoluteUrl(image)} />
     <meta name="twitter:image:alt" content={imageAlt} />
-    <script type="application/ld+json" set:html={JSON.stringify(schemas)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schemas)} />
     <slot name="head" />
   </head>
   <body class={bodyClass}>
+    <a class="skip-link" href="#content">Skip to content</a>
     <slot />
   </body>
 </html>

@@ -3,19 +3,25 @@
   const mobileNav = document.getElementById('mobile-nav');
   const closeBtn = document.querySelector('.mobile-nav-close');
 
-  toggle.addEventListener('click', () => {
-    mobileNav.classList.add('is-open');
-    toggle.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
-  });
-  function closeMobile() {
-    mobileNav.classList.remove('is-open');
-    toggle.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
+  if (toggle && mobileNav && closeBtn) {
+    toggle.addEventListener('click', () => {
+      mobileNav.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      mobileNav.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      closeBtn.focus();
+    });
+    function closeMobile(restoreFocus) {
+      mobileNav.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      mobileNav.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (restoreFocus) toggle.focus();
+    }
+    closeBtn.addEventListener('click', () => closeMobile(true));
+    mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => closeMobile(false)));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && mobileNav.classList.contains('is-open')) closeMobile(true); });
   }
-  closeBtn.addEventListener('click', closeMobile);
-  mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobile));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobile(); });
 
   // ── Scroll reveals ────────────────────────────────────────
   (function () {
