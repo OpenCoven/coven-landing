@@ -1,0 +1,78 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocPage from '../components/DocPage.astro';
+import { SITE } from '../config/site';
+import { createBreadcrumbSchema } from '../lib/seo';
+
+const breadcrumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'About', href: '/about' },
+];
+---
+
+<BaseLayout
+  title="About OpenCoven"
+  description="OpenCoven is a local-first runtime for persistent AI familiars. Learn what it is, what it is not, and how the project is organized."
+  canonicalPath="/about"
+  pageSchemas={[createBreadcrumbSchema(breadcrumbs, `${SITE.url}/about`)]}
+>
+  <DocPage
+    kicker="About"
+    title="What OpenCoven Is"
+    description="OpenCoven is a local-first runtime for persistent AI familiars: named agents with memory, tools, identity, and project-scoped continuity."
+    breadcrumbs={breadcrumbs}
+    footerNote="OpenCoven is maintained in the open. For project questions, use email, GitHub, or Discord."
+  >
+    <section class="doc-grid doc-grid--three">
+      <article class="doc-card">
+        <h2>Local-first by default</h2>
+        <p>Sessions, memory, and project state stay on your machine. The runtime is designed around explicit boundaries instead of centralized workspace control.</p>
+      </article>
+      <article class="doc-card">
+        <h2>Built for durable agents</h2>
+        <p>OpenCoven keeps named familiars, repeatable sessions, and reusable context together so the work persists across restarts and tools.</p>
+      </article>
+      <article class="doc-card">
+        <h2>Open ecosystem</h2>
+        <p>The site, docs, CLI, and community live in the open so builders can inspect the runtime, verify claims, and extend the stack.</p>
+      </article>
+    </section>
+
+    <section class="doc-callout">
+      <h2>What ships with the project</h2>
+      <p>Coven includes a daemon, CLI, browser surfaces, and integration points for supported harnesses. The landing page summarizes the architecture, the quick start, and the runtime model visitors need before they install anything.</p>
+      <div class="doc-actions">
+        <a class="doc-button" href="/#architecture">Read architecture</a>
+        <a class="doc-button-secondary" href="/#quickstart">See the quick start</a>
+      </div>
+    </section>
+
+    <section class="doc-grid">
+      <article class="doc-panel">
+        <h2>Trust signals</h2>
+        <ul class="doc-list">
+          <li><a href="/privacy">Privacy policy</a> that explains the site's data handling and local-first posture.</li>
+          <li><a href="/terms">Terms of service</a> that govern hosted services and website usage.</li>
+          <li><a href="/contact">Contact page</a> with direct support, issue, and community links.</li>
+        </ul>
+      </article>
+      <article class="doc-panel">
+        <h2>Project boundaries</h2>
+        <ul class="doc-list">
+          <li>OpenCoven is not a model provider.</li>
+          <li>OpenCoven is not a black-box SaaS wrapper.</li>
+          <li>OpenCoven is the runtime layer around persistent AI work.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="doc-callout">
+      <h2>Get oriented</h2>
+      <p>If you are evaluating the project, start with the home page, then the quick start and the FAQ. Those three pages cover the model, the architecture, and the first execution path without forcing a deep docs dive.</p>
+      <div class="doc-actions">
+        <a class="doc-button" href="/">Go to home</a>
+        <a class="doc-button-secondary" href="/#faq">Open the FAQ</a>
+      </div>
+    </section>
+  </DocPage>
+</BaseLayout>

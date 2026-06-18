@@ -1,0 +1,95 @@
+---
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '../styles/global.css';
+
+import { SITE } from '../config/site';
+import {
+  absoluteUrl,
+  canonicalUrl,
+  createOrganizationSchema,
+  createSoftwareApplicationSchema,
+  createWebPageSchema,
+  createWebSiteSchema,
+  formatTitle,
+} from '../lib/seo';
+
+const {
+  title,
+  description = SITE.description,
+  canonical,
+  canonicalPath,
+  breadcrumbs = [],
+  image = SITE.socialImage,
+  imageAlt = SITE.name,
+  imageWidth = 1200,
+  imageHeight = 630,
+  robots,
+  type = 'WebPage',
+  themeColor = '#050409',
+  lang = 'en',
+  noindex = false,
+  pageSchemas = [],
+  includeSoftwareApplication = false,
+  bodyClass = '',
+} = Astro.props;
+
+const canonicalHref = canonical ?? canonicalUrl(canonicalPath ?? Astro.url.pathname);
+const robotsContent =
+  robots ??
+  (noindex
+    ? 'noindex,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
+    : 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1');
+
+const schemas = [
+  createOrganizationSchema(),
+  createWebSiteSchema(),
+  createWebPageSchema({
+    title,
+    description,
+    url: canonicalHref,
+    type,
+    breadcrumbs,
+  }),
+  ...(includeSoftwareApplication ? [createSoftwareApplicationSchema()] : []),
+  ...pageSchemas,
+];
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="theme-color" content={themeColor} />
+    <meta name="application-name" content={SITE.name} />
+    <meta name="author" content={SITE.name} />
+    <meta name="description" content={description} />
+    <meta name="robots" content={robotsContent} />
+    <title>{formatTitle(title)}</title>
+    <link rel="canonical" href={canonicalHref} />
+    <link rel="icon" href={SITE.logo} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalHref} />
+    <meta property="og:image" content={absoluteUrl(image)} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absoluteUrl(image)} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    <script type="application/ld+json" set:html={JSON.stringify(schemas)} />
+    <slot name="head" />
+  </head>
+  <body class={bodyClass}>
+    <slot />
+  </body>
+</html>

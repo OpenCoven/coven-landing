@@ -1,288 +1,79 @@
 ---
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocPage from '../components/DocPage.astro';
+import { SITE } from '../config/site';
+import { createBreadcrumbSchema } from '../lib/seo';
+
+const breadcrumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'Terms', href: '/terms' },
+];
 ---
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Terms of Service — OpenCoven</title>
-  <meta name="description" content="OpenCoven Terms of Service. Read the terms governing your use of the OpenCoven platform, tools, and ecosystem." />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://opencoven.ai/terms" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --bg:          #050409;
-      --surface:     #0d0b12;
-      --border:      rgba(255,255,255,0.07);
-      --text:        #e8e4f0;
-      --muted:       #7a748a;
-      --accent:      #8e3dff;
-      --accent-soft: rgba(142,61,255,0.12);
-      --font-sans:   'Space Grotesk', system-ui, sans-serif;
-      --font-mono:   'JetBrains Mono', monospace;
-    }
+<BaseLayout
+  title="Terms of Service"
+  description="OpenCoven Terms of Service. Read the terms governing your use of the OpenCoven platform, tools, and ecosystem."
+  canonicalPath="/terms"
+  type="TermsOfService"
+  pageSchemas={[createBreadcrumbSchema(breadcrumbs, `${SITE.url}/terms`)]}
+>
+  <DocPage
+    kicker="Legal"
+    title="Terms of Service"
+    description="Please read these Terms of Service carefully before using OpenCoven or any of its associated tools, packages, SDKs, or services."
+    breadcrumbs={breadcrumbs}
+    footerNote="These terms govern the website and hosted services, not the open-source software license itself."
+  >
+    <section class="doc-panel">
+      <h2>Acceptance of Terms</h2>
+      <p>By downloading, installing, accessing, or using OpenCoven ("the Software"), you agree to these Terms of Service ("Terms") and our <a href="/privacy">Privacy Policy</a>. If you do not agree, do not use the Software.</p>
+      <p>These Terms apply to all users including individuals, organizations, and developers integrating OpenCoven into their own products.</p>
+    </section>
 
-    html { background: var(--bg); color: var(--text); font-family: var(--font-sans); }
+    <section class="doc-panel">
+      <h2>What OpenCoven Is</h2>
+      <p>OpenCoven is an open-source framework for building and running persistent AI familiars - named agents with memory, identity, tools, and continuity. It includes a daemon, CLI, harness integrations, and related packages published under the <code>@opencoven</code> namespace.</p>
+      <p>OpenCoven is primarily a local-first tool. You run it on your own hardware. You control your agents, your data, and your keys.</p>
+    </section>
 
-    body { min-height: 100vh; display: flex; flex-direction: column; }
+    <section class="doc-grid doc-grid--three">
+      <article class="doc-card">
+        <h2>Open Source License</h2>
+        <p>OpenCoven's source code is released under the <a href="https://github.com/OpenCoven/coven/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>.</p>
+      </article>
+      <article class="doc-card">
+        <h2>Permitted Use</h2>
+        <p>You may build, run, and extend AI familiars, integrate OpenCoven into your own products, contribute to the open-source codebase, and access documentation and packages.</p>
+      </article>
+      <article class="doc-card">
+        <h2>Prohibited Use</h2>
+        <p>You may not use OpenCoven to generate illegal content, harass people, deceive users, circumvent security, or violate third-party AI provider policies.</p>
+      </article>
+    </section>
 
-    /* ── Header ── */
-    .page-header {
-      border-bottom: 1px solid var(--border);
-      padding: 0 40px;
-    }
-    .page-header-inner {
-      max-width: 800px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      height: 60px;
-      gap: 12px;
-    }
-    .header-brand {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none; color: var(--text);
-      font-weight: 600; font-size: 15px;
-    }
-    .header-brand img { width: 24px; height: 24px; }
-    .header-back {
-      margin-left: auto;
-      font-size: 13px; color: var(--muted);
-      text-decoration: none;
-      transition: color .15s;
-    }
-    .header-back:hover { color: var(--text); }
+    <section class="doc-callout">
+      OpenCoven is local-first. We don't see your agent conversations, your files, or your keys. Responsible use is your responsibility.
+    </section>
 
-    /* ── Main ── */
-    main {
-      flex: 1;
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 64px 40px 96px;
-      width: 100%;
-    }
+    <section class="doc-grid">
+      <article class="doc-panel">
+        <h2>Third-Party AI Providers</h2>
+        <p>OpenCoven integrates with third-party AI providers (OpenAI, Anthropic, Google, and others). Your use of those providers is governed by their respective terms of service and usage policies.</p>
+      </article>
+      <article class="doc-panel">
+        <h2>No Warranty and Liability</h2>
+        <p>OpenCoven is provided "as is" without warranty. To the maximum extent permitted by law, OpenCoven and its contributors are not liable for indirect, incidental, special, consequential, or punitive damages arising from use of the Software.</p>
+      </article>
+    </section>
 
-    .doc-kicker {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 16px;
-    }
+    <section class="doc-panel">
+      <h2>Privacy</h2>
+      <p>Our data practices are described in our <a href="/privacy">Privacy Policy</a>. By using OpenCoven, you agree to the collection and use of information as described there.</p>
+    </section>
 
-    h1 {
-      font-size: 40px;
-      font-weight: 700;
-      line-height: 1.15;
-      margin-bottom: 8px;
-    }
-
-    .doc-meta {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 48px;
-    }
-
-    .doc-intro {
-      font-size: 17px;
-      line-height: 1.7;
-      color: rgba(232,228,240,0.85);
-      margin-bottom: 56px;
-      padding-bottom: 40px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    h2 {
-      font-size: 20px;
-      font-weight: 600;
-      margin: 48px 0 12px;
-      color: var(--text);
-    }
-
-    h2::before {
-      content: '§';
-      color: var(--accent);
-      margin-right: 8px;
-      font-weight: 400;
-      font-family: var(--font-mono);
-      font-size: 14px;
-    }
-
-    p {
-      font-size: 15px;
-      line-height: 1.75;
-      color: rgba(232,228,240,0.8);
-      margin-bottom: 16px;
-    }
-
-    ul {
-      margin: 8px 0 16px 20px;
-    }
-    ul li {
-      font-size: 15px;
-      line-height: 1.75;
-      color: rgba(232,228,240,0.8);
-      margin-bottom: 6px;
-    }
-
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    .callout {
-      background: var(--accent-soft);
-      border: 1px solid rgba(142,61,255,0.25);
-      border-radius: 10px;
-      padding: 20px 24px;
-      margin: 32px 0;
-      font-size: 14px;
-      line-height: 1.7;
-      color: rgba(232,228,240,0.85);
-    }
-
-    /* ── Footer ── */
-    .page-footer {
-      border-top: 1px solid var(--border);
-      padding: 28px 40px;
-      text-align: center;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .page-footer a { color: var(--muted); }
-    .page-footer a:hover { color: var(--text); }
-
-    @media (max-width: 640px) {
-      .page-header { padding: 0 20px; }
-      main { padding: 48px 20px 72px; }
-      h1 { font-size: 30px; }
-      .page-footer { padding: 24px 20px; }
-    }
-  </style>
-</head>
-<body>
-
-<header class="page-header">
-  <div class="page-header-inner">
-    <a class="header-brand" href="/">
-      <img src="/favicon.svg" alt="OpenCoven" />
-      OpenCoven
-    </a>
-    <a class="header-back" href="/">← Back to home</a>
-  </div>
-</header>
-
-<main>
-  <p class="doc-kicker">Legal</p>
-  <h1>Terms of Service</h1>
-  <p class="doc-meta">Effective date: May 27, 2026 &nbsp;·&nbsp; Last updated: May 27, 2026</p>
-
-  <div class="doc-intro">
-    Please read these Terms of Service carefully before using OpenCoven or any of its associated tools, packages, SDKs, or services. By accessing or using OpenCoven you agree to be bound by these terms.
-  </div>
-
-  <h2>Acceptance of Terms</h2>
-  <p>
-    By downloading, installing, accessing, or using OpenCoven ("the Software"), you agree to these Terms of Service ("Terms") and our <a href="/privacy">Privacy Policy</a>. If you do not agree, do not use the Software.
-  </p>
-  <p>
-    These Terms apply to all users including individuals, organizations, and developers integrating OpenCoven into their own products.
-  </p>
-
-  <h2>What OpenCoven Is</h2>
-  <p>
-    OpenCoven is an open-source framework for building and running persistent AI familiars — named agents with memory, identity, tools, and continuity. It includes a daemon, CLI, harness integrations, and related packages published under the <code>@opencoven</code> namespace.
-  </p>
-  <p>
-    OpenCoven is primarily a local-first tool. You run it on your own hardware. You control your agents, your data, and your keys.
-  </p>
-
-  <h2>Open Source License</h2>
-  <p>
-    OpenCoven's source code is released under the <a href="https://github.com/OpenCoven/coven/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>. Your use of the source code is governed by that license in addition to these Terms.
-  </p>
-  <p>
-    These Terms govern your use of any hosted services, websites, or infrastructure operated by OpenCoven (opencoven.ai, docs.opencoven.ai, and related properties), not the open-source software itself.
-  </p>
-
-  <h2>Permitted Use</h2>
-  <p>You may use OpenCoven to:</p>
-  <ul>
-    <li>Build, run, and extend AI familiars for personal or commercial use</li>
-    <li>Integrate OpenCoven into your own products and services</li>
-    <li>Contribute to the open-source codebase under the project's contribution guidelines</li>
-    <li>Access documentation, examples, and official OpenCoven packages</li>
-  </ul>
-
-  <h2>Prohibited Use</h2>
-  <p>You may not use OpenCoven to:</p>
-  <ul>
-    <li>Generate or distribute illegal content, including content that violates intellectual property laws, privacy laws, or anti-spam regulations</li>
-    <li>Harass, threaten, or harm individuals</li>
-    <li>Build systems designed to deceive users into believing they are interacting with a human when they are not, without appropriate disclosure</li>
-    <li>Circumvent security measures or access systems without authorization</li>
-    <li>Violate the acceptable use policies of any third-party AI provider integrated with OpenCoven (e.g., OpenAI, Anthropic, Google)</li>
-  </ul>
-
-  <div class="callout">
-    OpenCoven is local-first. We don't see your agent conversations, your files, or your keys. Responsible use is your responsibility.
-  </div>
-
-  <h2>Third-Party AI Providers</h2>
-  <p>
-    OpenCoven integrates with third-party AI providers (OpenAI, Anthropic, Google, and others). Your use of those providers is governed by their respective terms of service and usage policies. OpenCoven is not responsible for the outputs, policies, or availability of third-party AI services.
-  </p>
-
-  <h2>No Warranty</h2>
-  <p>
-    OpenCoven is provided "as is" without warranty of any kind, express or implied. We do not warrant that the Software will be error-free, secure, or uninterrupted. Use at your own risk.
-  </p>
-
-  <h2>Limitation of Liability</h2>
-  <p>
-    To the maximum extent permitted by applicable law, OpenCoven and its contributors shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your use of or inability to use the Software, even if advised of the possibility of such damages.
-  </p>
-
-  <h2>Indemnification</h2>
-  <p>
-    You agree to indemnify and hold harmless OpenCoven, its contributors, and maintainers from any claims, damages, or expenses arising from your use of the Software in violation of these Terms.
-  </p>
-
-  <h2>Privacy</h2>
-  <p>
-    Our data practices are described in our <a href="/privacy">Privacy Policy</a>. By using OpenCoven, you agree to the collection and use of information as described there.
-  </p>
-
-  <h2>Changes to These Terms</h2>
-  <p>
-    We may update these Terms from time to time. When we do, we'll update the "Last updated" date at the top of this page. Continued use of OpenCoven after changes are posted constitutes acceptance of the revised Terms.
-  </p>
-
-  <h2>Governing Law</h2>
-  <p>
-    These Terms shall be governed by the laws of the State of Texas, United States, without regard to conflict of law principles.
-  </p>
-
-  <h2>Contact</h2>
-  <p>
-    Questions about these Terms? Reach us at <a href="mailto:hello@opencoven.ai">hello@opencoven.ai</a> or open an issue on <a href="https://github.com/OpenCoven/coven" target="_blank" rel="noopener noreferrer">GitHub</a>.
-  </p>
-</main>
-
-<footer class="page-footer">
-  <p>
-    &copy; {new Date().getFullYear()} OpenCoven &nbsp;·&nbsp;
-    <a href="/terms">Terms</a> &nbsp;·&nbsp;
-    <a href="/privacy">Privacy</a> &nbsp;·&nbsp;
-    <a href="/">Home</a>
-  </p>
-</footer>
-
-</body>
-</html>
+    <section class="doc-panel">
+      <h2>Contact</h2>
+      <p>Questions about these Terms? Reach us at <a href="mailto:hello@opencoven.ai">hello@opencoven.ai</a> or open an issue on <a href="https://github.com/OpenCoven/coven" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
+    </section>
+  </DocPage>
+</BaseLayout>

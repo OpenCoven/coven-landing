@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocPage from '../components/DocPage.astro';
+import { SITE, SEARCH_INDEX } from '../config/site';
+import { createBreadcrumbSchema } from '../lib/seo';
+
+const breadcrumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'Search', href: '/search' },
+];
+---
+
+<BaseLayout
+  title="Search OpenCoven"
+  description="Search the OpenCoven site for core pages, project information, and fast navigation targets."
+  canonicalPath="/search"
+  noindex={true}
+  pageSchemas={[createBreadcrumbSchema(breadcrumbs, `${SITE.url}/search`)]}
+>
+  <DocPage
+    kicker="Search"
+    title="Search OpenCoven"
+    description="Find the right page or section fast. This page searches the site index on the client so visitors can jump to the relevant route without leaving the browser."
+    breadcrumbs={breadcrumbs}
+    footerNote="Search pages are intentionally noindex. Use the results here to jump to indexable pages and sections."
+  >
+    <section class="doc-callout">
+      <div class="doc-searchbar">
+        <span aria-hidden="true">⌕</span>
+        <input id="site-search" type="search" placeholder="Search OpenCoven..." autocomplete="off" />
+      </div>
+      <p id="search-summary" class="doc-copy">Showing the most useful site pages and sections.</p>
+    </section>
+
+    <section class="doc-result-list" id="search-results">
+      {SEARCH_INDEX.map((item) => (
+        <article class="doc-result" data-title={item.title} data-description={item.description} data-keywords={item.keywords.join(' ')}>
+          <a href={item.href}>{item.title}</a>
+          <p>{item.description}</p>
+          <small>{item.keywords.join(' · ')}</small>
+        </article>
+      ))}
+    </section>
+
+    <section class="doc-grid">
+      <article class="doc-panel">
+        <h2>Fast links</h2>
+        <ul class="doc-list">
+          <li><a href="/about">About</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="/privacy">Privacy</a></li>
+          <li><a href="/terms">Terms</a></li>
+        </ul>
+      </article>
+      <article class="doc-panel">
+        <h2>Intent</h2>
+        <p>The page exists to help people and search systems find the right OpenCoven page quickly. It is not meant to rank as a standalone result.</p>
+      </article>
+    </section>
+
+    <script>
+      (() => {
+        const input = document.getElementById('site-search');
+        const summary = document.getElementById('search-summary');
+        const results = Array.from(document.querySelectorAll('#search-results .doc-result'));
+        if (!input || !summary || !results.length) return;
+
+        const normalize = (value) => value.toLowerCase().trim();
+        const initialQuery = new URLSearchParams(window.location.search).get('q') || '';
+        input.value = initialQuery;
+
+        const apply = () => {
+          const query = normalize(input.value);
+          let visible = 0;
+
+          results.forEach((result) => {
+            const title = normalize(result.getAttribute('data-title') || '');
+            const description = normalize(result.getAttribute('data-description') || '');
+            const keywords = normalize(result.getAttribute('data-keywords') || '');
+            const matches = !query || title.includes(query) || description.includes(query) || keywords.includes(query);
+            result.hidden = !matches;
+            if (matches) visible += 1;
+          });
+
+          summary.textContent = query
+            ? `Found ${visible} result${visible === 1 ? '' : 's'} for "${input.value}".`
+            : `Showing ${visible} site pages and sections.`;
+        };
+
+        input.addEventListener('input', apply);
+        apply();
+      })();
+    </script>
+  </DocPage>
+</BaseLayout>

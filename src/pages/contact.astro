@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DocPage from '../components/DocPage.astro';
+import { SITE } from '../config/site';
+import { createBreadcrumbSchema } from '../lib/seo';
+
+const breadcrumbs = [
+  { name: 'Home', href: '/' },
+  { name: 'Contact', href: '/contact' },
+];
+---
+
+<BaseLayout
+  title="Contact OpenCoven"
+  description="Reach OpenCoven by email, GitHub, Discord, or docs. Use this page for support, issues, and project questions."
+  canonicalPath="/contact"
+  pageSchemas={[createBreadcrumbSchema(breadcrumbs, `${SITE.url}/contact`)]}
+>
+  <DocPage
+    kicker="Contact"
+    title="Talk to OpenCoven"
+    description="Use the channel that matches your question: email for direct contact, GitHub for code and issues, Discord for community discussion, and docs for self-serve help."
+    breadcrumbs={breadcrumbs}
+    footerNote="For site, legal, and support questions, email is the fastest path."
+  >
+    <section class="doc-grid doc-grid--three">
+      <article class="doc-card">
+        <h2>Email</h2>
+        <p>hello@opencoven.ai</p>
+        <div class="doc-actions"><a class="doc-button" href={`mailto:${SITE.email}`}>Email us</a></div>
+      </article>
+      <article class="doc-card">
+        <h2>GitHub</h2>
+        <p>Source, issues, pull requests, and release tracking for the OpenCoven project.</p>
+        <div class="doc-actions"><a class="doc-button" href={SITE.githubUrl} target="_blank" rel="noopener noreferrer">Open repository</a></div>
+      </article>
+      <article class="doc-card">
+        <h2>Discord</h2>
+        <p>Community discussion, product feedback, and live project conversation.</p>
+        <div class="doc-actions"><a class="doc-button" href={SITE.discordUrl} target="_blank" rel="noopener noreferrer">Join Discord</a></div>
+      </article>
+    </section>
+
+    <section class="doc-callout">
+      <h2>What to include</h2>
+      <p>When you send a question, include the page or route you were on, the browser or device you used, and the exact issue. That makes it easier to route the message to the right maintainer and cut response time.</p>
+      <div class="doc-actions">
+        <a class="doc-button-secondary" href={SITE.docsUrl} target="_blank" rel="noopener noreferrer">Read the docs</a>
+        <a class="doc-button-secondary" href="/privacy">Privacy policy</a>
+      </div>
+    </section>
+
+    <section class="doc-grid">
+      <article class="doc-panel">
+        <h2>Support paths</h2>
+        <ul class="doc-list">
+          <li><a href={SITE.docsUrl} target="_blank" rel="noopener noreferrer">Docs</a> for installation, CLI usage, and architecture references.</li>
+          <li><a href="/about">About</a> for project context and trust signals.</li>
+          <li><a href="/search">Search</a> for quick navigation to key pages and sections.</li>
+        </ul>
+      </article>
+      <article class="doc-panel">
+        <h2>Business and partnership questions</h2>
+        <p>If your question is about the project, website, or integration fit, email is the right starting point. GitHub is better for public code and issue tracking.</p>
+      </article>
+    </section>
+  </DocPage>
+</BaseLayout>

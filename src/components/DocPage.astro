@@ -1,0 +1,385 @@
+---
+import { SITE, UTILITY_NAV_LINKS } from '../config/site';
+import { normalizePathname } from '../lib/seo';
+
+const {
+  kicker,
+  title,
+  description,
+  breadcrumbs = [],
+  footerNote = 'Questions about OpenCoven? Reach us by email, GitHub, or Discord.',
+} = Astro.props as {
+  kicker?: string;
+  title: string;
+  description?: string;
+  breadcrumbs?: Array<{ href: string; name: string }>;
+  footerNote?: string;
+};
+
+const currentPath = normalizePathname(Astro.url.pathname);
+---
+
+<div class="doc-shell">
+  <header class="doc-shell-header">
+    <a class="doc-brand" href="/">
+      <img src={SITE.logo} alt="" width="24" height="24" />
+      <span>
+        <strong>{SITE.name}</strong>
+        <small>Persistent AI familiars</small>
+      </span>
+    </a>
+    <nav class="doc-shell-nav" aria-label="Utility navigation">
+      {UTILITY_NAV_LINKS.map((link) => (
+        <a href={link.href} aria-current={normalizePathname(link.href) === currentPath ? 'page' : undefined}>
+          {link.label}
+        </a>
+      ))}
+    </nav>
+  </header>
+
+  <main class="doc-shell-main" id="content">
+    {breadcrumbs.length > 0 && (
+      <nav class="doc-breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+          {breadcrumbs.map((crumb, index) => (
+            <li>
+              {index < breadcrumbs.length - 1 ? <a href={crumb.href}>{crumb.name}</a> : <span aria-current="page">{crumb.name}</span>}
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
+
+    <section class="doc-hero">
+      {kicker && <p class="doc-kicker">{kicker}</p>}
+      <h1>{title}</h1>
+      {description && <p class="doc-lede">{description}</p>}
+    </section>
+
+    <div class="doc-content">
+      <slot />
+    </div>
+  </main>
+
+  <footer class="doc-shell-footer">
+    <div>
+      <p class="doc-footer-note">{footerNote}</p>
+      <p class="doc-footer-meta">
+        <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        <span>·</span>
+        <a href={SITE.githubUrl} target="_blank" rel="noopener noreferrer">GitHub</a>
+        <span>·</span>
+        <a href={SITE.discordUrl} target="_blank" rel="noopener noreferrer">Discord</a>
+      </p>
+    </div>
+    <div class="doc-footer-links">
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/search">Search</a>
+    </div>
+  </footer>
+</div>
+
+<style>
+  .doc-shell {
+    position: relative;
+    z-index: 1;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 24px 32px 72px;
+  }
+
+  .doc-card p,
+  .doc-panel p,
+  .doc-callout p,
+  .doc-result p,
+  .doc-copy,
+  .doc-list li {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--muted);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 0;
+    font-size: 14px;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  .data-table th {
+    text-align: left;
+    font-weight: 700;
+    color: var(--white);
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(154, 142, 205, 0.16);
+    background: rgba(154, 142, 205, 0.08);
+  }
+
+  .data-table td {
+    padding: 12px 14px;
+    color: var(--muted);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    vertical-align: top;
+  }
+
+  .data-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .doc-shell-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .doc-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .doc-brand img {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .doc-brand strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .doc-brand small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .doc-shell-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .doc-shell-nav a,
+  .doc-footer-links a,
+  .doc-footer-meta a,
+  .doc-breadcrumbs a {
+    color: var(--coven-violet-light);
+    text-decoration: none;
+  }
+
+  .doc-shell-nav a {
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(154, 142, 205, 0.16);
+    background: rgba(154, 142, 205, 0.06);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .doc-shell-nav a[aria-current='page'] {
+    color: var(--white);
+    border-color: rgba(154, 142, 205, 0.4);
+    background: rgba(154, 142, 205, 0.16);
+  }
+
+  .doc-shell-main {
+    padding-top: 32px;
+  }
+
+  .doc-breadcrumbs {
+    margin-bottom: 18px;
+  }
+
+  .doc-breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    color: rgba(232, 224, 240, 0.58);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .doc-breadcrumbs li + li::before {
+    content: '/';
+    margin-right: 8px;
+    color: rgba(232, 224, 240, 0.28);
+  }
+
+  .doc-hero {
+    max-width: 780px;
+    margin-bottom: 28px;
+  }
+
+  .doc-kicker {
+    margin-bottom: 14px;
+    color: var(--vtext);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .doc-hero h1 {
+    margin: 0;
+    font-size: clamp(36px, 4vw, 64px);
+    font-weight: 900;
+    line-height: 0.98;
+    letter-spacing: -0.05em;
+    color: var(--white);
+  }
+
+  .doc-lede {
+    margin-top: 18px;
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--muted);
+    max-width: 720px;
+  }
+
+  .doc-card p,
+  .doc-panel p,
+  .doc-callout p,
+  .doc-result p,
+  .doc-copy,
+  .doc-list li {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--muted);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 0;
+    font-size: 14px;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  .data-table th {
+    text-align: left;
+    font-weight: 700;
+    color: var(--white);
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(154, 142, 205, 0.16);
+    background: rgba(154, 142, 205, 0.08);
+  }
+
+  .data-table td {
+    padding: 12px 14px;
+    color: var(--muted);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    vertical-align: top;
+  }
+
+  .data-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .doc-content {
+    display: grid;
+    gap: 18px;
+  }
+
+  .doc-shell-footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding-top: 28px;
+    margin-top: 42px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .doc-footer-note {
+    font-size: 14px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .doc-footer-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .doc-footer-meta span {
+    color: rgba(232, 224, 240, 0.32);
+  }
+
+  .doc-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+  }
+
+  .doc-shell a:hover {
+    color: var(--white);
+    text-decoration: underline;
+  }
+
+  @media (max-width: 900px) {
+    .doc-shell {
+      padding: 20px 20px 64px;
+    }
+
+    .doc-shell-header,
+    .doc-shell-footer {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .doc-shell-nav {
+      justify-content: flex-start;
+    }
+
+    .doc-hero h1 {
+      font-size: clamp(32px, 9vw, 46px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .doc-shell {
+      padding: 16px 16px 56px;
+    }
+
+    .doc-shell-nav {
+      gap: 8px;
+    }
+
+    .doc-shell-nav a {
+      font-size: 11px;
+      padding: 7px 9px;
+    }
+
+    .doc-lede {
+      font-size: 16px;
+    }
+  }
+</style>

@@ -1,0 +1,86 @@
+---
+import { HOME_FAQS } from '../config/site';
+
+const { faqs = HOME_FAQS } = Astro.props as {
+  faqs?: Array<{ question: string; answer: string }>;
+};
+---
+
+<section class="faq-section content-section" id="faq" aria-labelledby="faq-heading">
+  <div class="section-header" data-reveal>
+    <p class="section-kicker">FAQ</p>
+    <h2 id="faq-heading">Answers that match how people actually search.</h2>
+    <p>Short, direct answers help both visitors and search engines understand what OpenCoven is, how it works, and where it fits.</p>
+  </div>
+
+  <div class="faq-grid">
+    {faqs.map((faq) => (
+      <details class="faq-item glass-card" data-reveal>
+        <summary>{faq.question}</summary>
+        <div class="faq-answer">
+          <p>{faq.answer}</p>
+        </div>
+      </details>
+    ))}
+  </div>
+</section>
+
+<style>
+  .faq-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .faq-item {
+    margin: 0;
+    background: var(--bg);
+    padding: 22px 22px 18px;
+  }
+
+  .faq-item summary {
+    list-style: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.45;
+    color: var(--white);
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item summary::after {
+    content: '+';
+    float: right;
+    color: var(--vtext);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .faq-item[open] summary::after {
+    content: '–';
+  }
+
+  .faq-answer {
+    padding-top: 12px;
+  }
+
+  .faq-answer p {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  @media (max-width: 900px) {
+    .faq-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
