@@ -3,19 +3,19 @@ const COPY_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
 
 const steps = [
   {
-    kicker: '01 · Verify',
-    command: 'npx @opencoven/cli doctor',
+    kicker: '01 · Install',
+    command: 'npm install -g @opencoven/cli',
+    body: 'Installs the Coven CLI through npm so the coven command is available on your PATH.',
+  },
+  {
+    kicker: '02 · Verify',
+    command: 'coven doctor',
     body: 'Checks your environment and detects supported harnesses — Codex, Claude Code, and more.',
   },
   {
-    kicker: '02 · Start a session',
+    kicker: '03 · Start a session',
     command: 'coven run claude "fix the failing tests"',
     body: "Launches a project-scoped session through Coven's managed PTY, bound to the current working directory.",
-  },
-  {
-    kicker: '03 · Resume anywhere',
-    command: 'coven sessions',
-    body: 'Interactive browser to rejoin, summon, archive, or view logs — work picks up where you left off.',
   },
 ];
 ---
@@ -23,7 +23,7 @@ const steps = [
   <div class="section-header" data-reveal>
     <p class="section-kicker">Quick Start</p>
     <h2 id="quickstart-heading">Run your first familiar in three commands.</h2>
-    <p>Coven runs locally inside the projects you already have. Verify, start, and resume — memory persists across every session.</p>
+    <p>Coven runs locally inside the projects you already have. Install, verify, and start — memory persists across every session.</p>
   </div>
   <div class="card-grid three">
     {steps.map((step) => (

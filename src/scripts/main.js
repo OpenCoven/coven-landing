@@ -220,3 +220,99 @@
       });
     });
   })();
+
+  // ── Download CTA: detect visitor's platform ─────────────────
+  //
+  // Promotes the matching button to the visually-primary slot and
+  // updates the headline. Works fully without JS — every link is
+  // a real <a href> with the canonical destination — this just
+  // adds visual emphasis.
+  //
+  // Detection order:
+  //   1. UA-string OS markers (most intentional; matches UA overrides)
+  //   2. UA-Client-Hints `platform` (Chromium)
+  //   3. `navigator.platform` fallback
+  //   4. Default fallback: macOS
+  (function () {
+    var cta = document.querySelector('[data-download-cta]');
+    if (!cta) return;
+
+    var headingEl = cta.querySelector('[data-download-platform]');
+    var subEl = cta.querySelector('[data-download-sub]');
+    var buttons = cta.querySelectorAll('.download-btn');
+    if (!buttons.length) return;
+
+    var ua = navigator.userAgent || '';
+    var rawPlatform = (navigator.platform || '').toLowerCase();
+    var uaPlatform = '';
+    try {
+      // UA-Client-Hints (Chromium-based browsers). High-entropy
+      // hints would be more accurate but require a Permissions-Policy
+      // header; the low-entropy 'platform' string is fine for our
+      // four-bucket detection.
+      if (navigator.userAgentData && navigator.userAgentData.platform) {
+        uaPlatform = String(navigator.userAgentData.platform).toLowerCase();
+      }
+    } catch (_) {}
+
+    // iPad on iOS 13+ reports as Mac in UA + platform. Disambiguate
+    // by checking for multi-touch capability (Macs report 0).
+    var isIOSDevice = /iPhone|iPad|iPod/i.test(ua) ||
+                      (rawPlatform === 'macintel' && navigator.maxTouchPoints > 1);
+
+    // Order: explicit UA-string markers > UA-Client-Hints > navigator.platform.
+    // The UA string is what dev tools / mobile sites set, and it's the most
+    // intentional signal. Client hints + navigator.platform come from the OS
+    // and can't always be overridden, so they go last.
+    var detected = 'mac';
+    if (isIOSDevice) {
+      detected = 'ios';
+    } else if (/Windows/i.test(ua)) {
+      detected = 'win';
+    } else if (/Linux|X11|CrOS|Android/i.test(ua) && !/Mac/i.test(ua)) {
+      // Android browsers report "Linux" too — we don't ship Android yet,
+      // so steering them to the Linux/CLI path is the least-bad option.
+      detected = 'linux';
+    } else if (/Mac OS X|Macintosh/i.test(ua)) {
+      detected = 'mac';
+    } else if (uaPlatform.indexOf('win') >= 0 || rawPlatform.indexOf('win') >= 0) {
+      detected = 'win';
+    } else if (uaPlatform.indexOf('linux') >= 0 || rawPlatform.indexOf('linux') >= 0 ||
+               uaPlatform.indexOf('chromeos') >= 0) {
+      detected = 'linux';
+    } else if (uaPlatform.indexOf('mac') >= 0 || rawPlatform.indexOf('mac') >= 0) {
+      detected = 'mac';
+    }
+
+    var COPY = {
+      mac:   { name: 'CovenCave for macOS', sub: "We detected macOS — your one-click download is highlighted below." },
+      ios:   { name: 'CovenCave for iPhone & iPad', sub: "We detected an iOS device — join the TestFlight beta below." },
+      win:   { name: 'CovenCave for Windows', sub: "We detected Windows — your one-click installer is highlighted below." },
+      linux: { name: 'CovenCave for Linux',   sub: "We detected Linux — your one-click AppImage is highlighted below." },
+    };
+
+    var copy = COPY[detected] || COPY.mac;
+    if (headingEl) headingEl.textContent = copy.name;
+    if (subEl) subEl.textContent = copy.sub;
+
+    // Promote the matching button to .is-primary. Desktop platforms move to
+    // the top; TestFlight stays in the bottom full-width row.
+    var primary = null;
+    buttons.forEach(function (btn) {
+      btn.classList.remove('is-primary');
+      if (btn.getAttribute('data-platform') === detected) {
+        primary = btn;
+      }
+    });
+
+    if (primary && primary.parentNode && detected !== 'ios') {
+      var grid = primary.parentNode;
+      // Move the primary to the front of the grid so it spans the
+      // full row (see .download-btn.is-primary CSS rule).
+      grid.insertBefore(primary, grid.firstChild);
+      primary.classList.add('is-primary');
+    }
+
+    // Stamp the resolved platform on the cta for analytics / debug.
+    cta.setAttribute('data-detected', detected);
+  })();
