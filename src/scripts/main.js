@@ -295,7 +295,8 @@
     if (headingEl) headingEl.textContent = copy.name;
     if (subEl) subEl.textContent = copy.sub;
 
-    // Promote the matching button to .is-primary, reorder to top.
+    // Promote the matching button to .is-primary. Desktop platforms move to
+    // the top; TestFlight stays in the bottom full-width row.
     var primary = null;
     buttons.forEach(function (btn) {
       btn.classList.remove('is-primary');
@@ -304,7 +305,7 @@
       }
     });
 
-    if (primary && primary.parentNode) {
+    if (primary && primary.parentNode && detected !== 'ios') {
       var grid = primary.parentNode;
       // Move the primary to the front of the grid so it spans the
       // full row (see .download-btn.is-primary CSS rule).

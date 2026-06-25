@@ -1077,6 +1077,9 @@
       color: var(--vtext);
       transform: translateY(1px);
     }
+    .download-btn[data-platform="ios"] {
+      grid-column: 1 / -1;
+    }
 
     /* Primary (auto-detected platform) treatment */
     .download-btn.is-primary {
