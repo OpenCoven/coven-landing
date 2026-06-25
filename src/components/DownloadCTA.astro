@@ -3,10 +3,9 @@
 //
 // Renders four buttons (macOS · iOS/iPadOS · Windows · Linux) plus a CLI
 // affordance. Client-side script detects the visitor's platform (UA + UA-CH
-// + plus heuristics for Apple Silicon) and:
+// + navigator.platform, with an iPad-on-iOS-13+ disambiguation) and:
 //   1. Promotes the matching button to the visually-primary slot.
-//   2. Re-labels the headline tag (e.g. "Made for your Mac").
-//
+//   2. Updates the platform name in the headline (e.g. "CovenCave for macOS").
 // Server-rendered markup is fully functional without JS — every button is
 // a real link, every platform link points at the canonical release/asset
 // URL or TestFlight. The script only changes the visual emphasis.
