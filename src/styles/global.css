@@ -953,7 +953,7 @@
     /* ────────────────────────────────────────────────────────────
        Download CTA (Hero)
        Predominant platform-aware download block. The .is-primary
-       button (assigned by JS based on detected platform) gets the
+       link (assigned by JS based on detected platform) gets the
        solid violet treatment; the others stay glassy/secondary.
        Server-rendered without any .is-primary so the *first* card
        (macOS) is the default emphasis fallback if JS never runs.
