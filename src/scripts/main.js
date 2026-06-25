@@ -229,10 +229,10 @@
   // adds visual emphasis.
   //
   // Detection order:
-  //   1. UA-Client-Hints `platform` (if present, most accurate)
-  //   2. `navigator.platform` for desktop OSes
-  //   3. UA-string sniff for iOS/iPadOS (Safari hides it as Mac+touch)
-  //   4. Fallback: macOS (most common visitor on landing pages)
+  //   1. UA-string OS markers (most intentional; matches UA overrides)
+  //   2. UA-Client-Hints `platform` (Chromium)
+  //   3. `navigator.platform` fallback
+  //   4. Default fallback: macOS
   (function () {
     var cta = document.querySelector('[data-download-cta]');
     if (!cta) return;
