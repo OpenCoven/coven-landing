@@ -230,23 +230,35 @@
     }
 
     /* ── HERO ────────────────────────────────────────────── */
+    /* Layout C: a single no-scroll viewport. A centered vertical stack holds
+       the 2-column main row (copy+downloads LEFT, CLI card RIGHT) with a slim
+       full-width feature strip beneath it, so neither column grows tall enough
+       to force scrolling. */
     .hero {
       position: relative; z-index: 1;
-      min-height: calc(100vh - 60px);
+      /* Fit the whole hero within one viewport minus the fixed header (~60px),
+         with a little bottom breathing room so the feature strip is never
+         flush against the fold on short 720px laptops. */
+      min-height: calc(100vh - 72px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+      max-width: 1280px; margin: 0 auto;
+      padding: 22px 32px 30px;
+    }
+
+    /* The 2-column main row */
+    .hero-main {
       display: grid;
       grid-template-columns: 1.1fr 0.9fr;
-      max-width: 1280px; margin: 0 auto;
-      padding: 0 32px;
-      gap: 0;
+      align-items: center;
+      gap: 56px;
     }
 
     .hero-copy {
       display: flex; flex-direction: column;
       justify-content: center;
-      /* Swapped hero: copy sits on the RIGHT, so the inner gutter is on its
-         left (toward the CLI card). */
-      order: 2;
-      padding: 80px 0 80px 56px;
       gap: 0;
     }
 
@@ -255,7 +267,7 @@
       font-size: 10px; font-weight: 600;
       letter-spacing: 0.18em;
       color: var(--vtext); opacity: 0.7;
-      margin-bottom: 24px;
+      margin-bottom: 18px;
       display: flex; align-items: center; gap: 10px;
     }
     .kicker::before {
@@ -265,12 +277,12 @@
     }
 
     h1 {
-      font-size: clamp(44px, 5.5vw, 76px);
+      font-size: clamp(40px, 4.6vw, 62px);
       font-weight: 900;
-      line-height: 1.0;
+      line-height: 1.02;
       letter-spacing: -0.04em;
       color: var(--white);
-      margin-bottom: 28px;
+      margin-bottom: 22px;
     }
     h1 em {
       font-style: normal;
@@ -278,13 +290,13 @@
     }
 
     .hero-lede {
-      font-size: 16px; line-height: 1.65;
+      font-size: 16px; line-height: 1.55;
       color: var(--muted);
       max-width: 460px;
-      margin-bottom: 48px;
+      margin-bottom: 22px;
     }
 
-    /* 4-column mini feature grid */
+    /* 4-column mini feature grid — a slim full-width strip beneath the main row */
     .feature-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -293,12 +305,12 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       overflow: hidden;
-      margin-bottom: 40px;
+      margin-bottom: 0;
     }
     .feature-cell {
       background: var(--bg);
-      padding: 18px 14px 20px;
-      display: flex; flex-direction: column; gap: 8px;
+      padding: 14px 16px 15px;
+      display: flex; flex-direction: column; gap: 6px;
       position: relative;
       transition: background 0.25s ease;
     }
@@ -856,10 +868,10 @@
     }
 
     @media (max-width: 1100px) {
-      /* Tablet: hero shifts to 55/45, reduce hero padding */
-      .hero { grid-template-columns: 1fr 1fr; padding: 0 24px; }
-      .hero-copy { padding: 60px 0 60px 40px; }
-      h1 { font-size: clamp(40px, 5vw, 64px); }
+      /* Tablet: main row shifts to 50/50, reduce hero padding */
+      .hero { padding: 36px 24px; }
+      .hero-main { grid-template-columns: 1fr 1fr; gap: 40px; }
+      h1 { font-size: clamp(38px, 4.8vw, 56px); }
       /* Card grids: 2-col on tablet instead of jumping to 1 */
       .card-grid.three { grid-template-columns: repeat(2, 1fr); }
       .card-grid.four  { grid-template-columns: repeat(2, 1fr); }
@@ -883,18 +895,22 @@
       .testimonial-strip { padding: 32px 20px; }
       footer { padding: 32px 20px; }
 
-      /* Hero: stack vertically, image fills nicely */
+      /* Hero: stack the main row vertically; let it flow (no forced viewport
+         height) so nothing clips on short/tall phones. */
       .hero {
-        grid-template-columns: 1fr;
         min-height: auto;
-        padding: 0 20px;
+        padding: 40px 20px;
+        gap: 28px;
+        justify-content: flex-start;
       }
-      .hero-copy { order: 1; padding: 52px 0 36px; }
+      .hero-main {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      /* Copy leads, card follows below it on narrow screens. */
+      .hero-copy { order: 1; }
       .hero-lede { max-width: 100%; font-size: 15px; }
-
-      /* Hero card: on mobile, full width, less padding; stacks BELOW the copy
-         so the headline still leads on phones despite the desktop swap. */
-      .hero-visual { order: 2; padding: 0 0 32px; justify-content: flex-start; }
+      .hero-visual { order: 2; justify-content: flex-start; }
       .hero-card { max-width: 100%; }
 
       /* Grids */
@@ -920,7 +936,6 @@
 
     @media (max-width: 520px) {
       h1 { font-size: 38px; }
-      .hero-copy { padding: 40px 0 28px; }
       /* hero card naturally sized at 520px */
       /* Feature grid: 2x2 clips the descriptions at phone widths (the cells'
          side padding + gaps push two columns past ~390px), so drop to a
@@ -970,19 +985,19 @@
        ──────────────────────────────────────────────────────────── */
     .download-cta {
       display: flex; flex-direction: column;
-      gap: 14px;
-      margin: 6px 0 18px;
+      gap: 10px;
+      margin: 2px 0 0;
       max-width: 560px;
     }
     .download-beta-badge {
       display: inline-flex; align-items: center; gap: 8px;
       align-self: flex-start;
-      padding: 5px 11px;
+      padding: 4px 10px;
       border-radius: 999px;
       border: 1px solid rgba(142,61,255,0.35);
       background: rgba(142,61,255,0.08);
       color: var(--vtext);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -999,7 +1014,7 @@
     }
     .download-heading {
       margin: 0;
-      font-size: clamp(20px, 2.2vw, 26px);
+      font-size: clamp(19px, 2vw, 23px);
       font-weight: 700;
       letter-spacing: -0.01em;
       color: var(--white);
@@ -1011,20 +1026,20 @@
     .download-sub {
       margin: 0;
       color: var(--muted);
-      font-size: 14px;
-      line-height: 1.55;
-      max-width: 48ch;
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 52ch;
     }
     .download-buttons {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 4px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 2px;
     }
     .download-btn {
-      display: flex; align-items: center; gap: 12px;
+      display: flex; align-items: center; gap: 9px;
       text-decoration: none;
-      padding: 14px 16px;
+      padding: 10px 12px;
       border-radius: 10px;
       border: 1px solid var(--border-v);
       background: rgba(20, 14, 35, 0.55);
@@ -1050,7 +1065,7 @@
     .download-btn:hover::after { transform: translateX(100%); }
     .download-btn-icon {
       flex: 0 0 auto;
-      width: 22px; height: 22px;
+      width: 19px; height: 19px;
       display: flex; align-items: center; justify-content: center;
       color: var(--vtext);
     }
@@ -1060,14 +1075,21 @@
       flex: 1 1 auto;
       min-width: 0;
     }
+    /* Compact 4-across hero download row: show a short platform word
+       ('macOS', 'Windows', 'Linux', 'iOS') rather than the full 'Download
+       for …' so four chips fit on one slim line. */
     .download-btn-label {
-      font-size: 13px; font-weight: 700;
+      font-size: 12.5px; font-weight: 700;
       letter-spacing: 0.01em;
       color: var(--white);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+    /* Compact hero: the per-platform sub-line ('.dmg · signed', etc.) is hidden
+       on the standard buttons to keep the download grid to two slim rows and
+       the whole hero within one viewport. It stays visible on the detected
+       (is-primary) button, which gets the full rich treatment below. */
     .download-btn-sub {
       font-size: 11px;
       font-weight: 500;
@@ -1076,6 +1098,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: none;
     }
     .download-btn-arrow {
       flex: 0 0 auto;
@@ -1088,21 +1111,23 @@
       transform: translateY(1px);
     }
     .download-btn[data-platform="ios"] {
-      grid-column: 1 / -1;
+      grid-column: auto;
     }
 
-    /* Primary (auto-detected platform) treatment */
+    /* Primary (auto-detected platform) treatment — emphasized IN PLACE (violet
+       fill) rather than spanning the full row, so the download row stays a
+       stable single line of four in every state and the hero never grows a
+       surprise extra row that pushes content below the fold. */
     .download-btn.is-primary {
-      grid-column: 1 / -1;
-      padding: 18px 20px;
+      grid-column: auto;
       background: linear-gradient(135deg, var(--violet-cta) 0%, #553f9a 100%);
       border-color: transparent;
       box-shadow: 0 8px 24px -8px rgba(109, 91, 175, 0.65),
                   0 0 0 1px rgba(255,255,255,0.06) inset;
     }
     .download-btn.is-primary .download-btn-icon { color: #fff; }
-    .download-btn.is-primary .download-btn-label { font-size: 15px; }
-    .download-btn.is-primary .download-btn-sub { color: rgba(255,255,255,0.78); }
+    .download-btn.is-primary .download-btn-label { color: #fff; }
+    .download-btn.is-primary .download-btn-sub { color: rgba(255,255,255,0.78); display: none; }
     .download-btn.is-primary .download-btn-arrow {
       color: #fff;
       font-size: 17px;
@@ -1114,44 +1139,9 @@
                   0 0 0 1px rgba(255,255,255,0.1) inset;
     }
 
-    .download-secondary {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px;
-      margin-top: 4px;
-      flex-wrap: wrap;
-    }
-    .download-cli {
-      display: inline-flex; align-items: center; gap: 10px;
-      text-decoration: none;
-      padding: 8px 12px;
-      border-radius: 8px;
-      color: var(--muted);
-      transition: color 0.15s, background 0.15s;
-    }
-    .download-cli:hover {
-      color: var(--white);
-      background: rgba(142,61,255,0.06);
-    }
-    .download-cli-icon {
-      width: 18px; height: 18px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--vtext);
-    }
-    .download-cli-icon svg { width: 100%; height: 100%; }
-    .download-cli-text { display: flex; flex-direction: column; gap: 1px; }
-    .download-cli-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .download-cli-cmd {
-      font-family: 'JetBrains Mono Variable', ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--white);
-    }
     .download-all {
+      display: inline-block;
+      margin-top: 10px;
       color: var(--muted);
       text-decoration: none;
       font-size: 12px;
@@ -1181,7 +1171,6 @@
     @media (max-width: 720px) {
       .download-buttons { grid-template-columns: 1fr; }
       .download-btn.is-primary { grid-column: 1; }
-      .download-secondary { flex-direction: column; align-items: flex-start; }
     }
     @media (max-width: 420px) {
       /* Narrow phones: tighten padding so the buttons stay visually

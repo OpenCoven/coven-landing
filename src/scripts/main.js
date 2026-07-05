@@ -305,11 +305,10 @@
       }
     });
 
-    if (primary && primary.parentNode && detected !== 'ios') {
-      var grid = primary.parentNode;
-      // Move the primary to the front of the grid so it spans the
-      // full row (see .download-btn.is-primary CSS rule).
-      grid.insertBefore(primary, grid.firstChild);
+    if (primary && detected !== 'ios') {
+      // Emphasize the detected platform in place (violet fill). We no longer
+      // move it or span it full-width — the download row stays a stable
+      // single line of four so the hero height is predictable (no-scroll).
       primary.classList.add('is-primary');
     }
 
