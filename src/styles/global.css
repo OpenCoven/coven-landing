@@ -243,7 +243,10 @@
     .hero-copy {
       display: flex; flex-direction: column;
       justify-content: center;
-      padding: 80px 56px 80px 0;
+      /* Swapped hero: copy sits on the RIGHT, so the inner gutter is on its
+         left (toward the CLI card). */
+      order: 2;
+      padding: 80px 0 80px 56px;
       gap: 0;
     }
 
@@ -351,8 +354,11 @@
     /* Hero visual — right column (field-manual terminal card) */
     .hero-visual {
       position: relative;
+      /* Swapped hero: the Coven CLI card now leads on the LEFT, so its inner
+         gutter is on the right (toward the copy). */
+      order: 1;
       display: flex; align-items: center; justify-content: center;
-      padding: 40px 0 40px 40px;
+      padding: 40px 40px 40px 0;
     }
     .hero-card {
       width: 100%;
@@ -852,7 +858,7 @@
     @media (max-width: 1100px) {
       /* Tablet: hero shifts to 55/45, reduce hero padding */
       .hero { grid-template-columns: 1fr 1fr; padding: 0 24px; }
-      .hero-copy { padding: 60px 40px 60px 0; }
+      .hero-copy { padding: 60px 0 60px 40px; }
       h1 { font-size: clamp(40px, 5vw, 64px); }
       /* Card grids: 2-col on tablet instead of jumping to 1 */
       .card-grid.three { grid-template-columns: repeat(2, 1fr); }
@@ -883,11 +889,12 @@
         min-height: auto;
         padding: 0 20px;
       }
-      .hero-copy { padding: 52px 0 36px; }
+      .hero-copy { order: 1; padding: 52px 0 36px; }
       .hero-lede { max-width: 100%; font-size: 15px; }
 
-      /* Hero card: on mobile, full width, less padding */
-      .hero-visual { padding: 0 0 32px; justify-content: flex-start; }
+      /* Hero card: on mobile, full width, less padding; stacks BELOW the copy
+         so the headline still leads on phones despite the desktop swap. */
+      .hero-visual { order: 2; padding: 0 0 32px; justify-content: flex-start; }
       .hero-card { max-width: 100%; }
 
       /* Grids */
