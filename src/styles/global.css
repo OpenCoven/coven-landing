@@ -922,7 +922,10 @@
       h1 { font-size: 38px; }
       .hero-copy { padding: 40px 0 28px; }
       /* hero card naturally sized at 520px */
-      .feature-grid { grid-template-columns: repeat(2, 1fr); }
+      /* Feature grid: 2x2 clips the descriptions at phone widths (the cells'
+         side padding + gaps push two columns past ~390px), so drop to a
+         single column here — full-width cells wrap cleanly on any phone. */
+      .feature-grid { grid-template-columns: 1fr; }
       .proof-grid { grid-template-columns: 1fr 1fr; }
       .card-grid.three, .card-grid.four { grid-template-columns: 1fr; }
       .hero-actions { flex-direction: column; align-items: stretch; width: 100%; }
