@@ -496,7 +496,9 @@
     }
     .card-prompt { font-size: 12px; color: var(--vtext); flex-shrink: 0; }
     .card-cmd {
-      flex: 1 1 auto; min-width: 0;
+      /* Shrinkable (keeps long commands from overflowing) but not growing,
+         so the blinking cursor hugs the end of the typed text. */
+      flex: 0 1 auto; min-width: 0;
       font-size: 12px; color: rgba(232,224,240,0.88);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
       transition: opacity 0.2s ease;
@@ -1043,14 +1045,22 @@
     }
     /* Stagger items within grids — same timing across every grid */
     .motion-on .continuity-events [data-reveal]:nth-child(2),
-    .motion-on .proof-grid        [data-reveal]:nth-child(2),
-    .motion-on .card-grid         [data-reveal]:nth-child(2) { transition-delay: 0.08s; }
+    .motion-on .proof-grid       [data-reveal]:nth-child(2),
+    .motion-on .card-grid        [data-reveal]:nth-child(2) { transition-delay: 0.08s; }
     .motion-on .continuity-events [data-reveal]:nth-child(3),
-    .motion-on .proof-grid        [data-reveal]:nth-child(3),
-    .motion-on .card-grid         [data-reveal]:nth-child(3) { transition-delay: 0.16s; }
+    .motion-on .proof-grid       [data-reveal]:nth-child(3),
+    .motion-on .card-grid        [data-reveal]:nth-child(3) { transition-delay: 0.16s; }
     .motion-on .continuity-events [data-reveal]:nth-child(4),
-    .motion-on .proof-grid        [data-reveal]:nth-child(4),
-    .motion-on .card-grid         [data-reveal]:nth-child(4) { transition-delay: 0.24s; }
+    .motion-on .proof-grid       [data-reveal]:nth-child(4),
+    .motion-on .card-grid        [data-reveal]:nth-child(4) { transition-delay: 0.24s; }
+
+    /* Hero load orchestration: copy lands first, the terminal answers,
+       then the continuity thread grows node by node left to right. */
+    .motion-on .hero-visual[data-reveal] { transition-delay: 0.12s; }
+    .motion-on .continuity-events [data-reveal]:nth-child(1) { transition-delay: 0.28s; }
+    .motion-on .continuity-events [data-reveal]:nth-child(2) { transition-delay: 0.42s; }
+    .motion-on .continuity-events [data-reveal]:nth-child(3) { transition-delay: 0.56s; }
+    .motion-on .continuity-events [data-reveal]:nth-child(4) { transition-delay: 0.70s; }
 
     /* ── REDUCED MOTION ──────────────────────────────────── */
     @media (prefers-reduced-motion: reduce) {
