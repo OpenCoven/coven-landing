@@ -320,23 +320,6 @@
       primary.setAttribute('rel', 'noopener noreferrer');
     }
 
-    // Drop the detected platform from the "also on" row (it's now the
-    // primary) and re-list macOS in its place when the visitor isn't
-    // on a Mac, so all four platforms stay one click away.
-    cta.querySelectorAll('.download-alt[data-alt-platform]').forEach(function (a) {
-      a.classList.toggle('is-detected', a.getAttribute('data-alt-platform') === detected);
-    });
-    if (detected !== 'mac' && releasesUrl) {
-      var macAlt = document.createElement('a');
-      macAlt.className = 'download-alt';
-      macAlt.setAttribute('data-alt-platform', 'mac');
-      macAlt.href = releasesUrl;
-      macAlt.textContent = 'macOS';
-      var altsRow = cta.querySelector('.download-alts');
-      var kicker = altsRow && altsRow.querySelector('.download-alts-kicker');
-      if (kicker) kicker.insertAdjacentElement('afterend', macAlt);
-    }
-
     // Stamp the resolved platform on the cta for analytics / debug.
     cta.setAttribute('data-detected', detected);
   })();

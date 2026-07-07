@@ -1,14 +1,14 @@
 ---
-// Platform-aware download CTA — one decision, not four.
+// Platform-aware download CTA — one dynamic button.
 //
 // Renders a single primary "Download for macOS" button (macOS is the
-// server-side default) plus a quiet one-line row of the remaining
-// platforms. Client-side detection (src/scripts/main.js) rewrites the
-// primary button's label/sub/href to match the visitor's platform and
-// swaps the detected platform out of the alt row.
+// server-side default). Client-side detection (src/scripts/main.js)
+// rewrites the label/sub/href to match the visitor's platform:
+// macOS/Windows/Linux point at the latest GitHub release, iOS/iPadOS
+// points at the TestFlight beta (opened in a new tab).
 //
-// Works fully without JS: the primary button and every alt-row link are
-// real <a href>s pointing at the canonical release page or TestFlight.
+// Works without JS: the button is a real <a href> to the release page,
+// which lists every platform's artifact.
 //
 // Download sources (resolved at runtime — never bake versions in):
 //   • macOS + Windows + Linux → GitHub Releases (latest release page;
@@ -18,21 +18,6 @@
 
 const RELEASES_URL = 'https://github.com/OpenCoven/coven-cave/releases/latest';
 const TESTFLIGHT_URL = 'https://testflight.apple.com/join/61Dqw8y4';
-
-type Platform = 'mac' | 'ios' | 'win' | 'linux';
-
-interface Alt {
-  id: Platform;
-  label: string;
-  href: string;
-  external?: boolean;
-}
-
-const alts: Alt[] = [
-  { id: 'win', label: 'Windows', href: RELEASES_URL },
-  { id: 'linux', label: 'Linux', href: RELEASES_URL },
-  { id: 'ios', label: 'iOS (TestFlight)', href: TESTFLIGHT_URL, external: true },
-];
 ---
 <div
   class="download-cta"
@@ -47,18 +32,4 @@ const alts: Alt[] = [
       <span class="download-primary-sub" data-download-sub>CovenCave · .dmg · signed · free</span>
     </span>
   </a>
-
-  <p class="download-alts">
-    <span class="download-alts-kicker">also on</span>
-    {alts.map((a) => (
-      <a
-        class="download-alt"
-        href={a.href}
-        data-alt-platform={a.id}
-        target={a.external ? '_blank' : null}
-        rel={a.external ? 'noopener noreferrer' : null}
-      >{a.label}</a>
-    ))}
-    <a class="download-alt download-alt--all" href={RELEASES_URL} target="_blank" rel="noopener noreferrer">all releases ↗</a>
-  </p>
 </div>

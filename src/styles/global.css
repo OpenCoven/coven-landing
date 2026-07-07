@@ -492,29 +492,14 @@
       color: rgba(255,255,255,0.72);
       text-wrap: balance; /* no orphaned word when it wraps on small phones */
     }
-    .download-alts {
-      display: flex; align-items: baseline; flex-wrap: wrap;
-      gap: 6px 16px;
-      font-family: var(--mono);
-      font-size: 0.7188rem;
-      letter-spacing: 0.03em;
-      margin: 0;
-    }
-    .download-alts-kicker { color: var(--muted); }
-    .download-alt {
-      color: var(--muted);
-      text-decoration: none;
-      border-bottom: 1px dotted rgba(154,142,205,0.4);
-      padding-bottom: 1px;
-      transition: color 0.15s, border-color 0.15s;
-    }
-    .download-alt:hover { color: var(--vtext); border-bottom-color: var(--vtext); }
-    .download-alt.is-detected { display: none; }
 
-    /* Secondary hero actions (Discord + Docs) — deliberately low-key */
+    /* Secondary hero actions (Discord + Docs) — deliberately low-key,
+       tucked under the headline. Negative left margin optically aligns
+       the first ghost label with the h1's left edge. */
     .hero-actions-secondary {
       display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-      margin-top: 22px;
+      margin-top: 26px;
+      margin-left: -14px;
     }
     .btn-ghost {
       display: inline-flex; align-items: center; gap: 8px;
@@ -886,7 +871,6 @@
       .download-primary { padding: 16px 30px 16px 23px; }
       .download-primary-label { font-size: 1.0625rem; }
       .download-primary-sub { font-size: 0.6875rem; }
-      .download-alts { font-size: 0.75rem; }
 
       .hero-card-cmdline { padding: 17px 22px 15px; }
       .card-prompt, .card-cmd { font-size: 0.8125rem; }

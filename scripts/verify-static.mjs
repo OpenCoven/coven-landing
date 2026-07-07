@@ -73,39 +73,23 @@ if (existsSync(distIndex)) {
     throw new Error(`Missing expected copy in dist/index.html: ${missingCopy.join(', ')}`);
   }
 
-  const downloadLabels = [
-    'Download for macOS', // server-rendered primary (JS retargets per platform)
-    'Windows',
-    'Linux',
-    'iOS (TestFlight)',
-    'all releases',
-  ];
-  // Scope to the CTA block — words like "Windows" also appear in the
-  // head's JSON-LD, which would confuse a whole-document indexOf.
+  // Single dynamic download button: server-rendered as macOS; JS retargets
+  // label/href per platform (iOS -> TestFlight). Scope to the CTA block.
   const ctaStart = html.indexOf('data-download-cta');
   if (ctaStart === -1) {
     throw new Error('dist/index.html is missing the data-download-cta block');
   }
-  const ctaHtml = html.slice(ctaStart);
-  const downloadLabelPositions = downloadLabels.map((label) => ({
-    label,
-    index: ctaHtml.indexOf(label),
-  }));
-  const missingDownloadLabels = downloadLabelPositions
-    .filter(({ index }) => index === -1)
-    .map(({ label }) => label);
-  if (missingDownloadLabels.length > 0) {
-    throw new Error(`Missing expected download labels in dist/index.html: ${missingDownloadLabels.join(', ')}`);
+  const ctaHtml = html.slice(ctaStart, html.indexOf('</div>', ctaStart) + 6);
+  if (!ctaHtml.includes('Download for macOS')) {
+    throw new Error('Download CTA must server-render the macOS default label');
   }
-  for (let i = 1; i < downloadLabelPositions.length; i += 1) {
-    if (downloadLabelPositions[i - 1].index > downloadLabelPositions[i].index) {
-      throw new Error('Download CTA order must be the macOS primary, then Windows, Linux, iOS beta, and all releases');
-    }
+  if (!html.includes('data-testflight-url')) {
+    throw new Error('Download CTA must carry the TestFlight URL for iOS retargeting');
   }
 
   const css = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
-  if (!css.includes('.download-alt.is-detected') || !html.includes('data-download-primary')) {
-    throw new Error('Download CTA must render one retargetable primary button and hide the detected platform from the alt row');
+  if (!css.includes('.download-primary') || !html.includes('data-download-primary')) {
+    throw new Error('Download CTA must render one retargetable primary button (JS rewrites label/href per platform, iOS -> TestFlight)');
   }
   console.log(
     `Verified ${requiredPublicFiles.length} required public files, canonical favicon + OG logos, and ${requiredCopy.length} required copy strings in dist/index.html.`,
