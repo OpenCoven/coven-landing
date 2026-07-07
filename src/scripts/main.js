@@ -73,12 +73,12 @@
     var motionOn = document.documentElement.classList.contains('motion-on');
 
     var FAMILIARS = {
-      forge: {
-        name: 'Forge',
-        sigil: 'F',
+      hexi: {
+        name: 'Hexi',
+        sigil: 'H',
         role: 'code steward · tools · git',
         count: '128 notes · 47 days',
-        command: 'coven attach forge --project ./opencoven',
+        command: 'coven attach hexi --project ./opencoven',
         notes: [
           { text: 'resumed feat/runtime-attach · 4 files staged', meta: '2h ago' },
           { text: 'prefers terse PR summaries, no trailing recap', meta: 'persisted' }
@@ -107,8 +107,8 @@
         ]
       }
     };
-    var order = ['forge', 'charm', 'sage'];
-    var current = 'forge';
+    var order = ['hexi', 'charm', 'sage'];
+    var current = 'hexi';
     var userTook = false;
     var rotateTimer = null;
     var typeTimer = null;
