@@ -55,6 +55,27 @@
       /* ── Typography (self-hosted Inter Variable + JetBrains Mono Variable) ── */
       --font-ui:   'Inter Variable', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       --mono:      'JetBrains Mono Variable', 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
+      /* Display voice — used only for the emphasized word in the hero h1.
+         Fraunces italic: the grimoire serif against the hard grotesque. */
+      --font-display: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+
+      /* ── Motion + layout scales (shared by every overhauled section) ── */
+      --ease-out:   cubic-bezier(0.2, 0.8, 0.2, 1);
+      --dur-ui:     0.18s;
+      --dur-reveal: 0.7s;
+      --dur-swap:   0.2s;
+      --section-py: 72px;
+      --gutter:     32px;
+
+      /* ── Shared panel + inset surfaces (echo the hero card bar) ── */
+      --panel-bg:         linear-gradient(180deg, rgba(17, 16, 24, 0.72) 0%, rgba(5, 4, 9, 0.55) 100%);
+      --panel-bg-arrival: linear-gradient(135deg, rgba(59, 22, 79, 0.42) 0%, rgba(14, 11, 22, 0.82) 60%);
+      --panel-shadow:     0 24px 60px -24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      --inset-bg:         rgba(5, 4, 9, 0.5);
+      --accent-wash:      rgba(154, 142, 205, 0.06);
+      --accent-active:    rgba(154, 142, 205, 0.14);
+      --accent-line:      rgba(154, 142, 205, 0.22);
+      --accent-strong:    rgba(154, 142, 205, 0.45);
     }
 
     /* Screen-reader-only utility — used for invisible landmark headings
@@ -102,6 +123,56 @@
       -webkit-backdrop-filter: blur(12px);
     }
 
+    /* ── Shared panel primitives (hero-grade glass frame + interactive
+       inset). Consumed by Architecture, HowItWorks, Compare, Ecosystem so
+       every module reads as one family instead of five experiments. ── */
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-v);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--panel-shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+    .panel--arrival { background: var(--panel-bg-arrival); }
+
+    /* Interactive sub-element inside a panel: rows, pills, cards, codeblocks.
+       Add .is-card for a hover lift; .is-active for the selected state. */
+    .panel-inset {
+      background: var(--inset-bg);
+      border: 1px solid var(--oc-border-subtle);
+      border-radius: var(--radius-md);
+      transition:
+        background var(--dur-ui) ease,
+        border-color var(--dur-ui) ease,
+        transform var(--dur-ui) ease,
+        box-shadow var(--dur-ui) ease;
+    }
+    .panel-inset.is-active {
+      background: var(--accent-active);
+      border-color: var(--accent-strong);
+      color: #fff;
+    }
+
+    /* Content-swap fade — generalizes the hero memory-swap. JS toggles
+       .is-swapping around a repaint of a live region. Gated on motion. */
+    .motion-on .swap-fade { transition: opacity var(--dur-swap) ease; }
+    .motion-on .swap-fade.is-swapping { opacity: 0.12; }
+
+    @media (hover: hover) {
+      .panel-inset:hover {
+        background: var(--accent-wash);
+        border-color: var(--accent-line);
+      }
+      .panel-inset.is-card:hover { transform: translateY(-2px); }
+      /* Selected state stays dominant over hover */
+      .panel-inset.is-active:hover {
+        background: var(--accent-active);
+        border-color: var(--accent-strong);
+      }
+    }
+
     /* ── Inline code (matches coven-docs dark code style) ── */
     :not(pre) > code {
       background: rgba(154, 142, 205, 0.1);
@@ -114,6 +185,16 @@
     }
 
     a, button { touch-action: manipulation; }
+
+    /* ── Unified focus ring ──────────────────────────────────
+       Consumes the --oc-focus-ring token (previously defined but unused).
+       Zero-specificity :where() base so any component focus rule still
+       wins; over time this retires the four ad-hoc focus treatments. SVG
+       nodes keep a stroke variant (box-shadow doesn't render inside SVG). */
+    :where(a, button, [role="button"], [role="tab"], [tabindex="0"]):focus-visible {
+      outline: none;
+      box-shadow: var(--oc-focus-ring);
+    }
 
     /* ── AMBIENT ─────────────────────────────────────────── */
     .ambient {
@@ -229,116 +310,102 @@
       color: var(--white); padding: 8px;
     }
 
-    /* ── HERO ────────────────────────────────────────────── */
-    /* Layout C: a single no-scroll viewport. A centered vertical stack holds
-       the 2-column main row (copy+downloads LEFT, CLI card RIGHT) with a slim
-       full-width feature strip beneath it, so neither column grows tall enough
-       to force scrolling. */
+    /* ── HERO — "the summoning" ──────────────────────────── */
+    /* A single no-scroll viewport: the 2-column main row (copy + downloads
+       LEFT, live summon-session terminal RIGHT) with the continuity
+       timeline — the hero's signature — threaded across its base. */
     .hero {
       position: relative; z-index: 1;
-      /* Fit the whole hero within one viewport minus the fixed header (~60px),
-         with a little bottom breathing room so the feature strip is never
-         flush against the fold on short 720px laptops. */
+      /* Fit within one viewport minus the sticky header (~60px), with
+         breathing room so the continuity strip never kisses the fold. */
       min-height: calc(100vh - 72px);
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 20px;
+      gap: 44px;
       max-width: 1280px; margin: 0 auto;
-      padding: 22px 32px 30px;
+      padding: 30px 32px 38px;
     }
 
     /* The 2-column main row */
     .hero-main {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-columns: 1.08fr 0.92fr;
       align-items: center;
-      gap: 56px;
+      gap: 64px;
     }
+    /* Both columns hold nowrap terminal text (.card-cmd, memory notes);
+       min-width: 0 lets them shrink instead of forcing page overflow. */
+    .hero-main > * { min-width: 0; }
 
     .hero-copy {
       display: flex; flex-direction: column;
       justify-content: center;
-      gap: 0;
     }
 
     .kicker {
       font-family: var(--mono);
-      font-size: 10px; font-weight: 600;
-      letter-spacing: 0.18em;
-      color: var(--vtext); opacity: 0.7;
-      margin-bottom: 18px;
-      display: flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 22px;
+      display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
     }
-    .kicker::before {
-      content: '';
-      display: inline-block; width: 20px; height: 1px;
-      background: var(--violet); opacity: 0.6;
+    .kicker-beta {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(154,142,205,0.35);
+      background: rgba(154,142,205,0.08);
+      color: var(--vtext);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 9.5px;
+    }
+    .beta-dot {
+      width: 6px; height: 6px; border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 10px rgba(48,209,88,0.7);
+      animation: beta-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes beta-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(0.8); }
     }
 
     h1 {
-      font-size: clamp(40px, 4.6vw, 62px);
-      font-weight: 900;
-      line-height: 1.02;
-      letter-spacing: -0.04em;
+      font-size: clamp(42px, 4.9vw, 68px);
+      font-weight: 850;
+      line-height: 1.04;
+      letter-spacing: -0.038em;
       color: var(--white);
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
+    /* The one display-type moment on the page: the differentiator set in a
+       grimoire serif italic against the hard grotesque around it. */
     h1 em {
-      font-style: normal;
+      font-family: var(--font-display);
+      font-style: italic;
+      font-weight: 460;
+      font-size: 1.05em;
+      letter-spacing: -0.015em;
       color: var(--vtext);
+      text-shadow: 0 0 44px rgba(154,142,205,0.35);
     }
 
     .hero-lede {
-      font-size: 16px; line-height: 1.55;
+      font-size: 16.5px; line-height: 1.6;
       color: var(--muted);
-      max-width: 460px;
-      margin-bottom: 22px;
+      max-width: 500px;
+      margin-bottom: 30px;
+    }
+    .hero-lede strong {
+      color: var(--white);
+      font-weight: 600;
     }
 
-    /* 4-column mini feature grid — a slim full-width strip beneath the main row */
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      margin-bottom: 0;
-    }
-    .feature-cell {
-      background: var(--bg);
-      padding: 14px 16px 15px;
-      display: flex; flex-direction: column; gap: 6px;
-      position: relative;
-      transition: background 0.25s ease;
-    }
-    .feature-icon {
-      font-size: 18px; line-height: 1;
-      margin-bottom: 2px;
-      display: inline-block;
-      transition: transform 0.25s ease, color 0.25s ease;
-      color: var(--vtext);
-      opacity: 0.85;
-    }
-    .feature-label {
-      font-family: var(--mono);
-      font-size: 9px; font-weight: 700;
-      letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--vtext);
-      transition: color 0.25s ease;
-    }
-    .feature-desc {
-      font-size: 11px; line-height: 1.5;
-      color: var(--muted);
-    }
-
-    /* CTAs */
-    .hero-actions {
-      display: flex; align-items: center; gap: 12px;
-      flex-wrap: wrap;
-    }
+    /* Buttons shared with QuickStart (.qs-actions) */
     .btn-primary {
       display: inline-flex; align-items: center; gap: 8px;
       background: var(--violet-cta);
@@ -363,31 +430,119 @@
     }
     .btn-secondary:hover { color: var(--white); border-color: rgba(142,61,255,0.4); }
 
-    /* Hero visual — right column (field-manual terminal card) */
+    /* ── Download CTA — one decision, not four ─────────────
+       A single primary button (server-default: macOS) that main.js
+       rewrites for the detected platform, plus a quiet mono line of
+       the remaining platforms. */
+    .download-cta {
+      display: flex; flex-direction: column;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .download-primary {
+      display: inline-flex; align-items: center; gap: 14px;
+      text-decoration: none;
+      padding: 14px 26px 14px 20px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--violet-cta) 0%, #55409b 100%);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #fff;
+      box-shadow:
+        0 12px 32px -10px rgba(109,91,175,0.7),
+        0 0 0 1px rgba(154,142,205,0.18);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+    .download-primary:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #7e6cc4 0%, #5e479e 100%);
+      box-shadow:
+        0 18px 40px -10px rgba(109,91,175,0.85),
+        0 0 0 1px rgba(180,170,235,0.32);
+    }
+    .download-primary:active { transform: translateY(0); }
+    .download-primary-icon {
+      width: 22px; height: 22px;
+      flex: 0 0 auto;
+      color: rgba(255,255,255,0.92);
+    }
+    .download-primary-text {
+      display: flex; flex-direction: column; gap: 3px;
+      text-align: left;
+    }
+    .download-primary-label {
+      font-size: 15px; font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+    }
+    .download-primary-sub {
+      font-family: var(--mono);
+      font-size: 10px; font-weight: 500;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.72);
+    }
+    .download-alts {
+      display: flex; align-items: baseline; flex-wrap: wrap;
+      gap: 6px 16px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.03em;
+      margin: 0;
+    }
+    .download-alts-kicker { color: var(--muted); }
+    .download-alt {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(154,142,205,0.4);
+      padding-bottom: 1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .download-alt:hover { color: var(--vtext); border-bottom-color: var(--vtext); }
+    .download-alt.is-detected { display: none; }
+
+    /* Secondary hero actions (Discord + Docs) — deliberately low-key */
+    .hero-actions-secondary {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin-top: 22px;
+    }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--muted); text-decoration: none;
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 8px 14px; border-radius: 6px;
+      transition: color 0.15s;
+    }
+    .btn-ghost:hover { color: var(--white); }
+    .btn-ghost svg { width: 14px; height: 11px; fill: currentColor; }
+
+    /* ── Hero terminal — a live summon session ─────────────
+       Reads top-to-bottom like a real session: typed command →
+       familiar state as output → roster tabs. Rotation, typing and
+       tab switching are driven by src/scripts/main.js. */
     .hero-visual {
       position: relative;
-      /* Swapped hero: the Coven CLI card now leads on the LEFT, so its inner
-         gutter is on the right (toward the copy). */
-      order: 1;
       display: flex; align-items: center; justify-content: center;
-      padding: 40px 40px 40px 0;
     }
     .hero-card {
       width: 100%;
-      max-width: 480px;
-      background: rgba(17,16,24,0.72);
-      border: 1px solid rgba(142,61,255,0.18);
-      border-radius: 10px;
+      max-width: 500px;
+      background: rgba(17,16,24,0.78);
+      border: 1px solid rgba(154,142,205,0.22);
+      border-radius: 14px;
       overflow: hidden;
       font-family: var(--mono);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 0 0 1px rgba(142,61,255,0.06), 0 24px 64px rgba(0,0,0,0.45);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow:
+        0 0 0 1px rgba(154,142,205,0.05),
+        0 32px 80px rgba(0,0,0,0.5),
+        0 0 90px -30px rgba(154,142,205,0.28);
     }
     .hero-card-topbar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 16px;
-      border-bottom: 1px solid rgba(142,61,255,0.12);
+      padding: 11px 18px;
+      border-bottom: 1px solid rgba(154,142,205,0.14);
       background: rgba(5,4,9,0.6);
     }
     .hero-card-dots { display: flex; gap: 6px; }
@@ -398,129 +553,255 @@
     }
     .hero-card-label {
       font-size: 9px; font-weight: 700;
-      letter-spacing: 0.14em; text-transform: uppercase;
-      color: rgba(201,167,255,0.5);
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(196,185,240,0.55);
     }
     .hero-card-status {
       display: flex; align-items: center; gap: 6px;
-      font-size: 9px; color: rgba(255,255,255,0.3);
-      letter-spacing: 0.08em;
+      font-size: 9px; color: rgba(255,255,255,0.35);
+      letter-spacing: 0.1em; text-transform: uppercase;
     }
     .hero-card-status::before {
       content: '';
       width: 6px; height: 6px; border-radius: 50%;
-      background: #4ade80;
-      box-shadow: 0 0 6px rgba(74,222,128,0.5);
+      background: var(--green);
+      box-shadow: 0 0 6px rgba(48,209,88,0.5);
     }
-    .hero-card-body { padding: 20px; display: flex; flex-direction: column; gap: 0; }
-    .card-familiar {
+
+    .hero-card-cmdline {
+      display: flex; align-items: center; gap: 9px;
+      padding: 15px 20px 13px;
+    }
+    .card-prompt { font-size: 12px; color: var(--vtext); flex-shrink: 0; }
+    .card-cmd {
+      /* Shrinkable (keeps long commands from overflowing) but not growing,
+         so the blinking cursor hugs the end of the typed text. */
+      flex: 0 1 auto; min-width: 0;
+      font-size: 12px; color: rgba(232,224,240,0.88);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: opacity 0.2s ease;
+    }
+    .card-cursor {
+      width: 7px; height: 14px;
+      background: rgba(154,142,205,0.85);
+      border-radius: 1px;
+      animation: blink 1.1s step-end infinite;
+      flex-shrink: 0;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .hero-card-output {
+      margin: 0 20px 16px;
+      border: 1px solid rgba(154,142,205,0.14);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(5,4,9,0.35);
+    }
+    .output-identity {
       display: grid;
-      grid-template-columns: 32px 1fr auto;
+      grid-template-columns: 38px 1fr auto;
       align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
+      gap: 13px;
+      padding: 14px 16px;
     }
-    .card-familiar:last-child { border-bottom: none; }
-    .card-familiar { outline: none; user-select: none; }
-    .card-familiar:focus-visible {
-      box-shadow: inset 0 0 0 1px rgba(142,61,255,0.5);
-      border-radius: 4px;
-    }
-    .card-familiar.active .familiar-sigil {
-      border-color: rgba(142,61,255,0.55);
-      background: rgba(142,61,255,0.22);
-      color: #E8DBFF;
-      box-shadow: 0 0 0 1px rgba(142,61,255,0.15), 0 0 14px rgba(142,61,255,0.18);
-    }
-    .card-familiar.active .familiar-name { color: #fff; }
-    /* Memory note swap fade — applied by JS when notes change */
-    .memory-note, .memory-title, .card-cmd { transition: opacity 0.2s ease; }
-    .memory-swap .memory-note,
-    .memory-swap .memory-title { opacity: 0.15; }
-    .familiar-badge { transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease; }
     .familiar-sigil {
-      width: 32px; height: 32px;
-      border-radius: 6px;
-      border: 1px solid rgba(142,61,255,0.28);
-      background: rgba(142,61,255,0.1);
+      width: 38px; height: 38px;
+      border-radius: 9px;
+      border: 1px solid rgba(154,142,205,0.5);
+      background: linear-gradient(150deg, rgba(154,142,205,0.28), rgba(154,142,205,0.08));
       display: grid; place-items: center;
-      font-size: 11px; font-weight: 800;
-      color: rgba(201,167,255,0.9);
-      transition: background 0.2s, border-color 0.2s;
+      font-size: 14px; font-weight: 800;
+      color: #E8E0F0;
+      box-shadow: 0 0 18px rgba(154,142,205,0.22);
+      transition: opacity 0.2s ease;
     }
-    .familiar-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-    .familiar-name { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.9); letter-spacing: 0.02em; }
-    .familiar-role { font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.06em; text-transform: uppercase; }
+    .familiar-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .familiar-name {
+      font-size: 13px; font-weight: 700;
+      color: #fff; letter-spacing: 0.02em;
+      transition: opacity 0.2s ease;
+    }
+    .familiar-role {
+      font-size: 9px; color: rgba(232,224,240,0.52);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: opacity 0.2s ease;
+    }
     .familiar-badge {
-      font-size: 8px; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 3px 8px; border-radius: 4px;
+      font-size: 8.5px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 4px 9px; border-radius: 5px;
     }
-    .badge-active { background: rgba(74,222,128,0.1); color: rgba(74,222,128,0.8); border: 1px solid rgba(74,222,128,0.2); }
-    .badge-idle   { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.08); }
-    .hero-card-memory {
-      padding: 14px 20px 16px;
-      border-top: 1px solid rgba(142,61,255,0.12);
-      background: linear-gradient(180deg, rgba(142,61,255,0.04) 0%, rgba(142,61,255,0.015) 100%);
-      display: flex; flex-direction: column; gap: 7px;
+    .badge-active {
+      background: rgba(48,209,88,0.1); color: rgba(48,209,88,0.85);
+      border: 1px solid rgba(48,209,88,0.22);
+    }
+    .output-memory {
+      padding: 13px 16px 15px;
+      border-top: 1px solid rgba(154,142,205,0.12);
+      background: linear-gradient(180deg, rgba(154,142,205,0.05) 0%, rgba(154,142,205,0.015) 100%);
+      display: flex; flex-direction: column; gap: 8px;
     }
     .memory-header {
       font-size: 9px; font-weight: 700;
-      letter-spacing: 0.14em; text-transform: uppercase;
-      color: rgba(201,167,255,0.55);
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: rgba(196,185,240,0.6);
       display: flex; align-items: center; gap: 8px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .memory-header::before {
       content: ''; display: inline-block;
       width: 5px; height: 5px; border-radius: 50%;
-      background: rgba(201,167,255,0.55);
-      box-shadow: 0 0 6px rgba(201,167,255,0.4);
+      background: rgba(196,185,240,0.6);
+      box-shadow: 0 0 6px rgba(196,185,240,0.45);
     }
     .memory-header .memory-count {
       margin-left: auto;
-      color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.3);
       font-weight: 500;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.08em;
+      text-transform: none;
     }
     .memory-note {
       display: flex; align-items: baseline; gap: 8px;
       font-size: 10.5px;
-      color: rgba(255,255,255,0.6);
-      letter-spacing: 0.005em;
-      line-height: 1.4;
+      color: rgba(232,224,240,0.62);
+      line-height: 1.45;
+      transition: opacity 0.2s ease;
     }
     .memory-note::before {
       content: '◇';
-      color: rgba(201,167,255,0.55);
+      color: rgba(196,185,240,0.55);
       font-size: 8.5px;
       flex-shrink: 0;
       transform: translateY(-1px);
     }
     .memory-note .memory-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .memory-note .memory-meta {
-      color: rgba(255,255,255,0.28);
+      color: rgba(232,224,240,0.45);
       font-size: 9px;
       letter-spacing: 0.06em;
       flex-shrink: 0;
     }
-    .hero-card-footer {
-      padding: 12px 20px;
-      border-top: 1px solid rgba(142,61,255,0.1);
+    .memory-title { transition: opacity 0.2s ease; }
+    /* Output swap fade — applied by JS when the familiar changes */
+    .memory-swap .memory-note,
+    .memory-swap .memory-title,
+    .memory-swap .familiar-sigil,
+    .memory-swap .familiar-name,
+    .memory-swap .familiar-role { opacity: 0.12; }
+
+    .hero-card-roster {
+      display: flex; align-items: center; gap: 6px;
+      padding: 12px 20px 14px;
+      border-top: 1px solid rgba(154,142,205,0.12);
       background: rgba(5,4,9,0.4);
-      display: flex; align-items: center; gap: 8px;
     }
-    .card-prompt { font-size: 10px; color: rgba(201,167,255,0.5); flex-shrink: 0; }
-    .card-cmd { font-size: 10px; color: rgba(255,255,255,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-cursor {
-      width: 6px; height: 12px;
-      background: rgba(142,61,255,0.8);
-      border-radius: 1px;
-      animation: blink 1.1s step-end infinite;
-      flex-shrink: 0;
+    .roster-tab {
+      font-family: var(--mono);
+      font-size: 10.5px; font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: color 0.18s, background 0.18s, border-color 0.18s;
     }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .roster-tab:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(154,142,205,0.55);
+    }
+    .roster-tab.active {
+      color: #fff;
+      background: rgba(154,142,205,0.16);
+      border-color: rgba(154,142,205,0.4);
+    }
+    .roster-hint {
+      margin-left: auto;
+      min-width: 0;
+      text-align: right;
+      font-size: 9px;
+      color: rgba(232,224,240,0.45);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Continuity timeline — the signature ───────────────
+       One familiar's memory plotted across real time; the thread ends
+       in a live "today" node. Persistence, drawn instead of claimed. */
+    .continuity {
+      position: relative;
+      padding-top: 6px;
+    }
+    .continuity-track {
+      position: absolute;
+      left: 0;
+      /* End the thread at the "today" node instead of running past it:
+         trim the width of the last grid column minus its node radius
+         (columns are (100% - 3×24px gap) / 4 wide — see .continuity-events). */
+      right: calc((100% - 72px) / 4 - 9px);
+      top: calc(6px + 14px + 10px + 4px); /* pad + date row + gap + node center */
+      height: 1px;
+      background: linear-gradient(90deg,
+        rgba(154,142,205,0.08) 0%,
+        rgba(154,142,205,0.35) 55%,
+        rgba(180,170,235,0.75) 100%);
+      pointer-events: none;
+    }
+    .continuity-events {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .continuity-event {
+      display: grid;
+      grid-template-rows: 14px 9px auto;
+      row-gap: 10px;
+      justify-items: start;
+    }
+    .continuity-date {
+      font-family: var(--mono);
+      font-size: 9.5px; font-weight: 600;
+      line-height: 14px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); /* AA at small sizes — matches body-muted token */
+    }
+    .continuity-node {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--oc-surface-1);
+      border: 1.5px solid rgba(154,142,205,0.65);
+      box-shadow: 0 0 0 3px rgba(5,4,9,0.9);
+      position: relative; z-index: 1;
+    }
+    .continuity-text {
+      font-size: 12px; line-height: 1.5;
+      color: var(--muted);
+      max-width: 24ch;
+    }
+    .continuity-event.is-now .continuity-date { color: var(--vtext); }
+    .continuity-event.is-now .continuity-text { color: var(--oc-text); }
+    .continuity-event.is-now .continuity-node {
+      background: var(--oc-purple-light);
+      border-color: var(--oc-purple-light);
+      box-shadow:
+        0 0 0 3px rgba(5,4,9,0.9),
+        0 0 14px rgba(180,170,235,0.8);
+    }
+    .motion-on .continuity-event.is-now .continuity-node::after {
+      content: '';
+      position: absolute; inset: -5px;
+      border-radius: 50%;
+      border: 1px solid rgba(180,170,235,0.7);
+      animation: now-pulse 2.6s ease-out infinite;
+    }
+    @keyframes now-pulse {
+      0%   { transform: scale(0.6); opacity: 0.9; }
+      70%  { transform: scale(1.6); opacity: 0; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
 
     /* ── TESTIMONIAL STRIP ───────────────────────────────── */
     .testimonial-strip {
@@ -596,9 +877,22 @@
       max-width: 1280px; margin: 0 auto;
       padding: 72px 32px;
     }
+    /* Shared chapter divider — a faint fading hairline at the top of each
+       content section. Chosen over alternating surface tints, which would
+       muddy over the fixed radial glows. Add .content-section--flush to
+       suppress it (e.g. the first section after the proof band). */
+    .content-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: var(--gutter); right: var(--gutter);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--oc-border-subtle) 15%, var(--oc-border-subtle) 85%, transparent);
+    }
+    .content-section--flush::before { display: none; }
     .section-header {
       max-width: 600px; margin-bottom: 48px;
     }
+    .section-header--wide { max-width: 640px; }
     .section-kicker {
       font-family: var(--mono);
       font-size: 10px; font-weight: 700;
@@ -809,25 +1103,19 @@
     /* Hover states isolated to (hover: hover) so touch devices don't latch
        sticky :hover state after a tap. Same easing/timing everywhere. */
     @media (hover: hover) {
-      .feature-cell:hover,
       .proof-card:hover,
       .glass-card:hover {
         background: linear-gradient(180deg, rgba(142,61,255,0.07) 0%, var(--surface) 100%);
       }
-      .feature-cell:hover .feature-icon {
-        transform: scale(1.12);
-        color: #E8DBFF;
-      }
-      .feature-cell:hover .feature-label { color: #fff; }
       .proof-card:hover .proof-num { opacity: 1; color: var(--vtext); }
       .proof-card:hover h3 { color: var(--vtext); }
       .glass-card:hover .card-kicker { opacity: 1; color: var(--vtext); }
       .glass-card:hover h3 { color: #fff; }
 
-      /* Hero card familiar rows: subtle hover hint */
-      .card-familiar { transition: background 0.2s ease; cursor: pointer; }
-      .card-familiar:hover:not(.active) {
-        background: rgba(142,61,255,0.04);
+      /* Hero roster tabs: subtle hover hint */
+      .roster-tab:hover:not(.active) {
+        color: var(--white);
+        background: rgba(154,142,205,0.07);
       }
     }
 
@@ -846,16 +1134,23 @@
       opacity: 1;
       transform: none;
     }
-    /* Stagger items within grids — same timing across every grid */
-    .motion-on .feature-grid [data-reveal]:nth-child(2),
-    .motion-on .proof-grid   [data-reveal]:nth-child(2),
-    .motion-on .card-grid    [data-reveal]:nth-child(2) { transition-delay: 0.08s; }
-    .motion-on .feature-grid [data-reveal]:nth-child(3),
-    .motion-on .proof-grid   [data-reveal]:nth-child(3),
-    .motion-on .card-grid    [data-reveal]:nth-child(3) { transition-delay: 0.16s; }
-    .motion-on .feature-grid [data-reveal]:nth-child(4),
-    .motion-on .proof-grid   [data-reveal]:nth-child(4),
-    .motion-on .card-grid    [data-reveal]:nth-child(4) { transition-delay: 0.24s; }
+    /* Stagger items within a container — same timing everywhere. Existing
+       grids (.proof-grid, .card-grid) keep working; new containers opt in
+       with the .reveal-stagger utility. (.continuity-events has its own
+       load orchestration below, so it's intentionally not in this list.) */
+    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(2) { transition-delay: 0.08s; }
+    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(3) { transition-delay: 0.16s; }
+    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(4) { transition-delay: 0.24s; }
+    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(5) { transition-delay: 0.32s; }
+    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(6) { transition-delay: 0.40s; }
+
+    /* Hero load orchestration: copy lands first, the terminal answers,
+       then the continuity thread grows node by node left to right. */
+    .motion-on .hero-visual[data-reveal] { transition-delay: 0.12s; }
+    .motion-on .continuity-events [data-reveal]:nth-child(1) { transition-delay: 0.28s; }
+    .motion-on .continuity-events [data-reveal]:nth-child(2) { transition-delay: 0.42s; }
+    .motion-on .continuity-events [data-reveal]:nth-child(3) { transition-delay: 0.56s; }
+    .motion-on .continuity-events [data-reveal]:nth-child(4) { transition-delay: 0.70s; }
 
     /* ── REDUCED MOTION ──────────────────────────────────── */
     @media (prefers-reduced-motion: reduce) {
@@ -913,8 +1208,35 @@
       .hero-visual { order: 2; justify-content: flex-start; }
       .hero-card { max-width: 100%; }
 
+      /* Continuity timeline: rotate to a vertical thread down the left */
+      .continuity-track { display: none; }
+      .continuity-events {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        position: relative;
+      }
+      .continuity-events::before {
+        content: '';
+        position: absolute;
+        left: 4px; top: 8px; bottom: 8px;
+        width: 1px;
+        background: linear-gradient(180deg,
+          rgba(154,142,205,0.08) 0%,
+          rgba(154,142,205,0.35) 55%,
+          rgba(180,170,235,0.75) 100%);
+        pointer-events: none;
+      }
+      .continuity-event {
+        grid-template-rows: auto auto;
+        grid-template-columns: 9px 1fr;
+        column-gap: 16px;
+        row-gap: 3px;
+      }
+      .continuity-date { grid-column: 2; grid-row: 1; }
+      .continuity-node { grid-column: 1; grid-row: 1; align-self: center; }
+      .continuity-text { grid-column: 2; grid-row: 2; max-width: none; }
+
       /* Grids */
-      .feature-grid { grid-template-columns: repeat(2, 1fr); }
       .proof-grid { grid-template-columns: repeat(2, 1fr); }
       .card-grid.three, .card-grid.four { grid-template-columns: repeat(2, 1fr); }
 
@@ -937,14 +1259,14 @@
     @media (max-width: 520px) {
       h1 { font-size: 38px; }
       /* hero card naturally sized at 520px */
-      /* Feature grid: 2x2 clips the descriptions at phone widths (the cells'
-         side padding + gaps push two columns past ~390px), so drop to a
-         single column here — full-width cells wrap cleanly on any phone. */
-      .feature-grid { grid-template-columns: 1fr; }
       .proof-grid { grid-template-columns: 1fr 1fr; }
       .card-grid.three, .card-grid.four { grid-template-columns: 1fr; }
-      .hero-actions { flex-direction: column; align-items: stretch; width: 100%; }
+      /* Primary download goes full-width; alt platforms wrap beneath */
+      .download-cta { width: 100%; }
+      .download-primary { width: 100%; }
       .btn-primary, .btn-secondary { justify-content: center; }
+      /* The roster hint crowds the tab row on narrow phones */
+      .roster-hint { display: none; }
       .testimonial-quote { font-size: 16px; }
       .section-header { margin-bottom: 32px; }
       .ecosystem-inner { padding: 24px 20px; }
@@ -953,12 +1275,12 @@
 
     @media (max-width: 400px) {
       h1 { font-size: 34px; }
-      .kicker { font-size: 9px; }
+      .kicker { font-size: 10px; }
       /* Uniform 16px gutter at smallest viewports */
       .header-inner { padding: 0 16px; }
       .testimonial-strip { padding: 28px 16px; }
       footer { padding: 28px 16px; }
-      .hero { padding: 0 16px; }
+      .hero { padding: 32px 16px; }
       .content-section, .proof-section { padding: 40px 16px; }
       .ecosystem-section { padding: 40px 0; }
       .ecosystem-inner { padding: 24px 16px; }
@@ -975,211 +1297,3 @@
       color: var(--coven-violet-light);
     }
 
-    /* ────────────────────────────────────────────────────────────
-       Download CTA (Hero)
-       Predominant platform-aware download block. The .is-primary
-       link (assigned by JS based on detected platform) gets the
-       solid violet treatment; the others stay glassy/secondary.
-       Server-rendered without any .is-primary so the *first* card
-       (macOS) is the default emphasis fallback if JS never runs.
-       ──────────────────────────────────────────────────────────── */
-    .download-cta {
-      display: flex; flex-direction: column;
-      gap: 10px;
-      margin: 2px 0 0;
-      max-width: 560px;
-    }
-    .download-beta-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      align-self: flex-start;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(142,61,255,0.35);
-      background: rgba(142,61,255,0.08);
-      color: var(--vtext);
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .beta-dot {
-      width: 7px; height: 7px; border-radius: 999px;
-      background: var(--vtext);
-      box-shadow: 0 0 12px var(--vtext);
-      animation: download-pulse 2.4s ease-in-out infinite;
-    }
-    @keyframes download-pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%      { opacity: 0.55; transform: scale(0.85); }
-    }
-    .download-heading {
-      margin: 0;
-      font-size: clamp(19px, 2vw, 23px);
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--white);
-      display: flex; flex-wrap: wrap; gap: 6px 10px;
-      align-items: baseline;
-    }
-    .download-heading-pre { color: var(--muted); font-weight: 500; }
-    .download-heading-platform { color: var(--vtext); }
-    .download-sub {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-      max-width: 52ch;
-    }
-    .download-buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-top: 2px;
-    }
-    .download-btn {
-      display: flex; align-items: center; gap: 9px;
-      text-decoration: none;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border-v);
-      background: rgba(20, 14, 35, 0.55);
-      backdrop-filter: blur(6px);
-      color: var(--white);
-      transition: background 0.18s, border-color 0.18s, transform 0.18s;
-      position: relative;
-      overflow: hidden;
-    }
-    .download-btn::after {
-      content: "";
-      position: absolute; inset: 0;
-      pointer-events: none;
-      background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,0.05) 50%, transparent 65%);
-      transform: translateX(-100%);
-      transition: transform 0.55s ease;
-    }
-    .download-btn:hover {
-      border-color: rgba(142,61,255,0.5);
-      background: rgba(34, 22, 58, 0.7);
-      transform: translateY(-1px);
-    }
-    .download-btn:hover::after { transform: translateX(100%); }
-    .download-btn-icon {
-      flex: 0 0 auto;
-      width: 19px; height: 19px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--vtext);
-    }
-    .download-btn-icon svg { width: 100%; height: 100%; }
-    .download-btn-text {
-      display: flex; flex-direction: column; gap: 2px;
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-    /* Compact 4-across hero download row: show a short platform word
-       ('macOS', 'Windows', 'Linux', 'iOS') rather than the full 'Download
-       for …' so four chips fit on one slim line. */
-    .download-btn-label {
-      font-size: 12.5px; font-weight: 700;
-      letter-spacing: 0.01em;
-      color: var(--white);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    /* Compact hero: the per-platform sub-line ('.dmg · signed', etc.) is hidden
-       on the standard buttons to keep the download grid to two slim rows and
-       the whole hero within one viewport. It stays visible on the detected
-       (is-primary) button, which gets the full rich treatment below. */
-    .download-btn-sub {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--muted);
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: none;
-    }
-    .download-btn-arrow {
-      flex: 0 0 auto;
-      color: var(--muted);
-      font-size: 14px;
-      transition: color 0.15s, transform 0.18s;
-    }
-    .download-btn:hover .download-btn-arrow {
-      color: var(--vtext);
-      transform: translateY(1px);
-    }
-    .download-btn[data-platform="ios"] {
-      grid-column: auto;
-    }
-
-    /* Primary (auto-detected platform) treatment — emphasized IN PLACE (violet
-       fill) rather than spanning the full row, so the download row stays a
-       stable single line of four in every state and the hero never grows a
-       surprise extra row that pushes content below the fold. */
-    .download-btn.is-primary {
-      grid-column: auto;
-      background: linear-gradient(135deg, var(--violet-cta) 0%, #553f9a 100%);
-      border-color: transparent;
-      box-shadow: 0 8px 24px -8px rgba(109, 91, 175, 0.65),
-                  0 0 0 1px rgba(255,255,255,0.06) inset;
-    }
-    .download-btn.is-primary .download-btn-icon { color: #fff; }
-    .download-btn.is-primary .download-btn-label { color: #fff; }
-    .download-btn.is-primary .download-btn-sub { color: rgba(255,255,255,0.78); display: none; }
-    .download-btn.is-primary .download-btn-arrow {
-      color: #fff;
-      font-size: 17px;
-    }
-    .download-btn.is-primary:hover {
-      transform: translateY(-1px);
-      background: linear-gradient(135deg, #7e6cc4 0%, #5e479e 100%);
-      box-shadow: 0 12px 28px -8px rgba(109, 91, 175, 0.8),
-                  0 0 0 1px rgba(255,255,255,0.1) inset;
-    }
-
-    .download-all {
-      display: inline-block;
-      margin-top: 10px;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 12px;
-      letter-spacing: 0.04em;
-      transition: color 0.15s;
-    }
-    .download-all:hover { color: var(--vtext); }
-
-    /* Secondary hero actions (Discord + Docs) — kept low-key
-       beneath the primary download block. */
-    .hero-actions-secondary {
-      margin-top: 6px;
-      gap: 10px;
-    }
-    .btn-ghost {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: transparent;
-      color: var(--muted); text-decoration: none;
-      font-size: 12px; font-weight: 600;
-      letter-spacing: 0.04em;
-      padding: 8px 14px; border-radius: 6px;
-      transition: color 0.15s;
-    }
-    .btn-ghost:hover { color: var(--white); }
-    .btn-ghost svg { width: 14px; height: 11px; fill: currentColor; }
-
-    @media (max-width: 720px) {
-      .download-buttons { grid-template-columns: 1fr; }
-      .download-btn.is-primary { grid-column: 1; }
-    }
-    @media (max-width: 420px) {
-      /* Narrow phones: tighten padding so the buttons stay visually
-         contained inside the (pre-existing) narrow hero gutter. */
-      .download-cta { gap: 12px; }
-      .download-btn { padding: 12px 14px; gap: 10px; }
-      .download-btn.is-primary { padding: 14px 16px; }
-      .download-btn-label { font-size: 12.5px; }
-      .download-btn.is-primary .download-btn-label { font-size: 14px; }
-      .download-btn-sub { font-size: 10.5px; }
-      .download-heading { font-size: 18px; }
-    }

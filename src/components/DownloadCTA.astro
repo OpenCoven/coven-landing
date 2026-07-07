@@ -1,94 +1,64 @@
 ---
-// Predominant "Download" call-to-action for the Hero.
+// Platform-aware download CTA — one decision, not four.
 //
-// Renders four platform buttons (macOS · iOS/iPadOS · Windows · Linux) plus
-// an "all releases & checksums" utility link. Client-side script detects the
-// visitor's platform (UA + UA-CH + navigator.platform, with an iPad-on-iOS-13+
-// disambiguation) and:
-//   1. Promotes the matching button to the visually-primary slot.
-//   2. Updates the platform name in the headline (e.g. "CovenCave for macOS").
-// Server-rendered markup is fully functional without JS — every button is
-// a real link, every platform link points at the canonical release/asset
-// URL or TestFlight. The script only changes the visual emphasis.
+// Renders a single primary "Download for macOS" button (macOS is the
+// server-side default) plus a quiet one-line row of the remaining
+// platforms. Client-side detection (src/scripts/main.js) rewrites the
+// primary button's label/sub/href to match the visitor's platform and
+// swaps the detected platform out of the alt row.
+//
+// Works fully without JS: the primary button and every alt-row link are
+// real <a href>s pointing at the canonical release page or TestFlight.
 //
 // Download sources (resolved at runtime — never bake versions in):
-//   • macOS + Windows + Linux  →  GitHub Releases (latest)
-//   • iOS / iPadOS             →  TestFlight public link.
-// (The interactive "coven cli" card in the hero already demos the CLI, so the
-//  CTA stays focused on native downloads rather than repeating an install line.)
-//
-// Latest releases live on:
-//   https://github.com/OpenCoven/coven-cave/releases/latest
-// We link to /releases/latest (the release page) for the platform buttons
-// because asset filenames carry a version suffix (e.g. CovenCave-vX.Y.Z-...)
-// and GitHub's /latest/download/<asset> redirect only works with stable
-// filenames. The release page already lists every artifact in one tap and
-// ships the user straight to the newest signed build — no version drift in source.
-// build — no version drift in source.
+//   • macOS + Windows + Linux → GitHub Releases (latest release page;
+//     asset filenames carry version suffixes so /latest/download/<asset>
+//     redirects can't be used).
+//   • iOS / iPadOS → TestFlight public link.
 
 const RELEASES_URL = 'https://github.com/OpenCoven/coven-cave/releases/latest';
 const TESTFLIGHT_URL = 'https://testflight.apple.com/join/61Dqw8y4';
 
-// Inline icon helpers — kept tiny so the hero stays the LCP.
-const ICONS = {
-  apple: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M16.365 1.43c0 1.14-.45 2.27-1.18 3.09-.78.88-2.05 1.57-3.07 1.5-.13-1.12.4-2.27 1.13-3.06.83-.9 2.23-1.58 3.12-1.53zm4.06 17.13c-.55 1.28-.82 1.85-1.53 2.98-.99 1.57-2.4 3.53-4.13 3.54-1.55.02-1.95-1.01-4.06-.99-2.11.02-2.55 1.01-4.1.99-1.74-.02-3.08-1.79-4.07-3.36C.06 18.6-.34 13.27 1.79 10.48c1.5-1.97 3.85-3.12 6.06-3.12 2.25 0 3.66 1.23 5.52 1.23 1.79 0 2.88-1.23 5.49-1.23 1.97 0 4.06 1.07 5.55 2.92-4.88 2.67-4.08 9.65 1.49 11.78l-.47 1.5z"/></svg>`,
-  ios: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M5 4h14a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3zm7 2.5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zM7.5 11h9a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5v-5a.5.5 0 0 1 .5-.5z"/></svg>`,
-  windows: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3 5.6 11 4.4v7.1H3V5.6zM12 4.3l9-1.3v8.5h-9V4.3zM3 12.5h8v7.1L3 18.4v-5.9zm9 0h9V21l-9-1.3v-7.2z"/></svg>`,
-  linux: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2c-2 0-3.5 1.6-3.5 4 0 .7.2 1.3.4 1.8-.6.5-1.4 1.5-1.4 3.6 0 1.8.7 3.1 1.3 3.9-.5.4-1.6 1.3-2 2.5-.6 1.7.7 4.2 5.2 4.2s5.8-2.5 5.2-4.2c-.4-1.2-1.5-2.1-2-2.5.6-.8 1.3-2.1 1.3-3.9 0-2.1-.8-3.1-1.4-3.6.2-.5.4-1.1.4-1.8 0-2.4-1.5-4-3.5-4zm-1.5 3.2c.4 0 .8.4.8 1 0 .5-.4 1-.8 1-.5 0-.8-.5-.8-1 0-.6.3-1 .8-1zm3 0c.4 0 .8.4.8 1 0 .5-.4 1-.8 1s-.8-.5-.8-1c0-.6.4-1 .8-1z"/></svg>`,
-};
-
 type Platform = 'mac' | 'ios' | 'win' | 'linux';
 
-interface Btn {
+interface Alt {
   id: Platform;
   label: string;
-  sub: string;
   href: string;
-  icon: string;
+  external?: boolean;
 }
 
-const buttons: Btn[] = [
-  { id: 'mac', label: 'macOS', sub: '.dmg · universal · signed', href: RELEASES_URL, icon: ICONS.apple },
-  { id: 'win', label: 'Windows', sub: '.msi · x64 · signed', href: RELEASES_URL, icon: ICONS.windows },
-  { id: 'linux', label: 'Linux', sub: '.AppImage · x86_64', href: RELEASES_URL, icon: ICONS.linux },
-  { id: 'ios', label: 'iOS Beta', sub: 'TestFlight · iPhone & iPad', href: TESTFLIGHT_URL, icon: ICONS.ios },
+const alts: Alt[] = [
+  { id: 'win', label: 'Windows', href: RELEASES_URL },
+  { id: 'linux', label: 'Linux', href: RELEASES_URL },
+  { id: 'ios', label: 'iOS (TestFlight)', href: TESTFLIGHT_URL, external: true },
 ];
 ---
-<div class="download-cta" data-download-cta>
-  <span class="download-beta-badge">
-    <span class="beta-dot" aria-hidden="true"></span>
-    Public beta · free · open source
-  </span>
-
-  <h2 class="download-heading" data-download-heading>
-    <span class="download-heading-pre">Download</span>
-    <span class="download-heading-platform" data-download-platform>CovenCave</span>
-  </h2>
-
-  <p class="download-sub" data-download-sub>
-    Native apps and the CLI — your platform's build is highlighted.
-  </p>
-
-  <div class="download-buttons" role="group" aria-label="Download options">
-    {buttons.map((b) => (
-      <a
-        class="download-btn"
-        href={b.href}
-        data-platform={b.id}
-        target={b.id === 'ios' ? '_blank' : null}
-        rel={b.id === 'ios' ? 'noopener noreferrer' : null}
-      >
-        <span class="download-btn-icon" set:html={b.icon} />
-        <span class="download-btn-text">
-          <span class="download-btn-label">{b.label}</span>
-          <span class="download-btn-sub">{b.sub}</span>
-        </span>
-        <span class="download-btn-arrow" aria-hidden="true">↓</span>
-      </a>
-    ))}
-  </div>
-
-  <a class="download-all" href={RELEASES_URL} target="_blank" rel="noopener noreferrer">
-    All releases &amp; checksums ↗
+<div
+  class="download-cta"
+  data-download-cta
+  data-releases-url={RELEASES_URL}
+  data-testflight-url={TESTFLIGHT_URL}
+>
+  <a class="download-primary" href={RELEASES_URL} data-download-primary data-platform="mac">
+    <svg class="download-primary-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 3v10.55m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    <span class="download-primary-text">
+      <span class="download-primary-label" data-download-label>Download for macOS</span>
+      <span class="download-primary-sub" data-download-sub>CovenCave · .dmg · signed · free</span>
+    </span>
   </a>
+
+  <p class="download-alts">
+    <span class="download-alts-kicker">also on</span>
+    {alts.map((a) => (
+      <a
+        class="download-alt"
+        href={a.href}
+        data-alt-platform={a.id}
+        target={a.external ? '_blank' : null}
+        rel={a.external ? 'noopener noreferrer' : null}
+      >{a.label}</a>
+    ))}
+    <a class="download-alt download-alt--all" href={RELEASES_URL} target="_blank" rel="noopener noreferrer">all releases ↗</a>
+  </p>
 </div>
