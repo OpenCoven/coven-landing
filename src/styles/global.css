@@ -1025,8 +1025,12 @@
     }
     .qs-step {
       display: grid;
-      grid-template-columns: 40px 1fr;
+      /* minmax(0,1fr) + min-width 0 all the way up: the codeblock's nowrap
+         command must scroll internally, never widen the step/list/page */
+      grid-template-columns: 40px minmax(0, 1fr);
       column-gap: 20px;
+      min-width: 0;
+      max-width: 100%;
       padding-bottom: 16px;
     }
     .qs-step:last-child { padding-bottom: 0; }
@@ -1072,6 +1076,9 @@
       border-radius: var(--radius-lg);
       padding: 18px 20px 20px;
       display: flex; flex-direction: column; gap: 12px;
+      /* min-width: 0 — without it the codeblock's nowrap command sets the
+         body's min-content and it overflows its grid track on phones */
+      min-width: 0;
       transition: box-shadow var(--dur-ui) ease, border-color var(--dur-ui) ease, transform var(--dur-ui) ease;
     }
     .qs-step-kicker {
@@ -1173,7 +1180,7 @@
       .qs-copy:active { transform: translateY(-50%) scale(0.94); }
     }
     @media (max-width: 520px) {
-      .qs-step { grid-template-columns: 34px 1fr; column-gap: 14px; }
+      .qs-step { grid-template-columns: 34px minmax(0, 1fr); column-gap: 14px; }
       .qs-node { width: 30px; height: 30px; font-size: 0.75rem; }
       .qs-step:not(:last-child) .qs-rail::before { top: 30px; }
       .qs-body { padding: 16px 16px 18px; }
