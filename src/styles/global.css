@@ -328,23 +328,31 @@
     }
 
     /* Editorial masthead: full-width eyebrow row (echoes the section
-       eyebrows below), then headline LEFT / lede + downloads RIGHT. */
+       eyebrows below), then headline LEFT / lede + downloads RIGHT.
+       The masthead reuses the console's column split (--hero-cols) with
+       zero gap — the aside's left padding is the gutter — so the
+       masthead seam sits exactly above the console's inner divider,
+       and row 2 bottom-aligns to the console's top edge. */
+    .hero { --hero-cols: 1.08fr 0.92fr; }
     .hero-masthead {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: var(--hero-cols);
       grid-template-areas:
         "kicker kicker"
         "headline aside";
-      align-items: start;
-      gap: 0 72px;
+      align-items: end;
     }
     /* Both columns hold long unbreakable content; min-width: 0 lets them
        shrink instead of forcing page overflow. */
     .hero-masthead > * { min-width: 0; }
 
     .hero-masthead .kicker { grid-area: kicker; }
-    .hero-headline { grid-area: headline; }
-    .hero-aside { grid-area: aside; display: flex; flex-direction: column; }
+    .hero-headline { grid-area: headline; padding-right: 32px; }
+    .hero-aside {
+      grid-area: aside;
+      display: flex; flex-direction: column;
+      padding-left: 56px;
+    }
 
     .kicker {
       font-family: var(--mono);
@@ -532,13 +540,19 @@
     }
     .hero-console-main {
       display: grid;
-      grid-template-columns: 1.08fr 0.92fr;
+      grid-template-columns: var(--hero-cols);
+      grid-template-areas:
+        "session continuity"
+        "roster  roster";
     }
     .hero-console-main > * { min-width: 0; }
     .hero-session {
+      grid-area: session;
       font-family: var(--mono);
       display: flex; flex-direction: column;
     }
+    .hero-console-main .continuity { grid-area: continuity; }
+    .hero-console-main .hero-card-roster { grid-area: roster; }
     .hero-card-topbar {
       font-family: var(--mono);
       display: flex; align-items: center; justify-content: space-between;
@@ -755,9 +769,11 @@
     .continuity-events {
       list-style: none;
       position: relative;
+      flex: 1; /* fill the rail so events distribute the full column height */
       display: grid;
       grid-template-columns: 1fr;
-      gap: 15px;
+      align-content: space-between;
+      row-gap: 12px;
     }
     /* The thread: a vertical line the nodes sit on, brightening toward now */
     .continuity-events::before {
@@ -828,25 +844,25 @@
     @media (min-width: 901px) and (max-height: 720px) {
       .hero {
         min-height: calc(100vh - 64px);
-        gap: 18px;
-        padding: 12px 32px 16px;
+        gap: 16px;
+        padding: 10px 32px 14px;
       }
-      .kicker { margin-bottom: 12px; }
+      .kicker { margin-bottom: 10px; }
       h1 {
-        font-size: clamp(2.375rem, 4vw, 3rem);
+        font-size: clamp(2.25rem, 3.8vw, 2.75rem);
       }
       .hero-lede { margin-bottom: 18px; font-size: 0.9688rem; }
       .download-cta { gap: 10px; }
       .download-primary { padding: 11px 22px 11px 17px; }
       .hero-actions-secondary { margin-top: 12px; }
-      .hero-masthead { column-gap: 48px; }
+      .hero-aside { padding-left: 44px; }
       .hero-card-cmdline { padding: 12px 20px 10px; }
       .hero-card-output { margin-bottom: 12px; }
       .output-identity { padding: 11px 16px; }
       .output-memory { padding: 10px 16px 12px; gap: 6px; }
-      .hero-card-roster { padding: 9px 20px 11px; }
-      .continuity { padding: 13px 22px 15px; gap: 11px; }
-      .continuity-events { gap: 11px; }
+      .hero-card-roster { padding: 7px 20px 9px; }
+      .continuity { padding: 11px 22px 13px; gap: 9px; }
+      .continuity-events { row-gap: 9px; }
       .continuity-text { font-size: 0.7188rem; }
     }
 
@@ -863,7 +879,7 @@
       .footer-inner { max-width: 1440px; }
 
       .hero { gap: 56px; }
-      .hero-masthead { column-gap: 96px; }
+      .hero-aside { padding-left: 72px; }
       .kicker { font-size: 0.75rem; margin-bottom: 26px; }
       h1 { font-size: clamp(4.25rem, 3.2vw, 5rem); }
       .hero-lede { font-size: 1.125rem; margin-bottom: 28px; }
@@ -1405,7 +1421,7 @@
     @media (max-width: 1100px) {
       /* Tablet: tighten masthead + hero padding */
       .hero { padding: 36px 24px; }
-      .hero-masthead { column-gap: 44px; }
+      .hero-aside { padding-left: 44px; }
       h1 { font-size: clamp(2.375rem, 4.8vw, 3.5rem); }
       /* Card grids: 2-col on tablet instead of jumping to 1 */
       .card-grid.three { grid-template-columns: repeat(2, 1fr); }
@@ -1469,10 +1485,14 @@
         grid-template-areas: "kicker" "headline" "aside";
         gap: 0;
       }
-      .hero-headline { margin-bottom: 22px; }
+      .hero-headline { margin-bottom: 22px; padding-right: 0; }
+      .hero-aside { padding-left: 0; }
       .hero-lede { max-width: 55ch; font-size: 0.9375rem; }
-      /* Console: session stacks above the continuity rail */
-      .hero-console-main { grid-template-columns: 1fr; }
+      /* Console: session stacks above the continuity rail, roster last */
+      .hero-console-main {
+        grid-template-columns: 1fr;
+        grid-template-areas: "session" "continuity" "roster";
+      }
       .continuity {
         border-left: none;
         border-top: 1px solid rgba(154,142,205,0.12);
@@ -1486,7 +1506,7 @@
         padding: 28px 20px 32px;
         gap: 24px;
       }
-      .hero-masthead { column-gap: 36px; }
+      .hero-aside { padding-left: 32px; }
       .kicker { margin-bottom: 12px; }
       h1 { font-size: clamp(1.875rem, 4.6vw, 2.375rem); }
       .hero-lede { font-size: 0.875rem; margin-bottom: 16px; max-width: 46ch; }
