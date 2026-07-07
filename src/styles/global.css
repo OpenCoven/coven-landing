@@ -58,6 +58,24 @@
       /* Display voice — used only for the emphasized word in the hero h1.
          Fraunces italic: the grimoire serif against the hard grotesque. */
       --font-display: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+
+      /* ── Motion + layout scales (shared by every overhauled section) ── */
+      --ease-out:   cubic-bezier(0.2, 0.8, 0.2, 1);
+      --dur-ui:     0.18s;
+      --dur-reveal: 0.7s;
+      --dur-swap:   0.2s;
+      --section-py: 72px;
+      --gutter:     32px;
+
+      /* ── Shared panel + inset surfaces (echo the hero card bar) ── */
+      --panel-bg:         linear-gradient(180deg, rgba(17, 16, 24, 0.72) 0%, rgba(5, 4, 9, 0.55) 100%);
+      --panel-bg-arrival: linear-gradient(135deg, rgba(59, 22, 79, 0.42) 0%, rgba(14, 11, 22, 0.82) 60%);
+      --panel-shadow:     0 24px 60px -24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      --inset-bg:         rgba(5, 4, 9, 0.5);
+      --accent-wash:      rgba(154, 142, 205, 0.06);
+      --accent-active:    rgba(154, 142, 205, 0.14);
+      --accent-line:      rgba(154, 142, 205, 0.22);
+      --accent-strong:    rgba(154, 142, 205, 0.45);
     }
 
     /* Screen-reader-only utility — used for invisible landmark headings
@@ -105,6 +123,56 @@
       -webkit-backdrop-filter: blur(12px);
     }
 
+    /* ── Shared panel primitives (hero-grade glass frame + interactive
+       inset). Consumed by Architecture, HowItWorks, Compare, Ecosystem so
+       every module reads as one family instead of five experiments. ── */
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-v);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--panel-shadow);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+    .panel--arrival { background: var(--panel-bg-arrival); }
+
+    /* Interactive sub-element inside a panel: rows, pills, cards, codeblocks.
+       Add .is-card for a hover lift; .is-active for the selected state. */
+    .panel-inset {
+      background: var(--inset-bg);
+      border: 1px solid var(--oc-border-subtle);
+      border-radius: var(--radius-md);
+      transition:
+        background var(--dur-ui) ease,
+        border-color var(--dur-ui) ease,
+        transform var(--dur-ui) ease,
+        box-shadow var(--dur-ui) ease;
+    }
+    .panel-inset.is-active {
+      background: var(--accent-active);
+      border-color: var(--accent-strong);
+      color: #fff;
+    }
+
+    /* Content-swap fade — generalizes the hero memory-swap. JS toggles
+       .is-swapping around a repaint of a live region. Gated on motion. */
+    .motion-on .swap-fade { transition: opacity var(--dur-swap) ease; }
+    .motion-on .swap-fade.is-swapping { opacity: 0.12; }
+
+    @media (hover: hover) {
+      .panel-inset:hover {
+        background: var(--accent-wash);
+        border-color: var(--accent-line);
+      }
+      .panel-inset.is-card:hover { transform: translateY(-2px); }
+      /* Selected state stays dominant over hover */
+      .panel-inset.is-active:hover {
+        background: var(--accent-active);
+        border-color: var(--accent-strong);
+      }
+    }
+
     /* ── Inline code (matches coven-docs dark code style) ── */
     :not(pre) > code {
       background: rgba(154, 142, 205, 0.1);
@@ -117,6 +185,16 @@
     }
 
     a, button { touch-action: manipulation; }
+
+    /* ── Unified focus ring ──────────────────────────────────
+       Consumes the --oc-focus-ring token (previously defined but unused).
+       Zero-specificity :where() base so any component focus rule still
+       wins; over time this retires the four ad-hoc focus treatments. SVG
+       nodes keep a stroke variant (box-shadow doesn't render inside SVG). */
+    :where(a, button, [role="button"], [role="tab"], [tabindex="0"]):focus-visible {
+      outline: none;
+      box-shadow: var(--oc-focus-ring);
+    }
 
     /* ── AMBIENT ─────────────────────────────────────────── */
     .ambient {
@@ -799,9 +877,22 @@
       max-width: 1280px; margin: 0 auto;
       padding: 72px 32px;
     }
+    /* Shared chapter divider — a faint fading hairline at the top of each
+       content section. Chosen over alternating surface tints, which would
+       muddy over the fixed radial glows. Add .content-section--flush to
+       suppress it (e.g. the first section after the proof band). */
+    .content-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: var(--gutter); right: var(--gutter);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--oc-border-subtle) 15%, var(--oc-border-subtle) 85%, transparent);
+    }
+    .content-section--flush::before { display: none; }
     .section-header {
       max-width: 600px; margin-bottom: 48px;
     }
+    .section-header--wide { max-width: 640px; }
     .section-kicker {
       font-family: var(--mono);
       font-size: 10px; font-weight: 700;
@@ -1043,16 +1134,15 @@
       opacity: 1;
       transform: none;
     }
-    /* Stagger items within grids — same timing across every grid */
-    .motion-on .continuity-events [data-reveal]:nth-child(2),
-    .motion-on .proof-grid       [data-reveal]:nth-child(2),
-    .motion-on .card-grid        [data-reveal]:nth-child(2) { transition-delay: 0.08s; }
-    .motion-on .continuity-events [data-reveal]:nth-child(3),
-    .motion-on .proof-grid       [data-reveal]:nth-child(3),
-    .motion-on .card-grid        [data-reveal]:nth-child(3) { transition-delay: 0.16s; }
-    .motion-on .continuity-events [data-reveal]:nth-child(4),
-    .motion-on .proof-grid       [data-reveal]:nth-child(4),
-    .motion-on .card-grid        [data-reveal]:nth-child(4) { transition-delay: 0.24s; }
+    /* Stagger items within a container — same timing everywhere. Existing
+       grids (.proof-grid, .card-grid) keep working; new containers opt in
+       with the .reveal-stagger utility. (.continuity-events has its own
+       load orchestration below, so it's intentionally not in this list.) */
+    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(2) { transition-delay: 0.08s; }
+    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(3) { transition-delay: 0.16s; }
+    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(4) { transition-delay: 0.24s; }
+    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(5) { transition-delay: 0.32s; }
+    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(6) { transition-delay: 0.40s; }
 
     /* Hero load orchestration: copy lands first, the terminal answers,
        then the continuity thread grows node by node left to right. */
