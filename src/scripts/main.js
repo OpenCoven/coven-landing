@@ -113,18 +113,14 @@
     var rotateTimer = null;
     var typeTimer = null;
 
-    function typeCommand(cmd, done) {
+    function typeCommand(cmd) {
       if (typeTimer) { clearTimeout(typeTimer); typeTimer = null; }
       if (!cliCmd) return;
-      if (!motionOn) {
-        cliCmd.textContent = cmd;
-        if (done) done();
-        return;
-      }
+      if (!motionOn) { cliCmd.textContent = cmd; return; }
       cliCmd.textContent = '';
       var i = 0;
       function step() {
-        if (i >= cmd.length) { if (done) done(); return; }
+        if (i >= cmd.length) return;
         cliCmd.textContent += cmd.charAt(i++);
         typeTimer = setTimeout(step, 24 + Math.random() * 28);
       }
@@ -185,7 +181,6 @@
       tab.addEventListener('click', function () {
         userTook = true;
         stopRotate();
-        if (card) card.classList.remove('card-boot', 'card-booted');
         applyFamiliar(tab.getAttribute('data-familiar'), true);
       });
       // Roving tabindex + arrow keys (standard tablist keyboard pattern)
@@ -208,25 +203,7 @@
       card.addEventListener('focusout', function () { if (!userTook) startRotate(); });
     }
 
-    // Boot sequence: type the first command, then let the output arrive
-    // in beats (identity → memory → roster) before rotation begins.
-    // Non-motion visitors get the complete card and no rotation.
-    if (motionOn) {
-      if (card) {
-        card.classList.add('card-boot');
-        setTimeout(function () {
-          typeCommand(FAMILIARS[current].command, function () {
-            card.classList.add('card-booted');
-            setTimeout(function () {
-              card.classList.remove('card-boot', 'card-booted');
-            }, 1400);
-            startRotate();
-          });
-        }, 400);
-      } else {
-        startRotate();
-      }
-    }
+    if (motionOn) startRotate();
   })();
 
   // ── Quick Start: copy-to-clipboard ────────────────────────
