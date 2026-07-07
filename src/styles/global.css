@@ -958,6 +958,14 @@
       max-width: 600px; margin-bottom: 48px;
     }
     .section-header--wide { max-width: 640px; }
+    /* Large screens: let the title sentence run the full container width;
+       the supporting paragraph keeps a readable measure. */
+    @media (min-width: 1101px) {
+      .section-header,
+      .section-header--wide,
+      .ecosystem-inner h2 { max-width: none; }
+      .section-header p { max-width: 68ch; }
+    }
     .section-kicker {
       font-family: var(--mono);
       font-size: 10px; font-weight: 700;
