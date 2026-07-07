@@ -10,6 +10,7 @@ import path from 'node:path';
  *  - required public assets exist (favicon, apple-touch-icon, OG image+svg)
  *  - canonical OpenCoven logo treatment in favicon.svg and og.svg
  *  - rendered dist/index.html exists and contains load-bearing copy
+ *  - rendered dist/github/index.html exists and contains hosted GitHub beta copy
  */
 
 const root = process.cwd();
@@ -115,3 +116,32 @@ if (existsSync(distIndex)) {
     `Verified ${requiredPublicFiles.length} required public files and canonical favicon + OG logos. (Skipped dist/index.html copy check — run \`npm run build\` first.)`,
   );
 }
+
+const distGithub = path.join(distDir, 'github', 'index.html');
+if (!existsSync(distGithub)) {
+  throw new Error('Missing rendered GitHub landing page at dist/github/index.html');
+}
+
+const githubHtml = await readFile(distGithub, 'utf8');
+const requiredGithubCopy = [
+  'Assign it like a teammate. Get a PR back.',
+  'OpenCoven lets your team deploy a trusted familiar to GitHub.',
+  'Your familiar on your GitHub',
+  'Join the hosted beta',
+  'Self-host the adapter',
+  'launch pricing',
+  '$99/mo',
+  '$399/mo',
+  'from $2,000/mo',
+  '14-day trial',
+  'Hosted beta waitlist',
+  'docs/demo.md',
+];
+const missingGithubCopy = requiredGithubCopy.filter((needle) => !githubHtml.includes(needle));
+if (missingGithubCopy.length > 0) {
+  throw new Error(`Missing expected copy in dist/github/index.html: ${missingGithubCopy.join(', ')}`);
+}
+
+console.log(
+  `Verified ${requiredGithubCopy.length} required copy strings in dist/github/index.html.`,
+);

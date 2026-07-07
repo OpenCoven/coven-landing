@@ -1,9 +1,10 @@
 ---
 // Sticky header with brand mark, desktop nav, mobile hamburger, and Join CTA.
+const isGithub = Astro.url.pathname.replace(/\/$/, '') === '/github';
 ---
 <header class="site-header">
   <div class="header-inner">
-    <a class="brand" href="#top" aria-label="OpenCoven home">
+    <a class="brand" href="/#top" aria-label="OpenCoven home">
       <span class="brand-mark"><img src="/favicon.svg" alt="" /></span>
       <span>OpenCoven</span>
     </a>
@@ -11,11 +12,12 @@
       <svg width="22" height="16" viewBox="0 0 22 16" fill="none"><rect y="0" width="22" height="2" rx="1" fill="currentColor"/><rect y="7" width="22" height="2" rx="1" fill="currentColor"/><rect y="14" width="22" height="2" rx="1" fill="currentColor"/></svg>
     </button>
     <nav class="desktop-nav">
-      <a href="#architecture">Architecture</a>
-      <a href="#how-it-works">How It Works</a>
-      <a href="#quickstart">Quick Start</a>
+      <a href="/#architecture">Architecture</a>
+      <a href="/#how-it-works">How It Works</a>
+      <a href="/#quickstart">Quick Start</a>
+      <a href="/github" aria-current={isGithub ? 'page' : undefined}>GitHub App</a>
       <a href="https://docs.opencoven.ai">Docs</a>
-      <a href="#ecosystem">Ecosystem</a>
+      <a href="/#ecosystem">Ecosystem</a>
       <a href="https://github.com/OpenCoven/coven">GitHub</a>
       <a href="https://x.com/OpenCvn" aria-label="OpenCoven on X">X</a>
     </nav>
