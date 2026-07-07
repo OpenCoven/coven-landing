@@ -1,35 +1,37 @@
 ---
-// Hero — "the summoning".
+// Hero — "the first console frame".
 //
-// Three layers, one thesis (continuity):
-//   1. .hero-main  — copy + platform-aware DownloadCTA on the LEFT,
-//                    a live "summon session" terminal on the RIGHT. The
-//                    terminal reads top-to-bottom like a real session:
-//                    typed command → familiar state as output → roster tabs.
-//   2. .continuity — the signature element: a thin timeline across the
-//                    hero's base plotting one familiar's memory across real
-//                    time, ending in a live "today · still remembers" pulse.
-//                    It replaces the old 4-cell icon grid (whose content
-//                    duplicated ProofGrid) and encodes persistence itself.
+// The rest of the page is a series of full-width console frames
+// (COVEN · RUNTIME, COVEN · ARCHITECTURE, …). The hero opens the same
+// way instead of a two-column SaaS split:
 //
-// Terminal rotation + typing + roster switching live in src/scripts/main.js.
-// Everything renders complete without JS; scripts only add motion/emphasis.
+//   1. .hero-masthead — editorial row: kicker + display headline on the
+//      left, lede + platform-aware DownloadCTA on the right.
+//   2. .hero-console  — one full-width COVEN · SESSION frame holding the
+//      live session (command line, familiar state, roster tabs) with the
+//      continuity strip as its footer: the familiar's memory plotted
+//      across 47 days, ending in a live "today" node.
+//
+// Rotation + typing live in src/scripts/main.js. Everything renders
+// complete without JS; motion is limited to typing, rotation, and the
+// shared reveal transitions (no orchestration — see repo memory).
 import DownloadCTA from './DownloadCTA.astro';
 ---
 <section class="hero" id="top" aria-label="Hero">
-  <div class="hero-main">
-    <div class="hero-copy" data-reveal>
-      <p class="kicker">
-        <span class="kicker-beta"><span class="beta-dot" aria-hidden="true"></span>public beta</span>
-        free &amp; open source · runs locally
-      </p>
-
+  <div class="hero-masthead">
+    <p class="kicker" data-reveal>
+      <span class="kicker-beta"><span class="beta-dot" aria-hidden="true"></span>public beta</span>
+      free &amp; open source · runs locally
+    </p>
+    <div class="hero-headline" data-reveal>
       <h1>Summon agents<br>that <em>remember.</em></h1>
+    </div>
 
+    <div class="hero-aside" data-reveal>
       <p class="hero-lede">
-        Coven gives each AI agent a name, a memory, and a place in your work.
-        Close the terminal tonight — tomorrow <strong>Forge</strong> still knows
-        your branch, your conventions, and where you left off.
+        Coven gives each AI agent a name, a memory, and a place in your
+        work. Close the terminal tonight — tomorrow <strong>Forge</strong>
+        still knows your branch, your conventions, and where you left off.
       </p>
 
       <DownloadCTA />
@@ -44,15 +46,17 @@ import DownloadCTA from './DownloadCTA.astro';
         <a class="btn-ghost" href="https://docs.opencoven.ai">Read the docs ↗</a>
       </div>
     </div>
+  </div>
 
-    <div class="hero-visual" data-reveal>
-      <div class="hero-card" aria-label="Coven session preview">
-        <div class="hero-card-topbar">
-          <div class="hero-card-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-          <span class="hero-card-label">coven · session</span>
-          <span class="hero-card-status">local</span>
-        </div>
+  <div class="hero-console panel" data-reveal aria-label="Live Coven session preview">
+    <div class="hero-card-topbar">
+      <div class="hero-card-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      <span class="hero-card-label">coven · session</span>
+      <span class="hero-card-status">local</span>
+    </div>
 
+    <div class="hero-console-main">
+      <div class="hero-session">
         <div class="hero-card-cmdline">
           <span class="card-prompt" aria-hidden="true">❯</span>
           <span class="card-cmd">coven attach forge --project ./opencoven</span>
@@ -91,32 +95,32 @@ import DownloadCTA from './DownloadCTA.astro';
           <span class="roster-hint" aria-hidden="true">one runtime · three familiars</span>
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="continuity" aria-label="One familiar's memory across 47 days">
-    <div class="continuity-track" aria-hidden="true"></div>
-    <ol class="continuity-events">
-      <li class="continuity-event" data-reveal>
-        <span class="continuity-date">day 1</span>
-        <span class="continuity-node" aria-hidden="true"></span>
-        <span class="continuity-text">summoned Forge, learned the repo</span>
-      </li>
-      <li class="continuity-event" data-reveal>
-        <span class="continuity-date">day 9</span>
-        <span class="continuity-node" aria-hidden="true"></span>
-        <span class="continuity-text">picked up your review style</span>
-      </li>
-      <li class="continuity-event" data-reveal>
-        <span class="continuity-date">day 23</span>
-        <span class="continuity-node" aria-hidden="true"></span>
-        <span class="continuity-text">shipped feat/runtime-attach</span>
-      </li>
-      <li class="continuity-event is-now" data-reveal>
-        <span class="continuity-date">day 47 · today</span>
-        <span class="continuity-node" aria-hidden="true"></span>
-        <span class="continuity-text">still remembers all of it</span>
-      </li>
-    </ol>
+      <div class="continuity" aria-label="One familiar's memory across 47 days">
+        <p class="continuity-kicker">continuity · forge</p>
+        <ol class="continuity-events">
+          <li class="continuity-event" data-reveal>
+            <span class="continuity-date">day 1</span>
+            <span class="continuity-node" aria-hidden="true"></span>
+            <span class="continuity-text">summoned Forge, learned the repo</span>
+          </li>
+          <li class="continuity-event" data-reveal>
+            <span class="continuity-date">day 9</span>
+            <span class="continuity-node" aria-hidden="true"></span>
+            <span class="continuity-text">picked up your review style</span>
+          </li>
+          <li class="continuity-event" data-reveal>
+            <span class="continuity-date">day 23</span>
+            <span class="continuity-node" aria-hidden="true"></span>
+            <span class="continuity-text">shipped feat/runtime-attach</span>
+          </li>
+          <li class="continuity-event is-now" data-reveal>
+            <span class="continuity-date">day 47 · today</span>
+            <span class="continuity-node" aria-hidden="true"></span>
+            <span class="continuity-text">still remembers all of it</span>
+          </li>
+        </ol>
+      </div>
+    </div>
   </div>
 </section>

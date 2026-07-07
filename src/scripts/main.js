@@ -62,7 +62,7 @@
   (function () {
     var tabs = document.querySelectorAll('.roster-tab[data-familiar]');
     if (tabs.length === 0) return;
-    var card     = document.querySelector('.hero-card');
+    var card     = document.querySelector('.hero-console');
     var output   = document.querySelector('.hero-card-output');
     var sigilEl  = document.querySelector('[data-sigil]');
     var nameEl   = document.querySelector('[data-name]');
