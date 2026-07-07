@@ -69,7 +69,12 @@ const toolGates = [
     <p>Memory, sessions, harnesses, and tools are the four moving parts. Each tab is a working preview of how that piece behaves in a real Coven session.</p>
   </div>
 
-  <div class="howit-frame" data-reveal>
+  <div class="howit-frame panel" data-reveal>
+    <div class="howit-railbar" aria-hidden="true">
+      <span class="howit-dots"><span></span><span></span><span></span></span>
+      <span class="howit-rail-label">coven · runtime</span>
+      <span class="howit-rail-status">local</span>
+    </div>
     <div class="howit-tabs" role="tablist" aria-label="Coven moving parts">
       {tabs.map((t, i) => (
         <button
@@ -85,6 +90,7 @@ const toolGates = [
       ))}
     </div>
 
+    <div class="howit-stage">
     <!-- Memory panel -->
     <div
       class="howit-panel is-active"
@@ -114,7 +120,7 @@ const toolGates = [
             </button>
           ))}
         </div>
-        <div class="memory-board" aria-live="polite">
+        <div class="memory-board swap-fade" aria-live="polite">
           {memoryTimeline[memoryTimeline.length - 1].notes.map((n) => (
             <div class="memory-note-row">
               <span class="memory-note-tag">{n.meta}</span>
@@ -146,6 +152,7 @@ const toolGates = [
           <button class="sessions-filter"           type="button" data-filter="idle"     aria-pressed="false">Idle</button>
           <button class="sessions-filter"           type="button" data-filter="archived" aria-pressed="false">Archived</button>
         </div>
+        <div class="sessions-results" aria-live="polite">
         <ul class="sessions-list">
           {sessionsData.map((s) => (
             <li class="sessions-row" data-status={s.status}>
@@ -157,6 +164,8 @@ const toolGates = [
             </li>
           ))}
         </ul>
+        <p class="sessions-empty" hidden>No sessions match this filter.</p>
+        </div>
       </div>
     </div>
 
@@ -202,7 +211,7 @@ const toolGates = [
             </li>
           ))}
         </ul>
-        <div class="harness-detail" aria-live="polite">
+        <div class="harness-detail swap-fade" aria-live="polite">
           <p class="harness-detail-tag">contract</p>
           <p class="harness-detail-text">{harnessRows[0].detail}</p>
         </div>
@@ -235,7 +244,7 @@ const toolGates = [
             >{t.label}</button>
           ))}
         </div>
-        <div class="tool-flow" aria-live="polite">
+        <div class="tool-flow">
           <div class="tool-flow-step">request</div>
           <div class="tool-flow-arrow" aria-hidden="true">→</div>
           <div class="tool-flow-step tool-flow-gate">gate</div>
@@ -244,11 +253,12 @@ const toolGates = [
           <div class="tool-flow-arrow" aria-hidden="true">→</div>
           <div class="tool-flow-step">result</div>
         </div>
-        <div class="tool-rule">
+        <div class="tool-rule swap-fade" aria-live="polite">
           <p class="tool-rule-title">{toolGates[0].title}</p>
           <p class="tool-rule-text">{toolGates[0].rule}</p>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </section>
@@ -258,6 +268,8 @@ const toolGates = [
 </script>
 
 <script>
+  import { fadeSwap, wireRadioGroup } from '../scripts/shared.js';
+
   (function () {
     const root = document.querySelector('.howitworks-section');
     if (!root) return;
@@ -299,34 +311,6 @@ const toolGates = [
       });
     });
 
-    // Arrow-key navigation helper for radio-style groups.
-    // `attr` is the aria attribute that tracks selection ('aria-checked' for
-    // role=radio, 'aria-pressed' for toggle buttons).
-    function wireRadioGroup(buttons, attr, onSelect) {
-      const order = Array.from(buttons);
-      buttons.forEach((btn) => {
-        btn.addEventListener('click', () => onSelect(btn));
-        btn.addEventListener('keydown', (e) => {
-          const i = order.indexOf(btn);
-          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-            e.preventDefault();
-            const next = order[(i + 1) % order.length];
-            next.focus(); onSelect(next);
-          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-            e.preventDefault();
-            const prev = order[(i - 1 + order.length) % order.length];
-            prev.focus(); onSelect(prev);
-          } else if (e.key === 'Home') {
-            e.preventDefault();
-            order[0].focus(); onSelect(order[0]);
-          } else if (e.key === 'End') {
-            e.preventDefault();
-            order[order.length - 1].focus(); onSelect(order[order.length - 1]);
-          }
-        });
-      });
-    }
-
     // ── Memory scrubber ──────────────────────────────────────
     const memoryTimeline = window.__HOWIT__?.memoryTimeline || [];
     const memoryButtons = root.querySelectorAll('[data-memory-step]');
@@ -334,19 +318,22 @@ const toolGates = [
     function paintMemory(stepIdx) {
       const data = memoryTimeline[stepIdx];
       if (!data || !memoryBoard) return;
-      // Build rows via DOM construction (safe vs. arbitrary text in notes).
-      memoryBoard.replaceChildren();
-      data.notes.forEach((n) => {
-        const row = document.createElement('div');
-        row.className = 'memory-note-row';
-        const tag = document.createElement('span');
-        tag.className = 'memory-note-tag';
-        tag.textContent = n.meta;
-        const text = document.createElement('span');
-        text.className = 'memory-note-text';
-        text.textContent = n.text;
-        row.append(tag, text);
-        memoryBoard.appendChild(row);
+      // Crossfade the board while rebuilding rows via DOM construction
+      // (safe vs. arbitrary text in notes).
+      fadeSwap(memoryBoard, () => {
+        memoryBoard.replaceChildren();
+        data.notes.forEach((n) => {
+          const row = document.createElement('div');
+          row.className = 'memory-note-row';
+          const tag = document.createElement('span');
+          tag.className = 'memory-note-tag';
+          tag.textContent = n.meta;
+          const text = document.createElement('span');
+          text.className = 'memory-note-text';
+          text.textContent = n.text;
+          row.append(tag, text);
+          memoryBoard.appendChild(row);
+        });
       });
       memoryButtons.forEach((b) => {
         const match = Number(b.getAttribute('data-memory-step')) === stepIdx;
@@ -358,9 +345,10 @@ const toolGates = [
       paintMemory(Number(b.getAttribute('data-memory-step')));
     });
 
-    // ── Sessions filter (toggle buttons, not radios) ─────────
+    // ── Sessions filter (hide non-matches, announce empty state) ──
     const filters = root.querySelectorAll('.sessions-filter');
     const rows = root.querySelectorAll('.sessions-row');
+    const emptyMsg = root.querySelector('.sessions-empty');
     filters.forEach((f) => {
       f.addEventListener('click', () => {
         const filter = f.getAttribute('data-filter');
@@ -369,22 +357,26 @@ const toolGates = [
           other.classList.toggle('is-active', match);
           other.setAttribute('aria-pressed', match ? 'true' : 'false');
         });
+        let visible = 0;
         rows.forEach((r) => {
           const match = filter === 'all' || r.getAttribute('data-status') === filter;
-          r.classList.toggle('is-dimmed', !match);
+          r.hidden = !match;
+          if (match) visible += 1;
         });
+        if (emptyMsg) emptyMsg.hidden = visible !== 0;
       });
     });
 
     // ── Harnesses selector ──────────────────────────────────
-    const harnessRows = window.__HOWIT__?.harnessRows || [];
+    const harnessData = window.__HOWIT__?.harnessRows || [];
     const harnessButtons = root.querySelectorAll('[data-harness]');
     const harnessDetail = root.querySelector('.harness-detail-text');
+    const harnessDetailBox = root.querySelector('.harness-detail');
     function selectHarness(b) {
       const id = b.getAttribute('data-harness');
-      const data = harnessRows.find((h) => h.id === id);
+      const data = harnessData.find((h) => h.id === id);
       if (!data) return;
-      if (harnessDetail) harnessDetail.textContent = data.detail;
+      fadeSwap(harnessDetailBox, () => { if (harnessDetail) harnessDetail.textContent = data.detail; });
       harnessButtons.forEach((other) => {
         const match = other === b;
         other.classList.toggle('is-active', match);
@@ -394,16 +386,19 @@ const toolGates = [
     wireRadioGroup(harnessButtons, 'aria-checked', selectHarness);
 
     // ── Tools picker ────────────────────────────────────────
-    const toolGates = window.__HOWIT__?.toolGates || [];
+    const toolData = window.__HOWIT__?.toolGates || [];
     const toolButtons = root.querySelectorAll('[data-tool]');
     const toolTitle = root.querySelector('.tool-rule-title');
     const toolText = root.querySelector('.tool-rule-text');
+    const toolRuleBox = root.querySelector('.tool-rule');
     function selectTool(b) {
       const id = b.getAttribute('data-tool');
-      const data = toolGates.find((t) => t.id === id);
+      const data = toolData.find((t) => t.id === id);
       if (!data) return;
-      if (toolTitle) toolTitle.textContent = data.title;
-      if (toolText)  toolText.textContent  = data.rule;
+      fadeSwap(toolRuleBox, () => {
+        if (toolTitle) toolTitle.textContent = data.title;
+        if (toolText)  toolText.textContent  = data.rule;
+      });
       toolButtons.forEach((other) => {
         const match = other === b;
         other.classList.toggle('is-active', match);
@@ -415,17 +410,40 @@ const toolGates = [
 </script>
 
 <style>
-  .howit-frame {
-    border: 1px solid var(--border-v);
-    border-radius: 10px;
-    background: linear-gradient(180deg, rgba(14,11,22,0.7) 0%, rgba(5,4,9,0.5) 100%);
-    overflow: hidden;
+  /* Frame surface comes from the shared .panel; here we add the console
+     topbar rail (echoes the hero card top bar). */
+  .howit-railbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(154,142,205,0.12);
+    background: rgba(5,4,9,0.55);
+  }
+  .howit-dots { display: inline-flex; gap: 6px; }
+  .howit-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .howit-rail-label {
+    font-family: var(--mono); font-size: 9px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(180,170,235,0.5);
+  }
+  .howit-rail-status {
+    margin-left: auto;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: rgba(255,255,255,0.3);
+  }
+  .howit-rail-status::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); box-shadow: 0 0 6px rgba(48,209,88,0.5);
   }
   .howit-tabs {
     display: flex;
     gap: 4px;
     padding: 8px;
-    border-bottom: 1px solid rgba(142,61,255,0.12);
+    border-bottom: 1px solid rgba(154,142,205,0.12);
     background: rgba(5,4,9,0.6);
   }
   .howit-tab {
@@ -445,17 +463,14 @@ const toolGates = [
     transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
   }
   .howit-tab:hover { color: var(--white); }
-  .howit-tab:focus-visible {
-    outline: 2px solid #E8DBFF;
-    outline-offset: 2px;
-    border-color: rgba(201,167,255,0.6);
-  }
   .howit-tab.is-active {
-    background: rgba(142,61,255,0.16);
+    background: var(--accent-active);
     color: #fff;
-    border-color: rgba(142,61,255,0.36);
+    border-color: var(--accent-strong);
   }
 
+  /* Stage: min-height locked so switching tabs never reflows the page. */
+  .howit-stage { min-height: 336px; }
   .howit-panel {
     display: grid;
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -463,6 +478,12 @@ const toolGates = [
     padding: 32px;
   }
   .howit-panel[hidden] { display: none; }
+  /* Crossfade the incoming panel (presentational only; gated on motion). */
+  .motion-on .howit-panel.is-active { animation: howit-fade-in 0.3s var(--ease-out); }
+  @keyframes howit-fade-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
 
   .howit-copy h3 {
     font-size: 1.375rem;
@@ -480,7 +501,7 @@ const toolGates = [
 
   .howit-widget {
     background: rgba(5,4,9,0.5);
-    border: 1px solid rgba(142,61,255,0.14);
+    border: 1px solid rgba(154,142,205,0.14);
     border-radius: 8px;
     padding: 18px;
     display: flex;
@@ -497,7 +518,7 @@ const toolGates = [
   }
   .memory-step {
     background: transparent;
-    border: 1px solid rgba(142,61,255,0.16);
+    border: 1px solid rgba(154,142,205,0.16);
     border-radius: 6px;
     padding: 8px 10px;
     color: var(--muted);
@@ -509,18 +530,17 @@ const toolGates = [
     transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
     outline: none;
   }
-  .memory-step:hover { background: rgba(142,61,255,0.06); color: var(--white); }
-  .memory-step:focus-visible { outline: 2px solid #E8DBFF; outline-offset: 2px; }
+  .memory-step:hover { background: rgba(154,142,205,0.06); color: var(--white); }
   .memory-step.is-active {
-    background: rgba(142,61,255,0.18);
-    border-color: rgba(201,167,255,0.5);
+    background: rgba(154,142,205,0.18);
+    border-color: rgba(180,170,235,0.5);
     color: #fff;
   }
   .memory-step-num {
     font-family: var(--mono);
     font-size: 0.5625rem;
     letter-spacing: 0.14em;
-    color: rgba(201,167,255,0.55);
+    color: rgba(180,170,235,0.55);
   }
   .memory-step-label {
     font-size: 0.75rem;
@@ -554,7 +574,7 @@ const toolGates = [
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(201,167,255,0.55);
+    color: rgba(180,170,235,0.55);
     flex-shrink: 0;
     width: 60px;
   }
@@ -568,7 +588,7 @@ const toolGates = [
   }
   .sessions-filter {
     background: transparent;
-    border: 1px solid rgba(142,61,255,0.16);
+    border: 1px solid rgba(154,142,205,0.16);
     color: var(--muted);
     font-family: var(--mono);
     font-size: 0.625rem;
@@ -582,10 +602,9 @@ const toolGates = [
     transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
   }
   .sessions-filter:hover { color: var(--white); }
-  .sessions-filter:focus-visible { outline: 2px solid #E8DBFF; outline-offset: 2px; }
   .sessions-filter.is-active {
-    background: rgba(142,61,255,0.18);
-    border-color: rgba(201,167,255,0.5);
+    background: rgba(154,142,205,0.18);
+    border-color: rgba(180,170,235,0.5);
     color: #fff;
   }
   .sessions-list {
@@ -606,18 +625,24 @@ const toolGates = [
     font-size: 0.75rem;
     transition: opacity 0.18s ease;
   }
-  .sessions-row.is-dimmed { opacity: 0.22; }
+  /* Grid display beats the UA [hidden] rule, so hide filtered rows here. */
+  .sessions-row[hidden] { display: none; }
+  .sessions-empty {
+    font-family: var(--mono); font-size: 0.6875rem;
+    color: var(--muted); letter-spacing: 0.04em;
+    padding: 8px 12px;
+  }
   .sessions-dot {
     width: 8px; height: 8px; border-radius: 50%;
     background: rgba(255,255,255,0.2);
   }
-  .sessions-dot.status-running  { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.5); }
-  .sessions-dot.status-idle     { background: rgba(201,167,255,0.7); }
+  .sessions-dot.status-running  { background: var(--green); box-shadow: 0 0 6px rgba(48,209,88,0.5); }
+  .sessions-dot.status-idle     { background: rgba(180,170,235,0.7); }
   .sessions-dot.status-archived { background: rgba(255,255,255,0.18); }
   .sessions-project { color: var(--white); font-weight: 600; }
   .sessions-harness {
     font-family: var(--mono);
-    color: rgba(201,167,255,0.55);
+    color: rgba(180,170,235,0.55);
     font-size: 0.6875rem;
   }
   .sessions-status {
@@ -629,8 +654,8 @@ const toolGates = [
     padding: 3px 8px;
     border-radius: 3px;
   }
-  .sessions-status.status-running  { color: #4ade80; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); }
-  .sessions-status.status-idle     { color: var(--vtext); background: rgba(201,167,255,0.08); border: 1px solid rgba(201,167,255,0.18); }
+  .sessions-status.status-running  { color: var(--green); background: rgba(48,209,88,0.1); border: 1px solid rgba(48,209,88,0.2); }
+  .sessions-status.status-idle     { color: var(--vtext); background: rgba(180,170,235,0.08); border: 1px solid rgba(180,170,235,0.18); }
   .sessions-status.status-archived { color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
   .sessions-age {
     font-family: var(--mono);
@@ -664,10 +689,9 @@ const toolGates = [
     transition: background 0.18s ease, border-color 0.18s ease;
   }
   .harness-row:hover { background: rgba(20,16,32,0.7); }
-  .harness-row:focus-visible { outline: 2px solid #E8DBFF; outline-offset: 2px; }
   .harness-row.is-active {
-    background: rgba(142,61,255,0.14);
-    border-color: rgba(201,167,255,0.45);
+    background: rgba(154,142,205,0.14);
+    border-color: rgba(180,170,235,0.45);
   }
   .harness-logo {
     grid-area: logo;
@@ -690,7 +714,7 @@ const toolGates = [
     font-family: var(--mono);
     font-size: 1.125rem;
     font-weight: 700;
-    color: rgba(201,167,255,0.7);
+    color: rgba(180,170,235,0.7);
     line-height: 1;
     background: transparent;
   }
@@ -699,7 +723,7 @@ const toolGates = [
     border-color: rgba(255,255,255,0.08);
   }
   .harness-row.is-active .harness-logo {
-    box-shadow: 0 0 0 1px rgba(201,167,255,0.45), 0 0 12px rgba(142,61,255,0.25);
+    box-shadow: 0 0 0 1px rgba(180,170,235,0.45), 0 0 12px rgba(154,142,205,0.25);
   }
   .harness-name {
     grid-area: name;
@@ -714,7 +738,7 @@ const toolGates = [
     font-size: 0.5938rem;
     font-weight: 600;
     letter-spacing: 0.08em;
-    color: rgba(201,167,255,0.55);
+    color: rgba(180,170,235,0.55);
     text-transform: lowercase;
   }
   .harness-status {
@@ -727,8 +751,8 @@ const toolGates = [
     padding: 3px 8px;
     border-radius: 3px;
   }
-  .harness-status.status-active  { color: #4ade80;        background: rgba(74,222,128,0.1);  border: 1px solid rgba(74,222,128,0.2); }
-  .harness-status.status-idle    { color: var(--vtext);    background: rgba(201,167,255,0.08); border: 1px solid rgba(201,167,255,0.18); }
+  .harness-status.status-active  { color: var(--green);        background: rgba(48,209,88,0.1);  border: 1px solid rgba(48,209,88,0.2); }
+  .harness-status.status-idle    { color: var(--vtext);    background: rgba(180,170,235,0.08); border: 1px solid rgba(180,170,235,0.18); }
   .harness-status.status-adapter { color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); }
   .harness-meta {
     grid-area: meta;
@@ -740,7 +764,7 @@ const toolGates = [
   .harness-detail {
     margin-top: auto;
     padding-top: 12px;
-    border-top: 1px dashed rgba(142,61,255,0.18);
+    border-top: 1px dashed rgba(154,142,205,0.18);
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -751,12 +775,12 @@ const toolGates = [
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(201,167,255,0.55);
+    color: rgba(180,170,235,0.55);
   }
-  .harness-detail-text {
-    font-size: 0.7812rem !important;
-    line-height: 1.6 !important;
-    color: rgba(232,224,240,0.78) !important;
+  .howit-widget .harness-detail-text {
+    font-size: 0.7812rem;
+    line-height: 1.6;
+    color: rgba(232,224,240,0.78);
   }
 
   /* ── Tools widget ────────────────────────────────────────── */
@@ -767,7 +791,7 @@ const toolGates = [
   }
   .tool-pill {
     background: transparent;
-    border: 1px solid rgba(142,61,255,0.16);
+    border: 1px solid rgba(154,142,205,0.16);
     color: var(--muted);
     font-family: var(--mono);
     font-size: 0.625rem;
@@ -781,10 +805,9 @@ const toolGates = [
     transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
   }
   .tool-pill:hover { color: var(--white); }
-  .tool-pill:focus-visible { outline: 2px solid #E8DBFF; outline-offset: 2px; }
   .tool-pill.is-active {
-    background: rgba(142,61,255,0.18);
-    border-color: rgba(201,167,255,0.5);
+    background: rgba(154,142,205,0.18);
+    border-color: rgba(180,170,235,0.5);
     color: #fff;
   }
   .tool-flow {
@@ -802,40 +825,41 @@ const toolGates = [
     flex: 1;
     text-align: center;
     padding: 8px 6px;
-    border: 1px solid rgba(142,61,255,0.2);
+    border: 1px solid rgba(154,142,205,0.2);
     border-radius: 5px;
     color: rgba(232,224,240,0.75);
     background: rgba(5,4,9,0.5);
   }
   .tool-flow-step.tool-flow-gate {
     color: var(--vtext);
-    border-color: rgba(201,167,255,0.45);
-    background: rgba(142,61,255,0.1);
+    border-color: rgba(180,170,235,0.45);
+    background: rgba(154,142,205,0.1);
   }
   .tool-flow-arrow {
-    color: rgba(201,167,255,0.5);
+    color: rgba(180,170,235,0.5);
     font-size: 0.875rem;
   }
   .tool-rule {
     padding-top: 8px;
-    border-top: 1px dashed rgba(142,61,255,0.18);
+    border-top: 1px dashed rgba(154,142,205,0.18);
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
-  .tool-rule-title {
-    font-size: 0.8125rem !important;
+  .howit-widget .tool-rule-title {
+    font-size: 0.8125rem;
     font-weight: 700;
-    color: var(--white) !important;
+    color: var(--white);
   }
-  .tool-rule-text {
-    font-size: 0.7812rem !important;
-    line-height: 1.6 !important;
-    color: rgba(232,224,240,0.78) !important;
+  .howit-widget .tool-rule-text {
+    font-size: 0.7812rem;
+    line-height: 1.6;
+    color: rgba(232,224,240,0.78);
   }
 
   /* ── Responsive ──────────────────────────────────────────── */
   @media (max-width: 900px) {
+    .howit-stage { min-height: 0; }
     .howit-panel {
       grid-template-columns: 1fr;
       gap: 22px;
@@ -846,10 +870,13 @@ const toolGates = [
     .sessions-row .sessions-harness { display: none; }
   }
   @media (max-width: 520px) {
-    .howit-tabs { padding: 6px; gap: 2px; }
-    .howit-tab { padding: 7px 6px; font-size: 0.5625rem; letter-spacing: 0.08em; }
+    /* Tabs become a 2×2 grid instead of a cramped single row */
+    .howit-tabs { padding: 6px; gap: 6px; display: grid; grid-template-columns: 1fr 1fr; }
+    .howit-tab { padding: 12px 8px; font-size: 0.6875rem; letter-spacing: 0.06em; }
     .memory-scrubber { grid-template-columns: 1fr; }
-    .tool-flow-arrow { display: none; }
-    .tool-flow { gap: 4px; }
+    /* Tool flow stacks vertically; arrows rotate to stay visible (→ becomes ↓) */
+    .tool-flow { flex-direction: column; align-items: stretch; gap: 6px; }
+    .tool-flow-step { width: 100%; }
+    .tool-flow-arrow { transform: rotate(90deg); }
   }
 </style>
