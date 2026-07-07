@@ -58,20 +58,26 @@
     }, { passive: true });
   })();
 
-  // ── Hero card: live familiar state ────────────────────────
+  // ── Hero terminal: live summon session ────────────────────
   (function () {
-    var rows = document.querySelectorAll('.card-familiar[data-familiar]');
-    if (rows.length === 0) return;
-    var card       = document.querySelector('.hero-card');
-    var memBody    = document.querySelector('.hero-card-memory');
-    var memTitle   = document.querySelector('.memory-title');
-    var memNotes   = document.querySelectorAll('.memory-note');
-    var cliCmd     = document.querySelector('.card-cmd');
-    var motionOn   = document.documentElement.classList.contains('motion-on');
+    var tabs = document.querySelectorAll('.roster-tab[data-familiar]');
+    if (tabs.length === 0) return;
+    var card     = document.querySelector('.hero-card');
+    var output   = document.querySelector('.hero-card-output');
+    var sigilEl  = document.querySelector('[data-sigil]');
+    var nameEl   = document.querySelector('[data-name]');
+    var roleEl   = document.querySelector('[data-role]');
+    var countEl  = document.querySelector('[data-count]');
+    var memNotes = document.querySelectorAll('.memory-note');
+    var cliCmd   = document.querySelector('.card-cmd');
+    var motionOn = document.documentElement.classList.contains('motion-on');
 
     var FAMILIARS = {
       forge: {
         name: 'Forge',
+        sigil: 'F',
+        role: 'code steward · tools · git',
+        count: '128 notes · 47 days',
         command: 'coven attach forge --project ./opencoven',
         notes: [
           { text: 'resumed feat/runtime-attach · 4 files staged', meta: '2h ago' },
@@ -80,6 +86,9 @@
       },
       charm: {
         name: 'Charm',
+        sigil: 'C',
+        role: 'voice · social · presence',
+        count: '64 notes · 21 days',
         command: 'coven attach charm --voice on --thread design-sync',
         notes: [
           { text: 'drafted reply for #design-sync · awaiting review', meta: '12m ago' },
@@ -88,6 +97,9 @@
       },
       sage: {
         name: 'Sage',
+        sigil: 'S',
+        role: 'research · docs · long context',
+        count: '203 notes · 65 days',
         command: 'coven attach sage --context ./docs --long',
         notes: [
           { text: 'loaded 4 docs into context · 18k tokens', meta: '40m ago' },
@@ -100,13 +112,6 @@
     var userTook = false;
     var rotateTimer = null;
     var typeTimer = null;
-
-    function setBadge(badge, isActive) {
-      if (!badge) return;
-      badge.textContent = isActive ? 'active' : 'idle';
-      badge.classList.toggle('badge-active', isActive);
-      badge.classList.toggle('badge-idle', !isActive);
-    }
 
     function typeCommand(cmd) {
       if (typeTimer) { clearTimeout(typeTimer); typeTimer = null; }
@@ -122,8 +127,11 @@
       step();
     }
 
-    function paintNotes(data) {
-      if (memTitle) memTitle.textContent = 'memory · ' + data.name.toLowerCase();
+    function paintOutput(data) {
+      if (sigilEl) sigilEl.textContent = data.sigil;
+      if (nameEl)  nameEl.textContent = data.name;
+      if (roleEl)  roleEl.textContent = data.role;
+      if (countEl) countEl.textContent = data.count;
       for (var i = 0; i < memNotes.length; i++) {
         var note = data.notes[i];
         if (!note) continue;
@@ -137,30 +145,28 @@
     function applyFamiliar(id, animate) {
       if (!FAMILIARS[id]) return;
       current = id;
-      rows.forEach(function (row) {
-        var isActive = row.getAttribute('data-familiar') === id;
-        row.classList.toggle('active', isActive);
-        row.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        row.setAttribute('tabindex', isActive ? '0' : '-1');
-        setBadge(row.querySelector('.familiar-badge'), isActive);
+      tabs.forEach(function (tab) {
+        var isActive = tab.getAttribute('data-familiar') === id;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        tab.setAttribute('tabindex', isActive ? '0' : '-1');
       });
       var data = FAMILIARS[id];
-      if (animate && memBody && motionOn) {
-        memBody.classList.add('memory-swap');
+      if (animate && output && motionOn) {
+        output.classList.add('memory-swap');
         setTimeout(function () {
-          paintNotes(data);
-          memBody.classList.remove('memory-swap');
+          paintOutput(data);
+          output.classList.remove('memory-swap');
         }, 200);
       } else {
-        paintNotes(data);
+        paintOutput(data);
       }
       typeCommand(data.command);
     }
 
     function rotate() {
       var idx = order.indexOf(current);
-      var next = order[(idx + 1) % order.length];
-      applyFamiliar(next, true);
+      applyFamiliar(order[(idx + 1) % order.length], true);
     }
     function startRotate() {
       if (userTook) return;
@@ -171,19 +177,22 @@
       if (rotateTimer) { clearInterval(rotateTimer); rotateTimer = null; }
     }
 
-    rows.forEach(function (row) {
-      row.addEventListener('click', function () {
+    tabs.forEach(function (tab, i) {
+      tab.addEventListener('click', function () {
         userTook = true;
         stopRotate();
-        applyFamiliar(row.getAttribute('data-familiar'), true);
+        applyFamiliar(tab.getAttribute('data-familiar'), true);
       });
-      row.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          userTook = true;
-          stopRotate();
-          applyFamiliar(row.getAttribute('data-familiar'), true);
-        }
+      // Roving tabindex + arrow keys (standard tablist keyboard pattern)
+      tab.addEventListener('keydown', function (e) {
+        var dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!dir) return;
+        e.preventDefault();
+        var next = tabs[(i + dir + tabs.length) % tabs.length];
+        userTook = true;
+        stopRotate();
+        applyFamiliar(next.getAttribute('data-familiar'), true);
+        next.focus();
       });
     });
 
@@ -223,10 +232,10 @@
 
   // ── Download CTA: detect visitor's platform ─────────────────
   //
-  // Promotes the matching button to the visually-primary slot and
-  // updates the headline. Works fully without JS — every link is
-  // a real <a href> with the canonical destination — this just
-  // adds visual emphasis.
+  // Rewrites the single primary button's label/sub/href to match the
+  // visitor's platform and hides that platform from the "also on" row.
+  // Works fully without JS — the primary defaults to macOS and every
+  // alt link is a real <a href> — this only retargets the emphasis.
   //
   // Detection order:
   //   1. UA-string OS markers (most intentional; matches UA overrides)
@@ -237,10 +246,13 @@
     var cta = document.querySelector('[data-download-cta]');
     if (!cta) return;
 
-    var headingEl = cta.querySelector('[data-download-platform]');
+    var primary = cta.querySelector('[data-download-primary]');
+    var labelEl = cta.querySelector('[data-download-label]');
     var subEl = cta.querySelector('[data-download-sub]');
-    var buttons = cta.querySelectorAll('.download-btn');
-    if (!buttons.length) return;
+    if (!primary) return;
+
+    var releasesUrl = cta.getAttribute('data-releases-url');
+    var testflightUrl = cta.getAttribute('data-testflight-url');
 
     var ua = navigator.userAgent || '';
     var rawPlatform = (navigator.platform || '').toLowerCase();
@@ -285,31 +297,37 @@
     }
 
     var COPY = {
-      mac:   { name: 'CovenCave for macOS', sub: "We detected macOS — your one-click download is highlighted below." },
-      ios:   { name: 'CovenCave for iPhone & iPad', sub: "We detected an iOS device — join the TestFlight beta below." },
-      win:   { name: 'CovenCave for Windows', sub: "We detected Windows — your one-click installer is highlighted below." },
-      linux: { name: 'CovenCave for Linux',   sub: "We detected Linux — your one-click AppImage is highlighted below." },
+      mac:   { label: 'Download for macOS',   sub: 'CovenCave · .dmg · signed · free',      href: releasesUrl },
+      win:   { label: 'Download for Windows', sub: 'CovenCave · .msi · signed · free',      href: releasesUrl },
+      linux: { label: 'Download for Linux',   sub: 'CovenCave · .AppImage · x86_64 · free', href: releasesUrl },
+      ios:   { label: 'Get the iOS beta',     sub: 'CovenCave · TestFlight · iPhone & iPad', href: testflightUrl },
     };
 
     var copy = COPY[detected] || COPY.mac;
-    if (headingEl) headingEl.textContent = copy.name;
+    if (labelEl) labelEl.textContent = copy.label;
     if (subEl) subEl.textContent = copy.sub;
+    if (copy.href) primary.setAttribute('href', copy.href);
+    primary.setAttribute('data-platform', detected);
+    if (detected === 'ios') {
+      primary.setAttribute('target', '_blank');
+      primary.setAttribute('rel', 'noopener noreferrer');
+    }
 
-    // Promote the matching button to .is-primary. Desktop platforms move to
-    // the top; TestFlight stays in the bottom full-width row.
-    var primary = null;
-    buttons.forEach(function (btn) {
-      btn.classList.remove('is-primary');
-      if (btn.getAttribute('data-platform') === detected) {
-        primary = btn;
-      }
+    // Drop the detected platform from the "also on" row (it's now the
+    // primary) and re-list macOS in its place when the visitor isn't
+    // on a Mac, so all four platforms stay one click away.
+    cta.querySelectorAll('.download-alt[data-alt-platform]').forEach(function (a) {
+      a.classList.toggle('is-detected', a.getAttribute('data-alt-platform') === detected);
     });
-
-    if (primary && detected !== 'ios') {
-      // Emphasize the detected platform in place (violet fill). We no longer
-      // move it or span it full-width — the download row stays a stable
-      // single line of four so the hero height is predictable (no-scroll).
-      primary.classList.add('is-primary');
+    if (detected !== 'mac' && releasesUrl) {
+      var macAlt = document.createElement('a');
+      macAlt.className = 'download-alt';
+      macAlt.setAttribute('data-alt-platform', 'mac');
+      macAlt.href = releasesUrl;
+      macAlt.textContent = 'macOS';
+      var altsRow = cta.querySelector('.download-alts');
+      var kicker = altsRow && altsRow.querySelector('.download-alts-kicker');
+      if (kicker) kicker.insertAdjacentElement('afterend', macAlt);
     }
 
     // Stamp the resolved platform on the cta for analytics / debug.
