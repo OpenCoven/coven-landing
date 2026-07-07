@@ -1,18 +1,21 @@
 ---
-// Comparison strip: Coven vs. Raw harness vs. Other agent tools.
-// Click any row to expand its detail panel below the matrix.
+// Capability comparison: Coven vs. a raw harness vs. other agent tools.
+// A grid-of-lanes (not a <table>): every verdict is a labelled pill, each
+// lane carries an always-visible takeaway, and each lane expands its own
+// deep-dive independently. Reflows to stacked cards on mobile.
 
 const columns = [
-  { id: 'raw',    label: 'Raw harness',   sub: 'Claude Code, Codex direct' },
-  { id: 'other',  label: 'Other tools',   sub: 'IDE-bound agents, suites' },
-  { id: 'coven',  label: 'Coven',         sub: 'recommended runtime', badge: 'Best fit', highlight: true },
+  { id: 'raw',   label: 'Raw harness', sub: 'Claude Code, Codex direct' },
+  { id: 'other', label: 'Other tools', sub: 'IDE-bound agents, suites' },
+  { id: 'coven', label: 'Coven',       sub: 'recommended runtime', badge: 'Best fit', highlight: true },
 ];
 
-// status values: 'yes' | 'partial' | 'no'
+// status values: 'yes' | 'partial' | 'no'  (rendered Yes / Limited / No)
 const rows = [
   {
     id: 'memory',
     label: 'Cross-session memory',
+    take: 'Notes persist and resurface in the next session',
     cells: { raw: 'no', other: 'partial', coven: 'yes' },
     detail:
       'Raw harnesses lose state when the chat ends; most other tools save chat history but not curated working memory per familiar. Coven stores explicit notes that persist and surface in the next session.',
@@ -20,6 +23,7 @@ const rows = [
   {
     id: 'scope',
     label: 'Project-scoped boundary',
+    take: 'Every session bound to one project record',
     cells: { raw: 'partial', other: 'partial', coven: 'yes' },
     detail:
       'Most tools assume the current directory and trust you to remember. Coven binds every session to a project record — filesystem, git, terminals, and docs all scoped to that root.',
@@ -27,6 +31,7 @@ const rows = [
   {
     id: 'multi',
     label: 'Multi-harness through one interface',
+    take: 'Codex, Claude Code, and more through one adapter',
     cells: { raw: 'no', other: 'partial', coven: 'yes' },
     detail:
       'A raw harness only knows itself; suites bundle one or two. Coven exposes a neutral adapter contract so Codex, Claude Code, and future CLIs all run the same way.',
@@ -34,6 +39,7 @@ const rows = [
   {
     id: 'tools',
     label: 'Inspectable tool contracts',
+    take: 'One auditable gateway — fs, git, exec, web',
     cells: { raw: 'partial', other: 'partial', coven: 'yes' },
     detail:
       'Each harness has its own permission model and prompt style. Coven funnels every tool call through one auditable gateway: fs, git, exec, web — same contract, visible logs.',
@@ -41,6 +47,7 @@ const rows = [
   {
     id: 'resume',
     label: 'Detach and resume any time',
+    take: 'Detach, reboot, resume the live session',
     cells: { raw: 'no', other: 'partial', coven: 'yes' },
     detail:
       'Raw harness sessions die with their terminal. Coven keeps the PTY alive in the runtime, so you can detach, reboot, and pick up exactly where the agent left off.',
@@ -48,342 +55,244 @@ const rows = [
   {
     id: 'open',
     label: 'Open framework, locally owned',
+    take: 'Read it, swap the adapter, own it locally',
     cells: { raw: 'yes', other: 'no', coven: 'yes' },
     detail:
       "Raw harnesses already run locally; SaaS suites don't. Coven is open and inspectable end-to-end — you can read what it runs, swap the adapter, or replace the gateway.",
   },
 ];
+
+const verdict = { yes: 'Yes', partial: 'Limited', no: 'No' };
 ---
 
-<section class="compare-section content-section" id="compare" aria-labelledby="compare-heading">
+<section class="cmp content-section" id="compare" aria-labelledby="cmp-heading">
   <div class="section-header" data-reveal>
     <p class="section-kicker">Compare</p>
-    <h2 id="compare-heading">Why Coven, not just a harness?</h2>
-    <p>Same agent CLIs, different runtime around them. Pick a row to see how each option actually behaves.</p>
+    <h2 id="cmp-heading">Why Coven, not just a harness?</h2>
+    <p>Same agent CLIs, different runtime around them. Open a capability to see how each option actually behaves.</p>
   </div>
 
-  <div class="compare-frame" data-reveal>
-    <table class="compare-table" aria-describedby="compare-heading">
-      <thead>
-        <tr>
-          <th scope="col" class="compare-th-spacer"><span class="sr-only">Capability</span></th>
-          {columns.map((c) => (
-            <th
-              scope="col"
-              class={`compare-col-head${c.highlight ? ' is-highlight' : ''}`}
-            >
-              {c.badge && <span class="compare-col-badge">{c.badge}</span>}
-              <span class="compare-col-label">{c.label}</span>
-              <span class="compare-col-sub">{c.sub}</span>
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((r, i) => (
-          <tr
-            class={`compare-row${i === 0 ? ' is-selected' : ''}`}
-            data-row={r.id}
-          >
-            <th scope="row" class="compare-row-label">
-              <button
-                class="compare-row-button"
-                type="button"
-                data-row-button
-                aria-pressed={i === 0 ? 'true' : 'false'}
-              >{r.label}</button>
-            </th>
-            {columns.map((c) => {
-              const v = r.cells[c.id];
-              const symbol = v === 'yes' ? '✓' : v === 'partial' ? '−' : '✗';
-              const aria = v === 'yes' ? 'Yes' : v === 'partial' ? 'Partial' : 'No';
-              return (
-                <td class={`compare-cell cell-${v}${c.highlight ? ' is-highlight' : ''}`}>
-                  <span class="compare-mark" aria-label={aria}>{symbol}</span>
-                </td>
-              );
-            })}
-          </tr>
+  <div class="cmp-frame panel" data-reveal>
+    <div class="cmp-matrix">
+      <div class="cmp-head">
+        <div class="cmp-corner"><span class="sr-only">Capability</span></div>
+        {columns.map((c) => (
+          <div class:list={["cmp-colhead", { "is-coven": c.highlight }]}>
+            {c.badge && <span class="cmp-badge">{c.badge}</span>}
+            <span class="cmp-colhead-label">{c.label}</span>
+            <span class="cmp-colhead-sub">{c.sub}</span>
+          </div>
         ))}
-      </tbody>
-    </table>
+      </div>
 
-    <div class="compare-detail" aria-live="polite">
-      <p class="compare-detail-kicker">
-        <span class="compare-detail-dot"></span>
-        <span class="compare-detail-tag">{rows[0].label}</span>
-      </p>
-      <p class="compare-detail-text">{rows[0].detail}</p>
+      {rows.map((r, i) => (
+        <div class="cmp-lane" data-lane={r.id}>
+          <button
+            class="cmp-toggle"
+            type="button"
+            id={`cmp-t-${r.id}`}
+            aria-controls={`cmp-d-${r.id}`}
+            aria-expanded={i === 0 ? 'true' : 'false'}
+          >
+            <span class="cmp-toggle-main">
+              <span class="cmp-lane-title">{r.label}</span>
+              <span class="cmp-lane-take">{r.take}</span>
+            </span>
+            <svg class="cmp-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
+          </button>
+          {columns.map((c) => {
+            const v = r.cells[c.id];
+            return (
+              <div class:list={["cmp-cell", { "is-coven": c.highlight }]}>
+                <span class="cmp-opt">{c.label}</span>
+                <span class={`cmp-pill is-${v}`} aria-label={`${c.label} — ${verdict[v]}`}>{verdict[v]}</span>
+              </div>
+            );
+          })}
+          <div
+            class:list={["cmp-detail", { "is-open": i === 0 }]}
+            id={`cmp-d-${r.id}`}
+            role="region"
+            aria-labelledby={`cmp-t-${r.id}`}
+          >
+            <div class="cmp-detail-inner"><p>{r.detail}</p></div>
+          </div>
+        </div>
+      ))}
     </div>
   </div>
 </section>
 
-<script is:inline define:vars={{ rows }}>
-  window.__COMPARE__ = rows;
-</script>
-
 <script>
   (function () {
-    const root = document.querySelector('.compare-section');
+    const root = document.querySelector('.cmp');
     if (!root) return;
-    const rows = root.querySelectorAll('.compare-row');
-    const buttons = root.querySelectorAll('.compare-row-button');
-    const tagEl = root.querySelector('.compare-detail-tag');
-    const textEl = root.querySelector('.compare-detail-text');
-    const data = window.__COMPARE__ || [];
+    const toggles = Array.from(root.querySelectorAll('.cmp-toggle'));
 
-    function select(row) {
-      rows.forEach((r) => r.classList.toggle('is-selected', r === row));
-      buttons.forEach((b) => {
-        const match = b.closest('.compare-row') === row;
-        b.setAttribute('aria-pressed', match ? 'true' : 'false');
-      });
-      const id = row.getAttribute('data-row');
-      const entry = data.find((d) => d.id === id);
-      if (entry && tagEl)  tagEl.textContent  = entry.label;
-      if (entry && textEl) textEl.textContent = entry.detail;
+    function setOpen(btn, open) {
+      const detail = document.getElementById(btn.getAttribute('aria-controls'));
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (detail) detail.classList.toggle('is-open', open);
     }
 
-    // Mouse: anywhere on the row activates the row's select button.
-    rows.forEach((row) => {
-      row.addEventListener('click', (e) => {
-        // Skip if the click was on the button itself — its own handler fires.
-        if (e.target.closest('.compare-row-button')) return;
-        select(row);
+    toggles.forEach((btn, i) => {
+      // Each lane toggles only itself — multiple can stay open at once.
+      btn.addEventListener('click', () => {
+        setOpen(btn, btn.getAttribute('aria-expanded') !== 'true');
       });
-    });
-
-    // Keyboard: real <button> handles Enter/Space natively; we add arrow nav.
-    const order = Array.from(buttons);
-    buttons.forEach((btn) => {
-      const row = btn.closest('.compare-row');
-      btn.addEventListener('click', () => select(row));
+      // Arrow keys move between lane toggles; Enter/Space toggle natively.
       btn.addEventListener('keydown', (e) => {
-        const i = order.indexOf(btn);
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          const next = order[Math.min(i + 1, order.length - 1)];
-          next.focus(); select(next.closest('.compare-row'));
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          const prev = order[Math.max(i - 1, 0)];
-          prev.focus(); select(prev.closest('.compare-row'));
-        } else if (e.key === 'Home') {
-          e.preventDefault();
-          order[0].focus(); select(order[0].closest('.compare-row'));
-        } else if (e.key === 'End') {
-          e.preventDefault();
-          order[order.length - 1].focus();
-          select(order[order.length - 1].closest('.compare-row'));
-        }
+        if (e.key === 'ArrowDown') { e.preventDefault(); toggles[Math.min(i + 1, toggles.length - 1)].focus(); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); toggles[Math.max(i - 1, 0)].focus(); }
+        else if (e.key === 'Home') { e.preventDefault(); toggles[0].focus(); }
+        else if (e.key === 'End') { e.preventDefault(); toggles[toggles.length - 1].focus(); }
       });
+      // Normalize state to match markup (first open, rest closed).
+      setOpen(btn, i === 0);
     });
   })();
 </script>
 
 <style>
-  .sr-only {
-    position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px; overflow: hidden;
-    clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  .cmp-frame { position: relative; }
+
+  /* Grid pseudo-table: lanes use display:contents so their children align
+     to these columns; the detail spans the full width beneath. */
+  .cmp-matrix {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) repeat(3, minmax(92px, 0.9fr));
+    row-gap: 0;
+  }
+  .cmp-head, .cmp-lane { display: contents; }
+
+  /* ── Column headers ── */
+  .cmp-corner { border-bottom: 1px solid rgba(154, 142, 205, 0.16); }
+  .cmp-colhead {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 16px 12px 14px; text-align: center;
+    border-bottom: 1px solid rgba(154, 142, 205, 0.16);
+  }
+  .cmp-colhead-label { font-size: 12.5px; font-weight: 700; color: var(--white); }
+  .cmp-colhead-sub { font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; color: var(--muted); }
+  .cmp-badge {
+    font-family: var(--mono); font-size: 8px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--vtext);
+    background: rgba(154, 142, 205, 0.18);
+    border: 1px solid rgba(154, 142, 205, 0.35);
+    border-radius: 999px; padding: 2px 8px; margin-bottom: 2px;
   }
 
-  .compare-frame {
-    border: 1px solid var(--border-v);
-    border-radius: var(--radius-lg);
-    background: linear-gradient(180deg, rgba(14,11,22,0.7) 0%, rgba(5,4,9,0.5) 100%);
-    overflow: hidden;
+  /* ── Coven rail: one continuous highlighted band, header → last cell ── */
+  .cmp-colhead.is-coven,
+  .cmp-cell.is-coven {
+    background: linear-gradient(180deg, rgba(154, 142, 205, 0.14), rgba(154, 142, 205, 0.05));
+    border-left: 1px solid rgba(154, 142, 205, 0.30);
+    border-right: 1px solid rgba(154, 142, 205, 0.30);
   }
+  .cmp-colhead.is-coven { border-top: 1px solid rgba(154, 142, 205, 0.30); border-bottom-color: rgba(154, 142, 205, 0.30); }
+  .cmp-lane:last-child .cmp-cell.is-coven { border-bottom: 1px solid rgba(154, 142, 205, 0.30); }
 
-  .compare-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
+  /* ── Lane toggle (col 1) ── */
+  .cmp-toggle {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    width: 100%; text-align: left; cursor: pointer;
+    background: transparent; border: none;
+    padding: 15px 18px;
+    border-bottom: 1px solid rgba(154, 142, 205, 0.08);
+    transition: background var(--dur-ui) ease;
   }
-  .compare-table thead th {
-    text-align: left;
-    padding: 18px 16px 14px;
-    font-weight: 500;
-    border-bottom: 1px solid rgba(154,142,205,0.16);
+  .cmp-toggle-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .cmp-lane-title { font-size: 13.5px; font-weight: 600; color: var(--white); }
+  .cmp-lane-take { font-size: 12px; line-height: 1.4; color: var(--oc-text-muted); }
+  .cmp-chevron { width: 14px; height: 14px; flex: 0 0 auto; color: var(--muted); transition: transform var(--dur-ui) ease; }
+  .cmp-toggle[aria-expanded='true'] .cmp-chevron { transform: rotate(180deg); color: var(--vtext); }
+
+  /* ── Verdict cells (cols 2–4) ── */
+  .cmp-cell {
+    display: flex; align-items: center; justify-content: center;
+    padding: 15px 8px;
+    border-bottom: 1px solid rgba(154, 142, 205, 0.08);
   }
-  .compare-th-spacer { width: 38%; }
-  .compare-col-head {
-    width: calc(62% / 3);
+  .cmp-opt { display: none; } /* shown only in the mobile card layout */
+  .cmp-pill {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 60px; padding: 4px 11px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.01em;
+    border-radius: 999px; border: 1px solid transparent;
+  }
+  /* Colourblind-safe: distinct text + border-style, not hue alone */
+  .cmp-pill.is-yes {
+    color: var(--green);
+    background: rgba(48, 209, 88, 0.10);
+    border-color: rgba(48, 209, 88, 0.30);
+  }
+  .cmp-pill.is-partial {
+    color: var(--coven-violet-light);
+    background: rgba(154, 142, 205, 0.10);
+    border-color: rgba(154, 142, 205, 0.28);
+  }
+  .cmp-pill.is-no {
     color: var(--muted);
-    border-left: 1px solid rgba(255,255,255,0.04);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.18);
   }
-  /* Coven highlight column — clearly branded */
-  .compare-col-head.is-highlight {
-    color: var(--coven-violet-light);
-    background: linear-gradient(180deg, rgba(154,142,205,0.16) 0%, rgba(154,142,205,0.06) 100%);
-    border-left: 1px solid rgba(154,142,205,0.35);
-    border-right: 1px solid rgba(154,142,205,0.35);
-    box-shadow: inset 0 0 24px rgba(154,142,205,0.06);
-  }
-  .compare-col-badge {
-    display: inline-block;
-    margin-bottom: 6px;
-    padding: 2px 8px;
-    background: rgba(154,142,205,0.18);
-    border: 1px solid rgba(154,142,205,0.35);
-    border-radius: 999px;
-    font-family: var(--mono);
-    font-size: 9px;
+  .cmp-cell.is-coven .cmp-pill.is-yes {
     font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--coven-violet-light);
-  }
-  .compare-col-label {
-    display: block;
-    font-family: var(--font-ui);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0;
-  }
-  .compare-col-head.is-highlight .compare-col-label {
-    color: var(--white);
-    font-size: 14px;
-  }
-  .compare-col-sub {
-    display: block;
-    margin-top: 4px;
-    font-family: var(--mono);
-    font-size: 9.5px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    color: rgba(255,255,255,0.42);
-    text-transform: lowercase;
-  }
-  .compare-col-head.is-highlight .compare-col-sub {
-    color: var(--coven-violet-light);
-    opacity: 0.75;
+    box-shadow: 0 0 10px rgba(48, 209, 88, 0.22);
   }
 
-  .compare-row {
-    cursor: pointer;
-    outline: none;
-    transition: background 0.18s ease;
+  /* ── Per-lane detail: animated grid-rows disclosure (motion-gated) ── */
+  .cmp-detail {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-rows: 1fr; /* no-JS: open */
   }
-  .compare-row th,
-  .compare-row td {
-    padding: 14px 16px;
-    border-top: 1px solid rgba(255,255,255,0.04);
-    vertical-align: middle;
+  :global(.js-on) .cmp-detail {
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--dur-ui) ease;
   }
-  .compare-row td { text-align: center; border-left: 1px solid rgba(255,255,255,0.04); }
-  .compare-row td.is-highlight {
-    border-left: 1px solid rgba(154,142,205,0.22);
-    border-right: 1px solid rgba(154,142,205,0.22);
-    background: rgba(154,142,205,0.05);
-  }
-  .compare-row-label {
-    text-align: left;
-    font-weight: 600;
-    color: var(--white);
-  }
-  .compare-row-button {
-    appearance: none;
-    background: transparent;
-    border: 0;
-    padding: 0;
-    margin: 0;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-    width: 100%;
-    outline: none;
-  }
-  .compare-row-button:focus-visible {
-    outline: 2px solid var(--coven-violet-light);
-    outline-offset: 4px;
-    border-radius: var(--radius-sm);
-  }
-  .compare-row:hover { background: rgba(154,142,205,0.04); }
-  .compare-row.is-selected {
-    background: rgba(154,142,205,0.08);
-  }
-  .compare-row.is-selected td.is-highlight {
-    background: rgba(154,142,205,0.14);
-  }
-  /* Selected row: Coven cell gets a stronger glow */
-  .compare-row.is-selected td.is-highlight .compare-mark {
-    box-shadow: 0 0 12px rgba(74,222,128,0.3);
+  :global(.js-on) .cmp-detail.is-open { grid-template-rows: 1fr; }
+  .cmp-detail-inner { overflow: hidden; min-height: 0; }
+  .cmp-detail-inner p {
+    padding: 4px 18px 18px;
+    font-size: 13px; line-height: 1.6;
+    color: var(--oc-text-muted);
+    max-width: 68ch;
   }
 
-  .compare-mark {
-    display: inline-grid;
-    place-items: center;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    font-size: 14px;
-    font-weight: 700;
-  }
-  .cell-yes .compare-mark {
-    color: #4ade80;
-    background: rgba(74,222,128,0.10);
-    border: 1px solid rgba(74,222,128,0.28);
-  }
-  .cell-partial .compare-mark {
-    color: var(--coven-violet-light);
-    background: rgba(154,142,205,0.08);
-    border: 1px solid rgba(154,142,205,0.22);
-  }
-  .cell-no .compare-mark {
-    color: rgba(255,255,255,0.42);
-    background: rgba(255,255,255,0.03);
-    border: 1px dashed rgba(255,255,255,0.18);
-  }
-  /* Coven column: yes marks get branded tint */
-  .is-highlight .cell-yes .compare-mark,
-  td.is-highlight .compare-mark {
-    box-shadow: 0 0 8px rgba(74,222,128,0.2);
+  @media (hover: hover) {
+    .cmp-toggle:hover { background: rgba(154, 142, 205, 0.05); }
+    .cmp-toggle:hover .cmp-lane-title { color: #fff; }
   }
 
-  .compare-detail {
-    padding: 18px 22px 22px;
-    border-top: 1px solid rgba(154,142,205,0.14);
-    background: rgba(5,4,9,0.45);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .compare-detail-kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(180,170,235,0.6);
-  }
-  .compare-detail-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--coven-violet-light);
-    box-shadow: 0 0 8px rgba(154,142,205,0.5);
-  }
-  .compare-detail-text {
-    font-size: 13.5px;
-    line-height: 1.7;
-    color: rgba(232,224,240,0.78);
-  }
-
+  /* ── Mobile: reflow to stacked capability cards (not a shrunk table) ── */
   @media (max-width: 720px) {
-    .compare-table { font-size: 12px; }
-    .compare-th-spacer { width: 44%; }
-    .compare-col-sub { display: none; }
-    .compare-col-badge { display: none; }
-    .compare-row th, .compare-row td { padding: 11px 8px; }
-    .compare-row-label { font-size: 12px; }
-    .compare-mark { width: 22px; height: 22px; font-size: 12px; }
-    .compare-detail { padding: 16px 18px; }
-    .compare-detail-text { font-size: 12.5px; }
+    .cmp-matrix { display: block; }
+    .cmp-head { display: none; }
+    .cmp-lane {
+      display: block;
+      border: 1px solid var(--border-v);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .cmp-lane:last-child { margin-bottom: 0; }
+    .cmp-toggle { border-bottom: 1px solid rgba(154, 142, 205, 0.12); }
+    .cmp-cell {
+      justify-content: space-between;
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(154, 142, 205, 0.06);
+      border-left: none; border-right: none;
+    }
+    .cmp-cell.is-coven {
+      background: rgba(154, 142, 205, 0.10);
+      border-left: 2px solid rgba(154, 142, 205, 0.45);
+    }
+    .cmp-opt { display: inline; font-size: 12px; color: var(--muted); }
+    .cmp-detail { display: block; grid-template-rows: none; }
+    :global(.js-on) .cmp-detail { display: none; }
+    :global(.js-on) .cmp-detail.is-open { display: block; }
+    .cmp-detail-inner p { padding: 12px 16px 14px; }
   }
 </style>
