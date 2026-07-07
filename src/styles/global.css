@@ -1033,8 +1033,11 @@
     }
     .qs-step {
       display: grid;
-      grid-template-columns: 40px 1fr;
+      /* minmax(0,1fr): the nowrap codeblock must scroll internally,
+         never widen the step or the page on phones */
+      grid-template-columns: 40px minmax(0, 1fr);
       column-gap: 20px;
+      min-width: 0;
       padding-bottom: 16px;
     }
     .qs-step:last-child { padding-bottom: 0; }
@@ -1080,6 +1083,7 @@
       border-radius: var(--radius-lg);
       padding: 18px 20px 20px;
       display: flex; flex-direction: column; gap: 12px;
+      min-width: 0; /* codeblock scrolls internally instead of widening */
       transition: box-shadow var(--dur-ui) ease, border-color var(--dur-ui) ease, transform var(--dur-ui) ease;
     }
     .qs-step-kicker {
@@ -1181,10 +1185,35 @@
       .qs-copy:active { transform: translateY(-50%) scale(0.94); }
     }
     @media (max-width: 520px) {
-      .qs-step { grid-template-columns: 34px 1fr; column-gap: 14px; }
+      .qs-step { grid-template-columns: 34px minmax(0, 1fr); column-gap: 14px; }
       .qs-node { width: 30px; height: 30px; font-size: 12px; }
       .qs-step:not(:last-child) .qs-rail::before { top: 30px; }
       .qs-body { padding: 16px 16px 18px; }
+    }
+
+    /* Desktop: the stepper counts horizontally, left to right — three
+       equal columns, node above each card, connector running 01 → 02 → 03. */
+    @media (min-width: 901px) {
+      .qs-steps {
+        max-width: none;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+      }
+      .qs-step {
+        grid-template-columns: none;
+        grid-template-rows: auto 1fr;
+        row-gap: 16px;
+        padding-bottom: 0;
+      }
+      .qs-rail { justify-content: flex-start; }
+      .qs-step:not(:last-child) .qs-rail::before {
+        top: 50%; bottom: auto;
+        transform: translateY(-50%);
+        left: 34px; right: -24px;
+        width: auto; height: 1.5px;
+        background: linear-gradient(90deg, rgba(154,142,205,0.12) 0%, rgba(180,170,235,0.55) 100%);
+      }
     }
 
     /* ── ECOSYSTEM / ARRIVAL SECTION ─────────────────────────
@@ -1196,26 +1225,36 @@
       padding: 72px 32px;
       border-top: 1px solid var(--border);
     }
-    /* Surface comes from .panel.panel--arrival; this rule owns only layout */
+    /* Surface comes from .panel.panel--arrival; this rule owns only layout.
+       Header on top, then one balanced grid: the Discord CTA as a tall
+       featured card (col 1, both rows) + the 2×2 destination portals. */
     .ecosystem-inner {
-      display: grid;
-      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-      gap: 48px; align-items: center;
+      display: flex; flex-direction: column;
+      gap: 36px;
       padding: 48px 56px;
     }
-    .ecosystem-lead { display: flex; flex-direction: column; gap: 28px; }
-    .ecosystem-lead .section-header { margin-bottom: 0; }
-    .ecosystem-inner h2 { max-width: 640px; }
-    .ecosystem-lead p {
+    .ecosystem-inner .section-header { margin-bottom: 0; }
+    .ecosystem-inner .section-header p {
       font-size: 16px; line-height: 1.65;
-      color: var(--muted); max-width: 46ch;
+      color: var(--muted); max-width: 60ch;
     }
 
-    /* Dominant CTA — Join the Coven (Discord), echoing the header button */
+    .ecosystem-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .ecosystem-grid > li { display: flex; min-width: 0; }
+    .eco-featured { grid-row: span 2; }
+
+    /* Featured CTA — Join the Coven (Discord), a full-height violet card */
     .eco-cta {
-      display: inline-flex; align-items: center; gap: 12px;
-      align-self: flex-start;
-      padding: 12px 20px;
+      position: relative;
+      display: flex; flex-direction: column; justify-content: center;
+      gap: 14px;
+      width: 100%;
+      padding: 24px 26px;
       border-radius: var(--radius-md);
       text-decoration: none;
       background: linear-gradient(135deg, var(--violet-cta) 0%, #553f9a 100%);
@@ -1224,18 +1263,16 @@
       box-shadow: 0 8px 24px -8px rgba(109,91,175,0.65), 0 0 0 1px rgba(255,255,255,0.06) inset;
       transition: transform var(--dur-ui) ease, box-shadow var(--dur-ui) ease, background var(--dur-ui) ease;
     }
-    .eco-cta-icon { flex: 0 0 auto; display: grid; place-items: center; }
-    .eco-cta-icon svg { width: 22px; height: 17px; fill: currentColor; }
-    .eco-cta-text { display: flex; flex-direction: column; gap: 2px; text-align: left; }
-    .eco-cta-title { font-size: 14px; font-weight: 700; letter-spacing: 0.01em; }
-    .eco-cta-sub { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.75); }
-
-    /* Destination portal cards (built on .panel-inset.is-card) */
-    .ecosystem-portals {
-      list-style: none;
-      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+    .eco-cta-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; background: rgba(255,255,255,0.12); }
+    .eco-cta-icon svg { width: 24px; height: 19px; fill: currentColor; }
+    .eco-cta-text { display: flex; flex-direction: column; gap: 4px; text-align: left; }
+    .eco-cta-title { font-size: 17px; font-weight: 700; letter-spacing: 0.01em; }
+    .eco-cta-sub { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.78); line-height: 1.5; }
+    .eco-cta-cue {
+      position: absolute; top: 18px; right: 20px;
+      font-size: 15px; color: rgba(255,255,255,0.7);
+      transition: transform var(--dur-ui) ease, color var(--dur-ui) ease;
     }
-    .ecosystem-portals > li { display: flex; }
     .eco-portal {
       display: flex; align-items: flex-start; gap: 12px;
       width: 100%;
@@ -1423,11 +1460,14 @@
          with other sections instead of double-indenting */
       .ecosystem-section { padding: 48px 0; }
       .ecosystem-inner {
-        grid-template-columns: 1fr;
         padding: 32px 20px; gap: 28px;
         border-radius: 0;
         border-left: none; border-right: none;
       }
+      /* Featured CTA rides on top, portals 2-up beneath */
+      .ecosystem-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .eco-featured { grid-row: auto; grid-column: 1 / -1; }
+      .eco-cta { padding: 20px 22px; }
 
       /* Footer */
       .footer-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
@@ -1521,7 +1561,7 @@
       .testimonial-quote { font-size: 16px; }
       .section-header { margin-bottom: 32px; }
       .ecosystem-inner { padding: 24px 20px; }
-      .ecosystem-portals { grid-template-columns: 1fr; }
+      .ecosystem-grid { grid-template-columns: 1fr; }
       .proof-grid { grid-template-columns: 1fr; }
     }
 

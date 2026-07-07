@@ -20,22 +20,23 @@ const portals = [
 ---
 <section class="ecosystem-section" id="ecosystem" aria-labelledby="ecosystem-heading">
   <div class="ecosystem-inner panel panel--arrival" data-reveal>
-    <div class="ecosystem-lead">
-      <div class="section-header section-header--wide">
-        <p class="section-kicker">Ecosystem</p>
-        <h2 id="ecosystem-heading">Runtime is Open.<br>Our Coven is too.</h2>
-        <p>A living workspace of familiar agents — the open runtime, the companion terminal, and the builders shaping it. Pick a way in.</p>
-      </div>
-      <a class="eco-cta" href="https://discord.gg/opencoven">
-        <span class="eco-cta-icon"><Fragment set:html={DISCORD} /></span>
-        <span class="eco-cta-text">
-          <span class="eco-cta-title">Join the Coven</span>
-          <span class="eco-cta-sub">Discord community — help shape the roadmap</span>
-        </span>
-      </a>
+    <div class="section-header section-header--wide">
+      <p class="section-kicker">Ecosystem</p>
+      <h2 id="ecosystem-heading">Our Runtime is Open.<br>Our Coven is too.</h2>
+      <p>A living workspace of familiar agents — the open runtime, the companion terminal, and the builders shaping it. Pick a way in.</p>
     </div>
 
-    <ul class="ecosystem-portals reveal-stagger" role="list">
+    <ul class="ecosystem-grid reveal-stagger" role="list">
+      <li class="eco-featured">
+        <a class="eco-cta" href="https://discord.gg/opencoven">
+          <span class="eco-cta-icon"><Fragment set:html={DISCORD} /></span>
+          <span class="eco-cta-text">
+            <span class="eco-cta-title">Join the Coven</span>
+            <span class="eco-cta-sub">Discord community — help shape the roadmap</span>
+          </span>
+          <span class="eco-cta-cue" aria-hidden="true">↗</span>
+        </a>
+      </li>
       {portals.map((p) => (
         <li>
           <a class="eco-portal panel-inset is-card" href={p.href} target="_blank" rel="noopener noreferrer">
