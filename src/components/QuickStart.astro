@@ -1,46 +1,93 @@
 ---
 const COPY_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>`;
 
+// Each step drives both the copied plaintext (`command`) and the coloured
+// display (`tokens`). Keep the two in sync — the reconstructed token text
+// must equal `command`. `out` is the expected-output hint (what success
+// looks like); the last step lights up as "you're running now".
 const steps = [
   {
-    kicker: '01 · Install',
+    kicker: 'Step 1 · Install',
+    title: 'Add the Coven CLI',
     command: 'npm install -g @opencoven/cli',
-    body: 'Installs the Coven CLI through npm so the coven command is available on your PATH.',
+    tokens: [
+      { t: 'npm', c: 'bin' },
+      { t: 'install', c: 'sub' },
+      { t: '-g', c: 'flag' },
+      { t: '@opencoven/cli', c: 'pkg' },
+    ],
+    out: '✓ coven ready on PATH',
+    note: 'Installs the coven command globally through npm.',
+    copyLabel: 'Copy install command',
   },
   {
-    kicker: '02 · Verify',
+    kicker: 'Step 2 · Verify',
+    title: 'Check your environment',
     command: 'coven doctor',
-    body: 'Checks your environment and detects supported harnesses — Codex, Claude Code, and more.',
+    tokens: [
+      { t: 'coven', c: 'bin' },
+      { t: 'doctor', c: 'sub' },
+    ],
+    out: '✓ Claude Code · Codex detected',
+    note: 'Detects the supported harnesses on your machine and confirms the runtime is healthy.',
+    copyLabel: 'Copy verify command',
   },
   {
-    kicker: '03 · Start a session',
-    command: 'coven run claude "fix the failing tests"',
-    body: "Launches a project-scoped session through Coven's managed PTY, bound to the current working directory.",
+    kicker: 'Step 3 · Summon',
+    title: 'Wake your first familiar',
+    command: 'coven run forge "pick up where we left off"',
+    tokens: [
+      { t: 'coven', c: 'bin' },
+      { t: 'run', c: 'sub' },
+      { t: 'forge', c: 'arg' },
+      { t: '"pick up where we left off"', c: 'str' },
+    ],
+    out: '✦ Forge awake · 128 notes · 47 days restored',
+    note: "Launches a project-scoped session through Coven's managed PTY, bound to the current directory — with Forge's memory already loaded.",
+    copyLabel: 'Copy summon command',
+    now: true,
   },
 ];
 ---
-<section class="content-section" id="quickstart" aria-labelledby="quickstart-heading">
+<section class="content-section qs-section" id="quickstart" aria-labelledby="quickstart-heading">
   <div class="section-header" data-reveal>
     <p class="section-kicker">Quick Start</p>
     <h2 id="quickstart-heading">Run your first familiar in three commands.</h2>
-    <p>Coven runs locally inside the projects you already have. Install, verify, and start — memory persists across every session.</p>
+    <p>Coven runs locally inside the projects you already have. Install, verify, and summon — memory persists across every session.</p>
   </div>
-  <div class="card-grid three">
-    {steps.map((step) => (
-      <div class="glass-card qs-step" data-reveal>
-        <p class="card-kicker">{step.kicker}</p>
-        <div class="qs-codeblock">
-          <code>{step.command}</code>
-          <button class="qs-copy" type="button" aria-label="Copy command" data-copy={step.command}>
-            <Fragment set:html={COPY_ICON_SVG} />
-          </button>
+
+  <ol class="qs-steps reveal-stagger">
+    {steps.map((step, i) => (
+      <li class:list={["qs-step", { "is-now": step.now }]} data-reveal>
+        <div class="qs-rail" aria-hidden="true">
+          <span class="qs-node">{i + 1}</span>
         </div>
-        <p>{step.body}</p>
-      </div>
+        <div class="qs-body glass-card">
+          <p class="qs-step-kicker">{step.kicker}</p>
+          <h3 class="qs-step-title">{step.title}</h3>
+          <div class="qs-codeblock">
+            <code>{step.tokens.map((tok, j) => (
+              <span class={`qs-tok qs-tok-${tok.c}`}>{j > 0 ? ' ' : ''}{tok.t}</span>
+            ))}</code>
+            <button class="qs-copy" type="button" aria-label={step.copyLabel} data-copy={step.command}>
+              <Fragment set:html={COPY_ICON_SVG} />
+            </button>
+          </div>
+          <p class="qs-out">
+            <span class="qs-out-label">expect</span>
+            <span class="qs-out-text">{step.out}</span>
+          </p>
+          <p class="qs-note">{step.note}</p>
+        </div>
+      </li>
     ))}
-  </div>
+  </ol>
+
   <div class="qs-actions" data-reveal>
     <a class="btn-primary" href="https://docs.opencoven.ai">Read the full docs</a>
     <a class="btn-secondary" href="https://github.com/OpenCoven/coven">View on GitHub ↗</a>
   </div>
+
+  <!-- Announces copy success to screen readers (written by main.js) -->
+  <div class="sr-only" role="status" aria-live="polite" data-copy-live></div>
 </section>
