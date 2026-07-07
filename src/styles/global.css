@@ -479,6 +479,7 @@
       font-size: 0.625rem; font-weight: 500;
       letter-spacing: 0.06em;
       color: rgba(255,255,255,0.72);
+      text-wrap: balance; /* no orphaned word when it wraps on small phones */
     }
     .download-alts {
       display: flex; align-items: baseline; flex-wrap: wrap;
@@ -523,6 +524,27 @@
     .hero-visual {
       position: relative;
       display: flex; align-items: center; justify-content: center;
+    }
+    /* Ambient bloom behind the terminal — one quiet pool of light that
+       breathes very slowly. Sits inside the hero stacking context. */
+    .hero-visual::before {
+      content: '';
+      position: absolute;
+      /* Horizontal inset stays at 0 — negative values create scrollable
+         overflow on phones; the blur alone bleeds the light outward. */
+      inset: -14% 0;
+      background: radial-gradient(ellipse 58% 52% at 55% 45%,
+        rgba(154,142,205,0.14), transparent 68%);
+      filter: blur(34px);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .motion-on .hero-visual::before {
+      animation: bloom-breathe 9s ease-in-out infinite alternate;
+    }
+    @keyframes bloom-breathe {
+      from { opacity: 0.65; transform: scale(0.97); }
+      to   { opacity: 1;    transform: scale(1.05); }
     }
     .hero-card {
       width: 100%;
@@ -727,6 +749,33 @@
       letter-spacing: 0.08em;
     }
 
+    /* ── Terminal boot: the session answers in beats ────────
+       JS adds .card-boot before typing the first command, then swaps to
+       .card-booted when it finishes — output arrives like a real session
+       responding. Without JS or motion neither class exists and the card
+       renders complete. */
+    .hero-card .output-identity,
+    .hero-card .output-memory,
+    .hero-card .hero-card-roster {
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .hero-card .hero-card-output {
+      transition: border-color 0.4s ease, background-color 0.4s ease;
+    }
+    .motion-on .hero-card.card-boot:not(.card-booted) .hero-card-output {
+      border-color: transparent;
+      background-color: transparent;
+    }
+    .motion-on .hero-card.card-boot:not(.card-booted) .output-identity,
+    .motion-on .hero-card.card-boot:not(.card-booted) .output-memory,
+    .motion-on .hero-card.card-boot:not(.card-booted) .hero-card-roster {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    .motion-on .hero-card.card-booted .output-identity { transition-delay: 0.05s; }
+    .motion-on .hero-card.card-booted .output-memory   { transition-delay: 0.22s; }
+    .motion-on .hero-card.card-booted .hero-card-roster { transition-delay: 0.4s; }
+
     /* ── Continuity timeline — the signature ───────────────
        One familiar's memory plotted across real time; the thread ends
        in a live "today" node. Persistence, drawn instead of claimed. */
@@ -748,6 +797,19 @@
         rgba(154,142,205,0.35) 55%,
         rgba(180,170,235,0.75) 100%);
       pointer-events: none;
+    }
+    /* The thread draws itself when the timeline reveals, reaching each
+       node as it fades in (node delays live in the orchestration block).
+       Guarded by @supports so non-:has browsers keep the static thread. */
+    @supports selector(:has(*)) {
+      .motion-on .continuity-track {
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform 1.5s cubic-bezier(0.3, 0.7, 0.3, 1) 0.15s;
+      }
+      .motion-on .continuity:has(.continuity-event.is-visible) .continuity-track {
+        transform: scaleX(1);
+      }
     }
     .continuity-events {
       list-style: none;
@@ -1470,6 +1532,17 @@
           rgba(154,142,205,0.35) 55%,
           rgba(180,170,235,0.75) 100%);
         pointer-events: none;
+      }
+      /* Vertical variant of the thread draw-in (top → down) */
+      @supports selector(:has(*)) {
+        .motion-on .continuity-events::before {
+          transform: scaleY(0);
+          transform-origin: center top;
+          transition: transform 1.5s cubic-bezier(0.3, 0.7, 0.3, 1) 0.15s;
+        }
+        .motion-on .continuity-events:has(.continuity-event.is-visible)::before {
+          transform: scaleY(1);
+        }
       }
       .continuity-event {
         grid-template-rows: auto auto;
