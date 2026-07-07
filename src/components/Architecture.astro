@@ -109,12 +109,11 @@ const nodes = [
     ] },
 ];
 
-const DEFAULT_INTRO = 'Pick any node to inspect how it fits into the runtime.';
-const DEFAULT_BULLETS = [
-  'Commands flow down: harness → runtime → your project',
-  'Output, state, and memory flow back up the return path',
-  'Every boundary is enforced at runtime, not just drawn here',
-];
+// Recommended-first: the Adapter node is the thesis of the whole diagram,
+// so it's pre-selected and its content is server-rendered as the default —
+// the detail panel never ships a generic "pick a node" state.
+const primary = nodes.find((n) => n.id === 'adapter');
+const ACCENTS = { violet: '#B4AAEB', orchid: '#C4B9F0', green: '#30D158' };
 
 // Glossary: key terms → { definition, docsPath? }
 const GLOSSARY: Record<string, { def: string; href?: string }> = {
@@ -168,7 +167,17 @@ function markKeywords(text: string): string {
     <p>Coven sits between every supported agent CLI and the project you're actually working in. Commands flow down, output and memory flow up, and every boundary is explicit.</p>
   </div>
 
-  <div class="architecture-diagram" data-reveal>
+  <div class="arch-console panel" data-reveal>
+    <div class="arch-consolebar" aria-hidden="true">
+      <span class="arch-dots"><span></span><span></span><span></span></span>
+      <span class="arch-console-label">coven · architecture</span>
+      <span class="arch-legend">
+        <span class="arch-legend-chip arch-chip--harness">harness</span>
+        <span class="arch-legend-chip arch-chip--coven">runtime</span>
+        <span class="arch-legend-chip arch-chip--project">project</span>
+      </span>
+    </div>
+    <div class="architecture-diagram">
     <svg
       class="arch-svg"
       viewBox="0 0 800 520"
@@ -183,7 +192,7 @@ function markKeywords(text: string): string {
           <path d="M0,0 L10,5 L0,10 Z" fill="rgba(180,170,235,0.55)" />
         </marker>
         <marker id="arch-arrow-up" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M0,0 L10,5 L0,10 Z" fill="rgba(74,222,128,0.55)" />
+          <path d="M0,0 L10,5 L0,10 Z" fill="rgba(48,209,88,0.55)" />
         </marker>
       </defs>
 
@@ -214,9 +223,10 @@ function markKeywords(text: string): string {
 
       {nodes.map((n, i) => (
         <g
-          class={`arch-node arch-node--${n.layer}`}
+          class={`arch-node arch-node--${n.layer}${n.id === 'adapter' ? ' is-selected' : ''}`}
           data-node={n.id}
           data-layer={n.layer}
+          data-recommended={n.id === 'adapter' ? 'true' : null}
           role="button"
           tabindex={i === 0 ? '0' : '-1'}
           aria-label={n.title}
@@ -228,20 +238,21 @@ function markKeywords(text: string): string {
     </svg>
 
     <div class="arch-detail" aria-live="polite">
-      <div class="arch-detail-inner">
-        <p class="arch-detail-kicker"><span class="arch-detail-dot"></span><span class="arch-detail-tag">pick a node</span></p>
-        <h3 class="arch-detail-title">How Coven fits into your stack</h3>
-        <p class="arch-detail-body">{DEFAULT_INTRO}</p>
+      <div class="arch-detail-inner swap-fade">
+        <p class="arch-detail-kicker is-active"><span class="arch-detail-dot" style={`background: ${ACCENTS[primary.color]}`}></span><span class="arch-detail-tag">{primary.layer}</span></p>
+        <h3 class="arch-detail-title" style={`color: ${ACCENTS[primary.color]}`}>{primary.title}</h3>
+        <p class="arch-detail-body">{primary.intro}</p>
         <ul class="arch-detail-bullets">
-          {DEFAULT_BULLETS.map((b) => <li>{b}</li>)}
+          {primary.bullets.map((b) => <li>{b}</li>)}
         </ul>
       </div>
     </div>
+    </div>
 
-    <!-- Glossary tooltip (rendered by JS, positioned absolutely). `inert`
-         keeps the inner link out of the tab order and the a11y tree until
-         the tooltip is actually shown. -->
-    <div id="arch-tooltip" class="arch-tooltip" role="tooltip" inert>
+    <!-- Glossary popover (rendered by JS, position:fixed + clamped). `inert`
+         keeps it out of the tab order and a11y tree until shown. -->
+    <div id="arch-tooltip" class="arch-tooltip" role="dialog" aria-label="Glossary definition" inert>
+      <button class="arch-tooltip-close" type="button" aria-label="Close definition">×</button>
       <p class="arch-tooltip-def"></p>
       <a class="arch-tooltip-link" href="#" target="_blank" rel="noopener">View in docs ↗</a>
     </div>
@@ -249,6 +260,8 @@ function markKeywords(text: string): string {
 </section>
 
 <script>
+  import { fadeSwap } from '../scripts/shared.js';
+
   (function () {
     const nodes = document.querySelectorAll('.arch-node[data-node]');
     if (!nodes.length) return;
@@ -257,6 +270,8 @@ function markKeywords(text: string): string {
     const bulletsEl = document.querySelector('.arch-detail-bullets');
     const tagEl     = document.querySelector('.arch-detail-tag');
     const kickerEl  = document.querySelector('.arch-detail-kicker');
+    const detailInner = document.querySelector('.arch-detail-inner');
+    const consoleEl = document.querySelector('.arch-console');
     const tooltip   = document.getElementById('arch-tooltip');
 
     const order = Array.from(nodes);
@@ -270,35 +285,41 @@ function markKeywords(text: string): string {
       const terms = Object.keys(glossary).sort((a, b) => b.length - a.length);
       const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
       const textNodes = [];
-      let n;
-      while ((n = walker.nextNode())) textNodes.push(n);
+      let node;
+      while ((node = walker.nextNode())) textNodes.push(node);
+
+      // Mark only the FIRST occurrence of each term across the container —
+      // marking every occurrence turned dense copy into visual noise.
+      const seen = new Set();
 
       textNodes.forEach((textNode) => {
         const text = textNode.textContent;
         const raw  = [];
         terms.forEach((term) => {
-          const re = new RegExp('\\b(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')\\b', 'gi');
-          let m;
-          while ((m = re.exec(text)) !== null) {
-            raw.push({ index: m.index, end: m.index + m[0].length, term, matched: m[0] });
-          }
+          if (seen.has(term)) return;
+          const re = new RegExp('\\b(' + term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')\\b', 'i');
+          const m = re.exec(text);
+          if (m) raw.push({ index: m.index, end: m.index + m[0].length, term, matched: m[0] });
         });
         if (!raw.length) return;
         raw.sort((a, b) => a.index - b.index);
         const hits = [];
         let cursor = 0;
-        raw.forEach((m) => { if (m.index >= cursor) { hits.push(m); cursor = m.end; } });
+        raw.forEach((m) => {
+          if (m.index >= cursor && !seen.has(m.term)) { hits.push(m); seen.add(m.term); cursor = m.end; }
+        });
+        if (!hits.length) return;
         const frag = document.createDocumentFragment();
         let last = 0;
         hits.forEach((m) => {
           if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
-          const mark = document.createElement('mark');
-          mark.className = 'kw';
-          mark.setAttribute('data-def', glossary[m.term].def);
-          if (glossary[m.term].href) mark.setAttribute('data-href', glossary[m.term].href);
-          mark.setAttribute('tabindex', '0');
-          mark.textContent = m.matched;
-          frag.appendChild(mark);
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'kw';
+          btn.setAttribute('data-def', glossary[m.term].def);
+          if (glossary[m.term].href) btn.setAttribute('data-href', glossary[m.term].href);
+          btn.textContent = m.matched;
+          frag.appendChild(btn);
           last = m.end;
         });
         if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
@@ -306,7 +327,24 @@ function markKeywords(text: string): string {
       });
     }
 
-    function showTooltip(mark) {
+    let pinnedMark = null;
+
+    function positionTooltip(mark) {
+      // Measure off-screen so width/height are known, then clamp to the
+      // viewport. position:fixed keeps the math simple on mobile.
+      tooltip.style.left = '-9999px';
+      tooltip.style.top = '0px';
+      const tw = tooltip.offsetWidth || 260;
+      const th = tooltip.offsetHeight || 80;
+      const rect = mark.getBoundingClientRect();
+      const left = Math.max(8, Math.min(rect.left, window.innerWidth - tw - 8));
+      let top = rect.bottom + 6;
+      if (top + th > window.innerHeight - 8) top = Math.max(8, rect.top - th - 6);
+      tooltip.style.left = left + 'px';
+      tooltip.style.top  = top + 'px';
+    }
+
+    function showTooltip(mark, pin) {
       if (!tooltip) return;
       const def  = mark.getAttribute('data-def') || '';
       const href = mark.getAttribute('data-href');
@@ -314,37 +352,51 @@ function markKeywords(text: string): string {
       const linkEl = tooltip.querySelector('.arch-tooltip-link');
       if (defEl)  defEl.textContent = def;
       if (linkEl) {
-        if (href) {
-          linkEl.href = 'https://docs.opencoven.ai' + href;
-          linkEl.style.display = '';
-        } else {
-          linkEl.style.display = 'none';
-        }
+        if (href) { linkEl.href = 'https://docs.opencoven.ai' + href; linkEl.style.display = ''; }
+        else linkEl.style.display = 'none';
       }
-      const rect     = mark.getBoundingClientRect();
-      const panel    = tooltip.closest('.arch-detail') || document.body;
-      const panelRect = panel.getBoundingClientRect();
-      tooltip.style.left = (rect.left - panelRect.left) + 'px';
-      tooltip.style.top  = (rect.bottom - panelRect.top + 6) + 'px';
       tooltip.removeAttribute('inert');
       tooltip.classList.add('is-visible');
+      positionTooltip(mark);
+      if (pin) { pinnedMark = mark; mark.classList.add('is-open'); }
     }
     function hideTooltip() {
       if (!tooltip) return;
       tooltip.setAttribute('inert', '');
       tooltip.classList.remove('is-visible');
+      if (pinnedMark) pinnedMark.classList.remove('is-open');
+      pinnedMark = null;
+    }
+    function toggleTooltip(mark) {
+      if (pinnedMark === mark) hideTooltip();
+      else { hideTooltip(); showTooltip(mark, true); }
     }
 
     function wireKeywords(container) {
-      container.querySelectorAll('mark.kw').forEach((mark) => {
-        mark.addEventListener('mouseenter', () => showTooltip(mark));
-        mark.addEventListener('mouseleave', hideTooltip);
-        mark.addEventListener('focusin',    () => showTooltip(mark));
-        mark.addEventListener('focusout',   hideTooltip);
+      container.querySelectorAll('.kw').forEach((kw) => {
+        // Tap/click toggles a pinned, dismissible popover (works on touch).
+        kw.addEventListener('click', (e) => { e.stopPropagation(); toggleTooltip(kw); });
+        // Hover/focus preview on pointer devices, but never fight a pin.
+        kw.addEventListener('mouseenter', () => { if (!pinnedMark) showTooltip(kw, false); });
+        kw.addEventListener('mouseleave', () => { if (!pinnedMark) hideTooltip(); });
+        kw.addEventListener('focus', () => { if (!pinnedMark) showTooltip(kw, false); });
+        kw.addEventListener('blur',  () => { if (!pinnedMark) hideTooltip(); });
       });
     }
 
-    // Wire the default bullets that Astro SSR already put in the DOM
+    // Dismissal: close button, Escape (returns focus to the term), click-outside.
+    const closeBtn = tooltip && tooltip.querySelector('.arch-tooltip-close');
+    if (closeBtn) closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); const m = pinnedMark; hideTooltip(); if (m) m.focus();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && pinnedMark) { const m = pinnedMark; hideTooltip(); m.focus(); }
+    });
+    document.addEventListener('click', (e) => {
+      if (pinnedMark && tooltip && !tooltip.contains(e.target) && !e.target.closest('.kw')) hideTooltip();
+    });
+
+    // Wire the SSR default bullets (the adapter node's) already in the DOM.
     markKeywordsInNode(document.querySelector('.arch-detail-bullets') || document);
     wireKeywords(document);
 
@@ -360,37 +412,42 @@ function markKeywords(text: string): string {
       const layer = node.getAttribute('data-layer');
       const data  = window.__ARCH_NODES__?.[id];
       if (!data) return;
-
-      if (titleEl) titleEl.textContent = data.title;
-      if (bodyEl)  bodyEl.textContent  = data.intro;
+      hideTooltip(); // the old keyword marks are about to be replaced
 
       const colorMap = { violet: '#B4AAEB', orchid: '#C4B9F0', green: '#30D158' };
       const accent = colorMap[data.color] || '#B4AAEB';
-      const dot = kickerEl?.querySelector('.arch-detail-dot');
-      if (dot) dot.style.background = accent;
-      if (titleEl) titleEl.style.color = accent;
 
-      if (bulletsEl) {
-        bulletsEl.replaceChildren();
-        (data.bullets || []).forEach((b) => {
-          const li = document.createElement('li');
-          li.textContent = b; // plain text first
-          bulletsEl.appendChild(li);
-        });
-        // Walk text nodes and inject <mark> elements safely
-        markKeywordsInNode(bulletsEl);
-        wireKeywords(bulletsEl);
-      }
-      if (tagEl)    tagEl.textContent = layer || 'node';
-      if (kickerEl) kickerEl.classList.add('is-active');
+      // Crossfade the whole panel while its content is rebuilt.
+      fadeSwap(detailInner, () => {
+        if (titleEl) { titleEl.textContent = data.title; titleEl.style.color = accent; }
+        if (bodyEl)  bodyEl.textContent = data.intro;
+        const dot = kickerEl && kickerEl.querySelector('.arch-detail-dot');
+        if (dot) dot.style.background = accent;
+        if (tagEl)    tagEl.textContent = layer || 'node';
+        if (kickerEl) kickerEl.classList.add('is-active');
+        if (bulletsEl) {
+          bulletsEl.replaceChildren();
+          (data.bullets || []).forEach((b) => {
+            const li = document.createElement('li');
+            li.textContent = b; // plain text first
+            bulletsEl.appendChild(li);
+          });
+          // Walk text nodes and inject keyword buttons safely
+          markKeywordsInNode(bulletsEl);
+          wireKeywords(bulletsEl);
+        }
+      });
     }
 
+    function unprime() { if (consoleEl) consoleEl.classList.remove('arch-primed'); }
+
     nodes.forEach((node) => {
-      node.addEventListener('click', () => select(node));
+      node.addEventListener('click', () => { unprime(); select(node); });
       node.addEventListener('keydown', (e) => {
         const i = order.indexOf(node);
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
+          unprime();
           select(node);
         } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
           e.preventDefault();
@@ -407,6 +464,10 @@ function markKeywords(text: string): string {
         }
       });
     });
+
+    // Prime a subtle pulse on the recommended (pre-selected) node until the
+    // user interacts, signalling the diagram is explorable.
+    if (consoleEl) consoleEl.classList.add('arch-primed');
   })();
 </script>
 
@@ -417,11 +478,42 @@ function markKeywords(text: string): string {
 </script>
 
 <style>
+  /* Console topbar (echoes the hero card + HowItWorks rail) */
+  .arch-consolebar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(154, 142, 205, 0.12);
+    background: rgba(5, 4, 9, 0.5);
+  }
+  .arch-dots { display: inline-flex; gap: 6px; }
+  .arch-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .arch-console-label {
+    font-family: var(--mono); font-size: 9px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(180, 170, 235, 0.5);
+  }
+  .arch-legend { margin-left: auto; display: inline-flex; gap: 14px; }
+  .arch-legend-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 8.5px; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .arch-legend-chip::before { content: ''; width: 8px; height: 8px; border-radius: 2px; }
+  .arch-chip--harness::before { background: rgba(180, 170, 235, 0.7); }
+  .arch-chip--coven::before   { background: #C4B9F0; }
+  .arch-chip--project::before { background: #30D158; }
+
   .architecture-diagram {
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
     gap: 32px;
     align-items: stretch;
+    padding: 24px;
   }
   .arch-svg {
     width: 100%;
@@ -456,12 +548,12 @@ function markKeywords(text: string): string {
   }
   .arch-return path {
     fill: none;
-    stroke: rgba(74, 222, 128, 0.45);
+    stroke: rgba(48, 209, 88, 0.45);
     stroke-width: 1.2;
     marker-end: url(#arch-arrow-up);
   }
   .arch-return-label {
-    fill: rgba(74, 222, 128, 0.78);
+    fill: rgba(48, 209, 88, 0.78);
     font-family: var(--mono);
     font-size: 0.5625rem;
     font-weight: 700;
@@ -495,7 +587,7 @@ function markKeywords(text: string): string {
     user-select: none;
   }
   .arch-node--harness rect { stroke: rgba(180, 170, 235, 0.32); }
-  .arch-node--project rect { stroke: rgba(74, 222, 128, 0.32); }
+  .arch-node--project rect { stroke: rgba(48, 209, 88, 0.32); }
 
   @media (hover: hover) {
     .arch-node:hover rect {
@@ -504,12 +596,12 @@ function markKeywords(text: string): string {
     }
   }
   .arch-node { outline: none; }
+  /* SVG nodes keep a stroke focus variant — box-shadow rings don't render
+     inside SVG — matched to the unified violet. */
   .arch-node:focus-visible rect {
-    stroke: #E8DBFF;
+    stroke: #B4AAEB;
     stroke-width: 2;
-    filter: drop-shadow(0 0 0 2px rgba(232, 219, 255, 0.45));
   }
-  /* Halo for keyboard focus that's perceptible against the dark surface */
   .arch-node:focus-visible {
     filter: drop-shadow(0 0 8px rgba(180, 170, 235, 0.6));
   }
@@ -521,6 +613,14 @@ function markKeywords(text: string): string {
   }
   .arch-node.is-selected text {
     fill: #fff;
+  }
+  /* Recommended-first cue: pulse the pre-selected node until first interaction */
+  @keyframes arch-primed-pulse {
+    0%, 100% { filter: drop-shadow(0 0 5px rgba(180, 170, 235, 0.25)); }
+    50%      { filter: drop-shadow(0 0 16px rgba(180, 170, 235, 0.7)); }
+  }
+  .motion-on .arch-console.arch-primed .arch-node[data-recommended] rect {
+    animation: arch-primed-pulse 2.4s ease-in-out infinite;
   }
 
   /* Detail panel */
@@ -601,34 +701,56 @@ function markKeywords(text: string): string {
   }
 
   /* ── Keyword marks ─────────────────────────────── */
-  /* :global() bypasses Astro scoped hash so JS-injected <mark> gets styles */
-  :global(mark.kw) {
+  /* :global() bypasses Astro scoped hash so JS-injected .kw buttons get
+     styles. They are real <button>s (native tap), styled to read as inline
+     text within the bullet copy. */
+  :global(.kw) {
+    display: inline;
     background: transparent;
     color: #B4AAEB;
+    font: inherit;
     font-weight: 600;
-    cursor: help;
+    padding: 0;
+    border: none;
     border-bottom: 1px dotted rgba(180, 170, 235, 0.45);
+    cursor: pointer;
     transition: color 0.15s, border-color 0.15s;
   }
-  :global(mark.kw:hover),
-  :global(mark.kw:focus) { color: #C4B9F0; border-color: rgba(210, 107, 255, 0.7); outline: none; }
+  :global(.kw:hover),
+  :global(.kw.is-open) { color: #C4B9F0; border-bottom-color: #C4B9F0; }
+  :global(.kw:focus-visible) {
+    color: #C4B9F0;
+    border-bottom-color: #C4B9F0;
+    box-shadow: none;
+    outline: 2px solid rgba(180, 170, 235, 0.55);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 
   /* ── Tooltip ───────────────────────────────────── */
   /* :global() needed — tooltip is outside the scoped component subtree */
   :global(.arch-tooltip) {
-    position: absolute;
+    position: fixed; /* clamped to the viewport by JS — robust on mobile */
     z-index: 200;
     max-width: 260px;
     background: rgba(14, 11, 22, 0.97);
     border: 1px solid rgba(154, 142, 205, 0.35);
     border-radius: 8px;
-    padding: 10px 14px;
+    padding: 10px 32px 10px 14px; /* room for the close button */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(154, 142, 205, 0.12);
     pointer-events: none;
     opacity: 0;
     transform: translateY(4px);
     transition: opacity 0.15s ease, transform 0.15s ease;
   }
+  :global(.arch-tooltip-close) {
+    position: absolute; top: 5px; right: 5px;
+    width: 20px; height: 20px;
+    display: grid; place-items: center;
+    background: transparent; border: none; border-radius: 4px;
+    color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer;
+  }
+  :global(.arch-tooltip-close:hover) { color: #fff; background: rgba(255, 255, 255, 0.06); }
   :global(.arch-tooltip.is-visible) {
     opacity: 1;
     transform: translateY(0);
@@ -656,6 +778,8 @@ function markKeywords(text: string): string {
     }
   }
   @media (max-width: 640px) {
+    .architecture-diagram { padding: 16px; }
+    .arch-legend { display: none; } /* legend crowds the bar on phones */
     .arch-detail { padding: 18px; }
     .arch-detail-title { font-size: 1.1875rem; }
     .arch-detail-body { font-size: 0.875rem; }
