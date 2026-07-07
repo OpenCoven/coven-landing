@@ -329,6 +329,12 @@ function markKeywords(text: string): string {
 
     let pinnedMark = null;
 
+    // Hover-preview is only wired on machines that actually support hovering
+    // with a fine pointer (mouse/trackpad). Touch devices report (hover: none)
+    // and would otherwise fire a synthetic mouseenter flash right before the
+    // tap-to-pin — there, tap and keyboard focus remain the way in.
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
     function positionTooltip(mark) {
       // Measure off-screen so width/height are known, then clamp to the
       // viewport. position:fixed keeps the math simple on mobile.
@@ -376,9 +382,12 @@ function markKeywords(text: string): string {
       container.querySelectorAll('.kw').forEach((kw) => {
         // Tap/click toggles a pinned, dismissible popover (works on touch).
         kw.addEventListener('click', (e) => { e.stopPropagation(); toggleTooltip(kw); });
-        // Hover/focus preview on pointer devices, but never fight a pin.
-        kw.addEventListener('mouseenter', () => { if (!pinnedMark) showTooltip(kw, false); });
-        kw.addEventListener('mouseleave', () => { if (!pinnedMark) hideTooltip(); });
+        // Hover preview only on machines that support hover; never fight a pin.
+        if (canHover) {
+          kw.addEventListener('mouseenter', () => { if (!pinnedMark) showTooltip(kw, false); });
+          kw.addEventListener('mouseleave', () => { if (!pinnedMark) hideTooltip(); });
+        }
+        // Keyboard focus preview stays on every device (desktop tab, AT).
         kw.addEventListener('focus', () => { if (!pinnedMark) showTooltip(kw, false); });
         kw.addEventListener('blur',  () => { if (!pinnedMark) hideTooltip(); });
       });
