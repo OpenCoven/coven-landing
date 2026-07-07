@@ -211,19 +211,26 @@
     var buttons = document.querySelectorAll('.qs-copy[data-copy]');
     if (!buttons.length || !navigator.clipboard) return;
     var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+    var liveRegion = document.querySelector('[data-copy-live]');
     buttons.forEach(function (btn) {
       var originalHTML = btn.innerHTML;
+      // Restore the step-specific label (e.g. "Copy install command")
+      // instead of a hardcoded string.
+      var originalLabel = btn.getAttribute('aria-label') || 'Copy command';
       var resetTimer = null;
       btn.addEventListener('click', function () {
-        navigator.clipboard.writeText(btn.getAttribute('data-copy')).then(function () {
+        var cmd = btn.getAttribute('data-copy');
+        navigator.clipboard.writeText(cmd).then(function () {
           btn.classList.add('is-copied');
           btn.innerHTML = CHECK_SVG;
           btn.setAttribute('aria-label', 'Copied');
+          // Announce success to screen readers.
+          if (liveRegion) liveRegion.textContent = 'Copied: ' + cmd;
           if (resetTimer) clearTimeout(resetTimer);
           resetTimer = setTimeout(function () {
             btn.classList.remove('is-copied');
             btn.innerHTML = originalHTML;
-            btn.setAttribute('aria-label', 'Copy command');
+            btn.setAttribute('aria-label', originalLabel);
           }, 1400);
         });
       });
