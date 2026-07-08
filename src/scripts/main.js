@@ -26,6 +26,15 @@
       items.forEach(function (el) { el.classList.add('is-visible'); });
       return;
     }
+
+    items.forEach(function (el) {
+      var rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add('is-visible');
+      }
+    });
+    document.documentElement.classList.add('reveal-ready');
+
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -34,7 +43,9 @@
         }
       });
     }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
-    items.forEach(function (el) { io.observe(el); });
+    items.forEach(function (el) {
+      if (!el.classList.contains('is-visible')) io.observe(el);
+    });
   })();
 
   // ── Ambient glow parallax (cursor-driven on desktop) ──────

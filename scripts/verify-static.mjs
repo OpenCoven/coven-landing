@@ -142,6 +142,15 @@ if (missingGithubCopy.length > 0) {
   throw new Error(`Missing expected copy in dist/github/index.html: ${missingGithubCopy.join(', ')}`);
 }
 
+const sourceCss = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
+const sourceMain = await readFile(path.join(root, 'src/scripts/main.js'), 'utf8');
+if (!sourceCss.includes('.motion-on.reveal-ready [data-reveal]')) {
+  throw new Error('Scroll reveal hidden state must wait for the reveal-ready class so first paint is readable');
+}
+if (!sourceMain.includes("document.documentElement.classList.add('reveal-ready')")) {
+  throw new Error('Scroll reveal script must enable reveal-ready only after marking initial in-view content visible');
+}
+
 console.log(
   `Verified ${requiredGithubCopy.length} required copy strings in dist/github/index.html.`,
 );
