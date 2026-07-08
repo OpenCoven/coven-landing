@@ -187,6 +187,8 @@ function markKeywords(text: string): string {
     >
       <title id="arch-svg-title">Coven architecture: harness, runtime, and project layers</title>
 
+      <rect class="arch-canvas" x="0" y="0" width="800" height="520" rx="12" aria-hidden="true" />
+
       <defs>
         <marker id="arch-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
           <path d="M0,0 L10,5 L0,10 Z" fill="rgba(180,170,235,0.55)" />
@@ -528,6 +530,11 @@ function markKeywords(text: string): string {
     width: 100%;
     height: auto;
     display: block;
+    background: #0B0A12; /* opaque — keeps Dark Reader from blowing out the diagram */
+    border-radius: 12px;
+  }
+  .arch-canvas {
+    fill: #0B0A12;
   }
   .arch-layer-label {
     fill: rgba(180, 170, 235, 0.78);
