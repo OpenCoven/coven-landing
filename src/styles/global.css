@@ -1306,6 +1306,255 @@
       }
     }
 
+    /* ── GITHUB LANDING ─────────────────────────────────────
+       Same night-glass system as the home page, tuned around GitHub-native
+       artifacts: issue, check run, status comment, draft PR, Cave link. */
+    .github-hero {
+      position: relative; z-index: 1;
+      min-height: calc(100vh - 72px);
+      max-width: 1280px; margin: 0 auto;
+      padding: 48px 32px 64px;
+      display: grid;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 64px;
+      align-items: center;
+    }
+    .github-hero > * { min-width: 0; }
+    .github-hero-copy {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .github-promise {
+      max-width: 520px;
+      margin: -8px 0 26px;
+      padding: 14px 16px;
+      border-left: 1px solid rgba(180,170,235,0.55);
+      background: linear-gradient(90deg, rgba(154,142,205,0.12), rgba(154,142,205,0.02));
+      color: rgba(232,224,240,0.82);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .github-hero-actions,
+    .github-final-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .github-hero-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+    .github-run-card {
+      width: 100%;
+      max-width: 540px;
+      font-family: var(--mono);
+      box-shadow:
+        0 0 0 1px rgba(154,142,205,0.05),
+        0 32px 80px rgba(0,0,0,0.5),
+        0 0 90px -30px rgba(154,142,205,0.28);
+    }
+    .github-run-list {
+      list-style: none;
+      margin: 0 20px 16px;
+      border: 1px solid rgba(154,142,205,0.14);
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(5,4,9,0.35);
+    }
+    .github-run-row {
+      position: relative;
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 12px;
+      padding: 15px 16px;
+      border-bottom: 1px solid rgba(154,142,205,0.12);
+      color: var(--muted);
+    }
+    .github-run-row:last-child { border-bottom: none; }
+    .github-run-row strong {
+      display: block;
+      color: rgba(232,224,240,0.9);
+      font-size: 12px;
+      line-height: 1.35;
+      letter-spacing: 0.01em;
+    }
+    .github-run-row small {
+      display: block;
+      margin-top: 5px;
+      color: rgba(232,224,240,0.48);
+      font-size: 10px;
+      line-height: 1.45;
+    }
+    .github-run-dot {
+      position: relative;
+      display: block;
+      width: 9px; height: 9px;
+      margin-top: 3px;
+      border-radius: 50%;
+      background: var(--oc-surface-1);
+      border: 1.5px solid rgba(154,142,205,0.65);
+      box-shadow: 0 0 0 3px rgba(5,4,9,0.9);
+    }
+    .github-run-row.is-complete .github-run-dot {
+      background: rgba(48,209,88,0.85);
+      border-color: rgba(48,209,88,0.85);
+      box-shadow: 0 0 0 3px rgba(5,4,9,0.9), 0 0 12px rgba(48,209,88,0.45);
+    }
+    .github-run-row.is-active {
+      background: linear-gradient(90deg, rgba(154,142,205,0.12), transparent);
+    }
+    .github-run-row.is-active .github-run-dot {
+      background: var(--oc-purple-light);
+      border-color: var(--oc-purple-light);
+      box-shadow: 0 0 0 3px rgba(5,4,9,0.9), 0 0 14px rgba(180,170,235,0.8);
+    }
+    .motion-on .github-run-row.is-active .github-run-dot::after {
+      content: '';
+      position: absolute;
+      inset: -5.5px;
+      border-radius: 50%;
+      border: 1px solid rgba(180,170,235,0.7);
+      animation: now-pulse 2.6s ease-out infinite;
+    }
+    .github-demo-link {
+      display: inline-flex;
+      margin: 0 20px 20px;
+      color: var(--vtext);
+      text-decoration: none;
+      font-size: 10.5px;
+      letter-spacing: 0.04em;
+      border-bottom: 1px dotted rgba(154,142,205,0.42);
+    }
+    .github-demo-link:hover { color: #fff; border-bottom-color: #fff; }
+
+    .github-loop {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .github-loop-step {
+      position: relative;
+      min-height: 250px;
+      padding: 24px 20px;
+      overflow: hidden;
+    }
+    .github-loop-step:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      top: 25px;
+      right: -11px;
+      z-index: 2;
+      width: 22px; height: 22px;
+      display: grid; place-items: center;
+      border-radius: 999px;
+      background: var(--oc-surface-1);
+      border: 1px solid rgba(154,142,205,0.28);
+      color: var(--vtext);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+    .github-loop-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px; height: 34px;
+      margin-bottom: 18px;
+      border-radius: 50%;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--vtext);
+      background: var(--oc-surface-1);
+      border: 1.5px solid rgba(154,142,205,0.55);
+    }
+    .github-loop-step h3 {
+      font-size: 14px;
+      line-height: 1.35;
+      margin-bottom: 10px;
+      color: var(--white);
+    }
+    .github-loop-step p:last-child {
+      font-size: 12px;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    .github-pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    .github-price-card h3 {
+      font-size: 26px;
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .github-price-note {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--vtext);
+      margin-bottom: 18px;
+    }
+    .github-price-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .github-price-card li {
+      display: flex;
+      gap: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+    .github-price-card li::before {
+      content: '◇';
+      flex: 0 0 auto;
+      color: rgba(196,185,240,0.62);
+      font-size: 9px;
+      transform: translateY(2px);
+    }
+
+    .github-trust-panel {
+      padding: 48px 56px;
+    }
+    .github-trust-panel .section-header { margin-bottom: 32px; }
+    .github-trust-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .github-trust-copy {
+      padding: 22px;
+    }
+    .github-trust-copy h3 {
+      font-size: 15px;
+      line-height: 1.35;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .github-trust-copy p {
+      font-size: 12px;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
     /* ── FOOTER ──────────────────────────────────────────── */
     footer {
       position: relative; z-index: 1;
@@ -1379,7 +1628,7 @@
     /* ── SCROLL REVEALS ──────────────────────────────────── */
     /* Hidden state only applies when JS+motion are on. Without JS,
        content renders normally. */
-    .motion-on [data-reveal] {
+    .motion-on.reveal-ready [data-reveal]:not(.is-visible) {
       opacity: 0;
       transform: translateY(14px);
       transition:
@@ -1387,7 +1636,7 @@
         transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
       will-change: opacity, transform;
     }
-    .motion-on [data-reveal].is-visible {
+    .motion-on.reveal-ready [data-reveal].is-visible {
       opacity: 1;
       transform: none;
     }
@@ -1423,6 +1672,10 @@
       /* Tablet: main row shifts to 50/50, reduce hero padding */
       .hero { padding: 36px 24px; }
       .hero-main { grid-template-columns: 1fr 1fr; gap: 40px; }
+      .github-hero { padding: 44px 24px 56px; grid-template-columns: 1fr 1fr; gap: 40px; }
+      .github-loop { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .github-loop-step:not(:last-child)::after { display: none; }
+      .github-pricing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       h1 { font-size: clamp(38px, 4.8vw, 56px); }
       /* Card grids: 2-col on tablet instead of jumping to 1 */
       .card-grid.three { grid-template-columns: repeat(2, 1fr); }
@@ -1456,6 +1709,7 @@
 
       /* Sections — uniform 20px gutter (matches hero) */
       .content-section, .proof-section { padding: 48px 20px; }
+      .github-trust-panel { padding: 40px 36px; }
       /* Ecosystem card spans edge-to-edge so its inner 20px gutter aligns
          with other sections instead of double-indenting */
       .ecosystem-section { padding: 48px 0; }
@@ -1488,6 +1742,14 @@
         grid-template-columns: 1fr;
         gap: 32px;
       }
+      .github-hero {
+        min-height: auto;
+        grid-template-columns: 1fr;
+        gap: 36px;
+        padding: 40px 20px 52px;
+      }
+      .github-hero-visual { justify-content: flex-start; }
+      .github-run-card { max-width: 100%; }
       /* Copy leads, card follows below it on narrow screens. */
       .hero-copy { order: 1; }
       .hero-lede { max-width: 100%; font-size: 15px; }
@@ -1531,6 +1793,7 @@
         gap: 26px;
       }
       .hero-main { grid-template-columns: 1.05fr 0.95fr; gap: 36px; }
+      .github-hero { grid-template-columns: 1fr; padding: 32px 20px 44px; }
       .kicker { margin-bottom: 12px; }
       h1 { font-size: clamp(1.875rem, 4.6vw, 2.375rem); margin-bottom: 14px; }
       .hero-lede { font-size: 0.875rem; margin-bottom: 18px; max-width: 46ch; }
@@ -1552,6 +1815,15 @@
       /* hero card naturally sized at 520px */
       .proof-grid { grid-template-columns: 1fr 1fr; }
       .card-grid.three, .card-grid.four { grid-template-columns: 1fr; }
+      .github-hero-actions,
+      .github-final-actions { align-items: stretch; flex-direction: column; }
+      .github-hero-actions > *,
+      .github-final-actions > * { width: 100%; }
+      .github-loop,
+      .github-pricing-grid,
+      .github-trust-grid { grid-template-columns: 1fr; }
+      .github-loop-step { min-height: auto; }
+      .github-trust-panel { padding: 32px 20px; border-radius: 0; border-left: none; border-right: none; }
       /* Primary download goes full-width; alt platforms wrap beneath */
       .download-cta { width: 100%; }
       .download-primary { width: 100%; }
@@ -1573,6 +1845,7 @@
       .testimonial-strip { padding: 28px 16px; }
       footer { padding: 28px 16px; }
       .hero { padding: 32px 16px; }
+      .github-hero { padding: 32px 16px 40px; }
       .content-section, .proof-section { padding: 40px 16px; }
       .ecosystem-section { padding: 40px 0; }
       .ecosystem-inner { padding: 24px 16px; }
@@ -1588,4 +1861,3 @@
     footer a:hover {
       color: var(--coven-violet-light);
     }
-
