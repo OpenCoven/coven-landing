@@ -76,10 +76,7 @@ if (existsSync(distIndex)) {
 
   const downloadLabels = [
     'Download for macOS', // server-rendered primary (JS retargets per platform)
-    'Windows',
-    'Linux',
-    'iOS (TestFlight)',
-    'all releases',
+    'Download for iOS', // dedicated TestFlight button (JS swaps to macOS on iOS)
   ];
   // Scope to the CTA block — words like "Windows" also appear in the
   // head's JSON-LD, which would confuse a whole-document indexOf.
@@ -100,13 +97,12 @@ if (existsSync(distIndex)) {
   }
   for (let i = 1; i < downloadLabelPositions.length; i += 1) {
     if (downloadLabelPositions[i - 1].index > downloadLabelPositions[i].index) {
-      throw new Error('Download CTA order must be the macOS primary, then Windows, Linux, iOS beta, and all releases');
+      throw new Error('Download CTA order must be the macOS primary, then the iOS (TestFlight) button');
     }
   }
 
-  const css = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
-  if (!css.includes('.download-alt.is-detected') || !html.includes('data-download-primary')) {
-    throw new Error('Download CTA must render one retargetable primary button and hide the detected platform from the alt row');
+  if (!html.includes('data-download-primary') || !html.includes('data-download-ios')) {
+    throw new Error('Download CTA must render the retargetable primary button and the dedicated iOS button');
   }
   console.log(
     `Verified ${requiredPublicFiles.length} required public files, canonical favicon + OG logos, and ${requiredCopy.length} required copy strings in dist/index.html.`,

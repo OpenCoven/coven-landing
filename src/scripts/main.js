@@ -250,10 +250,10 @@
 
   // ── Download CTA: detect visitor's platform ─────────────────
   //
-  // Rewrites the single primary button's label/sub/href to match the
-  // visitor's platform and hides that platform from the "also on" row.
-  // Works fully without JS — the primary defaults to macOS and every
-  // alt link is a real <a href> — this only retargets the emphasis.
+  // Rewrites the primary button's label/sub/href to match the visitor's
+  // platform; on iOS the dedicated TestFlight button retargets to macOS.
+  // Works fully without JS — both buttons are real <a href>s — this only
+  // retargets the emphasis.
   //
   // Detection order:
   //   1. UA-string OS markers (most intentional; matches UA overrides)
@@ -331,21 +331,17 @@
       primary.setAttribute('rel', 'noopener noreferrer');
     }
 
-    // Drop the detected platform from the "also on" row (it's now the
-    // primary) and re-list macOS in its place when the visitor isn't
-    // on a Mac, so all four platforms stay one click away.
-    cta.querySelectorAll('.download-alt[data-alt-platform]').forEach(function (a) {
-      a.classList.toggle('is-detected', a.getAttribute('data-alt-platform') === detected);
-    });
-    if (detected !== 'mac' && releasesUrl) {
-      var macAlt = document.createElement('a');
-      macAlt.className = 'download-alt';
-      macAlt.setAttribute('data-alt-platform', 'mac');
-      macAlt.href = releasesUrl;
-      macAlt.textContent = 'macOS';
-      var altsRow = cta.querySelector('.download-alts');
-      var kicker = altsRow && altsRow.querySelector('.download-alts-kicker');
-      if (kicker) kicker.insertAdjacentElement('afterend', macAlt);
+    // On iOS the primary already points at TestFlight, so retarget the
+    // dedicated iOS button to macOS — both paths stay one click away.
+    var iosBtn = cta.querySelector('[data-download-ios]');
+    if (iosBtn && detected === 'ios' && releasesUrl) {
+      iosBtn.setAttribute('href', releasesUrl);
+      iosBtn.removeAttribute('target');
+      iosBtn.removeAttribute('rel');
+      var iosLabel = iosBtn.querySelector('[data-download-ios-label]');
+      var iosSub = iosBtn.querySelector('[data-download-ios-sub]');
+      if (iosLabel) iosLabel.textContent = 'Download for macOS';
+      if (iosSub) iosSub.textContent = 'CovenCave · .dmg · signed · free';
     }
 
     // Stamp the resolved platform on the cta for analytics / debug.

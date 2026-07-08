@@ -5,13 +5,10 @@ const isGithub = Astro.url.pathname.replace(/\/$/, '') === '/github';
 ---
 <nav class="mobile-nav-overlay" id="mobile-nav" aria-label="Mobile navigation">
   <button class="mobile-nav-close" aria-label="Close menu">×</button>
-  <a href="/#architecture">Architecture</a>
   <a href="/#how-it-works">How It Works</a>
   <a href="/#quickstart">Quick Start</a>
   <a href="/github" aria-current={isGithub ? 'page' : undefined}>GitHub App</a>
   <a href="https://docs.opencoven.ai">Docs</a>
-  <a href="/#ecosystem">Ecosystem</a>
-  <a href="https://discord.gg/opencoven">Community</a>
   <a href="https://github.com/OpenCoven/coven">GitHub</a>
   <a href="https://x.com/OpenCvn">X</a>
   <a href="https://discord.gg/opencoven" style="color: #C9A7FF;">Join the Coven ✦</a>
