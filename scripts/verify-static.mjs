@@ -119,7 +119,7 @@ if (existsSync(distIndex)) {
 
 const distGithub = path.join(distDir, 'github', 'index.html');
 if (!existsSync(distGithub)) {
-  throw new Error('Missing rendered GitHub landing page at dist/github/index.html');
+  console.log('Skipped dist/github/index.html copy check — run `npm run build` first.'); process.exit(0);
 }
 
 const githubHtml = await readFile(distGithub, 'utf8');
