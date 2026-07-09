@@ -353,7 +353,7 @@
     .hero-main {
       display: grid;
       grid-template-columns: 1.08fr 0.92fr;
-      align-items: center;
+      align-items: stretch;
       gap: 64px;
     }
     /* Both columns hold nowrap terminal text (.card-cmd, memory notes);
@@ -457,10 +457,10 @@
        rewrites for the detected platform, plus a quiet mono line of
        the remaining platforms. */
     .download-cta {
-      display: flex; flex-direction: column;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
       align-items: stretch;
-      max-width: 400px;
     }
     .download-primary {
       display: flex; align-items: center; gap: 14px;
@@ -540,11 +540,14 @@
        tab switching are driven by src/scripts/main.js. */
     .hero-visual {
       position: relative;
-      display: flex; align-items: center; justify-content: center;
+      display: flex; align-items: stretch; justify-content: center;
     }
     .hero-card {
       width: 100%;
       max-width: 500px;
+      /* Stretch to the copy column's height for visual balance; the
+         memory panel (.output-memory) absorbs the extra space. */
+      display: flex; flex-direction: column;
       background: rgba(17,16,24,0.78);
       border: 1px solid rgba(154,142,205,0.22);
       border-radius: 14px;
@@ -614,6 +617,8 @@
       border-radius: 10px;
       overflow: hidden;
       background: rgba(5,4,9,0.35);
+      flex: 1;
+      display: flex; flex-direction: column;
     }
     .output-identity {
       display: grid;
@@ -659,6 +664,7 @@
       border-top: 1px solid rgba(154,142,205,0.12);
       background: linear-gradient(180deg, rgba(154,142,205,0.05) 0%, rgba(154,142,205,0.015) 100%);
       display: flex; flex-direction: column; gap: 8px;
+      flex: 1;
     }
     .memory-header {
       font-size: 9px; font-weight: 700;
@@ -1842,8 +1848,8 @@
       .github-trust-grid { grid-template-columns: 1fr; }
       .github-loop-step { min-height: auto; }
       .github-trust-panel { padding: 32px 20px; border-radius: 0; border-left: none; border-right: none; }
-      /* Primary download goes full-width; alt platforms wrap beneath */
-      .download-cta { width: 100%; }
+      /* Downloads stack one per row on narrow phones */
+      .download-cta { width: 100%; grid-template-columns: 1fr; }
       .download-primary { width: 100%; }
       .btn-primary, .btn-secondary { justify-content: center; }
       /* The roster hint crowds the tab row on narrow phones */
