@@ -55,9 +55,9 @@
       /* ── Typography (self-hosted Inter Variable + JetBrains Mono Variable) ── */
       --font-ui:   'Inter Variable', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       --mono:      'JetBrains Mono Variable', 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
-      /* Display voice — used only for the emphasized word in the hero h1.
-         Fraunces italic: the grimoire serif against the hard grotesque. */
-      --font-display: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+      /* Display voice — brand stack per DESIGN.md / brand/ui/typography.css:
+         Satoshi preferred, Neue Montreal alt, Geist self-hosted fallback. */
+      --font-display: Satoshi, 'Neue Montreal', 'Geist Variable', Geist, 'Inter Variable', Inter, 'SF Pro Display', system-ui, sans-serif;
 
       /* ── Motion + layout scales (shared by every overhauled section) ── */
       --ease-out:   cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -404,14 +404,13 @@
       color: var(--white);
       margin-bottom: 24px;
     }
-    /* The one display-type moment on the page: the differentiator set in a
-       grimoire serif italic against the hard grotesque around it. */
+    /* The one display-type moment on the page: the differentiator set in
+       the brand display voice (Geist) against the surrounding Inter. */
     h1 em {
       font-family: var(--font-display);
-      font-style: italic;
-      font-weight: 460;
-      font-size: 1.05em;
-      letter-spacing: -0.015em;
+      font-style: normal;
+      font-weight: 500;
+      letter-spacing: -0.02em;
       color: var(--vtext);
       text-shadow: 0 0 44px rgba(154,142,205,0.35);
     }
@@ -764,8 +763,8 @@
       /* End the thread at the "today" node instead of running past it:
          trim the width of the last grid column minus its node radius
          (columns are (100% - 3×24px gap) / 4 wide — see .continuity-events). */
-      right: calc((100% - 72px) / 4 - 9px);
-      top: calc(6px + 14px + 10px + 4px); /* pad + date row + gap + node center */
+      right: calc((100% - 72px) / 4 - 11px);
+      top: calc(6px + 16px + 12px + 5.5px); /* pad + date row + gap + node center */
       height: 1px;
       background: linear-gradient(90deg,
         rgba(154,142,205,0.08) 0%,
@@ -781,19 +780,19 @@
     }
     .continuity-event {
       display: grid;
-      grid-template-rows: 14px 9px auto;
-      row-gap: 10px;
+      grid-template-rows: 16px 11px auto;
+      row-gap: 12px;
       justify-items: start;
     }
     .continuity-date {
       font-family: var(--mono);
-      font-size: 0.59375rem; font-weight: 600;
-      line-height: 14px;
+      font-size: 0.6875rem; font-weight: 600;
+      line-height: 16px;
       letter-spacing: 0.14em; text-transform: uppercase;
       color: var(--muted); /* AA at small sizes — matches body-muted token */
     }
     .continuity-node {
-      width: 9px; height: 9px;
+      width: 11px; height: 11px;
       border-radius: 50%;
       background: var(--oc-surface-1);
       border: 1.5px solid rgba(154,142,205,0.65);
@@ -801,7 +800,7 @@
       position: relative; z-index: 1;
     }
     .continuity-text {
-      font-size: 0.75rem; line-height: 1.5;
+      font-size: 0.875rem; line-height: 1.5;
       color: var(--muted);
       white-space: nowrap;
     }
@@ -851,7 +850,7 @@
       .output-identity { padding: 11px 16px; }
       .output-memory { padding: 10px 16px 12px; gap: 6px; }
       .hero-card-roster { padding: 9px 20px 11px; }
-      .continuity-text { font-size: 0.7188rem; }
+      .continuity-text { font-size: 0.8125rem; }
     }
 
     /* ── Ultrawide (1680px+): scale the composition up ──────
@@ -882,8 +881,8 @@
       .memory-note { font-size: 0.6875rem; }
       .roster-tab { font-size: 0.6875rem; }
 
-      .continuity-date { font-size: 0.625rem; }
-      .continuity-text { font-size: 0.8125rem; }
+      .continuity-date { font-size: 0.71875rem; }
+      .continuity-text { font-size: 0.9375rem; }
 
       /* Ambient light scales with the canvas */
       .glow-left  { width: 820px; height: 680px; }
@@ -1260,21 +1259,6 @@
     .ecosystem-inner .section-header p {
       font-size: 1rem; line-height: 1.65;
       color: var(--muted); max-width: 60ch;
-    }
-    /* Large screens: header collapses to a single row — kicker above,
-       then title left + supporting copy right on one baseline. */
-    @media (min-width: 1101px) {
-      .ecosystem-inner .section-header {
-        display: grid;
-        grid-template-columns: auto minmax(0, 44ch);
-        column-gap: 56px;
-        align-items: end;
-        justify-content: space-between;
-      }
-      .ecosystem-inner .section-header .section-kicker { grid-column: 1 / -1; }
-      .ecosystem-inner .section-header h2 { margin-bottom: 0; }
-      .ecosystem-inner .section-header h2 br { display: none; }
-      .ecosystem-inner .section-header p { margin-bottom: 6px; }
     }
 
     .ecosystem-grid {
@@ -1805,7 +1789,7 @@
       .continuity-events::before {
         content: '';
         position: absolute;
-        left: 4px; top: 8px; bottom: 8px;
+        left: 5px; top: 8px; bottom: 8px;
         width: 1px;
         background: linear-gradient(180deg,
           rgba(154,142,205,0.08) 0%,
@@ -1815,7 +1799,7 @@
       }
       .continuity-event {
         grid-template-rows: auto auto;
-        grid-template-columns: 9px 1fr;
+        grid-template-columns: 11px 1fr;
         column-gap: 16px;
         row-gap: 3px;
       }
@@ -1846,7 +1830,7 @@
       .output-memory { padding: 10px 14px 12px; gap: 6px; }
       .hero-card-roster { padding: 9px 16px 11px; }
       .roster-hint { display: none; }
-      .continuity-text { font-size: 0.7188rem; }
+      .continuity-text { font-size: 0.8125rem; }
     }
 
     @media (max-width: 520px) {
