@@ -272,7 +272,7 @@
       letter-spacing: -0.3px;
       flex-shrink: 0;
     }
-    .brand-mark img { width: 26px; height: 26px; display: block; }
+    .brand-mark img { width: 26px; height: 26px; display: block; border-radius: 8px; }
 
     .desktop-nav {
       display: flex; align-items: center; gap: 6px;
@@ -1261,6 +1261,21 @@
       font-size: 1rem; line-height: 1.65;
       color: var(--muted); max-width: 60ch;
     }
+    /* Large screens: header collapses to a single row — kicker above,
+       then title left + supporting copy right on one baseline. */
+    @media (min-width: 1101px) {
+      .ecosystem-inner .section-header {
+        display: grid;
+        grid-template-columns: auto minmax(0, 44ch);
+        column-gap: 56px;
+        align-items: end;
+        justify-content: space-between;
+      }
+      .ecosystem-inner .section-header .section-kicker { grid-column: 1 / -1; }
+      .ecosystem-inner .section-header h2 { margin-bottom: 0; }
+      .ecosystem-inner .section-header h2 br { display: none; }
+      .ecosystem-inner .section-header p { margin-bottom: 6px; }
+    }
 
     .ecosystem-grid {
       list-style: none;
@@ -1594,7 +1609,7 @@
       text-decoration: none; color: var(--muted);
       font-size: 0.8125rem; font-weight: 600;
     }
-    .footer-brand img { width: 20px; height: 20px; opacity: 0.7; }
+    .footer-brand img { width: 20px; height: 20px; opacity: 0.7; border-radius: 6px; }
     .footer-nav {
       display: flex; gap: 20px; flex-wrap: wrap;
     }
