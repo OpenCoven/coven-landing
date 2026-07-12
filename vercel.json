@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    {
+      "source": "/party",
+      "destination": "https://discord.gg/NT3F6keYn?event=1498317633446215770",
+      "permanent": false
+    },
+    {
+      "source": "/weekly",
+      "destination": "https://discord.gg/NT3F6keYn?event=1498317633446215770",
+      "permanent": false
+    }
+  ]
+}
