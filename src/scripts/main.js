@@ -269,9 +269,9 @@
     var subEl = cta.querySelector('[data-download-sub]');
     if (!primary) return;
 
-    // Stable Vercel redirect routes → direct installer downloads
-    // (see vercel.json). Version suffixes live server-side, so these
-    // paths never change per release.
+    // Stable download routes → direct installer files. A serverless
+    // function (api/download.js) resolves the latest release per request,
+    // so these paths never change and there's nothing to bump per release.
     var DOWNLOAD = { mac: '/download/mac', win: '/download/windows', linux: '/download/linux' };
     var testflightUrl = cta.getAttribute('data-testflight-url');
 

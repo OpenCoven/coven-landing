@@ -9,26 +9,12 @@
       "source": "/weekly",
       "destination": "https://discord.gg/NT3F6keYn?event=1498317633446215770",
       "permanent": false
-    },
+    }
+  ],
+  "rewrites": [
     {
-      "source": "/download/mac",
-      "destination": "https://github.com/OpenCoven/coven-cave/releases/download/v0.1.0/CovenCave-v0.1.0-aarch64.dmg",
-      "permanent": false
-    },
-    {
-      "source": "/download/mac-intel",
-      "destination": "https://github.com/OpenCoven/coven-cave/releases/download/v0.1.0/CovenCave-v0.1.0-x86_64.dmg",
-      "permanent": false
-    },
-    {
-      "source": "/download/windows",
-      "destination": "https://github.com/OpenCoven/coven-cave/releases/download/v0.1.0/CovenCave_0.1.0_x64_en-US.msi",
-      "permanent": false
-    },
-    {
-      "source": "/download/linux",
-      "destination": "https://github.com/OpenCoven/coven-cave/releases/download/v0.1.0/CovenCave_0.1.0_amd64.AppImage",
-      "permanent": false
+      "source": "/download/:platform",
+      "destination": "/api/download?platform=:platform"
     }
   ]
 }

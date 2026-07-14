@@ -12,10 +12,11 @@
 //
 // Download sources:
 //   • macOS + Windows + Linux → stable /download/<platform> routes.
-//     These are Vercel redirects (see vercel.json) that 302 straight to
-//     the actual installer asset (.dmg/.msi/.AppImage) — a real file
-//     download, not the GitHub Releases listing page. Version suffixes
-//     live in one place (vercel.json), bumped per release.
+//     A serverless function (api/download.js, wired via vercel.json
+//     rewrites) resolves the latest release at request time and 302s
+//     straight to the actual installer asset (.dmg/.msi/.AppImage) — a
+//     real file download, not the GitHub Releases listing page. Nothing
+//     to bump per release.
 //   • iOS / iPadOS → TestFlight public link.
 
 const DOWNLOAD_MAC = '/download/mac';
