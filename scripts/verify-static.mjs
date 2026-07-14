@@ -128,7 +128,7 @@ const requiredGithubCopy = [
   'launch pricing',
   '$99/mo',
   '$399/mo',
-  'from $2,000/mo',
+  'Contact for Pricing',
   '14-day trial',
   'Hosted beta waitlist',
   'docs/demo.md',
