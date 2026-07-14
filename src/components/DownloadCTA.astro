@@ -8,24 +8,25 @@
 // on iOS the two buttons swap roles (TestFlight leads, macOS follows).
 //
 // Works fully without JS: both buttons are real <a href>s pointing at
-// the canonical release page or TestFlight.
+// a direct-download route or TestFlight.
 //
-// Download sources (resolved at runtime — never bake versions in):
-//   • macOS + Windows + Linux → GitHub Releases (latest release page;
-//     asset filenames carry version suffixes so /latest/download/<asset>
-//     redirects can't be used).
+// Download sources:
+//   • macOS + Windows + Linux → stable /download/<platform> routes.
+//     These are Vercel redirects (see vercel.json) that 302 straight to
+//     the actual installer asset (.dmg/.msi/.AppImage) — a real file
+//     download, not the GitHub Releases listing page. Version suffixes
+//     live in one place (vercel.json), bumped per release.
 //   • iOS / iPadOS → TestFlight public link.
 
-const RELEASES_URL = 'https://github.com/OpenCoven/coven-cave/releases/latest';
+const DOWNLOAD_MAC = '/download/mac';
 const TESTFLIGHT_URL = 'https://testflight.apple.com/join/61Dqw8y4';
 ---
 <div
   class="download-cta"
   data-download-cta
-  data-releases-url={RELEASES_URL}
   data-testflight-url={TESTFLIGHT_URL}
 >
-  <a class="download-primary" href={RELEASES_URL} data-download-primary data-platform="mac">
+  <a class="download-primary" href={DOWNLOAD_MAC} data-download-primary data-platform="mac">
     <svg class="download-primary-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 3v10.55m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
     <span class="download-primary-text">
       <span class="download-primary-label" data-download-label>Download for macOS</span>

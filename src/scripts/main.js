@@ -269,7 +269,10 @@
     var subEl = cta.querySelector('[data-download-sub]');
     if (!primary) return;
 
-    var releasesUrl = cta.getAttribute('data-releases-url');
+    // Stable Vercel redirect routes → direct installer downloads
+    // (see vercel.json). Version suffixes live server-side, so these
+    // paths never change per release.
+    var DOWNLOAD = { mac: '/download/mac', win: '/download/windows', linux: '/download/linux' };
     var testflightUrl = cta.getAttribute('data-testflight-url');
 
     var ua = navigator.userAgent || '';
@@ -315,9 +318,9 @@
     }
 
     var COPY = {
-      mac:   { label: 'Download for macOS',   sub: 'CovenCave · .dmg · signed · free',      href: releasesUrl },
-      win:   { label: 'Download for Windows', sub: 'CovenCave · .msi · signed · free',      href: releasesUrl },
-      linux: { label: 'Download for Linux',   sub: 'CovenCave · .AppImage · x86_64 · free', href: releasesUrl },
+      mac:   { label: 'Download for macOS',   sub: 'CovenCave · .dmg · signed · free',      href: DOWNLOAD.mac },
+      win:   { label: 'Download for Windows', sub: 'CovenCave · .msi · signed · free',      href: DOWNLOAD.win },
+      linux: { label: 'Download for Linux',   sub: 'CovenCave · .AppImage · x86_64 · free', href: DOWNLOAD.linux },
       ios:   { label: 'Get the iOS beta',     sub: 'CovenCave · TestFlight · iPhone & iPad', href: testflightUrl },
     };
 
@@ -334,8 +337,8 @@
     // On iOS the primary already points at TestFlight, so retarget the
     // dedicated iOS button to macOS — both paths stay one click away.
     var iosBtn = cta.querySelector('[data-download-ios]');
-    if (iosBtn && detected === 'ios' && releasesUrl) {
-      iosBtn.setAttribute('href', releasesUrl);
+    if (iosBtn && detected === 'ios') {
+      iosBtn.setAttribute('href', DOWNLOAD.mac);
       iosBtn.removeAttribute('target');
       iosBtn.removeAttribute('rel');
       var iosLabel = iosBtn.querySelector('[data-download-ios-label]');

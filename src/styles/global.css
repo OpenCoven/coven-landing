@@ -514,18 +514,18 @@
       letter-spacing: 0.06em;
       color: rgba(255,255,255,0.72);
     }
-    /* iOS (TestFlight) button — same width, quieter surface */
+    /* iOS (TestFlight) button — same width, secondary but clearly visible */
     .download-primary--ios {
-      background: rgba(154, 142, 205, 0.08);
-      border-color: rgba(154, 142, 205, 0.3);
-      box-shadow: none;
+      background: rgba(154, 142, 205, 0.2);
+      border-color: rgba(180, 170, 235, 0.55);
+      box-shadow: 0 8px 24px -14px rgba(109, 91, 175, 0.55);
     }
     .download-primary--ios:hover {
-      background: rgba(154, 142, 205, 0.14);
-      border-color: rgba(180, 170, 235, 0.5);
-      box-shadow: 0 12px 28px -14px rgba(109, 91, 175, 0.5);
+      background: rgba(154, 142, 205, 0.3);
+      border-color: rgba(198, 188, 245, 0.7);
+      box-shadow: 0 14px 32px -14px rgba(109, 91, 175, 0.7);
     }
-    .download-primary--ios .download-primary-sub { color: rgba(232, 224, 240, 0.6); }
+    .download-primary--ios .download-primary-sub { color: rgba(232, 224, 240, 0.82); }
 
     /* Secondary hero actions (Discord + Docs) — deliberately low-key */
     .hero-actions-secondary {
