@@ -801,4 +801,13 @@ function markKeywords(text: string): string {
     .arch-detail-body { font-size: 0.875rem; }
     .arch-detail-bullets li { font-size: 0.84375rem; }
   }
+
+  /* Light theme: the diagram canvas + detail panel are opaque dark by design
+     (keeps the technical diagram legible and Dark-Reader-proof). Keep the whole
+     console dark so the semi-transparent console bar doesn't read as light glass
+     over a light frame. :global() wraps <html>; the scoped class still matches. */
+  :global(html[data-theme="light"]) .arch-console.panel {
+    background: linear-gradient(180deg, rgba(23, 21, 32, 0.96) 0%, rgba(5, 4, 9, 0.94) 100%);
+    border-color: rgba(154, 142, 205, 0.20);
+  }
 </style>

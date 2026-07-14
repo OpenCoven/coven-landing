@@ -309,6 +309,17 @@
       background: rgba(154, 142, 205, 0.16);
     }
 
+    /* Theme toggle — reuses .header-social-link chrome. Shows only the icon
+       matching the current preference, which ThemeInit stamps on <html
+       data-theme-pref> before paint (so the right glyph shows without JS). */
+    .theme-toggle { cursor: pointer; }
+    .theme-toggle svg { display: none; width: 17px; height: 17px; }
+    .theme-toggle .ti-system { display: block; }
+    html[data-theme-pref="light"] .theme-toggle .ti-system,
+    html[data-theme-pref="dark"]  .theme-toggle .ti-system { display: none; }
+    html[data-theme-pref="light"] .theme-toggle .ti-light { display: block; }
+    html[data-theme-pref="dark"]  .theme-toggle .ti-dark  { display: block; }
+
     .btn-join {
       flex-shrink: 0;
       display: inline-flex; align-items: center; gap: 8px;
@@ -1884,3 +1895,127 @@
     footer a:hover {
       color: var(--coven-violet-light);
     }
+
+    /* ═══════════════════════════════════════════════════════════
+       LIGHT THEME
+       Applied when <html data-theme="light"> (set pre-paint by
+       ThemeInit.astro from the saved preference / OS setting).
+       The base :root above is the dark theme; this block flips the
+       PAGE SHELL — background, header, structural panels, body text,
+       nav, footer — to light. The terminal/code cards (hero summon
+       card, GitHub run card, QuickStart code block) stay DARK by
+       design, so their token-driven text colours are re-asserted at
+       the bottom. No-JS visitors get no data-theme attr → dark.
+       ═══════════════════════════════════════════════════════════ */
+    :root { color-scheme: dark; }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+
+      /* Surfaces → light */
+      --oc-surface-0: #FBFAFF;
+      --oc-surface-1: #FFFFFF;
+      --oc-surface-2: #F1ECFA;
+      --oc-surface-3: #E4DCF3;
+
+      /* Text → dark violet-ink */
+      --oc-text:       #1B1726;
+      --oc-text-muted: rgba(27, 23, 38, 0.70);
+      --oc-text-faint: rgba(27, 23, 38, 0.48);
+
+      /* Borders */
+      --oc-border-purple: rgba(122, 111, 179, 0.28);
+      --oc-border-subtle: rgba(27, 23, 38, 0.10);
+
+      /* Semantic aliases */
+      --bg:       var(--oc-surface-0);
+      --surface:  var(--oc-surface-1);
+      --border:   var(--oc-surface-3);
+      --border-v: var(--oc-border-purple);
+      /* Brand violet is too light for text on white — drop to a
+         darker stop that clears WCAG AA on the light surface. */
+      --vtext:    #5A4C9E;
+      --white:    #1B1726;
+      --muted:    #595370;
+
+      /* Panels + insets → light glass */
+      --panel-bg:         linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(244, 241, 251, 0.78) 100%);
+      --panel-bg-arrival: linear-gradient(135deg, rgba(196, 185, 240, 0.30) 0%, rgba(255, 255, 255, 0.90) 62%);
+      --panel-shadow:     0 24px 60px -30px rgba(60, 50, 90, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+      --inset-bg:         rgba(255, 255, 255, 0.66);
+      --accent-wash:      rgba(154, 142, 205, 0.10);
+      --accent-active:    rgba(122, 111, 179, 0.16);
+      --accent-line:      rgba(122, 111, 179, 0.32);
+      --accent-strong:    rgba(122, 111, 179, 0.50);
+
+      --oc-focus-ring: 0 0 0 2px rgba(122, 111, 179, 0.55), 0 0 22px rgba(122, 111, 179, 0.22);
+      --oc-hover-glow: 0 0 30px rgba(122, 111, 179, 0.18);
+    }
+
+    /* ── Page background + ambient mist ── */
+    html[data-theme="light"] { background: #FBFAFF; }
+    html[data-theme="light"] body {
+      background:
+        radial-gradient(ellipse 80% 45% at 50% -8%, rgba(154, 142, 205, 0.16), transparent 55%),
+        radial-gradient(ellipse 55% 35% at 90% 12%, rgba(180, 170, 235, 0.10), transparent 58%),
+        radial-gradient(ellipse 40% 25% at 5%  80%, rgba(154, 142, 205, 0.06), transparent 62%),
+        #FBFAFF;
+    }
+    html[data-theme="light"] .glow-left   { background: radial-gradient(circle, rgba(154, 142, 205, 0.22) 0%, transparent 70%); }
+    html[data-theme="light"] .glow-right  { background: radial-gradient(circle, rgba(180, 170, 235, 0.20) 0%, transparent 65%); }
+    html[data-theme="light"] .glow-bottom { background: radial-gradient(circle, rgba(154, 142, 205, 0.14) 0%, transparent 70%); }
+
+    /* ── Header ── */
+    html[data-theme="light"] .site-header {
+      background: rgba(255, 255, 255, 0.82);
+      border-bottom-color: rgba(27, 23, 38, 0.10);
+    }
+    html[data-theme="light"] .header-social-link:hover { color: var(--violet-cta); }
+
+    /* ── Glass cards + testimonial + mobile overlay ── */
+    html[data-theme="light"] .glass-card {
+      background: rgba(255, 255, 255, 0.72);
+      border-color: rgba(122, 111, 179, 0.20);
+    }
+    html[data-theme="light"] .testimonial-strip { background: rgba(255, 255, 255, 0.58); }
+    html[data-theme="light"] .mobile-nav-overlay { background: rgba(251, 250, 255, 0.97); }
+
+    /* ── Inline prose code (not the terminal) ── */
+    html[data-theme="light"] :not(pre) > code {
+      background: rgba(122, 111, 179, 0.10);
+      color: #5A4C9E;
+      border-color: rgba(122, 111, 179, 0.22);
+    }
+
+    /* ── Nav / footer hover: brand violet reads too light on white ── */
+    html[data-theme="light"] nav a:hover,
+    html[data-theme="light"] footer a:hover,
+    html[data-theme="light"] .desktop-nav a:hover { color: var(--violet-cta); }
+
+    /* ── Headings/labels hardcoded to #fff that now sit on light shell ── */
+    html[data-theme="light"] .github-price-card h3,
+    html[data-theme="light"] .github-trust-copy h3,
+    html[data-theme="light"] .eco-portal-name,
+    html[data-theme="light"] .panel-inset.is-active { color: var(--white); }
+
+    /* ═══ Terminal/code surfaces: STAY DARK ═══
+       These re-assert dark values because the elements inherit the
+       now-flipped page tokens but their cards remain dark. */
+
+    /* GitHub run card uses the shared .panel — keep it a dark terminal. */
+    html[data-theme="light"] .github-run-card.panel {
+      background: linear-gradient(180deg, rgba(23, 21, 32, 0.94) 0%, rgba(5, 4, 9, 0.92) 100%);
+      border-color: rgba(154, 142, 205, 0.22);
+    }
+    html[data-theme="light"] .github-run-row  { color: rgba(232, 224, 240, 0.68); }
+    html[data-theme="light"] .github-demo-link { color: #B4AAEB; }
+
+    /* Hero summon card (dark, hardcoded bg) — restore its terminal text. */
+    html[data-theme="light"] .card-prompt { color: #B4AAEB; }
+    html[data-theme="light"] .roster-tab  { color: rgba(232, 224, 240, 0.60); }
+
+    /* QuickStart code block (dark inset) — restore its syntax tokens. */
+    html[data-theme="light"] .qs-tok-bin  { color: #E8E0F0; }
+    html[data-theme="light"] .qs-tok-flag { color: rgba(232, 224, 240, 0.55); }
+    html[data-theme="light"] .qs-tok-arg,
+    html[data-theme="light"] .qs-tok-pkg  { color: #B4AAEB; }

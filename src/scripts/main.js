@@ -347,3 +347,55 @@
     // Stamp the resolved platform on the cta for analytics / debug.
     cta.setAttribute('data-detected', detected);
   })();
+
+  // ── Theme toggle: cycles system → light → dark ────────────
+  // The pre-paint script in ThemeInit.astro already stamped <html> with the
+  // resolved theme + preference; this only wires the header button and keeps
+  // 'system' in sync with the OS. Preference persists in localStorage.
+  (function () {
+    var STORAGE_KEY = 'theme';
+    var ORDER = ['system', 'light', 'dark'];
+    var LABELS = { system: 'System', light: 'Light', dark: 'Dark' };
+    var html = document.documentElement;
+    var btn = document.querySelector('[data-theme-toggle]');
+    var mql = window.matchMedia ? matchMedia('(prefers-color-scheme: light)') : null;
+
+    function getPref() {
+      var p = null;
+      try { p = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+      return (p === 'light' || p === 'dark' || p === 'system') ? p : 'system';
+    }
+    function resolve(pref) {
+      if (pref === 'system') return (mql && mql.matches) ? 'light' : 'dark';
+      return pref;
+    }
+    function apply(pref) {
+      var resolved = resolve(pref);
+      html.dataset.theme = resolved;
+      html.dataset.themePref = pref;
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', resolved === 'light' ? '#FBFAFF' : '#050409');
+      if (btn) {
+        var hint = pref === 'system' ? 'System (' + resolved + ')' : LABELS[pref];
+        btn.setAttribute('aria-label', 'Theme: ' + LABELS[pref] + ' — click to change');
+        btn.setAttribute('title', 'Theme: ' + hint);
+      }
+    }
+
+    apply(getPref());
+
+    if (btn) {
+      btn.addEventListener('click', function () {
+        var next = ORDER[(ORDER.indexOf(getPref()) + 1) % ORDER.length];
+        try { localStorage.setItem(STORAGE_KEY, next); } catch (e) {}
+        apply(next);
+      });
+    }
+
+    // While in system mode, follow live OS light/dark changes.
+    if (mql) {
+      var onChange = function () { if (getPref() === 'system') apply('system'); };
+      if (mql.addEventListener) mql.addEventListener('change', onChange);
+      else if (mql.addListener) mql.addListener(onChange);
+    }
+  })();

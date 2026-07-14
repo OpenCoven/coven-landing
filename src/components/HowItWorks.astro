@@ -857,6 +857,15 @@ const toolGates = [
     color: rgba(232,224,240,0.78);
   }
 
+  /* Light theme: this is an interactive console — keep it a dark demo card
+     (matches the hero + GitHub run cards) instead of recolouring every inner
+     widget. The shared .panel frame flips light by default, so re-assert dark
+     here. :global() wraps the <html> selector; the scoped class still matches. */
+  :global(html[data-theme="light"]) .howit-frame.panel {
+    background: linear-gradient(180deg, rgba(23, 21, 32, 0.96) 0%, rgba(5, 4, 9, 0.94) 100%);
+    border-color: rgba(154, 142, 205, 0.20);
+  }
+
   /* ── Responsive ──────────────────────────────────────────── */
   @media (max-width: 900px) {
     .howit-stage { min-height: 0; }

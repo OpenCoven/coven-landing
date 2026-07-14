@@ -1,0 +1,28 @@
+---
+// Pre-paint theme resolution. Runs before first paint (is:inline, in <head>)
+// so there's no flash of the wrong theme. Reads the saved preference
+// ('system' | 'light' | 'dark', default 'system'), resolves 'system' against
+// the OS setting, and stamps <html data-theme> (the concrete light/dark the
+// CSS keys off) plus <html data-theme-pref> (what the toggle displays).
+// No-JS visitors get no data-theme attribute, so the base :root dark theme
+// applies unchanged.
+---
+<script is:inline>
+  (function () {
+    var html = document.documentElement;
+    try {
+      var pref = localStorage.getItem('theme');
+      if (pref !== 'light' && pref !== 'dark' && pref !== 'system') pref = 'system';
+      var resolved = pref;
+      if (pref === 'system') {
+        resolved = (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches)
+          ? 'light' : 'dark';
+      }
+      html.dataset.theme = resolved;
+      html.dataset.themePref = pref;
+    } catch (e) {
+      html.dataset.theme = 'dark';
+      html.dataset.themePref = 'system';
+    }
+  })();
+</script>

@@ -93,6 +93,18 @@ const harnesses = [
     color: rgba(201, 167, 255, 0.78);
   }
 
+  /* Light theme: the strip becomes a quiet light divider. :global() wraps
+     the <html> selector so the scoped .trust-* classes still match. */
+  :global(html[data-theme="light"]) .trust-strip { background: rgba(255, 255, 255, 0.5); }
+  :global(html[data-theme="light"]) .trust-kicker { color: #6E5FB0; }
+  :global(html[data-theme="light"]) .trust-mark {
+    border-color: rgba(122, 111, 179, 0.18);
+    background: rgba(122, 111, 179, 0.05);
+  }
+  :global(html[data-theme="light"]) .trust-mark-name { color: #1B1726; }
+  :global(html[data-theme="light"]) .trust-mark-vendor { color: rgba(90, 76, 158, 0.78); }
+  :global(html[data-theme="light"]) .trust-mark--future .trust-mark-name { color: #6E5FB0; }
+
   @media (max-width: 720px) {
     .trust-strip { padding: 18px 20px; }
     .trust-inner { gap: 18px; }
