@@ -22,6 +22,7 @@ const requiredPublicFiles = [
   'apple-touch-icon.png',
   'og.png',
   'og.svg',
+  'robots.txt',
 ];
 
 const missing = requiredPublicFiles.filter(
@@ -59,6 +60,11 @@ assertCanonicalLogoSvg(og, 'public/og.svg');
 
 const distIndex = path.join(distDir, 'index.html');
 if (existsSync(distIndex)) {
+  // The sitemap only exists post-build; guard the @astrojs/sitemap
+  // integration against accidental removal from astro.config.mjs.
+  if (!existsSync(path.join(distDir, 'sitemap-index.xml'))) {
+    throw new Error('dist/sitemap-index.xml is missing — is the @astrojs/sitemap integration still configured?');
+  }
   const html = await readFile(distIndex, 'utf8');
   const requiredCopy = [
     'Persistent AI Familiars',
