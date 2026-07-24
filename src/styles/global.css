@@ -94,16 +94,8 @@
     /* ── Page-level ambient glow (mirrors coven-docs deep violet night) ── */
     html {
       background: #050409;
-      /* Subtle fixed radial so the glow follows the viewport, not the scroll */
-      background-attachment: fixed;
     }
     body {
-      background:
-        radial-gradient(ellipse 80% 45% at 50% -8%, rgba(154, 142, 205, 0.18), transparent 52%),
-        radial-gradient(ellipse 55% 35% at 90% 15%, rgba(122, 111, 179, 0.08), transparent 55%),
-        radial-gradient(ellipse 40% 25% at 5%  80%, rgba(154, 142, 205, 0.05), transparent 60%),
-        #050409;
-      background-attachment: fixed;
       color: var(--white);
       font-family: var(--font-ui);
       font-feature-settings: "rlig" 1, "calt" 1;
@@ -112,6 +104,24 @@
       min-height: 100vh;
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
+    }
+    /* Viewport-anchored mist gradients (glow follows the viewport, not the
+       scroll). These used to live on html/body via background-attachment:
+       fixed, which disables composited scrolling in Chromium/WebKit — every
+       scroll frame repainted the whole page underneath the backdrop-filter
+       surfaces (sticky header, panels) and the page visibly flickered.
+       A position:fixed pseudo-element renders identically but rasterizes
+       once on its own compositor layer, so scrolling never repaints it. */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 45% at 50% -8%, rgba(154, 142, 205, 0.18), transparent 52%),
+        radial-gradient(ellipse 55% 35% at 90% 15%, rgba(122, 111, 179, 0.08), transparent 55%),
+        radial-gradient(ellipse 40% 25% at 5%  80%, rgba(154, 142, 205, 0.05), transparent 60%);
     }
 
     /* ── Glassmorphism cards (mirrors coven-docs callout style) ── */
@@ -1981,12 +1991,11 @@
 
     /* ── Page background + ambient mist ── */
     html[data-theme="light"] { background: #FBFAFF; }
-    html[data-theme="light"] body {
+    html[data-theme="light"] body::before {
       background:
         radial-gradient(ellipse 80% 45% at 50% -8%, rgba(154, 142, 205, 0.16), transparent 55%),
         radial-gradient(ellipse 55% 35% at 90% 12%, rgba(180, 170, 235, 0.10), transparent 58%),
-        radial-gradient(ellipse 40% 25% at 5%  80%, rgba(154, 142, 205, 0.06), transparent 62%),
-        #FBFAFF;
+        radial-gradient(ellipse 40% 25% at 5%  80%, rgba(154, 142, 205, 0.06), transparent 62%);
     }
     html[data-theme="light"] .glow-left   { background: radial-gradient(circle, rgba(154, 142, 205, 0.22) 0%, transparent 70%); }
     html[data-theme="light"] .glow-right  { background: radial-gradient(circle, rgba(180, 170, 235, 0.20) 0%, transparent 65%); }
