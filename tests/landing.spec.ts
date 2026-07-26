@@ -328,3 +328,44 @@ test('product constellation exposes five complete keyboard links', async ({
     )
     .toBe('1');
 });
+
+test('product constellation preserves the focus ring while hovered', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+
+  const runtimeDocs = page.locator('.runtime-docs');
+  const firstCard = page
+    .locator('[data-product-constellation] .product-card')
+    .first();
+
+  await runtimeDocs.focus();
+  await firstCard.hover();
+  await expect
+    .poll(() => firstCard.evaluate((card) => card.matches(':hover')))
+    .toBe(true);
+
+  await page.keyboard.press('Tab');
+  await expect(firstCard).toBeFocused();
+
+  const focusState = await firstCard.evaluate((card) => {
+    const focusRingProbe = document.createElement('span');
+    focusRingProbe.style.boxShadow = 'var(--oc-focus-ring)';
+    document.body.append(focusRingProbe);
+
+    const state = {
+      focusVisible: card.matches(':focus-visible'),
+      hovered: card.matches(':hover'),
+      boxShadow: window.getComputedStyle(card).boxShadow,
+      focusRing: window.getComputedStyle(focusRingProbe).boxShadow,
+    };
+
+    focusRingProbe.remove();
+    return state;
+  });
+
+  expect(focusState.focusVisible).toBe(true);
+  expect(focusState.hovered).toBe(true);
+  expect(focusState.boxShadow).toBe(focusState.focusRing);
+});

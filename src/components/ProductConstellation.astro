@@ -253,7 +253,7 @@ import { quickstartProducts } from '../data/quickstart';
       will-change: transform;
     }
 
-    .product-card:hover {
+    .product-card:hover:not(:focus-visible) {
       transform: translateY(-2px);
       border-color: var(--accent-strong);
       background:
