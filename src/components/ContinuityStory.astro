@@ -193,20 +193,20 @@ import { storyStages } from '../data/landing';
     transform: translateY(4px);
   }
 
-  :global(html:not(.js-on)) .story-layout {
+  .continuity-story:not(.is-enhanced) .story-layout {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  :global(html:not(.js-on)) .continuity-stages li {
+  .continuity-story:not(.is-enhanced) .continuity-stages li {
     min-height: 0;
     padding-bottom: 72px;
   }
 
-  :global(html:not(.js-on)) .story-visual {
+  .continuity-story:not(.is-enhanced) .story-visual {
     display: none;
   }
 
-  :global(html:not(.js-on)) .stage-snapshot {
+  .continuity-story:not(.is-enhanced) .stage-snapshot {
     display: block;
     max-width: 680px;
     margin-top: 28px;

@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import type { BrowserContext } from '@playwright/test';
 import { quickstartProducts } from '../src/data/quickstart';
 
 const productContracts = [
@@ -126,7 +127,7 @@ test('hero emphasis meets light-theme contrast', async ({ page }) => {
   expect(contrastRatio).toBeGreaterThanOrEqual(3);
 });
 
-test('theme storage failure falls back to the live system preference', async ({ page }) => {
+test('bundle and theme storage failure preserve the complete fallback', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.route('**/*.js', async (route) => route.abort());
   await page.addInitScript(() => {
@@ -138,6 +139,11 @@ test('theme storage failure falls back to the live system preference', async ({ 
 
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await expect(page.locator('html')).toHaveAttribute('data-theme-pref', 'system');
+  await expect.soft(page.locator('[data-runtime-panel]:visible')).toHaveCount(3);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.soft(page.locator('.mobile-toggle')).toBeHidden();
+  await expect.soft(page.locator('.mobile-nav-fallback')).toBeVisible();
 });
 
 test('continuity anchors and passive scroll select story state', async ({ page }) => {
@@ -178,13 +184,10 @@ test('mobile story renders a readable ledger snapshot per stage', async ({ page 
   await expect(page.locator('.story-visual')).toBeHidden();
 });
 
-test('desktop story remains complete without JavaScript', async ({ browser }) => {
-  const context = await browser.newContext({
-    javaScriptEnabled: false,
-    viewport: { width: 1440, height: 1000 },
-  });
-
-  try {
+test('desktop story remains complete without JavaScript or IntersectionObserver', async ({
+  browser,
+}) => {
+  const assertStaticStory = async (context: BrowserContext) => {
     const page = await context.newPage();
     await page.goto('/');
 
@@ -206,8 +209,30 @@ test('desktop story remains complete without JavaScript', async ({ browser }) =>
         story.getByRole('heading', { level: 3, name: title, exact: true }),
       ).toBeVisible();
     }
+  };
+
+  const noJavaScriptContext = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 1440, height: 1000 },
+  });
+  try {
+    await assertStaticStory(noJavaScriptContext);
   } finally {
-    await context.close();
+    await noJavaScriptContext.close();
+  }
+
+  const noObserverContext = await browser.newContext({
+    viewport: { width: 1440, height: 1000 },
+  });
+  await noObserverContext.addInitScript(() => {
+    delete (window as Window & {
+      IntersectionObserver?: typeof IntersectionObserver;
+    }).IntersectionObserver;
+  });
+  try {
+    await assertStaticStory(noObserverContext);
+  } finally {
+    await noObserverContext.close();
   }
 });
 
@@ -1347,6 +1372,8 @@ for (const viewport of visualMatrix) {
         );
         expect(Math.min(...terminalFontSizes)).toBeGreaterThanOrEqual(13);
       }
+
+      await expect(page.locator('.hero-ledger')).toHaveCSS('opacity', '1');
 
       await page.screenshot({
         path: testInfo.outputPath(`${viewport.name}-${theme}.png`),

@@ -107,6 +107,7 @@
   };
   if (desktop.addEventListener) desktop.addEventListener('change', onDesktop);
   else desktop.addListener(onDesktop);
+  document.documentElement.classList.add('mobile-nav-on');
 })();
 
   // ── Scroll reveals ────────────────────────────────────────

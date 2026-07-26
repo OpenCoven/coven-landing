@@ -70,12 +70,11 @@ import FeedbackLauncher from '../components/FeedbackLauncher.astro';
   })} />
 
   <script is:inline>
-    /* Runs before paint: marks <html> with js-on / motion-on so interactive
-       CSS (reveals, parallax) only applies when JS + motion are available.
-       No-JS visitors and reduced-motion users never see hidden content. */
+    /* Runs before paint: motion-on enables the bounded arrival sequence only
+       when motion is allowed. Each interactive controller opts its own
+       component into enhanced CSS after it wires successfully. */
     (function () {
       var html = document.documentElement;
-      html.classList.add('js-on');
       if (!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) {
         html.classList.add('motion-on');
       }

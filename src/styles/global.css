@@ -1209,7 +1209,7 @@
       .header-actions {
         margin-left: auto;
       }
-      html.js-on .mobile-toggle {
+      html.mobile-nav-on .mobile-toggle {
         display: inline-grid;
       }
 
@@ -1232,6 +1232,9 @@
         gap: 8px 16px;
         padding: 12px 20px;
         border-bottom: 1px solid var(--oc-border-subtle);
+      }
+      html.mobile-nav-on .mobile-nav-fallback {
+        display: none;
       }
       .mobile-nav-fallback a {
         color: var(--muted);

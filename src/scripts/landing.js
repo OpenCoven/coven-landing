@@ -1,8 +1,8 @@
 function wireRovingTabs(root, tabSelector, panelSelector, valueAttribute) {
-  if (!root) return;
+  if (!root) return false;
   var tabs = Array.from(root.querySelectorAll(tabSelector));
   var panels = Array.from(root.querySelectorAll(panelSelector));
-  if (!tabs.length || !panels.length) return;
+  if (!tabs.length || !panels.length) return false;
 
   function select(tab, moveFocus) {
     var value = tab.getAttribute(valueAttribute);
@@ -30,14 +30,18 @@ function wireRovingTabs(root, tabSelector, panelSelector, valueAttribute) {
       select(tabs[nextIndex], true);
     });
   });
+  return true;
 }
 
-wireRovingTabs(
-  document.querySelector('[data-familiar-switcher]'),
+var familiarSwitcher = document.querySelector('[data-familiar-switcher]');
+if (wireRovingTabs(
+  familiarSwitcher,
   '[data-familiar-tab]',
   '[data-familiar-panel]',
   'data-familiar-tab',
-);
+)) {
+  familiarSwitcher.classList.add('is-enhanced');
+}
 
 (function wireContinuityStory() {
   var root = document.querySelector('[data-continuity-story]');
@@ -115,6 +119,7 @@ wireRovingTabs(
   stages.forEach(function (stage) {
     observer.observe(stage);
   });
+  root.classList.add('is-enhanced');
 })();
 
 (function wireRuntimeProof() {
@@ -178,6 +183,7 @@ wireRovingTabs(
       select(tabs[nextIndex], true);
     });
   });
+  root.classList.add('is-enhanced');
 })();
 
 (function wireFeedback() {
