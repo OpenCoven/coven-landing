@@ -228,6 +228,8 @@ const requiredQuickstartCopy = [
   'Add local surfaces one at a time without repeating their shared setup. GitHub automation has separate hosted-access or self-hosted operator setup.',
   'Coven CLI, Coven Code, Cave, and CastCodes share the runtime and session history you already set up. GitHub automation has its own hosted or self-hosted access path.',
   'Coven CLI, Coven Code, Cave, and CastCodes reuse the local runtime, provider connection, and session history. GitHub automation connects separately through the hosted beta or a self-hosted deployment.',
+  'Complete the prerequisites named by your guide — provider, account, runtime, or repository access — before you run anything.',
+  "Follow the guide's exact steps for one small, bounded task — the same loop you can repeat after this.",
   'Your first success',
 ];
 const missingQuickstartCopy = requiredQuickstartCopy.filter((needle) => !quickstartText.includes(needle));
