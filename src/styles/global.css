@@ -1611,6 +1611,7 @@
       z-index: 200;
       display: grid;
       justify-items: end;
+      overflow-y: auto;
       background: rgba(5, 4, 9, 0.98);
     }
     .mobile-nav-panel {

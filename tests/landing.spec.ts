@@ -686,6 +686,46 @@ test('mobile menu marks the GitHub App route as current', async ({ page }) => {
   ).toHaveAttribute('aria-current', 'page');
 });
 
+test('mobile menu keeps the final keyboard target reachable in a short viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.goto('/');
+
+  await page.locator('.mobile-toggle').click();
+  const dialog = page.locator('#mobile-nav');
+  const finalLink = dialog.locator('a').last();
+  await expect(dialog.locator('.mobile-nav-close')).toBeFocused();
+
+  await page.keyboard.press('Shift+Tab');
+  await expect(finalLink).toBeFocused();
+
+  const geometry = await dialog.evaluate((modal) => {
+    const anchors = modal.querySelectorAll('a');
+    const finalTarget = anchors.item(anchors.length - 1);
+    if (!finalTarget) throw new Error('Mobile navigation has no links');
+    const targetBox = finalTarget.getBoundingClientRect();
+    const style = window.getComputedStyle(modal);
+    return {
+      clientHeight: modal.clientHeight,
+      overflowY: style.overflowY,
+      scrollHeight: modal.scrollHeight,
+      scrollTop: modal.scrollTop,
+      targetBottom: targetBox.bottom,
+      targetTop: targetBox.top,
+      viewportHeight: window.innerHeight,
+    };
+  });
+
+  expect.soft(geometry.overflowY).toMatch(/^(auto|scroll)$/);
+  expect.soft(geometry.scrollHeight).toBeGreaterThan(geometry.clientHeight);
+  expect.soft(geometry.scrollTop).toBeGreaterThan(0);
+  expect.soft(geometry.targetTop).toBeGreaterThanOrEqual(0);
+  expect.soft(geometry.targetBottom).toBeLessThanOrEqual(
+    geometry.viewportHeight,
+  );
+});
+
 test('mobile menu preserves body state and inerts siblings added while open', async ({
   page,
 }) => {
