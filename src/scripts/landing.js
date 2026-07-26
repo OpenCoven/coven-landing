@@ -124,39 +124,37 @@ wireRovingTabs(
   var tabs = Array.from(root.querySelectorAll('[data-runtime-tab]'));
   var panels = Array.from(root.querySelectorAll('[data-runtime-panel]'));
   var panelRoot = root.querySelector('.runtime-panels');
-  var timer = null;
+  var animationFrame = null;
   var motionOn = document.documentElement.classList.contains('motion-on');
 
   function select(tab, moveFocus) {
     var id = tab.getAttribute('data-runtime-tab');
-    var apply = function () {
-      tabs.forEach(function (candidate) {
-        var active = candidate === tab;
-        candidate.setAttribute('aria-selected', active ? 'true' : 'false');
-        candidate.setAttribute('tabindex', active ? '0' : '-1');
-      });
-      panels.forEach(function (panel) {
-        panel.classList.toggle(
-          'is-active',
-          panel.getAttribute('data-runtime-panel') === id,
-        );
-      });
-      if (moveFocus) tab.focus();
-    };
+    var changed = tab.getAttribute('aria-selected') !== 'true';
 
-    if (!motionOn || !panelRoot) {
-      apply();
-      return;
-    }
+    tabs.forEach(function (candidate) {
+      var active = candidate === tab;
+      candidate.setAttribute('aria-selected', active ? 'true' : 'false');
+      candidate.setAttribute('tabindex', active ? '0' : '-1');
+    });
+    panels.forEach(function (panel) {
+      panel.classList.toggle(
+        'is-active',
+        panel.getAttribute('data-runtime-panel') === id,
+      );
+    });
+    if (moveFocus) tab.focus();
 
-    if (timer) window.clearTimeout(timer);
+    if (!changed || !motionOn || !panelRoot) return;
+
+    if (animationFrame) window.cancelAnimationFrame(animationFrame);
+    panelRoot.style.transition = 'none';
     panelRoot.style.opacity = '0.12';
-    timer = window.setTimeout(function () {
-      apply();
-      requestAnimationFrame(function () {
-        panelRoot.style.opacity = '';
-      });
-    }, 180);
+    panelRoot.getBoundingClientRect();
+    panelRoot.style.transition = '';
+    animationFrame = window.requestAnimationFrame(function () {
+      panelRoot.style.opacity = '';
+      animationFrame = null;
+    });
   }
 
   tabs.forEach(function (tab, index) {

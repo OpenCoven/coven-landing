@@ -37,9 +37,9 @@ public/         Static assets served at /        (favicon, og image, apple touch
 api/            Vercel serverless functions      (download.js — resolves latest installer)
 src/
   pages/        Astro routes                     (index, github, privacy, terms)
-  components/   Page sections                    (Hero, ProofGrid, Architecture, HowItWorks, …)
-  scripts/      Client-side islands              (main.js — hero card, reveals, parallax, copy;
-                                                  shared.js — fadeSwap, wireRadioGroup, typewriter)
+  components/   Page sections                    (Hero, ContinuityStory, RuntimeProof, QuickStart, …)
+  scripts/      Client-side behavior             (main.js — navigation, reveals, downloads, theme;
+                                                  landing.js — familiar tabs, continuity, runtime proof)
   styles/       Global stylesheet                (global.css)
 scripts/        Build-time sanity checks         (verify-static.mjs)
 ```

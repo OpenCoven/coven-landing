@@ -192,6 +192,64 @@ test('runtime proof uses accessible desktop tabs', async ({ page }) => {
   await expect(tabs.nth(2)).toBeFocused();
 });
 
+test('runtime proof synchronizes rapid keyboard selection immediately', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/');
+
+  const tabs = page.locator('[data-runtime-proof] [data-runtime-tab]');
+  await tabs.nth(0).click();
+  await page.waitForTimeout(220);
+
+  const snapshots = await page.evaluate(() => {
+    const proof = document.querySelector('[data-runtime-proof]')!;
+    const runtimeTabs = Array.from(
+      proof.querySelectorAll<HTMLElement>('[data-runtime-tab]'),
+    );
+
+    const snapshot = () => ({
+      focused: document.activeElement?.getAttribute('data-runtime-tab'),
+      selected: runtimeTabs
+        .find((tab) => tab.getAttribute('aria-selected') === 'true')
+        ?.getAttribute('data-runtime-tab'),
+      tabbable: runtimeTabs
+        .find((tab) => tab.getAttribute('tabindex') === '0')
+        ?.getAttribute('data-runtime-tab'),
+      panel: proof
+        .querySelector('[data-runtime-panel].is-active')
+        ?.getAttribute('data-runtime-panel'),
+    });
+
+    runtimeTabs[0].focus();
+    document.activeElement?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+    );
+    const afterFirst = snapshot();
+    document.activeElement?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
+    );
+    const afterSecond = snapshot();
+
+    return { afterFirst, afterSecond };
+  });
+
+  expect(snapshots).toEqual({
+    afterFirst: {
+      focused: 'coven',
+      selected: 'coven',
+      tabbable: 'coven',
+      panel: 'coven',
+    },
+    afterSecond: {
+      focused: 'project',
+      selected: 'project',
+      tabbable: 'project',
+      panel: 'project',
+    },
+  });
+});
+
 test('runtime proof becomes native disclosures on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
