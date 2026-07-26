@@ -32,7 +32,7 @@ import ThemeInit from '../components/ThemeInit.astro';
       --border:      rgba(255,255,255,0.07);
       --text:        #e8e4f0;
       --muted:       #7a748a;
-      --accent:      #8e3dff;
+      --accent:      #9a55ff; /* ≥4.5:1 on --bg for WCAG AA */
       --accent-soft: rgba(142,61,255,0.12);
       --font-sans:   'Inter Variable', Inter, system-ui, sans-serif;
       --font-mono:   'JetBrains Mono Variable', 'JetBrains Mono', monospace;
@@ -140,8 +140,13 @@ import ThemeInit from '../components/ThemeInit.astro';
       margin-bottom: 6px;
     }
 
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-decoration-color: rgba(154,85,255,0.45);
+      text-underline-offset: 3px;
+    }
+    a:hover { text-decoration-color: var(--accent); }
 
     .callout {
       background: var(--accent-soft);
@@ -183,8 +188,13 @@ import ThemeInit from '../components/ThemeInit.astro';
       font-size: 0.8125rem;
       color: var(--muted);
     }
-    .page-footer a { color: var(--muted); }
-    .page-footer a:hover { color: var(--text); }
+    .page-footer a {
+      color: var(--muted);
+      text-decoration: underline;
+      text-decoration-color: rgba(122,116,138,0.55);
+      text-underline-offset: 3px;
+    }
+    .page-footer a:hover { color: var(--text); text-decoration-color: currentColor; }
 
     @media (max-width: 640px) {
       .page-header { padding: 0 20px; }
@@ -200,7 +210,7 @@ import ThemeInit from '../components/ThemeInit.astro';
 <header class="page-header">
   <div class="page-header-inner">
     <a class="header-brand" href="/">
-      <img src="/favicon.svg" alt="OpenCoven" />
+      <img src="/favicon.svg" alt="" />
       OpenCoven
     </a>
     <a class="header-back" href="/">← Back to home</a>
