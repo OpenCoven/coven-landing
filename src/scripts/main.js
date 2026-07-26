@@ -102,10 +102,10 @@
 
   // ── Download CTA: detect visitor's platform ─────────────────
   //
-  // Rewrites the primary button's label/sub/href to match the visitor's
-  // platform; on iOS the dedicated TestFlight button retargets to macOS.
-  // Works fully without JS — both buttons are real <a href>s — this only
-  // retargets the emphasis.
+  // Rewrites the primary button's label/href to match the visitor's platform.
+  // Optional sublabel and iOS controls remain compatibility hooks for fuller
+  // download treatments that share this script. Server-rendered defaults
+  // remain usable without JS.
   //
   // Detection order:
   //   1. UA-string OS markers (most intentional; matches UA overrides)
@@ -170,10 +170,10 @@
     }
 
     var COPY = {
-      mac: { label: 'Download Coven Cave for macOS', href: DOWNLOAD.mac },
-      win: { label: 'Download Coven Cave for Windows', href: DOWNLOAD.win },
-      linux: { label: 'Download Coven Cave for Linux', href: DOWNLOAD.linux },
-      ios: { label: 'Get Coven Cave for iOS beta', href: testflightUrl },
+      mac: { label: 'Download Coven Cave for macOS', sub: 'CovenCave · .dmg · signed · free', href: DOWNLOAD.mac },
+      win: { label: 'Download Coven Cave for Windows', sub: 'CovenCave · .msi · signed · free', href: DOWNLOAD.win },
+      linux: { label: 'Download Coven Cave for Linux', sub: 'CovenCave · .AppImage · x86_64 · free', href: DOWNLOAD.linux },
+      ios: { label: 'Get Coven Cave for iOS beta', sub: 'CovenCave · TestFlight · iPhone & iPad', href: testflightUrl },
     };
 
     var copy = COPY[detected] || COPY.mac;
@@ -186,8 +186,8 @@
       primary.setAttribute('rel', 'noopener noreferrer');
     }
 
-    // On iOS the primary already points at TestFlight, so retarget the
-    // dedicated iOS button to macOS — both paths stay one click away.
+    // If a fuller treatment includes an iOS control, keep the macOS path
+    // available when the primary link points to TestFlight.
     var iosBtn = cta.querySelector('[data-download-ios]');
     if (iosBtn && detected === 'ios') {
       iosBtn.setAttribute('href', DOWNLOAD.mac);

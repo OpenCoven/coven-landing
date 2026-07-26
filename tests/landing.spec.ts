@@ -41,3 +41,53 @@ test('hero exposes one primary path and manual familiar tabs', async ({ page }) 
   await page.keyboard.press('Home');
   await expect(tabs.nth(0)).toBeFocused();
 });
+
+test('hero emphasis meets light-theme contrast', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'light' });
+  await page.addInitScript(() => {
+    window.localStorage.setItem('theme', 'light');
+  });
+  await page.goto('/');
+
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  const emphasis = page.locator('.hero h1 em');
+  await expect(emphasis).toBeVisible();
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+  });
+
+  const contrastRatio = await page.evaluate(() => {
+    const parseRgb = (value: string) => {
+      const channels = value.match(/\d+(?:\.\d+)?/g)?.slice(0, 3).map(Number);
+      if (!channels || channels.length !== 3) {
+        throw new Error(`Unable to parse RGB color: ${value}`);
+      }
+      return channels;
+    };
+
+    const luminance = (value: string) => {
+      const [red, green, blue] = parseRgb(value).map((channel) => {
+        const normalized = channel / 255;
+        return normalized <= 0.03928
+          ? normalized / 12.92
+          : ((normalized + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+    };
+
+    const foreground = window.getComputedStyle(
+      document.querySelector('.hero h1 em')!,
+    ).color;
+    const background = window.getComputedStyle(document.documentElement)
+      .backgroundColor;
+    const foregroundLuminance = luminance(foreground);
+    const backgroundLuminance = luminance(background);
+
+    return (
+      (Math.max(foregroundLuminance, backgroundLuminance) + 0.05) /
+      (Math.min(foregroundLuminance, backgroundLuminance) + 0.05)
+    );
+  });
+
+  expect(contrastRatio).toBeGreaterThanOrEqual(3);
+});

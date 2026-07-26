@@ -189,6 +189,20 @@ if (existsSync(distGithub)) {
 
 const sourceCss = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
 const sourceMain = await readFile(path.join(root, 'src/scripts/main.js'), 'utf8');
+const requiredDownloadSubs = [
+  'CovenCave · .dmg · signed · free',
+  'CovenCave · .msi · signed · free',
+  'CovenCave · .AppImage · x86_64 · free',
+  'CovenCave · TestFlight · iPhone & iPad',
+];
+const missingDownloadSubs = requiredDownloadSubs.filter(
+  (sub) => !sourceMain.includes(sub),
+);
+if (missingDownloadSubs.length > 0) {
+  throw new Error(
+    `Download CTA compatibility COPY is missing platform sublabels: ${missingDownloadSubs.join(', ')}`,
+  );
+}
 if (sourceMain.includes('setInterval(rotate')) {
   throw new Error('Hero familiars must not rotate automatically');
 }
