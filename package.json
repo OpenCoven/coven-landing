@@ -7,9 +7,10 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview --port 4173",
+    "preview": "astro preview --host 127.0.0.1 --port 4173",
     "astro": "astro",
-    "check": "node scripts/verify-static.mjs"
+    "check": "node scripts/verify-static.mjs",
+    "check:browser": "playwright test tests/landing.spec.ts"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
@@ -17,5 +18,10 @@
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
+    "@playwright/test": "1.62.0",
+    "lighthouse": "13.4.1"
   }
 }
