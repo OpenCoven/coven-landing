@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-26
 
-**Status:** Ready for maintainer review; implementation is not yet authorized
+**Status:** Approved for implementation
 
 **Design branch:** `design/living-familiar-landing`
 
@@ -555,9 +555,10 @@ specificity.
 ## Integration Sequence
 
 The comprehensive quickstart work currently lives in the isolated
-`feat/comprehensive-quickstart` worktree at `91c65f2`. It includes the typed
-product registry, `/quickstart`, reusable guide component, and accessibility
-follow-up commits.
+`feat/comprehensive-quickstart` worktree. The latest committed boundary
+inspected for this design is `e025a4b`. It includes the typed product registry,
+`/quickstart`, reusable guide component, accessibility follow-ups, and stronger
+static-output verification.
 
 Implementation of this design must:
 
