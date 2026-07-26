@@ -121,28 +121,32 @@ if (existsSync(distIndex)) {
 }
 
 const distGithub = path.join(distDir, 'github', 'index.html');
-if (!existsSync(distGithub)) {
-  console.log('Skipped dist/github/index.html copy check — run `npm run build` first.'); process.exit(0);
-}
+if (existsSync(distGithub)) {
+  const githubHtml = await readFile(distGithub, 'utf8');
+  const requiredGithubCopy = [
+    'Assign it like a teammate. Get a PR back.',
+    'OpenCoven lets your team deploy a trusted familiar to GitHub.',
+    'Your familiar on your GitHub',
+    'Join the hosted beta',
+    'Self-host the adapter',
+    'launch pricing',
+    '$99/mo',
+    '$399/mo',
+    'Contact for Pricing',
+    '14-day trial',
+    'Hosted beta waitlist',
+    'docs/demo.md',
+  ];
+  const missingGithubCopy = requiredGithubCopy.filter((needle) => !githubHtml.includes(needle));
+  if (missingGithubCopy.length > 0) {
+    throw new Error(`Missing expected copy in dist/github/index.html: ${missingGithubCopy.join(', ')}`);
+  }
 
-const githubHtml = await readFile(distGithub, 'utf8');
-const requiredGithubCopy = [
-  'Assign it like a teammate. Get a PR back.',
-  'OpenCoven lets your team deploy a trusted familiar to GitHub.',
-  'Your familiar on your GitHub',
-  'Join the hosted beta',
-  'Self-host the adapter',
-  'launch pricing',
-  '$99/mo',
-  '$399/mo',
-  'Contact for Pricing',
-  '14-day trial',
-  'Hosted beta waitlist',
-  'docs/demo.md',
-];
-const missingGithubCopy = requiredGithubCopy.filter((needle) => !githubHtml.includes(needle));
-if (missingGithubCopy.length > 0) {
-  throw new Error(`Missing expected copy in dist/github/index.html: ${missingGithubCopy.join(', ')}`);
+  console.log(
+    `Verified ${requiredGithubCopy.length} required copy strings in dist/github/index.html.`,
+  );
+} else {
+  console.log('Skipped dist/github/index.html copy check — run `npm run build` first.');
 }
 
 const sourceCss = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
@@ -153,10 +157,6 @@ if (!sourceCss.includes('.motion-on.reveal-ready [data-reveal]')) {
 if (!sourceMain.includes("document.documentElement.classList.add('reveal-ready')")) {
   throw new Error('Scroll reveal script must enable reveal-ready only after marking initial in-view content visible');
 }
-
-console.log(
-  `Verified ${requiredGithubCopy.length} required copy strings in dist/github/index.html.`,
-);
 
 const distQuickstart = path.join(distDir, 'quickstart', 'index.html');
 if (!existsSync(distQuickstart)) {
@@ -190,7 +190,9 @@ const requiredQuickstartLinks = [
   'https://github.com/OpenCoven/cast-codes/releases/latest',
   'https://github.com/OpenCoven/coven-github',
 ];
-const missingQuickstartLinks = requiredQuickstartLinks.filter((needle) => !quickstartHtml.includes(needle));
+const missingQuickstartLinks = requiredQuickstartLinks.filter(
+  (needle) => !quickstartHtml.includes(`href="${needle}"`),
+);
 if (missingQuickstartLinks.length > 0) {
   throw new Error(`Missing canonical links in dist/quickstart/index.html: ${missingQuickstartLinks.join(', ')}`);
 }
