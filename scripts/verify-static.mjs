@@ -189,6 +189,37 @@ if (existsSync(distGithub)) {
 
 const sourceCss = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
 const sourceMain = await readFile(path.join(root, 'src/scripts/main.js'), 'utf8');
+const sourceLandingData = await readFile(
+  path.join(root, 'src/data/landing.ts'),
+  'utf8',
+);
+const sourceLedger = await readFile(
+  path.join(root, 'src/components/FamiliarLedger.astro'),
+  'utf8',
+);
+
+for (const exportName of [
+  'heroFamiliars',
+  'storyStages',
+  'trustStatements',
+  'runtimeLayers',
+]) {
+  if (!sourceLandingData.includes(`export const ${exportName}`)) {
+    throw new Error(`src/data/landing.ts must export ${exportName}`);
+  }
+}
+
+for (const terminalToken of [
+  '--ledger-bg: #0b0910',
+  '--ledger-text: #e8e0f0',
+  '--ledger-muted: #aaa1b8',
+]) {
+  if (!sourceLedger.includes(terminalToken)) {
+    throw new Error(
+      `FamiliarLedger must own immutable terminal token ${terminalToken}`,
+    );
+  }
+}
 
 function getCssDeclarationBlock(css, selector) {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
