@@ -259,21 +259,22 @@ export const quickstartProducts: QuickstartProduct[] = [
     eyebrow: 'Visual desktop home',
     name: 'Coven Cave',
     summary:
-      'Connect the native app to your local Coven runtime and inspect familiar activity visually.',
-    bestFor: 'A visual desktop home for familiars, projects, and sessions.',
+      'Connect the desktop app to its local Coven runtime, with an optional iOS companion handoff.',
+    bestFor:
+      'A visual desktop home for familiars, projects, and sessions, with an optional iOS companion.',
     status: 'Native app',
     platforms: 'macOS · Windows · Linux · iOS',
     requires: [
-      'Coven CLI',
-      'A running Coven daemon for runtime-backed features',
-      'A supported desktop or iOS channel',
+      'Desktop first: macOS, Windows, or Linux',
+      'Coven CLI and a running Coven daemon on the desktop host',
+      'Optional iOS TestFlight client and Tailscale access to the desktop Cave host',
     ],
     steps: [
       {
         label: 'Prepare',
-        title: 'Prepare the local runtime',
+        title: 'Prepare the desktop host',
         body:
-          'Install the shared runtime, check its prerequisites, and start its daemon.',
+          'Start on macOS, Windows, or Linux. Install the shared runtime, check its prerequisites, and start the daemon on this desktop host. The local daemon and socket do not run on iOS.',
         commands: [
           {
             value: 'npm install -g @opencoven/cli',
@@ -285,11 +286,11 @@ export const quickstartProducts: QuickstartProduct[] = [
           },
         ],
         expected:
-          'The doctor completes without a blocking issue and the daemon starts locally.',
+          'The doctor completes without a blocking issue and the daemon starts on the desktop host.',
       },
       {
         label: 'Install',
-        title: 'Install Coven Cave',
+        title: 'Install Coven Cave on desktop',
         body:
           'Use Homebrew on macOS, or open the release page for the current Windows, Linux, or macOS build.',
         commands: [
@@ -304,13 +305,13 @@ export const quickstartProducts: QuickstartProduct[] = [
           primary: true,
         },
         expected:
-          'Coven Cave is installed from the channel that matches your platform.',
+          'Desktop Coven Cave is installed from the channel that matches the host platform.',
       },
       {
         label: 'Verify',
-        title: 'Open Cave and verify the runtime',
+        title: 'Open desktop Cave and verify the runtime',
         body:
-          'Cave uses the local Coven socket as the authority for runtime-backed features; it does not imply a cloud runtime.',
+          'Desktop Cave uses the desktop host’s local Coven socket as the authority for runtime-backed features; it does not imply a cloud runtime.',
         commands: [
           {
             value: 'coven daemon status',
@@ -318,23 +319,23 @@ export const quickstartProducts: QuickstartProduct[] = [
           },
         ],
         expected:
-          'The daemon reports a running state and Cave shows its local runtime connection.',
+          'The desktop daemon reports a running state and desktop Cave shows daemon-connected activity.',
       },
       {
         label: 'Explore',
-        title: 'Start a familiar conversation',
+        title: 'Start on desktop, then optionally hand off',
         body:
-          'Choose a familiar, select your first project, and run a small conversation you can inspect.',
+          'On desktop, choose a familiar, select your first project, and run a small conversation you can inspect. For the companion path, install the TestFlight client and use Tailscale to pair or hand off through the desktop Cave host.',
         expected:
-          'The project conversation appears with inspectable familiar and session activity.',
+          'Desktop Cave shows inspectable familiar and session activity; when used, the iOS companion is paired or handed off from the desktop host through Tailscale.',
       },
     ],
     success:
-      'Coven Cave is connected and shows inspectable familiar and session activity.',
+      'Desktop Cave shows daemon-connected activity; optionally, the iOS companion is paired or handed off through that desktop host with Tailscale.',
     recovery: [
       'If Cave shows the daemon as disconnected, start the local runtime and verify its status before reopening Cave.',
       'If the package manager install is unavailable, use the matching asset from the latest release page.',
-      'If you use TestFlight, remember that the iOS preview is limited to Apple TestFlight availability and does not replace a desktop channel.',
+      'If the iOS companion cannot connect, confirm the desktop Cave host is running and reachable through Tailscale; TestFlight does not replace the desktop-first setup.',
     ],
     links: [
       {
@@ -402,8 +403,14 @@ export const quickstartProducts: QuickstartProduct[] = [
       {
         label: 'Launch',
         title: 'Run the portable AppImage',
-        body: 'Mark the downloaded AppImage executable, then launch it.',
+        body:
+          'Verify the downloaded AppImage against its matching checksum before marking it executable and launching it.',
         commands: [
+          {
+            value:
+              'expected="$(awk \'{print $1}\' CastCodes-x86_64.AppImage.sha256)" && actual="$(sha256sum CastCodes-x86_64.AppImage | awk \'{print $1}\')" && test "$actual" = "$expected" && echo "CastCodes-x86_64.AppImage: OK"',
+            label: 'Copy the AppImage checksum verification command',
+          },
           {
             value: 'chmod +x CastCodes-x86_64.AppImage',
             label: 'Copy the AppImage permission command',
@@ -414,7 +421,7 @@ export const quickstartProducts: QuickstartProduct[] = [
           },
         ],
         expected:
-          'CastCodes opens its code-and-terminal workspace on Linux.',
+          'Verification prints “CastCodes-x86_64.AppImage: OK”, then CastCodes opens its code-and-terminal workspace on Linux.',
       },
       {
         label: 'Work',
@@ -464,23 +471,24 @@ export const quickstartProducts: QuickstartProduct[] = [
         label: 'Choose',
         title: 'Choose hosted or self-hosted',
         body:
-          'Hosted access is waitlisted. Self-hosting through the guide is an advanced path for teams that can operate the adapter.',
+          'Joining the hosted beta completes only the waitlist path and does not grant immediate GitHub App installation. Steps 2–4 require active hosted access or a completed, running self-host setup through the advanced guide.',
         action: {
           label: 'Join the hosted beta',
           href: GITHUB_HOSTED,
           primary: true,
         },
         expected:
-          'You have either joined the hosted waitlist or selected the self-hosting guide for deployment.',
+          'Hosted beta: waitlist submitted and onboarding pauses until access is granted. Self-hosted: self-host guide chosen; complete its setup before continuing.',
       },
       {
         label: 'Install',
         title: 'Connect one test repository',
         body:
-          'Install the GitHub App on one test repository, configure a signed webhook, and validate it. Self-hosters can also run the adapter diagnostic.',
+          'Continue only with active hosted access or a completed self-host setup. Install the GitHub App on one test repository, configure a signed webhook, and validate it. Self-hosters run the diagnostic from the cloned and built coven-github checkout after creating or editing config/local.toml.',
         commands: [
           {
-            value: 'coven-github doctor --config config/local.toml',
+            value:
+              './target/release/coven-github doctor --config config/local.toml',
             label: 'Copy the self-hosted adapter diagnostic command',
           },
         ],
@@ -505,7 +513,7 @@ export const quickstartProducts: QuickstartProduct[] = [
       },
     ],
     success:
-      'The issue shows a status and Check Run, with a draft pull request only when the familiar produced commits.',
+      'With active hosted access or a running self-host, the issue shows a status and Check Run, with a draft pull request only when the familiar produced commits.',
     recovery: [
       'If hosted access is unavailable, remain on the waitlist or use the advanced self-hosting path.',
       'If the self-hosted adapter is unhealthy, run the copied diagnostic against the local configuration and resolve its findings.',
