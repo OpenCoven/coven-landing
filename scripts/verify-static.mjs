@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { gzipSync } from 'node:zlib';
 import { quickstartProducts } from '../src/data/quickstart.ts';
 
 /**
@@ -25,6 +26,14 @@ const escapeRegExp = (value) =>
 const countMatches = (content, pattern) =>
   [...content.matchAll(pattern)].length;
 
+const hasClassToken = (content, token) => {
+  const tags = content.match(/<[a-z][^>]*>/gi) ?? [];
+  return tags.some((tag) => {
+    const classValue = tag.match(/\bclass=(["'])(.*?)\1/i)?.[2];
+    return classValue?.split(/\s+/).includes(token) ?? false;
+  });
+};
+
 const toRenderedText = (content) =>
   content
     .replace(/<[^>]*>/g, ' ')
@@ -35,6 +44,57 @@ const toRenderedText = (content) =>
     .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .trim();
+
+async function getInitialJavascriptBudget(htmlContent) {
+  const modulePaths = [];
+  const scriptTags = htmlContent.match(/<script\b[^>]*>/g) ?? [];
+  for (const tag of scriptTags) {
+    if (!/\btype="module"/.test(tag)) continue;
+    const src = tag.match(/\bsrc="([^"]+)"/)?.[1];
+    if (src?.startsWith('/') && src.endsWith('.js')) {
+      modulePaths.push(src);
+    }
+  }
+
+  const seen = new Set();
+  const queue = [...modulePaths];
+  let moduleGzipBytes = 0;
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (!current || seen.has(current)) continue;
+    seen.add(current);
+
+    const absolute = path.join(distDir, current.replace(/^\//, ''));
+    const source = await readFile(absolute, 'utf8');
+    moduleGzipBytes += gzipSync(source).byteLength;
+
+    const importPattern = /(?:from\s*|import\s*)["']([^"']+\.js)["']/g;
+    for (const match of source.matchAll(importPattern)) {
+      const specifier = match[1];
+      if (!specifier.startsWith('.')) continue;
+      queue.push(
+        path.posix.normalize(
+          path.posix.join(path.posix.dirname(current), specifier),
+        ),
+      );
+    }
+  }
+
+  const inlineScripts = [
+    ...htmlContent.matchAll(
+      /<script(?![^>]*\bsrc=)(?![^>]*application\/ld\+json)[^>]*>([\s\S]*?)<\/script>/g,
+    ),
+  ].map((match) => match[1]);
+  const inlineGzipBytes = inlineScripts.reduce(
+    (total, source) => total + gzipSync(source).byteLength,
+    0,
+  );
+
+  return {
+    bytes: moduleGzipBytes + inlineGzipBytes,
+    modules: [...seen],
+  };
+}
 
 const productContracts = [
   { id: 'coven-cli', name: 'Coven CLI' },
@@ -107,6 +167,44 @@ if (existsSync(distIndex)) {
   }
   const html = await readFile(distIndex, 'utf8');
   const renderedText = toRenderedText(html);
+  const narrativeOrder = [
+    'id="top"',
+    'class="trust-bar"',
+    'id="how-it-works"',
+    'id="runtime"',
+    'id="products"',
+    'id="quickstart"',
+    'class="closing-invitation"',
+  ];
+  let previousPosition = -1;
+  for (const marker of narrativeOrder) {
+    const position = html.indexOf(marker);
+    if (position <= previousPosition) {
+      throw new Error(
+        `Homepage narrative marker ${marker} is missing or out of order`,
+      );
+    }
+    previousPosition = position;
+  }
+
+  if (/<[a-z][^>]*\bdata-reveal(?:[=\s>])/i.test(html)) {
+    throw new Error('Homepage must not retain blanket per-card scroll reveals');
+  }
+
+  if (hasClassToken(html, 'ambient')) {
+    throw new Error('Homepage must not render the cursor-tracked Ambient component');
+  }
+
+  const javascriptBudget = await getInitialJavascriptBudget(html);
+  const maximumInitialJavascript = 20 * 1024;
+  if (javascriptBudget.bytes >= maximumInitialJavascript) {
+    throw new Error(
+      `Homepage initial JavaScript is ${javascriptBudget.bytes} gzip bytes; budget is below ${maximumInitialJavascript}`,
+    );
+  }
+  console.log(
+    `Verified homepage initial JavaScript: ${javascriptBudget.bytes} gzip bytes across ${javascriptBudget.modules.length} module files.`,
+  );
   const requiredCopy = [
     'Persistent AI Familiars',
     'familiars',
@@ -461,6 +559,11 @@ if (existsSync(distGithub)) {
 }
 
 const sourceCss = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
+if (/(?:^|\n)\s*\.hero\s*(?:\{|,)/.test(sourceCss)) {
+  throw new Error(
+    'Global CSS must not retain exact .hero selectors; homepage hero styles are component-scoped',
+  );
+}
 const sourceMain = await readFile(path.join(root, 'src/scripts/main.js'), 'utf8');
 const sourceLanding = await readFile(
   path.join(root, 'src/scripts/landing.js'),
@@ -470,6 +573,14 @@ const sourceIndex = await readFile(
   path.join(root, 'src/pages/index.astro'),
   'utf8',
 );
+if (
+  /import\s+Ambient\s+from\s+['"]\.\.\/components\/Ambient\.astro['"]/.test(
+    sourceIndex,
+  )
+  || /<Ambient\b/.test(sourceIndex)
+) {
+  throw new Error('Homepage must omit the cursor-tracked Ambient component');
+}
 const sourceFooter = await readFile(
   path.join(root, 'src/components/Footer.astro'),
   'utf8',

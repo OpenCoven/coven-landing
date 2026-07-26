@@ -21,7 +21,10 @@
       html.dataset.theme = resolved;
       html.dataset.themePref = pref;
     } catch (e) {
-      html.dataset.theme = 'dark';
+      var systemIsLight =
+        window.matchMedia
+        && matchMedia('(prefers-color-scheme: light)').matches;
+      html.dataset.theme = systemIsLight ? 'light' : 'dark';
       html.dataset.themePref = 'system';
     }
   })();

@@ -164,8 +164,7 @@
       color: #fff;
     }
 
-    /* Content-swap fade — generalizes the hero memory-swap. JS toggles
-       .is-swapping around a repaint of a live region. Gated on motion. */
+    /* Content-swap fade for live regions. Gated on motion. */
     .motion-on .swap-fade { transition: opacity var(--dur-swap) ease; }
     .motion-on .swap-fade.is-swapping { opacity: 0.12; }
 
@@ -185,14 +184,13 @@
          Without this, the transform transition promotes a fresh GPU
          layer at hover start and demotes it after — every layer-tree
          rebuild invalidates the backdrop-filter surfaces around it
-         (sticky header, .panel, .hero-card) and the page visibly
+         (sticky header and .panel) and the page visibly
          flickered. Same family as the body::before scroll-flicker fix
          above: keep layers stable so hover only animates an existing
          one. Gated on (hover: hover) — touch devices never lift, so
          they skip the extra layer memory. */
       .panel-inset.is-card,
-      .download-primary,
-      .qs-body {
+      .download-primary {
         will-change: transform;
       }
     }
@@ -415,135 +413,6 @@
       display: none;
     }
 
-    /* ── HERO — "the summoning" ──────────────────────────── */
-    /* A single no-scroll viewport: the 2-column main row (copy + downloads
-       LEFT, live summon-session terminal RIGHT) with the continuity
-       timeline — the hero's signature — threaded across its base. */
-    .hero {
-      position: relative; z-index: 1;
-      /* Fit within one viewport minus the sticky header (~60px), with
-         breathing room so the continuity strip never kisses the fold. */
-      min-height: calc(100vh - 72px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 44px;
-      max-width: 1280px; margin: 0 auto;
-      padding: 30px 32px 38px;
-    }
-
-    /* The 2-column main row */
-    .hero-main {
-      display: grid;
-      grid-template-columns: 1.08fr 0.92fr;
-      align-items: stretch;
-      gap: 64px;
-    }
-    /* Both columns hold nowrap terminal text (.card-cmd, memory notes);
-       min-width: 0 lets them shrink instead of forcing page overflow. */
-    .hero-main > * { min-width: 0; }
-
-    .hero-copy {
-      display: flex; flex-direction: column;
-      justify-content: center;
-    }
-
-    .kicker {
-      font-family: var(--mono);
-      font-size: 0.6875rem; font-weight: 500;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 22px;
-      display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
-    }
-    .kicker-beta {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 4px 11px;
-      border-radius: 999px;
-      border: 1px solid rgba(154,142,205,0.35);
-      background: rgba(154,142,205,0.08);
-      color: var(--vtext);
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-size: 0.59375rem;
-    }
-    .beta-dot {
-      width: 6px; height: 6px; border-radius: 999px;
-      background: var(--green);
-      box-shadow: 0 0 10px rgba(48,209,88,0.7);
-      animation: beta-pulse 2.4s ease-in-out infinite;
-    }
-    @keyframes beta-pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%      { opacity: 0.5; transform: scale(0.8); }
-    }
-
-    h1 {
-      font-size: clamp(2.625rem, 4.9vw, 4.25rem);
-      font-weight: 850;
-      line-height: 1.04;
-      letter-spacing: -0.038em;
-      color: var(--white);
-      margin-bottom: 24px;
-    }
-    /* The one display-type moment on the page: the differentiator set in
-       the brand display voice (Geist) against the surrounding Inter. */
-    h1 em {
-      font-family: var(--font-display);
-      font-style: normal;
-      font-weight: 500;
-      letter-spacing: -0.02em;
-      color: var(--vtext);
-      text-shadow: 0 0 44px rgba(154,142,205,0.35);
-    }
-
-    .hero-lede {
-      font-size: 1.03125rem; line-height: 1.6;
-      color: var(--muted);
-      max-width: 500px;
-      margin-bottom: 30px;
-    }
-    .hero-lede strong {
-      color: var(--white);
-      font-weight: 600;
-    }
-
-    /* Buttons shared with QuickStart (.qs-actions) */
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--violet-cta);
-      color: #fff; text-decoration: none;
-      font-size: 0.75rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 12px 24px; border-radius: 6px;
-      border: 1px solid var(--violet-cta);
-      transition: background 0.15s, border-color 0.15s;
-    }
-    .btn-primary:hover { background: var(--vtext); border-color: var(--vtext); color: var(--bg); }
-    .btn-primary svg { width: 18px; height: 14px; fill: currentColor; }
-    .btn-secondary {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: transparent;
-      color: var(--muted); text-decoration: none;
-      font-size: 0.75rem; font-weight: 600;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      padding: 12px 22px; border-radius: 6px;
-      border: 1px solid var(--border-v);
-      transition: color 0.15s, border-color 0.15s;
-    }
-    .btn-secondary:hover { color: var(--white); border-color: rgba(142,61,255,0.4); }
-
-    /* ── Download CTA — one decision, not four ─────────────
-       A single primary button (server-default: macOS) that main.js
-       rewrites for the detected platform, plus a quiet mono line of
-       the remaining platforms. */
-    .download-cta {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      align-items: stretch;
-    }
     .download-primary {
       display: flex; align-items: center; gap: 14px;
       width: 100%;
@@ -586,95 +455,6 @@
       letter-spacing: 0.06em;
       color: rgba(255,255,255,0.72);
     }
-    /* iOS (TestFlight) button — same width, secondary but clearly visible */
-    .download-primary--ios {
-      background: rgba(154, 142, 205, 0.2);
-      border-color: rgba(180, 170, 235, 0.55);
-      box-shadow: 0 8px 24px -14px rgba(109, 91, 175, 0.55);
-    }
-    .download-primary--ios:hover {
-      background: rgba(154, 142, 205, 0.3);
-      border-color: rgba(198, 188, 245, 0.7);
-      box-shadow: 0 14px 32px -14px rgba(109, 91, 175, 0.7);
-    }
-    .download-primary--ios .download-primary-sub { color: rgba(232, 224, 240, 0.82); }
-
-    /* Secondary hero actions (Discord + Docs) — deliberately low-key */
-    .hero-actions-secondary {
-      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-      margin-top: 22px;
-    }
-    .btn-ghost {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: transparent;
-      color: var(--muted); text-decoration: none;
-      font-size: 0.75rem; font-weight: 600;
-      letter-spacing: 0.04em;
-      padding: 8px 14px; border-radius: 6px;
-      transition: color 0.15s;
-    }
-    .btn-ghost:hover { color: var(--white); }
-    .btn-ghost svg { width: 14px; height: 11px; fill: currentColor; }
-
-    /* ── Hero terminal — a live summon session ─────────────
-       Reads top-to-bottom like a real session: typed command →
-       familiar state as output → roster tabs. Rotation, typing and
-       tab switching are driven by src/scripts/main.js. */
-    .hero-visual {
-      position: relative;
-      display: flex; align-items: stretch; justify-content: center;
-    }
-    .hero-card {
-      width: 100%;
-      max-width: 500px;
-      /* Stretch to the copy column's height for visual balance; the
-         memory panel (.output-memory) absorbs the extra space. */
-      display: flex; flex-direction: column;
-      background: rgba(17,16,24,0.78);
-      border: 1px solid rgba(154,142,205,0.22);
-      border-radius: 14px;
-      overflow: hidden;
-      font-family: var(--mono);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow:
-        0 0 0 1px rgba(154,142,205,0.05),
-        0 32px 80px rgba(0,0,0,0.5),
-        0 0 90px -30px rgba(154,142,205,0.28);
-    }
-    .hero-card-topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 11px 18px;
-      border-bottom: 1px solid rgba(154,142,205,0.14);
-      background: rgba(5,4,9,0.6);
-    }
-    .hero-card-dots { display: flex; gap: 6px; }
-    .hero-card-dots span {
-      width: 10px; height: 10px; border-radius: 50%;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-    }
-    .hero-card-label {
-      font-size: 0.5625rem; font-weight: 700;
-      letter-spacing: 0.16em; text-transform: uppercase;
-      color: rgba(196,185,240,0.55);
-    }
-    .hero-card-status {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 0.5625rem; color: rgba(255,255,255,0.35);
-      letter-spacing: 0.1em; text-transform: uppercase;
-    }
-    .hero-card-status::before {
-      content: '';
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 6px rgba(48,209,88,0.5);
-    }
-
-    .hero-card-cmdline {
-      display: flex; align-items: center; gap: 9px;
-      padding: 15px 20px 13px;
-    }
     .card-prompt { font-size: 0.75rem; color: var(--vtext); flex-shrink: 0; }
     .card-cmd {
       /* Shrinkable (keeps long commands from overflowing) but not growing,
@@ -693,310 +473,38 @@
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
-    .hero-card-output {
-      margin: 0 20px 16px;
-      border: 1px solid rgba(154,142,205,0.14);
-      border-radius: 10px;
-      overflow: hidden;
-      background: rgba(5,4,9,0.35);
-      flex: 1;
-      display: flex; flex-direction: column;
-    }
-    .output-identity {
-      display: grid;
-      grid-template-columns: 38px 1fr auto;
-      align-items: center;
-      gap: 13px;
-      padding: 14px 16px;
-    }
-    .familiar-sigil {
-      width: 38px; height: 38px;
-      border-radius: 9px;
-      border: 1px solid rgba(154,142,205,0.5);
-      background: linear-gradient(150deg, rgba(154,142,205,0.28), rgba(154,142,205,0.08));
-      display: grid; place-items: center;
-      font-size: 0.875rem; font-weight: 800;
-      color: #E8E0F0;
-      box-shadow: 0 0 18px rgba(154,142,205,0.22);
-      transition: opacity 0.2s ease;
-    }
-    .familiar-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-    .familiar-name {
-      font-size: 0.8125rem; font-weight: 700;
-      color: #fff; letter-spacing: 0.02em;
-      transition: opacity 0.2s ease;
-    }
-    .familiar-role {
-      font-size: 0.5625rem; color: rgba(232,224,240,0.52);
-      letter-spacing: 0.08em; text-transform: uppercase;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      transition: opacity 0.2s ease;
-    }
-    .familiar-badge {
-      font-size: 0.53125rem; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      padding: 4px 9px; border-radius: 5px;
-    }
-    .badge-active {
-      background: rgba(48,209,88,0.1); color: rgba(48,209,88,0.85);
-      border: 1px solid rgba(48,209,88,0.22);
-    }
-    .output-memory {
-      padding: 13px 16px 15px;
-      border-top: 1px solid rgba(154,142,205,0.12);
-      background: linear-gradient(180deg, rgba(154,142,205,0.05) 0%, rgba(154,142,205,0.015) 100%);
-      display: flex; flex-direction: column; gap: 8px;
-      flex: 1;
-    }
-    .memory-header {
-      font-size: 0.5625rem; font-weight: 700;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      color: rgba(196,185,240,0.6);
-      display: flex; align-items: center; gap: 8px;
-      margin-bottom: 2px;
-    }
-    .memory-header::before {
-      content: ''; display: inline-block;
-      width: 5px; height: 5px; border-radius: 50%;
-      background: rgba(196,185,240,0.6);
-      box-shadow: 0 0 6px rgba(196,185,240,0.45);
-    }
-    .memory-header .memory-count {
-      margin-left: auto;
-      color: rgba(255,255,255,0.3);
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: none;
-    }
-    .memory-note {
-      display: flex; align-items: baseline; gap: 8px;
-      font-size: 0.65625rem;
-      color: rgba(232,224,240,0.62);
-      line-height: 1.45;
-      transition: opacity 0.2s ease;
-    }
-    .memory-note::before {
-      content: '◇';
-      color: rgba(196,185,240,0.55);
-      font-size: 0.53125rem;
-      flex-shrink: 0;
-      transform: translateY(-1px);
-    }
-    .memory-note .memory-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .memory-note .memory-meta {
-      color: rgba(232,224,240,0.45);
-      font-size: 0.5625rem;
-      letter-spacing: 0.06em;
-      flex-shrink: 0;
-    }
-    .memory-title { transition: opacity 0.2s ease; }
-    /* Output swap fade — applied by JS when the familiar changes */
-    .memory-swap .memory-note,
-    .memory-swap .memory-title,
-    .memory-swap .familiar-sigil,
-    .memory-swap .familiar-name,
-    .memory-swap .familiar-role { opacity: 0.12; }
-
-    .hero-card-roster {
-      display: flex; align-items: center; gap: 6px;
-      padding: 12px 20px 14px;
-      border-top: 1px solid rgba(154,142,205,0.12);
-      background: rgba(5,4,9,0.4);
-    }
-    .roster-tab {
-      font-family: var(--mono);
-      font-size: 0.65625rem; font-weight: 600;
-      letter-spacing: 0.04em;
-      color: var(--muted);
-      background: transparent;
-      border: 1px solid transparent;
-      border-radius: 6px;
-      padding: 5px 12px;
-      cursor: pointer;
-      transition: color 0.18s, background 0.18s, border-color 0.18s;
-    }
-    .roster-tab:focus-visible {
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(154,142,205,0.55);
-    }
-    .roster-tab.active {
-      color: #fff;
-      background: rgba(154,142,205,0.16);
-      border-color: rgba(154,142,205,0.4);
-    }
-    .roster-hint {
-      margin-left: auto;
-      min-width: 0;
-      text-align: right;
-      font-size: 0.5625rem;
-      color: rgba(232,224,240,0.45);
-      letter-spacing: 0.08em;
-    }
-
-    /* ── Continuity timeline — the signature ───────────────
-       One familiar's memory plotted across real time; the thread ends
-       in a live "today" node. Persistence, drawn instead of claimed. */
-    .continuity {
-      position: relative;
-      padding-top: 6px;
-    }
-    .continuity-track {
-      position: absolute;
-      left: 0;
-      /* End the thread at the "today" node instead of running past it:
-         trim the width of the last grid column minus its node radius
-         (columns are (100% - 3×24px gap) / 4 wide — see .continuity-events). */
-      right: calc((100% - 72px) / 4 - 11px);
-      top: calc(6px + 16px + 12px + 5.5px); /* pad + date row + gap + node center */
-      height: 1px;
-      background: linear-gradient(90deg,
-        rgba(154,142,205,0.08) 0%,
-        rgba(154,142,205,0.35) 55%,
-        rgba(180,170,235,0.75) 100%);
-      pointer-events: none;
-    }
-    .continuity-events {
-      list-style: none;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-    }
-    .continuity-event {
-      display: grid;
-      grid-template-rows: 16px 11px auto;
-      row-gap: 12px;
-      justify-items: start;
-    }
-    .continuity-date {
-      font-family: var(--mono);
-      font-size: 0.6875rem; font-weight: 600;
-      line-height: 16px;
-      letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--muted); /* AA at small sizes — matches body-muted token */
-    }
-    .continuity-node {
-      width: 11px; height: 11px;
-      border-radius: 50%;
-      background: var(--oc-surface-1);
-      border: 1.5px solid rgba(154,142,205,0.65);
-      box-shadow: 0 0 0 3px rgba(5,4,9,0.9);
-      position: relative; z-index: 1;
-    }
-    .continuity-text {
-      font-size: 0.875rem; line-height: 1.5;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    .continuity-event.is-now .continuity-date { color: var(--vtext); }
-    .continuity-event.is-now .continuity-text { color: var(--oc-text); }
-    .continuity-event.is-now .continuity-node {
-      background: var(--oc-purple-light);
-      border-color: var(--oc-purple-light);
-      box-shadow:
-        0 0 0 3px rgba(5,4,9,0.9),
-        0 0 14px rgba(180,170,235,0.8);
-    }
-    .motion-on .continuity-event.is-now .continuity-node::after {
-      content: '';
-      position: absolute; inset: -5px;
-      border-radius: 50%;
-      border: 1px solid rgba(180,170,235,0.7);
-      animation: now-pulse 2.6s ease-out infinite;
-    }
-    @keyframes now-pulse {
-      0%   { transform: scale(0.6); opacity: 0.9; }
-      70%  { transform: scale(1.6); opacity: 0; }
-      100% { transform: scale(1.6); opacity: 0; }
-    }
-
-    /* ── Short laptops: keep the whole thesis above the fold ─
-       At ~640-720px-tall viewports the default rhythm pushes the
-       continuity timeline below the fold. Compress vertical rhythm
-       only — widths and columns stay untouched. */
+    /* ── Short laptops ────────────────────────────────────── */
     @media (min-width: 901px) and (max-height: 720px) {
-      .hero {
-        min-height: calc(100vh - 64px);
-        gap: 24px;
-        padding: 14px 32px 20px;
-      }
-      .kicker { margin-bottom: 14px; }
+      .github-kicker { margin-bottom: 14px; }
       h1 {
         font-size: clamp(2.375rem, 4vw, 3.25rem);
         margin-bottom: 16px;
       }
-      .hero-lede { margin-bottom: 20px; font-size: 0.9688rem; }
-      .download-cta { gap: 10px; }
+      .github-hero-lede { margin-bottom: 20px; font-size: 0.9688rem; }
       .download-primary { padding: 11px 22px 11px 17px; }
-      .hero-actions-secondary { margin-top: 12px; }
-      .hero-card-cmdline { padding: 12px 20px 10px; }
-      .hero-card-output { margin-bottom: 12px; }
-      .output-identity { padding: 11px 16px; }
-      .output-memory { padding: 10px 16px 12px; gap: 6px; }
-      .hero-card-roster { padding: 9px 20px 11px; }
-      .continuity-text { font-size: 0.8125rem; }
+      .github-run-cmdline { padding: 12px 20px 10px; }
     }
 
-    /* ── Ultrawide (1680px+): scale the composition up ──────
-       The page reads small when 1280px of content floats in a 2560px
-       viewport. Step the shared containers to 1440px and let the hero
-       type, terminal, and ambient light grow with them. */
+    /* ── Ultrawide (1680px+): scale the route shell up ────── */
     @media (min-width: 1680px) {
       .header-inner,
-      .hero,
       .content-section,
       .footer-inner { max-width: 1440px; }
 
-      .hero { gap: 56px; }
-      .hero-main { gap: 88px; }
-      .kicker { font-size: 0.75rem; margin-bottom: 26px; }
+      .github-kicker { font-size: 0.75rem; margin-bottom: 26px; }
       h1 { font-size: clamp(4.25rem, 3.2vw, 5rem); margin-bottom: 28px; }
-      .hero-lede { font-size: 1.1875rem; max-width: 560px; margin-bottom: 34px; }
+      .github-hero-lede { font-size: 1.1875rem; max-width: 560px; margin-bottom: 34px; }
       .download-primary { padding: 16px 30px 16px 23px; }
       .download-primary-label { font-size: 1.0625rem; }
       .download-primary-sub { font-size: 0.6875rem; }
 
-      .hero-card { max-width: 560px; }
-      .hero-card-cmdline { padding: 17px 22px 15px; }
+      .github-run-cmdline { padding: 17px 22px 15px; }
       .card-prompt, .card-cmd { font-size: 0.8125rem; }
-      .familiar-name { font-size: 0.875rem; }
-      .memory-note { font-size: 0.6875rem; }
-      .roster-tab { font-size: 0.6875rem; }
-
-      .continuity-date { font-size: 0.71875rem; }
-      .continuity-text { font-size: 0.9375rem; }
 
       /* Ambient light scales with the canvas */
       .glow-left  { width: 820px; height: 680px; }
       .glow-right { width: 960px; height: 820px; }
       .glow-bottom { width: 700px; height: 560px; }
-    }
-
-    /* ── TESTIMONIAL STRIP ───────────────────────────────── */
-    .testimonial-strip {
-      position: relative; z-index: 1;
-      border-top: 1px solid var(--border);
-      background: rgba(14,11,22,0.6);
-      padding: 32px;
-      text-align: center;
-    }
-    .testimonial-inner {
-      max-width: 760px; margin: 0 auto;
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
-    }
-    .testimonial-stars {
-      color: var(--vtext); font-size: 1rem; letter-spacing: 4px;
-    }
-    .testimonial-quote {
-      font-size: 1.125rem; font-weight: 300;
-      color: rgba(232,224,240,0.7);
-      font-style: italic; line-height: 1.5;
-      letter-spacing: -0.01em;
-    }
-    .testimonial-attr {
-      font-family: var(--mono);
-      font-size: 0.6875rem; font-weight: 500;
-      letter-spacing: 0.1em;
-      color: var(--muted);
     }
 
     /* ── CONTENT SECTIONS ────────────────────────────────── */
@@ -1041,6 +549,37 @@
       width: 16px; height: 1px;
       background: var(--violet); opacity: 0.6;
     }
+    h1 {
+      font-size: clamp(2.625rem, 4.9vw, 4.25rem);
+      font-weight: 850;
+      line-height: 1.04;
+      letter-spacing: -0.038em;
+      color: var(--white);
+      margin-bottom: 24px;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--violet-cta);
+      color: #fff; text-decoration: none;
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 12px 24px; border-radius: 6px;
+      border: 1px solid var(--violet-cta);
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-primary:hover { background: var(--vtext); border-color: var(--vtext); color: var(--bg); }
+    .btn-primary svg { width: 18px; height: 14px; fill: currentColor; }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--muted); text-decoration: none;
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 12px 22px; border-radius: 6px;
+      border: 1px solid var(--border-v);
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-secondary:hover { color: var(--white); border-color: rgba(142,61,255,0.4); }
     h2 {
       font-size: clamp(1.75rem, 3.5vw, 2.75rem);
       font-weight: 800; line-height: 1.1;
@@ -1084,103 +623,7 @@
       color: var(--muted);
     }
 
-    /* ── QUICK START ─────────────────────────────────────────
-       A guided vertical stepper: numbered nodes threaded on a gradient
-       connector (the hero continuity motif), each step a glass card with
-       a syntax-accented command, an expected-output hint, and copy. */
-    .qs-steps {
-      list-style: none;
-      max-width: 760px;
-      display: flex; flex-direction: column;
-    }
-    .qs-step {
-      display: grid;
-      /* minmax(0,1fr): the nowrap codeblock must scroll internally,
-         never widen the step or the page on phones */
-      grid-template-columns: 40px minmax(0, 1fr);
-      column-gap: 20px;
-      min-width: 0;
-      padding-bottom: 16px;
-    }
-    .qs-step:last-child { padding-bottom: 0; }
-
-    /* Rail: node at the top, gradient connector down to the next node */
-    .qs-rail { position: relative; display: flex; justify-content: center; }
-    .qs-node {
-      width: 34px; height: 34px; flex: 0 0 auto;
-      border-radius: 50%;
-      display: grid; place-items: center;
-      font-family: var(--mono); font-size: 0.8125rem; font-weight: 700;
-      color: var(--vtext);
-      background: var(--oc-surface-1);
-      border: 1.5px solid rgba(154,142,205,0.55);
-      box-shadow: 0 0 0 4px var(--bg); /* punch through the connector line */
-      position: relative; z-index: 1;
-    }
-    .qs-step:not(:last-child) .qs-rail::before {
-      content: '';
-      position: absolute;
-      left: 50%; transform: translateX(-50%);
-      top: 34px; bottom: -16px;
-      width: 1.5px;
-      background: linear-gradient(180deg, rgba(154,142,205,0.12) 0%, rgba(180,170,235,0.55) 100%);
-    }
-    /* Final node = "you're running now" (echoes .continuity-event.is-now) */
-    .qs-step.is-now .qs-node {
-      background: var(--oc-gradient-signature);
-      border-color: var(--oc-purple-light);
-      color: #0b0713;
-      box-shadow: 0 0 0 4px var(--bg), 0 0 14px rgba(180,170,235,0.6);
-    }
-    .motion-on .qs-step.is-now .qs-node::after {
-      content: '';
-      position: absolute; inset: -5px;
-      border-radius: 50%;
-      border: 1px solid rgba(180,170,235,0.7);
-      animation: now-pulse 2.6s ease-out infinite;
-    }
-
-    /* Body: glass card upgraded to the large radius + inner rhythm */
-    .qs-body {
-      border-radius: var(--radius-lg);
-      padding: 18px 20px 20px;
-      display: flex; flex-direction: column; gap: 12px;
-      min-width: 0; /* codeblock scrolls internally instead of widening */
-      transition: box-shadow var(--dur-ui) ease, border-color var(--dur-ui) ease, transform var(--dur-ui) ease;
-    }
-    .qs-step-kicker {
-      font-family: var(--mono);
-      font-size: 0.5625rem; font-weight: 700;
-      letter-spacing: 0.16em; text-transform: uppercase;
-      color: var(--vtext); opacity: 0.7;
-    }
-    .qs-step-title {
-      font-size: 0.9375rem; font-weight: 700;
-      color: var(--white); line-height: 1.3;
-      margin-top: -4px;
-    }
-
-    .qs-codeblock {
-      position: relative;
-      background: rgba(5,4,9,0.72);
-      border: 1px solid rgba(154,142,205,0.18);
-      border-radius: var(--radius-sm);
-      padding: 11px 44px 11px 14px;
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      color: rgba(232,224,240,0.92);
-      white-space: nowrap;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .qs-codeblock::before {
-      content: '$';
-      color: rgba(180,170,235,0.55);
-      margin-right: 8px;
-      user-select: none;
-    }
-    .qs-codeblock code { font-family: inherit; font-size: inherit; color: inherit; }
-    /* Syntax accents — all in-palette; the copied text lives in data-copy */
+    /* Syntax accents and copy control shared with /quickstart. */
     .qs-tok-bin  { color: var(--white); }
     .qs-tok-sub  { color: var(--coven-violet-light); }
     .qs-tok-flag { color: var(--muted); }
@@ -1208,74 +651,13 @@
       border-color: rgba(48,209,88,0.4);
       background: rgba(48,209,88,0.06);
     }
-
-    /* Expected-output hint — a quiet second line so the command stays hero */
-    .qs-out {
-      display: flex; align-items: center; gap: 8px;
-      font-family: var(--mono); font-size: 0.6875rem;
-      color: var(--muted);
-      flex-wrap: wrap;
-    }
-    .qs-out-label {
-      flex: 0 0 auto;
-      font-size: 0.53125rem; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: rgba(180,170,235,0.65);
-      border: 1px solid rgba(154,142,205,0.22);
-      border-radius: 4px; padding: 2px 6px;
-    }
-    .qs-out-text { color: rgba(232,224,240,0.72); }
-    .qs-note { font-size: 0.75rem; line-height: 1.6; color: var(--muted); }
-
-    .qs-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 40px;
-      flex-wrap: wrap;
-    }
     @media (hover: hover) {
-      .qs-body:hover {
-        border-color: rgba(154,142,205,0.28);
-        box-shadow: 0 24px 64px rgba(0,0,0,0.45);
-        transform: translateY(-2px);
-      }
       .qs-copy:hover {
         background: rgba(154,142,205,0.14);
         color: #fff;
         border-color: rgba(154,142,205,0.4);
       }
       .qs-copy:active { transform: translateY(-50%) scale(0.94); }
-    }
-    @media (max-width: 520px) {
-      .qs-step { grid-template-columns: 34px minmax(0, 1fr); column-gap: 14px; }
-      .qs-node { width: 30px; height: 30px; font-size: 0.75rem; }
-      .qs-step:not(:last-child) .qs-rail::before { top: 30px; }
-      .qs-body { padding: 16px 16px 18px; }
-    }
-
-    /* Desktop: the stepper counts horizontally, left to right — three
-       equal columns, node above each card, connector running 01 → 02 → 03. */
-    @media (min-width: 901px) {
-      .qs-steps {
-        max-width: none;
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 24px;
-      }
-      .qs-step {
-        grid-template-columns: none;
-        grid-template-rows: auto 1fr;
-        row-gap: 16px;
-        padding-bottom: 0;
-      }
-      .qs-rail { justify-content: flex-start; }
-      .qs-step:not(:last-child) .qs-rail::before {
-        top: 50%; bottom: auto;
-        transform: translateY(-50%);
-        left: 34px; right: -24px;
-        width: auto; height: 1.5px;
-        background: linear-gradient(90deg, rgba(154,142,205,0.12) 0%, rgba(180,170,235,0.55) 100%);
-      }
     }
 
     /* ── GITHUB LANDING ─────────────────────────────────────
@@ -1296,6 +678,42 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+    }
+    .github-kicker {
+      font-family: var(--mono);
+      font-size: 0.6875rem; font-weight: 500;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 22px;
+      display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .github-kicker-beta {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(154,142,205,0.35);
+      background: rgba(154,142,205,0.08);
+      color: var(--vtext);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 0.59375rem;
+    }
+    .github-beta-dot {
+      width: 6px; height: 6px; border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 10px rgba(48,209,88,0.7);
+      animation: beta-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes beta-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(0.8); }
+    }
+    .github-hero-lede {
+      font-size: 1.03125rem; line-height: 1.6;
+      color: var(--muted);
+      max-width: 500px;
+      margin-bottom: 30px;
     }
     .github-promise {
       max-width: 520px;
@@ -1328,6 +746,38 @@
         0 0 0 1px rgba(154,142,205,0.05),
         0 32px 80px rgba(0,0,0,0.5),
         0 0 90px -30px rgba(154,142,205,0.28);
+    }
+    .github-run-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 18px;
+      border-bottom: 1px solid rgba(154,142,205,0.14);
+      background: rgba(5,4,9,0.6);
+    }
+    .github-run-dots { display: flex; gap: 6px; }
+    .github-run-dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .github-run-label {
+      font-size: 0.5625rem; font-weight: 700;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(196,185,240,0.55);
+    }
+    .github-run-status {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.5625rem; color: rgba(255,255,255,0.35);
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .github-run-status::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px rgba(48,209,88,0.5);
+    }
+    .github-run-cmdline {
+      display: flex; align-items: center; gap: 9px;
+      padding: 15px 20px 13px;
     }
     .github-run-list {
       list-style: none;
@@ -1391,6 +841,11 @@
       border-radius: 50%;
       border: 1px solid rgba(180,170,235,0.7);
       animation: now-pulse 2.6s ease-out infinite;
+    }
+    @keyframes now-pulse {
+      0%   { transform: scale(0.6); opacity: 0.9; }
+      70%  { transform: scale(1.6); opacity: 0; }
+      100% { transform: scale(1.6); opacity: 0; }
     }
     .github-demo-link {
       display: inline-flex;
@@ -1693,12 +1148,6 @@
       }
       .glass-card:hover .card-kicker { opacity: 1; color: var(--vtext); }
       .glass-card:hover h3 { color: #fff; }
-
-      /* Hero roster tabs: subtle hover hint */
-      .roster-tab:hover:not(.active) {
-        color: var(--white);
-        background: rgba(154,142,205,0.07);
-      }
     }
 
     /* ── SCROLL REVEALS ──────────────────────────────────── */
@@ -1718,21 +1167,12 @@
     }
     /* Stagger items within a container — same timing everywhere. Existing
        card grids keep working; new containers opt in with the
-       .reveal-stagger utility. (.continuity-events has its own load
-       orchestration below, so it's intentionally not in this list.) */
+       .reveal-stagger utility. */
     .motion-on :is(.reveal-stagger, .card-grid) [data-reveal]:nth-child(2) { transition-delay: 0.08s; }
     .motion-on :is(.reveal-stagger, .card-grid) [data-reveal]:nth-child(3) { transition-delay: 0.16s; }
     .motion-on :is(.reveal-stagger, .card-grid) [data-reveal]:nth-child(4) { transition-delay: 0.24s; }
     .motion-on :is(.reveal-stagger, .card-grid) [data-reveal]:nth-child(5) { transition-delay: 0.32s; }
     .motion-on :is(.reveal-stagger, .card-grid) [data-reveal]:nth-child(6) { transition-delay: 0.40s; }
-
-    /* Hero load orchestration: copy lands first, the terminal answers,
-       then the continuity thread grows node by node left to right. */
-    .motion-on .hero-visual[data-reveal] { transition-delay: 0.12s; }
-    .motion-on .continuity-events [data-reveal]:nth-child(1) { transition-delay: 0.28s; }
-    .motion-on .continuity-events [data-reveal]:nth-child(2) { transition-delay: 0.42s; }
-    .motion-on .continuity-events [data-reveal]:nth-child(3) { transition-delay: 0.56s; }
-    .motion-on .continuity-events [data-reveal]:nth-child(4) { transition-delay: 0.70s; }
 
     /* ── REDUCED MOTION ──────────────────────────────────── */
     @media (prefers-reduced-motion: reduce) {
@@ -1745,9 +1185,6 @@
     }
 
     @media (max-width: 1100px) {
-      /* Tablet: main row shifts to 50/50, reduce hero padding */
-      .hero { padding: 36px 24px; }
-      .hero-main { grid-template-columns: 1fr 1fr; gap: 40px; }
       .github-hero { padding: 44px 24px 56px; grid-template-columns: 1fr 1fr; gap: 40px; }
       .github-loop { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .github-loop-step:not(:last-child)::after { display: none; }
@@ -1778,10 +1215,6 @@
 
       /* Consistent 20px gutter across header, sections, footer */
       .header-inner { padding-inline: 20px; }
-      .testimonial-strip { padding: 32px 20px; }
-
-      /* Hero stacking moved to the orientation-aware block below —
-         landscape phones ≥701px wide keep a compact two-column hero. */
 
       /* Grids */
       .card-grid.three, .card-grid.four { grid-template-columns: repeat(2, 1fr); }
@@ -1822,20 +1255,8 @@
       }
     }
 
-    /* ── Hero stacking — orientation-aware ──────────────────
-       Portrait handhelds stack; landscape phones (701-900px wide,
-       short) keep the two-column composition since it fits. */
+    /* ── GitHub hero stacking — orientation-aware ─────────── */
     @media (max-width: 700px), (max-width: 900px) and (orientation: portrait) {
-      .hero {
-        min-height: auto;
-        padding: 40px 20px;
-        gap: 28px;
-        justify-content: flex-start;
-      }
-      .hero-main {
-        grid-template-columns: 1fr;
-        gap: 32px;
-      }
       .github-hero {
         min-height: auto;
         grid-template-columns: 1fr;
@@ -1844,69 +1265,22 @@
       }
       .github-hero-visual { justify-content: flex-start; }
       .github-run-card { max-width: 100%; }
-      /* Copy leads, card follows below it on narrow screens. */
-      .hero-copy { order: 1; }
-      .hero-lede { max-width: 100%; font-size: 0.9375rem; }
-      .hero-visual { order: 2; justify-content: flex-start; }
-      .hero-card { max-width: 100%; }
-
-      /* Continuity timeline: rotate to a vertical thread down the left */
-      .continuity-track { display: none; }
-      .continuity-events {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        position: relative;
-      }
-      .continuity-events::before {
-        content: '';
-        position: absolute;
-        left: 5px; top: 8px; bottom: 8px;
-        width: 1px;
-        background: linear-gradient(180deg,
-          rgba(154,142,205,0.08) 0%,
-          rgba(154,142,205,0.35) 55%,
-          rgba(180,170,235,0.75) 100%);
-        pointer-events: none;
-      }
-      .continuity-event {
-        grid-template-rows: auto auto;
-        grid-template-columns: 11px 1fr;
-        column-gap: 16px;
-        row-gap: 3px;
-      }
-      .continuity-date { grid-column: 2; grid-row: 1; }
-      .continuity-node { grid-column: 1; grid-row: 1; align-self: center; }
-      .continuity-text { grid-column: 2; grid-row: 2; white-space: normal; }
+      .github-hero-lede { max-width: 100%; font-size: 0.9375rem; }
     }
 
-    /* Landscape phones: compact two-column hero */
+    /* Landscape phones: compact GitHub hero */
     @media (min-width: 701px) and (max-width: 900px) and (orientation: landscape) {
-      .hero {
-        min-height: auto;
-        padding: 28px 20px 32px;
-        gap: 26px;
-      }
-      .hero-main { grid-template-columns: 1.05fr 0.95fr; gap: 36px; }
       .github-hero { grid-template-columns: 1fr; padding: 32px 20px 44px; }
-      .kicker { margin-bottom: 12px; }
+      .github-kicker { margin-bottom: 12px; }
       h1 { font-size: clamp(1.875rem, 4.6vw, 2.375rem); margin-bottom: 14px; }
-      .hero-lede { font-size: 0.875rem; margin-bottom: 18px; max-width: 46ch; }
-      .download-cta { gap: 10px; }
+      .github-hero-lede { font-size: 0.875rem; margin-bottom: 18px; max-width: 46ch; }
       .download-primary { padding: 11px 20px 11px 16px; }
       .download-primary-label { font-size: 0.875rem; }
-      .hero-actions-secondary { margin-top: 10px; }
-      .hero-card-cmdline { padding: 12px 16px 10px; }
-      .hero-card-output { margin: 0 16px 12px; }
-      .output-identity { padding: 11px 14px; }
-      .output-memory { padding: 10px 14px 12px; gap: 6px; }
-      .hero-card-roster { padding: 9px 16px 11px; }
-      .roster-hint { display: none; }
-      .continuity-text { font-size: 0.8125rem; }
+      .github-run-cmdline { padding: 12px 16px 10px; }
     }
 
     @media (max-width: 520px) {
       h1 { font-size: 2.375rem; }
-      /* hero card naturally sized at 520px */
       .card-grid.three, .card-grid.four { grid-template-columns: 1fr; }
       .github-hero-actions,
       .github-final-actions { align-items: stretch; flex-direction: column; }
@@ -1917,25 +1291,18 @@
       .github-trust-grid { grid-template-columns: 1fr; }
       .github-loop-step { min-height: auto; }
       .github-trust-panel { padding: 32px 20px; border-radius: 0; border-left: none; border-right: none; }
-      /* Downloads stack one per row on narrow phones */
-      .download-cta { width: 100%; grid-template-columns: 1fr; }
       .download-primary { width: 100%; }
       .btn-primary, .btn-secondary { justify-content: center; }
-      /* The roster hint crowds the tab row on narrow phones */
-      .roster-hint { display: none; }
-      .testimonial-quote { font-size: 1rem; }
       .section-header { margin-bottom: 32px; }
     }
 
     @media (max-width: 400px) {
       h1 { font-size: 2.125rem; }
-      .kicker { font-size: 0.625rem; }
+      .github-kicker { font-size: 0.625rem; }
       /* Uniform 16px gutter at smallest viewports */
       .header-inner { padding-inline: 16px; }
-      .testimonial-strip { padding: 28px 16px; }
       footer { padding-inline: 16px; }
       .footer-groups { grid-template-columns: 1fr; }
-      .hero { padding: 32px 16px; }
       .github-hero { padding: 32px 16px 40px; }
       .content-section { padding: 40px 16px; }
     }
@@ -2027,20 +1394,11 @@
       background: rgba(251, 250, 255, 0.98);
     }
 
-    /* ── Glass cards + testimonial ── */
+    /* ── Glass cards ── */
     html[data-theme="light"] .glass-card {
       background: rgba(255, 255, 255, 0.72);
       border-color: rgba(122, 111, 179, 0.20);
     }
-    html[data-theme="light"] .testimonial-strip { background: rgba(255, 255, 255, 0.58); }
-
-    /* ── iOS (TestFlight) download button ──
-       The base button hardcodes #fff text for the dark macOS gradient,
-       but the iOS variant sits on a pale lavender wash in light mode —
-       white label/icon were invisible. Swap to ink + brand violet. */
-    html[data-theme="light"] .download-primary--ios { color: var(--oc-text); }
-    html[data-theme="light"] .download-primary--ios .download-primary-icon { color: #5A4C9E; }
-    html[data-theme="light"] .download-primary--ios .download-primary-sub { color: rgba(27, 23, 38, 0.68); }
 
     /* ── Inline prose code (not the terminal) ── */
     html[data-theme="light"] :not(pre) > code {
@@ -2059,6 +1417,17 @@
     html[data-theme="light"] .github-trust-copy h3,
     html[data-theme="light"] .panel-inset.is-active { color: var(--white); }
 
+    html[data-theme="light"] .section-kicker {
+      color: var(--vtext);
+      opacity: 1;
+    }
+    html[data-theme="light"] .quickstart-preview .preview-expected {
+      color: var(--muted);
+    }
+    html[data-theme="light"] .quickstart-preview .preview-expected strong {
+      color: #1F7A34;
+    }
+
     /* ═══ Terminal/code surfaces: STAY DARK ═══
        These re-assert dark values because the elements inherit the
        now-flipped page tokens but their cards remain dark. */
@@ -2071,9 +1440,8 @@
     html[data-theme="light"] .github-run-row  { color: rgba(232, 224, 240, 0.68); }
     html[data-theme="light"] .github-demo-link { color: #B4AAEB; }
 
-    /* Hero summon card (dark, hardcoded bg) — restore its terminal text. */
+    /* GitHub run command uses a dark terminal surface. */
     html[data-theme="light"] .card-prompt { color: #B4AAEB; }
-    html[data-theme="light"] .roster-tab  { color: rgba(232, 224, 240, 0.60); }
 
     /* QuickStart code block (dark inset) — restore its syntax tokens. */
     html[data-theme="light"] .qs-tok-bin  { color: #E8E0F0; }

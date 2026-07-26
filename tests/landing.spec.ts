@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { quickstartProducts } from '../src/data/quickstart';
 
@@ -24,6 +25,30 @@ for (const pathname of ['/', '/quickstart', '/github', '/terms', '/privacy']) {
     expect(errors).toEqual([]);
   });
 }
+
+test('GitHub beta and run preview retain their visible layout', async ({ page }) => {
+  await page.goto('/github');
+
+  const hero = page.locator('.github-hero');
+  const beta = hero.getByText('hosted beta', { exact: true });
+  await expect(beta).toBeVisible();
+  await expect(beta).toHaveCSS('display', 'flex');
+
+  const runCard = hero.locator('.github-run-card');
+  const topbar = runCard.getByText('github · familiar run', {
+    exact: true,
+  }).locator('..');
+  await expect(topbar).toBeVisible();
+  await expect(topbar).toHaveCSS('display', 'flex');
+  await expect(topbar).toHaveCSS('justify-content', 'space-between');
+
+  const cmdline = runCard.getByText('@Forge assigned to issue #128', {
+    exact: true,
+  }).locator('..');
+  await expect(cmdline).toBeVisible();
+  await expect(cmdline).toHaveCSS('display', 'flex');
+  await expect(cmdline).toHaveCSS('align-items', 'center');
+});
 
 test('hero exposes one primary path and manual familiar tabs', async ({ page }) => {
   await page.goto('/');
@@ -99,6 +124,20 @@ test('hero emphasis meets light-theme contrast', async ({ page }) => {
   });
 
   expect(contrastRatio).toBeGreaterThanOrEqual(3);
+});
+
+test('theme storage failure falls back to the live system preference', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.route('**/*.js', async (route) => route.abort());
+  await page.addInitScript(() => {
+    Storage.prototype.getItem = () => {
+      throw new Error('storage disabled');
+    };
+  });
+  await page.goto('/');
+
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme-pref', 'system');
 });
 
 test('continuity anchors and passive scroll select story state', async ({ page }) => {
@@ -1209,3 +1248,111 @@ test('a new clipboard attempt cancels the earlier reset timer', async ({
 
   await expect(button).toHaveAttribute('aria-label', 'Copied');
 });
+
+test('core homepage remains complete without JavaScript', async ({ browser }) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 390, height: 844 },
+  });
+  const page = await context.newPage();
+  await page.goto('/');
+
+  await expect(page.getByRole('heading', {
+    name: 'Summon agents that remember.',
+  })).toBeVisible();
+  await expect(page.locator('[data-story-stage]')).toHaveCount(4);
+  await expect(page.locator('[data-product-constellation] a')).toHaveCount(5);
+  await expect(page.locator('.runtime-disclosure')).toHaveCount(3);
+  await expect(page.locator('#quickstart code')).toHaveCount(3);
+  await expect(page.locator('.mobile-nav-fallback')).toBeVisible();
+  await expect(page.locator('.hero [data-primary-cta][href="/quickstart"]')).toBeVisible();
+
+  await context.close();
+});
+
+test('reduced motion shows content immediately with no hero animation', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+
+  await expect(page.locator('html')).not.toHaveClass(/motion-on/);
+  await expect(page.locator('.hero-copy')).toHaveCSS('animation-name', 'none');
+  await expect(page.locator('[data-story-stage]')).toHaveCount(4);
+});
+
+test('light theme keeps immutable dark ledger contrast', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('theme', 'light'));
+  await page.goto('/');
+
+  const ledger = page.locator('.familiar-ledger').first();
+  await expect(ledger).toHaveCSS('background-color', 'rgb(11, 9, 16)');
+  await expect(ledger).toHaveCSS('color', 'rgb(232, 224, 240)');
+  await expect(ledger.locator('.ledger-notes li').first()).toHaveCSS(
+    'font-size',
+    '12px',
+  );
+});
+
+for (const colorScheme of ['dark', 'light'] as const) {
+  test(`${colorScheme} homepage has no serious axe violations`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme, reducedMotion: 'reduce' });
+    await page.addInitScript(() => localStorage.setItem('theme', 'system'));
+    await page.goto('/');
+
+    const results = await new AxeBuilder({ page }).analyze();
+    const blocking = results.violations.filter(
+      (violation) =>
+        violation.impact === 'serious'
+        || violation.impact === 'critical',
+    );
+    expect(blocking).toEqual([]);
+  });
+}
+
+const visualMatrix = [
+  { name: 'desktop', width: 1440, height: 1000 },
+  { name: 'small-desktop', width: 1024, height: 768 },
+  { name: 'tablet', width: 768, height: 1024 },
+  { name: 'mobile', width: 390, height: 844 },
+  { name: 'small-mobile', width: 320, height: 568 },
+  { name: 'short-landscape', width: 844, height: 390 },
+];
+
+for (const viewport of visualMatrix) {
+  for (const theme of ['dark', 'light'] as const) {
+    test(`${viewport.name} ${theme} has no horizontal overflow`, async ({
+      browser,
+    }, testInfo) => {
+      const context = await browser.newContext({
+        viewport: { width: viewport.width, height: viewport.height },
+        colorScheme: theme,
+      });
+      const page = await context.newPage();
+      await page.addInitScript((selectedTheme) => {
+        localStorage.setItem('theme', selectedTheme);
+      }, theme);
+      await page.goto('/');
+
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - window.innerWidth,
+      );
+      expect(overflow).toBeLessThanOrEqual(1);
+
+      if (viewport.width <= 400) {
+        const terminalFontSizes = await page.locator(
+          '.familiar-ledger, .familiar-ledger *, .preview-command code',
+        ).evaluateAll((elements) =>
+          elements
+            .filter((element) => element.textContent?.trim())
+            .map((element) => Number.parseFloat(getComputedStyle(element).fontSize)),
+        );
+        expect(Math.min(...terminalFontSizes)).toBeGreaterThanOrEqual(13);
+      }
+
+      await page.screenshot({
+        path: testInfo.outputPath(`${viewport.name}-${theme}.png`),
+        fullPage: true,
+      });
+      await context.close();
+    });
+  }
+}
