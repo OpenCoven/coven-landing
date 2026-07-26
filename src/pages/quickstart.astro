@@ -1,0 +1,268 @@
+---
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '@fontsource-variable/geist/wght.css';
+import '../styles/global.css';
+
+import ThemeInit from '../components/ThemeInit.astro';
+import Ambient from '../components/Ambient.astro';
+import Header from '../components/Header.astro';
+import MobileNav from '../components/MobileNav.astro';
+import Footer from '../components/Footer.astro';
+import QuickstartProduct from '../components/QuickstartProduct.astro';
+import { quickstartProducts } from '../data/quickstart';
+
+// The true onboarding sequence, in the order it actually happens. This is
+// the one signature visual on the page — everything else stays restrained.
+const routeStages = [
+  {
+    mark: '01',
+    label: 'Choose',
+    title: 'Choose a product',
+    body: 'Match the chooser below to how you already work today: terminal, an interactive TUI, a desktop app, a Linux workspace, or GitHub.',
+  },
+  {
+    mark: '02',
+    label: 'Prepare',
+    title: 'Prepare prerequisites',
+    body: "Install the shared runtime and connect the provider or account that guide names, before you run anything.",
+  },
+  {
+    mark: '03',
+    label: 'Run',
+    title: 'Run the first loop',
+    body: 'Follow the exact commands for one small, bounded task — the same loop you repeat every day after this.',
+  },
+  {
+    mark: '04',
+    label: 'Verify',
+    title: 'Verify the result',
+    body: "Confirm the stated arrival state. That checkable proof, not a tutorial's last screen, is what success means here.",
+    isArrival: true,
+  },
+];
+
+const foundationItems = [
+  {
+    label: 'Bring a project',
+    body: 'Every path starts inside a Git-tracked local project you already control. Nothing here asks you to move your code anywhere else.',
+  },
+  {
+    label: 'Authenticate your provider',
+    body: 'Connect Anthropic or OpenAI directly. Your account and credentials stay owned and managed by that provider, not by OpenCoven.',
+  },
+  {
+    label: 'Keep the runtime local-first',
+    body: 'The runtime and session history run on your machine, so switching to a second surface later does not restart what you already built.',
+  },
+  {
+    label: 'Install one surface at a time',
+    body: 'Set up only the product you chose above. Add Coven Code, Cave, CastCodes, or GitHub automation later without repeating this setup.',
+  },
+];
+
+const collectionJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'OpenCoven Quickstart',
+  description:
+    'Choose an OpenCoven product and follow a verified path to your first successful Coven CLI, Coven Code, Cave, CastCodes, or GitHub run.',
+  url: 'https://opencoven.ai/quickstart',
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: quickstartProducts.map((product, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: product.name,
+      url: `https://opencoven.ai/quickstart#${product.id}`,
+    })),
+  },
+};
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <ThemeInit />
+  <title>OpenCoven Quickstart — Choose Your First Product</title>
+  <meta name="description" content="Choose an OpenCoven product and follow a verified path to your first successful Coven CLI, Coven Code, Cave, CastCodes, or GitHub run." />
+  <meta property="og:title" content="OpenCoven Quickstart" />
+  <meta property="og:description" content="Choose a product, prepare it, run the first loop, and verify a checkable first success." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://opencoven.ai/quickstart" />
+  <meta property="og:image" content="https://opencoven.ai/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="OpenCoven — Persistent AI Familiars" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@OpenCvn" />
+  <meta name="twitter:title" content="OpenCoven Quickstart" />
+  <meta name="twitter:description" content="Choose a product, prepare it, run the first loop, and verify a checkable first success." />
+  <meta name="twitter:image" content="https://opencoven.ai/og.png" />
+  <meta name="twitter:image:alt" content="OpenCoven — Persistent AI Familiars" />
+  <meta name="theme-color" content="#050409" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://opencoven.ai/quickstart" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(collectionJsonLd)} />
+
+  <script is:inline>
+    (function () {
+      var html = document.documentElement;
+      html.classList.add('js-on');
+      if (!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        html.classList.add('motion-on');
+      }
+    })();
+  </script>
+</head>
+<body class="quickstart-page">
+  <Ambient />
+  <Header />
+  <MobileNav />
+
+  <main id="content" tabindex="-1">
+    <section class="onboard-hero" id="top" aria-label="OpenCoven quickstart hero">
+      <div class="onboard-hero-copy">
+        <p class="section-kicker">Quickstart</p>
+        <h1>Choose your way into OpenCoven.</h1>
+        <p class="onboard-hero-lede">
+          Start with the surface that matches how you already work — a terminal runtime, an
+          interactive coding TUI, a visual desktop Cave, a Linux workspace, or GitHub automation.
+          Every path ends the same way: concrete, checkable proof that it worked.
+        </p>
+        <p class="onboard-hero-foundation">
+          <strong>One foundation, five surfaces.</strong> Adding a second or third product later
+          does not restart your local session history — it shares the runtime you already set up.
+        </p>
+        <div class="onboard-hero-actions">
+          <a class="btn-primary" href="#onboard-chooser">Choose a product</a>
+          <a class="btn-secondary" href="#onboard-guides">Read every guide</a>
+        </div>
+      </div>
+
+      <div class="onboard-route panel" aria-labelledby="onboard-route-heading">
+        <p class="section-kicker">Mission trace</p>
+        <h2 id="onboard-route-heading">The sequence that actually runs.</h2>
+        <ol class="onboard-route-list">
+          {routeStages.map((stage) => (
+            <li class:list={['onboard-route-step', { 'is-arrival': stage.isArrival }]}>
+              <span class="onboard-route-marker" aria-hidden="true">{stage.mark}</span>
+              <div class="onboard-route-body">
+                <p class="onboard-route-label">{stage.label}</p>
+                <h3 class="onboard-route-title">{stage.title}</h3>
+                <p class="onboard-route-desc">{stage.body}</p>
+                {stage.isArrival && (
+                  <p class="onboard-route-arrival-tag">
+                    <span aria-hidden="true">✓</span> Arrival state — the proof it worked
+                  </p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="onboard-chooser content-section" id="onboard-chooser" aria-labelledby="onboard-chooser-heading">
+      <div class="section-header" data-reveal>
+        <p class="section-kicker">Pick one to start</p>
+        <h2 id="onboard-chooser-heading">Five products. One successful first loop.</h2>
+        <p>
+          These are alternatives, not a sequence — install only the product you choose. Each card
+          jumps straight to its own install, connect, and first-run guide below.
+        </p>
+      </div>
+      <nav class="onboard-chooser-nav" aria-label="Choose a product guide">
+        <ul class="onboard-chooser-grid">
+          {quickstartProducts.map((product) => (
+            <li>
+              <a class="onboard-chooser-card panel-inset is-card" href={`#${product.id}`}>
+                <span class="onboard-chooser-sigil" aria-hidden="true">{product.sigil}</span>
+                <span class="onboard-chooser-name">{product.name}</span>
+                <span class="onboard-chooser-best">{product.bestFor}</span>
+                <span class="onboard-chooser-meta">
+                  <span class="onboard-chooser-status">{product.status}</span>
+                  <span class="onboard-chooser-platforms">{product.platforms}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </section>
+
+    <section class="onboard-foundation content-section" aria-labelledby="onboard-foundation-heading">
+      <div class="onboard-foundation-panel panel">
+        <div class="section-header" data-reveal>
+          <p class="section-kicker">Shared foundation</p>
+          <h2 id="onboard-foundation-heading">Prepare once. Add surfaces when you need them.</h2>
+        </div>
+        <ul class="onboard-foundation-grid">
+          {foundationItems.map((item) => (
+            <li class="onboard-foundation-item panel-inset">
+              <p class="onboard-foundation-label">{item.label}</p>
+              <p class="onboard-foundation-body">{item.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="onboard-guides content-section" id="onboard-guides" aria-labelledby="onboard-guides-heading">
+      <div class="section-header" data-reveal>
+        <p class="section-kicker">The five guides</p>
+        <h2 id="onboard-guides-heading">From install to proof.</h2>
+        <p>
+          Each guide below is self-contained: install, connect, run one bounded task, and the
+          exact signal that means you succeeded.
+        </p>
+      </div>
+      <div class="onboard-guide-list">
+        {quickstartProducts.map((product, index) => (
+          <QuickstartProduct product={product} index={index} />
+        ))}
+      </div>
+    </section>
+
+    <section class="onboard-support content-section" aria-labelledby="onboard-support-heading">
+      <div class="onboard-support-panel panel">
+        <div class="onboard-support-copy">
+          <p class="section-kicker">Keep going</p>
+          <h2 id="onboard-support-heading">The next surface uses the same foundation.</h2>
+          <p>
+            Whichever guide you finish first, the runtime, provider connection, and local session
+            history you just set up carry over to the next one. Nothing here has to be repeated.
+          </p>
+        </div>
+        <nav class="onboard-support-links" aria-label="OpenCoven community and documentation">
+          <a class="onboard-support-link is-primary" href="https://docs.opencoven.ai" target="_blank" rel="noopener noreferrer">
+            Read the docs
+            <span class="sr-only"> (opens in new tab)</span>
+          </a>
+          <a class="onboard-support-link" href="https://github.com/OpenCoven" target="_blank" rel="noopener noreferrer">
+            Browse the GitHub org
+            <span class="sr-only"> (opens in new tab)</span>
+          </a>
+          <a class="onboard-support-link" href="https://discord.gg/opencoven" target="_blank" rel="noopener noreferrer">
+            Ask in Discord
+            <span class="sr-only"> (opens in new tab)</span>
+          </a>
+        </nav>
+      </div>
+    </section>
+
+    <!-- Announces copy success to screen readers (written by main.js) -->
+    <div class="sr-only" role="status" aria-live="polite" data-copy-live></div>
+  </main>
+
+  <Footer />
+
+  <script>
+    import '../scripts/main.js';
+  </script>
+</body>
+</html>
