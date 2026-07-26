@@ -9,6 +9,8 @@ export default defineConfig({
   compressHTML: true,
   integrations: [sitemap()],
   build: {
-    inlineStylesheets: 'auto',
+    // Inline all CSS to eliminate render-blocking stylesheet requests
+    // (~900ms est. FCP savings on throttled connections).
+    inlineStylesheets: 'always',
   },
 });
