@@ -28,6 +28,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
       # CI=true keeps Astro non-interactive; verify-static.mjs asserts
       # required public assets, canonical logo treatment, and load-bearing
       # copy in the built HTML (see scripts/verify-static.mjs).
@@ -36,3 +39,6 @@ jobs:
 
       - name: Verify static output
         run: pnpm check
+
+      - name: Verify browser interactions
+        run: pnpm check:browser

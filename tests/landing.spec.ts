@@ -1356,3 +1356,106 @@ for (const viewport of visualMatrix) {
     });
   }
 }
+
+test('theme control cycles system to light to dark', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.addInitScript(() => localStorage.setItem('theme', 'system'));
+  await page.goto('/');
+
+  const toggle = page.locator('[data-theme-toggle]');
+  await expect(page.locator('html')).toHaveAttribute('data-theme-pref', 'system');
+  await toggle.click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme-pref', 'light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await toggle.click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme-pref', 'dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
+
+test('platform shortcut resolves Windows without changing the primary path', async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/131 Safari/537.36',
+  });
+  const page = await context.newPage();
+  await page.goto('/');
+
+  const download = page.locator('[data-download-primary]');
+  await expect(download).toContainText('Download Coven Cave for Windows');
+  await expect(download).toHaveAttribute('href', '/download/windows');
+  await expect(download).toHaveAttribute('data-platform', 'win');
+  await expect(
+    page.locator('.hero [data-primary-cta]'),
+  ).toHaveAttribute('href', '/quickstart');
+  await context.close();
+});
+
+test('copy success announces the exact command', async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as Window & { __copied?: string }).__copied = '';
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: (value: string) => {
+          (window as Window & { __copied?: string }).__copied = value;
+          return Promise.resolve();
+        },
+      },
+    });
+  });
+  await page.goto('/');
+
+  const button = page.locator('#quickstart [data-copy]').first();
+  await button.click();
+  await expect(button).toHaveAttribute('aria-label', 'Copied');
+  await expect(page.locator('#quickstart [data-copy-live]')).toHaveText(
+    'Copied: npm install -g @opencoven/cli',
+  );
+  expect(
+    await page.evaluate(
+      () => (window as Window & { __copied?: string }).__copied,
+    ),
+  ).toBe('npm install -g @opencoven/cli');
+});
+
+for (const colorScheme of ['light', 'dark'] as const) {
+  test(`system theme resolves initial ${colorScheme} preference`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme });
+    await page.addInitScript(() => localStorage.setItem('theme', 'system'));
+    await page.goto('/');
+
+    await expect(page.locator('html')).toHaveAttribute('data-theme', colorScheme);
+    await expect(page.locator('html')).toHaveAttribute(
+      'data-theme-pref',
+      'system',
+    );
+  });
+}
+
+test('system theme follows live preference changes', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.addInitScript(() => localStorage.setItem('theme', 'system'));
+  await page.goto('/');
+
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-theme-pref',
+    'system',
+  );
+
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-theme-pref',
+    'system',
+  );
+
+  await page.emulateMedia({ colorScheme: 'light' });
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-theme-pref',
+    'system',
+  );
+});
