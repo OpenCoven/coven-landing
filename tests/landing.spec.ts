@@ -1,6 +1,14 @@
 import { expect, test } from '@playwright/test';
 import { quickstartProducts } from '../src/data/quickstart';
 
+const productContracts = [
+  { id: 'coven-cli', name: 'Coven CLI' },
+  { id: 'coven-code', name: 'Coven Code' },
+  { id: 'coven-cave', name: 'Coven Cave' },
+  { id: 'castcodes', name: 'CastCodes' },
+  { id: 'github', name: 'OpenCoven for GitHub' },
+] as const;
+
 for (const pathname of ['/', '/quickstart', '/github']) {
   test(`${pathname} renders without runtime errors`, async ({ page }) => {
     const errors: string[] = [];
@@ -322,21 +330,25 @@ test('product constellation exposes five complete keyboard links', async ({
   const cards = page.locator('[data-product-constellation] .product-card');
   await expect(items).toHaveCount(5);
   await expect(cards).toHaveCount(5);
+  expect(
+    quickstartProducts.map(({ id, name }) => ({ id, name })),
+  ).toEqual(productContracts);
 
-  for (const [index, product] of quickstartProducts.entries()) {
+  for (const [index, contract] of productContracts.entries()) {
+    const product = quickstartProducts[index];
     const item = items.nth(index);
     const card = cards.nth(index);
     await expect(item.locator(':scope > a.product-card')).toHaveCount(1);
     await expect(card).toHaveAttribute(
       'href',
-      `/quickstart#${product.id}`,
+      `/quickstart#${contract.id}`,
     );
     await expect(card.locator('.product-sigil')).toHaveText(product.sigil);
     await expect(card.locator('.product-heading small')).toHaveText(
       product.eyebrow,
     );
     await expect(card.locator('.product-heading strong')).toHaveText(
-      product.name,
+      contract.name,
     );
     await expect(card.locator('.product-summary')).toHaveText(product.summary);
     await expect(card.locator('.product-best')).toContainText(product.bestFor);
@@ -349,7 +361,7 @@ test('product constellation exposes five complete keyboard links', async ({
     await expect(card).toHaveAccessibleName(
       [
         product.eyebrow,
-        product.name,
+        contract.name,
         product.summary,
         'Best for',
         product.bestFor,
