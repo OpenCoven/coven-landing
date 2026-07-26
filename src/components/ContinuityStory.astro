@@ -193,6 +193,25 @@ import { storyStages } from '../data/landing';
     transform: translateY(4px);
   }
 
+  :global(html:not(.js-on)) .story-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :global(html:not(.js-on)) .continuity-stages li {
+    min-height: 0;
+    padding-bottom: 72px;
+  }
+
+  :global(html:not(.js-on)) .story-visual {
+    display: none;
+  }
+
+  :global(html:not(.js-on)) .stage-snapshot {
+    display: block;
+    max-width: 680px;
+    margin-top: 28px;
+  }
+
   @media (max-width: 900px) {
     .continuity-story {
       padding: 88px 20px;

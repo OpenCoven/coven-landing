@@ -129,3 +129,36 @@ test('mobile story renders a readable ledger snapshot per stage', async ({ page 
   }
   await expect(page.locator('.story-visual')).toBeHidden();
 });
+
+test('desktop story remains complete without JavaScript', async ({ browser }) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 1440, height: 1000 },
+  });
+
+  try {
+    const page = await context.newPage();
+    await page.goto('/');
+
+    const story = page.locator('[data-continuity-story]');
+    const stages = story.locator('[data-story-stage]');
+    await expect(stages).toHaveCount(4);
+    for (let index = 0; index < 4; index += 1) {
+      await expect.soft(stages.nth(index).locator('.stage-snapshot')).toBeVisible();
+    }
+    await expect.soft(story.locator('.story-visual')).toBeHidden();
+
+    for (const title of [
+      'Start inside one explicit project.',
+      'Keep the conventions worth carrying.',
+      'Change surfaces without starting over.',
+      'Resume with the relevant state intact.',
+    ]) {
+      await expect(
+        story.getByRole('heading', { level: 3, name: title, exact: true }),
+      ).toBeVisible();
+    }
+  } finally {
+    await context.close();
+  }
+});
