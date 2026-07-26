@@ -2091,11 +2091,23 @@
        shared semantic tokens instead of inventing a parallel theme.
        ═══════════════════════════════════════════════════════════ */
     .quickstart-page {
+      --onboard-label-foreground: rgba(180, 170, 235, 0.82);
       --onboard-success-foreground: var(--green);
     }
 
     html[data-theme="light"] .quickstart-page {
+      --onboard-label-foreground: #5A4C9E;
       --onboard-success-foreground: #1F7A34;
+    }
+
+    .quickstart-page .section-kicker,
+    .quickstart-page .onboard-route-label,
+    .quickstart-page .onboard-chooser-status,
+    .quickstart-page .onboard-product-meta dt,
+    .quickstart-page .onboard-label,
+    .quickstart-page .onboard-step-label {
+      color: var(--onboard-label-foreground);
+      opacity: 1;
     }
 
     /* ── Hero: two-column composition — copy left, the "mission trace"
@@ -2173,7 +2185,6 @@
     .onboard-route-label {
       font-family: var(--mono); font-size: 0.5625rem; font-weight: 700;
       letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--vtext); opacity: 0.8;
       margin-bottom: 3px;
     }
     .onboard-route-title {
@@ -2231,7 +2242,6 @@
       font-family: var(--mono); font-size: 0.625rem;
       letter-spacing: 0.05em; text-transform: uppercase;
     }
-    .onboard-chooser-status { color: var(--vtext); opacity: 0.9; }
     .onboard-chooser-platforms { color: var(--muted); opacity: 0.9; }
     @media (hover: hover) {
       .onboard-chooser-card:hover {
@@ -2314,7 +2324,6 @@
     .onboard-product-meta dt {
       font-family: var(--mono); font-size: 0.5625rem; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--vtext); opacity: 0.75;
       margin-bottom: 4px;
     }
     .onboard-product-meta dd { font-size: 0.8125rem; line-height: 1.5; color: var(--white); }
@@ -2330,7 +2339,6 @@
     .onboard-label {
       font-family: var(--mono); font-size: 0.625rem; font-weight: 700;
       letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--vtext); opacity: 0.8;
       margin-bottom: 10px;
     }
     .onboard-requires ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
@@ -2377,7 +2385,6 @@
     .onboard-step-label {
       font-family: var(--mono); font-size: 0.5625rem; font-weight: 700;
       letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--vtext); opacity: 0.8;
     }
     .onboard-step-body h3 { font-size: 0.9375rem; font-weight: 700; color: var(--white); }
     .onboard-step-body > p { font-size: 0.8125rem; line-height: 1.6; color: var(--muted); }
@@ -2595,10 +2602,6 @@
       .onboard-support-panel { padding: 24px 16px; }
     }
 
-    /* No quickstart-specific light-theme overrides are needed: every
-       selector above uses the shared semantic tokens (--muted, --white,
-       --vtext, --panel-bg, --inset-bg, --border-v, --green, --violet-cta),
-       which already flip correctly in the LIGHT THEME block. The one
-       intentionally-dark surface (.onboard-command, mirroring the
-       QuickStart terminal block) uses hardcoded rgba values that were
-       already theme-invariant, so no re-assertion is required either. */
+    /* Quickstart-specific light-theme overrides are limited to the label
+       and success foreground tokens above. The intentionally-dark
+       .onboard-command surface remains theme-invariant. */
