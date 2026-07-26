@@ -303,95 +303,116 @@
 
     /* ── HEADER ──────────────────────────────────────────── */
     .site-header {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(5,4,9,0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--oc-border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid transparent;
+      background: transparent;
+      transition:
+        background 180ms ease,
+        border-color 180ms ease;
+    }
+    .site-header.is-scrolled {
+      border-bottom-color: var(--oc-border-subtle);
+      background: rgba(5, 4, 9, 0.98);
     }
     .header-inner {
-      max-width: 1280px; margin: 0 auto;
-      padding: 0 32px;
+      display: flex;
+      width: min(100%, 1280px);
       height: 60px;
-      display: flex; align-items: center; justify-content: space-between;
+      align-items: center;
       gap: 24px;
+      margin: 0 auto;
+      padding: 0 32px;
     }
     .brand {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none; color: var(--white);
-      font-size: 0.9375rem; font-weight: 700;
-      letter-spacing: -0.3px;
-      flex-shrink: 0;
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 10px;
+      color: var(--white);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      text-decoration: none;
     }
-    .brand-mark img { width: 26px; height: 26px; display: block; border-radius: 8px; }
+    .brand-mark img {
+      display: block;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+    }
 
     .desktop-nav {
-      display: flex; align-items: center; gap: 6px;
-      flex: 1; justify-content: center;
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
     .desktop-nav a {
-      font-size: 0.75rem; font-weight: 500;
-      color: var(--muted); text-decoration: none;
-      padding: 6px 12px; border-radius: 6px;
-      transition: color 0.15s;
-      letter-spacing: 0.01em;
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      padding: 0 10px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 550;
+      text-decoration: none;
     }
     .desktop-nav a:hover { color: var(--coven-violet-light); }
 
-    /* Prominent social icons: GitHub, X, Discord */
-    .header-social {
-      display: flex; align-items: center; gap: 6px;
-      flex-shrink: 0;
-      margin-right: 14px;
+    .header-actions {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 8px;
     }
-    .header-social-link {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 34px; height: 34px;
+
+    .header-control,
+    .mobile-toggle {
+      display: inline-grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border: 0;
       border-radius: 8px;
-      color: var(--vtext);
-      border: 1px solid rgba(154, 142, 205, 0.22);
-      background: rgba(154, 142, 205, 0.06);
-      transition: color 0.15s, border-color 0.15s, background 0.15s;
-    }
-    .header-social-link svg { width: 17px; height: 17px; }
-    .header-social-link:hover {
-      color: #fff;
-      border-color: rgba(180, 170, 235, 0.55);
-      background: rgba(154, 142, 205, 0.16);
+      background: transparent;
+      color: var(--white);
+      cursor: pointer;
     }
 
-    /* Theme toggle — reuses .header-social-link chrome. Shows only the icon
-       matching the current preference, which ThemeInit stamps on <html
-       data-theme-pref> before paint (so the right glyph shows without JS). */
-    .theme-toggle { cursor: pointer; }
-    .theme-toggle svg { display: none; width: 17px; height: 17px; }
-    .theme-toggle .ti-system { display: block; }
+    .theme-toggle svg {
+      display: none;
+      width: 18px;
+      height: 18px;
+    }
+    .theme-toggle .ti-system {
+      display: block;
+    }
     html[data-theme-pref="light"] .theme-toggle .ti-system,
-    html[data-theme-pref="dark"]  .theme-toggle .ti-system { display: none; }
-    html[data-theme-pref="light"] .theme-toggle .ti-light { display: block; }
-    html[data-theme-pref="dark"]  .theme-toggle .ti-dark  { display: block; }
+    html[data-theme-pref="dark"] .theme-toggle .ti-system {
+      display: none;
+    }
+    html[data-theme-pref="light"] .theme-toggle .ti-light,
+    html[data-theme-pref="dark"] .theme-toggle .ti-dark {
+      display: block;
+    }
 
-    .btn-join {
-      flex-shrink: 0;
-      display: inline-flex; align-items: center; gap: 8px;
+    .header-cta {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      padding: 0 16px;
+      border-radius: 7px;
       background: var(--violet-cta);
       color: #fff;
-      font-size: 0.6875rem; font-weight: 700;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      padding: 8px 18px;
-      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
       text-decoration: none;
-      border: none; cursor: pointer;
-      transition: background 0.15s;
     }
-    .btn-join:hover { background: var(--vtext); color: var(--bg); }
-    .btn-join .join-diamond { font-size: 0.625rem; }
 
-    /* Mobile toggle */
     .mobile-toggle {
       display: none;
-      background: none; border: none; cursor: pointer;
-      color: var(--white); padding: 8px;
     }
 
     /* ── HERO — "the summoning" ──────────────────────────── */
@@ -1508,53 +1529,158 @@
 
     /* ── FOOTER ──────────────────────────────────────────── */
     footer {
-      position: relative; z-index: 1;
-      border-top: 1px solid var(--border);
-      padding: 32px;
+      position: relative;
+      z-index: 1;
+      padding: 56px 32px 80px;
+      border-top: 1px solid var(--oc-border-subtle);
     }
     .footer-inner {
-      max-width: 1280px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 24px; flex-wrap: wrap;
+      display: grid;
+      width: min(100%, 1216px);
+      grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+      gap: 48px;
+      margin: 0 auto;
+    }
+    .footer-intro p {
+      max-width: 30ch;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      line-height: 1.6;
     }
     .footer-brand {
-      display: flex; align-items: center; gap: 8px;
-      text-decoration: none; color: var(--muted);
-      font-size: 0.8125rem; font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--white);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-decoration: none;
     }
-    .footer-brand img { width: 20px; height: 20px; opacity: 0.7; border-radius: 6px; }
-    .footer-nav {
-      display: flex; gap: 20px; flex-wrap: wrap;
+    .footer-brand img {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
     }
-    .footer-nav a {
-      font-family: var(--mono);
-      font-size: 0.625rem; letter-spacing: 0.1em;
-      color: var(--muted); text-decoration: none;
-      transition: color 0.15s;
+    .footer-groups {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 28px;
     }
-    .footer-nav a:hover { color: var(--coven-violet-light); }
-    .footer-copy {
-      /* 0.85 keeps ≥4.5:1 contrast (WCAG AA) in both themes */
-      font-size: 0.6875rem; color: var(--muted); opacity: 0.85;
+    .footer-groups nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-groups nav p {
+      margin-bottom: 4px;
+      color: var(--vtext);
+      font: 0.625rem/1 var(--mono);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .footer-groups a,
+    .footer-meta a {
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-decoration: none;
+    }
+    .footer-meta {
+      display: flex;
+      grid-column: 1 / -1;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--oc-border-subtle);
+      color: var(--muted);
+      font: 0.625rem/1.4 var(--mono);
+    }
+    .footer-meta nav {
+      display: flex;
+      gap: 18px;
     }
 
     /* ── MOBILE ──────────────────────────────────────────── */
-    .mobile-nav-overlay {
+    .mobile-nav-overlay[hidden] {
       display: none;
-      position: fixed; inset: 0; z-index: 200;
-      background: rgba(5,4,9,0.97);
-      flex-direction: column; align-items: center; justify-content: center;
-      gap: 24px;
     }
-    .mobile-nav-overlay.is-open { display: flex; }
-    .mobile-nav-overlay a {
-      font-size: 1.375rem; font-weight: 700;
-      color: var(--white); text-decoration: none;
+    .mobile-nav-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: grid;
+      justify-items: end;
+      background: rgba(5, 4, 9, 0.98);
+    }
+    .mobile-nav-panel {
+      display: flex;
+      width: min(100%, 440px);
+      min-height: 100%;
+      flex-direction: column;
+      padding:
+        calc(18px + env(safe-area-inset-top))
+        max(24px, env(safe-area-inset-right))
+        calc(24px + env(safe-area-inset-bottom))
+        24px;
+      border-left: 1px solid var(--oc-border-subtle);
+      background: #0b0910;
+      color: #e8e0f0;
+    }
+    .mobile-nav-panel > header {
+      display: flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(232, 224, 240, 0.1);
+    }
+    .mobile-nav-panel > header p {
+      color: #aaa1b8;
+      font: 0.6875rem/1 var(--mono);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
     }
     .mobile-nav-close {
-      position: absolute; top: 20px; right: 24px;
-      background: none; border: none; color: var(--muted);
-      font-size: 1.75rem; cursor: pointer;
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border: 0;
+      background: transparent;
+      color: #e8e0f0;
+      cursor: pointer;
+      font-size: 1.75rem;
+    }
+    .mobile-nav-panel > nav {
+      display: grid;
+      gap: 4px;
+      padding: 24px 0;
+    }
+    .mobile-nav-panel > nav a {
+      display: flex;
+      min-height: 52px;
+      align-items: center;
+      color: #e8e0f0;
+      font-family: var(--font-display);
+      font-size: 1.375rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .mobile-nav-panel .mobile-community {
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: auto;
+      padding-bottom: 0;
+      border-top: 1px solid rgba(232, 224, 240, 0.1);
+    }
+    .mobile-nav-panel .mobile-community a {
+      justify-content: center;
+      color: #aaa1b8;
+      font-family: var(--font-ui);
+      font-size: 0.8125rem;
+      font-weight: 650;
+    }
+    .mobile-nav-fallback {
+      display: none;
     }
 
     /* ── UNIFIED CARD HOVER ──────────────────────────────── */
@@ -1638,15 +1764,20 @@
     }
 
     @media (max-width: 900px) {
-      .desktop-nav { display: none; }
-      .mobile-toggle { display: flex; order: 3; }
-      .btn-join { display: none; }
-      .header-social { margin-right: 0; margin-left: auto; order: 2; }
+      .desktop-nav,
+      .header-cta {
+        display: none;
+      }
+      .header-actions {
+        margin-left: auto;
+      }
+      html.js-on .mobile-toggle {
+        display: inline-grid;
+      }
 
       /* Consistent 20px gutter across header, sections, footer */
-      .header-inner { padding: 0 20px; }
+      .header-inner { padding-inline: 20px; }
       .testimonial-strip { padding: 32px 20px; }
-      footer { padding: 32px 20px; }
 
       /* Hero stacking moved to the orientation-aware block below —
          landscape phones ≥701px wide keep a compact two-column hero. */
@@ -1659,8 +1790,35 @@
       .github-trust-panel { padding: 40px 36px; }
 
       /* Footer */
-      .footer-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
-      .footer-nav { gap: 12px; }
+      .footer-inner { grid-template-columns: 1fr; }
+
+      .mobile-nav-fallback {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 16px;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--oc-border-subtle);
+      }
+      .mobile-nav-fallback a {
+        color: var(--muted);
+        font-size: 0.75rem;
+      }
+    }
+
+    @media (max-width: 620px) {
+      footer {
+        padding:
+          44px
+          20px
+          calc(76px + env(safe-area-inset-bottom));
+      }
+      .footer-groups {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .footer-meta {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
 
     /* ── Hero stacking — orientation-aware ──────────────────
@@ -1772,9 +1930,10 @@
       h1 { font-size: 2.125rem; }
       .kicker { font-size: 0.625rem; }
       /* Uniform 16px gutter at smallest viewports */
-      .header-inner { padding: 0 16px; }
+      .header-inner { padding-inline: 16px; }
       .testimonial-strip { padding: 28px 16px; }
-      footer { padding: 28px 16px; }
+      footer { padding-inline: 16px; }
+      .footer-groups { grid-template-columns: 1fr; }
       .hero { padding: 32px 16px; }
       .github-hero { padding: 32px 16px 40px; }
       .content-section { padding: 40px 16px; }
@@ -1863,19 +2022,16 @@
     html[data-theme="light"] .glow-bottom { background: radial-gradient(circle, rgba(154, 142, 205, 0.14) 0%, transparent 70%); }
 
     /* ── Header ── */
-    html[data-theme="light"] .site-header {
-      background: rgba(255, 255, 255, 0.82);
-      border-bottom-color: rgba(27, 23, 38, 0.10);
+    html[data-theme="light"] .site-header.is-scrolled {
+      background: rgba(251, 250, 255, 0.98);
     }
-    html[data-theme="light"] .header-social-link:hover { color: var(--violet-cta); }
 
-    /* ── Glass cards + testimonial + mobile overlay ── */
+    /* ── Glass cards + testimonial ── */
     html[data-theme="light"] .glass-card {
       background: rgba(255, 255, 255, 0.72);
       border-color: rgba(122, 111, 179, 0.20);
     }
     html[data-theme="light"] .testimonial-strip { background: rgba(255, 255, 255, 0.58); }
-    html[data-theme="light"] .mobile-nav-overlay { background: rgba(251, 250, 255, 0.97); }
 
     /* ── iOS (TestFlight) download button ──
        The base button hardcodes #fff text for the dark macOS gradient,

@@ -643,3 +643,274 @@ test('closing invitation uses the approved mobile layout at 767px', async ({
     1,
   );
 });
+
+test('mobile menu is modal, traps focus, and restores the opener', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  const toggle = page.locator('.mobile-toggle');
+  const dialog = page.locator('#mobile-nav');
+  const close = dialog.locator('.mobile-nav-close');
+  const lastLink = dialog.locator('a').last();
+  await expect(page.locator('.site-header')).toContainText('OpenCoven');
+  await expect(
+    page.locator('.site-header a[aria-label*="GitHub"]'),
+  ).toHaveCount(0);
+
+  await toggle.click();
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveAttribute('role', 'dialog');
+  await expect(page.locator('main')).toHaveJSProperty('inert', true);
+  await expect(close).toBeFocused();
+
+  await page.keyboard.press('Shift+Tab');
+  await expect(lastLink).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(close).toBeFocused();
+
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(toggle).toBeFocused();
+  await expect(page.locator('main')).toHaveJSProperty('inert', false);
+});
+
+test('header becomes opaque only after scrolling', async ({ page }) => {
+  await page.goto('/');
+  const header = page.locator('.site-header');
+  await expect(header).not.toHaveClass(/is-scrolled/);
+  await page.evaluate(() => window.scrollTo(0, 120));
+  await expect(header).toHaveClass(/is-scrolled/);
+});
+
+test('feedback SDK is absent until the visitor activates feedback', async ({
+  page,
+}) => {
+  const sdkRequests: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().includes('/api/widget/sdk.js')) {
+      sdkRequests.push(request.url());
+    }
+  });
+  await page.route('**/api/widget/sdk.js', async (route) => {
+    await route.fulfill({
+      contentType: 'application/javascript',
+      body: `
+        window.Quackback = function (command) {
+          window.__feedbackCommands = window.__feedbackCommands || [];
+          window.__feedbackCommands.push(command);
+        };
+      `,
+    });
+  });
+
+  await page.goto('/');
+  await page.waitForTimeout(2_300);
+  expect(sdkRequests).toEqual([]);
+
+  await page.locator('[data-feedback-launcher]').click();
+  await expect.poll(() => sdkRequests.length).toBe(1);
+  await expect(page.locator('[data-feedback-status]')).toHaveText(
+    'Feedback opened.',
+  );
+  await expect
+    .poll(async () =>
+      page.evaluate(
+        () =>
+          (
+            window as Window & {
+              __feedbackCommands?: string[];
+            }
+          ).__feedbackCommands,
+      ),
+    )
+    .toEqual(['init', 'open']);
+});
+
+test('feedback SDK failure preserves a working Discord fallback', async ({
+  page,
+}) => {
+  await page.route('**/api/widget/sdk.js', async (route) => {
+    await route.abort('failed');
+  });
+  await page.route('https://discord.gg/opencoven', async (route) => {
+    await route.fulfill({
+      contentType: 'text/html',
+      body: '<title>Discord fallback</title>',
+    });
+  });
+
+  await page.goto('/');
+  const launcher = page.locator('[data-feedback-launcher]');
+  await expect(launcher).toHaveAttribute(
+    'href',
+    'https://discord.gg/opencoven',
+  );
+  await launcher.click();
+  await expect(launcher).toHaveAttribute('data-feedback-state', 'failed');
+  await expect(launcher).toContainText(
+    'Feedback unavailable · open Discord',
+  );
+  await expect(page.locator('[data-feedback-status]')).toHaveText(
+    'Feedback widget unavailable. Use the Discord fallback link.',
+  );
+
+  await launcher.click();
+  await expect(page).toHaveURL('https://discord.gg/opencoven');
+  await expect(page).toHaveTitle('Discord fallback');
+});
+
+test('failed feedback fallback avoids mobile conversion controls', async ({
+  page,
+}) => {
+  await page.route('**/api/widget/sdk.js', async (route) => {
+    await route.abort('failed');
+  });
+  await page.route('https://discord.gg/opencoven', async (route) => {
+    await route.fulfill({
+      contentType: 'text/html',
+      body: '<title>Discord fallback</title>',
+    });
+  });
+
+  const protectedSelector = [
+    '[data-copy]',
+    '[data-primary-cta]',
+    '[data-product-constellation] a',
+    '.quickstart-actions a',
+    '.closing-links a',
+    'footer a',
+  ].join(',');
+
+  const assertNoVisibleOverlap = async () => {
+    const result = await page.evaluate((selector) => {
+      const launcher = document.querySelector<HTMLElement>(
+        '[data-feedback-launcher]',
+      )!;
+      const launcherRect = launcher.getBoundingClientRect();
+      const collisions = Array.from(
+        document.querySelectorAll<HTMLElement>(selector),
+      )
+        .filter((target) => {
+          const style = window.getComputedStyle(target);
+          const rect = target.getBoundingClientRect();
+          const visible =
+            style.display !== 'none'
+            && style.visibility !== 'hidden'
+            && rect.width > 0
+            && rect.height > 0
+            && rect.bottom > 0
+            && rect.top < window.innerHeight
+            && rect.right > 0
+            && rect.left < window.innerWidth;
+          if (!visible) return false;
+
+          return !(
+            rect.right <= launcherRect.left
+            || rect.left >= launcherRect.right
+            || rect.bottom <= launcherRect.top
+            || rect.top >= launcherRect.bottom
+          );
+        })
+        .map(
+          (target) =>
+            target.getAttribute('aria-label')
+            || target.textContent?.trim()
+            || target.tagName,
+        );
+
+      return {
+        collisions,
+        launcher: {
+          width: launcherRect.width,
+          height: launcherRect.height,
+        },
+      };
+    }, protectedSelector);
+
+    expect(result.collisions).toEqual([]);
+    expect(result.launcher.width).toBeGreaterThanOrEqual(44);
+    expect(result.launcher.height).toBeGreaterThanOrEqual(44);
+  };
+
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/');
+
+    const launcher = page.locator('[data-feedback-launcher]');
+    await launcher.click();
+    await expect(launcher).toHaveAttribute('data-feedback-state', 'failed');
+    await expect(launcher).toBeVisible();
+    await expect(launcher).toHaveAccessibleName(
+      'Feedback unavailable · open Discord',
+    );
+    await expect(launcher).toHaveAttribute(
+      'href',
+      'https://discord.gg/opencoven',
+    );
+
+    await page.evaluate(() => {
+      window.location.hash = 'quickstart';
+    });
+    await page.locator('#quickstart').scrollIntoViewIfNeeded();
+    await assertNoVisibleOverlap();
+
+    for (const copyControl of await page.locator('#quickstart [data-copy]').all()) {
+      await copyControl.scrollIntoViewIfNeeded();
+      await assertNoVisibleOverlap();
+    }
+
+    for (const productCard of await page
+      .locator('[data-product-constellation] .product-card')
+      .all()) {
+      await productCard.scrollIntoViewIfNeeded();
+      await assertNoVisibleOverlap();
+    }
+
+    for (const section of [
+      page.locator('.quickstart-actions'),
+      page.locator('.closing-invitation'),
+      page.locator('footer'),
+    ]) {
+      await section.scrollIntoViewIfNeeded();
+      await assertNoVisibleOverlap();
+    }
+
+    await launcher.scrollIntoViewIfNeeded();
+    await assertNoVisibleOverlap();
+    await launcher.click();
+    await expect(page).toHaveURL('https://discord.gg/opencoven');
+    await expect(page).toHaveTitle('Discord fallback');
+  }
+});
+
+test('clipboard failure selects the command and gives a concrete fallback', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: () => Promise.reject(new Error('denied')),
+      },
+    });
+  });
+  await page.goto('/');
+
+  const preview = page.locator('#quickstart');
+  const button = preview.locator('[data-copy]').first();
+  const command = await preview.locator('code').first().textContent();
+  await button.click();
+
+  await expect(button).toHaveAttribute(
+    'aria-label',
+    'Copy unavailable. Select the command and copy manually.',
+  );
+  await expect(preview.locator('[data-copy-live]')).toContainText(
+    'Copy unavailable',
+  );
+  expect(await page.evaluate(() => window.getSelection()?.toString())).toBe(
+    command,
+  );
+});

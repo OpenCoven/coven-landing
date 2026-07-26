@@ -187,6 +187,42 @@ if (existsSync(distIndex)) {
     );
   }
 
+  const primaryCtaCount = countMatches(
+    html,
+    /<a(?=[^>]*\bdata-primary-cta)(?=[^>]*\bhref="\/quickstart")[^>]*>/g,
+  );
+  if (primaryCtaCount !== 3) {
+    throw new Error(
+      `Homepage must expose exactly three marked primary CTAs to /quickstart across header, hero, and close; found ${primaryCtaCount}`,
+    );
+  }
+
+  const mobileDialog = html.match(
+    /<div(?=[^>]*\bid="mobile-nav")(?=[^>]*\brole="dialog")(?=[^>]*\baria-modal="true")(?=[^>]*\bhidden)[^>]*>/,
+  );
+  if (!mobileDialog) {
+    throw new Error(
+      'Mobile navigation must render as an initially hidden modal dialog',
+    );
+  }
+
+  if (!html.includes('class="mobile-nav-fallback"')) {
+    throw new Error('Mobile navigation must include a no-JavaScript fallback');
+  }
+
+  if (!html.includes('data-feedback-launcher')) {
+    throw new Error(
+      'Homepage must render the lightweight feedback fallback link',
+    );
+  }
+  if (
+    html.includes(
+      '<script src="https://feedback.opencoven.ai/api/widget/sdk.js"',
+    )
+  ) {
+    throw new Error('Homepage HTML must not load the feedback SDK eagerly');
+  }
+
   if (
     !/<ol(?=[^>]*\bclass="quickstart-preview-steps")(?=[^>]*\brole="list")[^>]*>/.test(
       html,
@@ -426,10 +462,41 @@ if (existsSync(distGithub)) {
 
 const sourceCss = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
 const sourceMain = await readFile(path.join(root, 'src/scripts/main.js'), 'utf8');
+const sourceLanding = await readFile(
+  path.join(root, 'src/scripts/landing.js'),
+  'utf8',
+);
+const sourceIndex = await readFile(
+  path.join(root, 'src/pages/index.astro'),
+  'utf8',
+);
 const sourceFooter = await readFile(
   path.join(root, 'src/components/Footer.astro'),
   'utf8',
 );
+if (
+  sourceLanding.includes('requestIdleCallback')
+  || sourceLanding.includes("addEventListener('load', schedule")
+) {
+  throw new Error('Feedback must not schedule itself on load or idle');
+}
+if (
+  !sourceLanding.includes("addEventListener('click', activateFeedback)")
+  || !sourceLanding.includes("window.Quackback('open')")
+) {
+  throw new Error(
+    'Feedback SDK must load and open only from launcher activation',
+  );
+}
+if (
+  sourceIndex.includes('OpenCovenFeedback')
+  || sourceIndex.includes('requestIdleCallback')
+  || sourceIndex.includes("addEventListener('load', schedule")
+) {
+  throw new Error(
+    'Homepage source must not retain the obsolete eager feedback scheduler',
+  );
+}
 for (const [label, source] of [
   ['src/components/Footer.astro', sourceFooter],
   ['src/styles/global.css', sourceCss],

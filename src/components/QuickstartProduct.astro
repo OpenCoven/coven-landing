@@ -66,7 +66,7 @@ const COPY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
               <h3>{step.title}</h3>
               <p>{step.body}</p>
               {step.commands?.map((command) => (
-                <div class="onboard-command">
+                <div class="onboard-command" data-copy-surface>
                   <code>{command.value}</code>
                   <button
                     class="qs-copy"

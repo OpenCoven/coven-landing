@@ -179,3 +179,75 @@ wireRovingTabs(
     });
   });
 })();
+
+(function wireFeedback() {
+  var launcher = document.querySelector('[data-feedback-launcher]');
+  var label = launcher?.querySelector('[data-feedback-label]');
+  var status = document.querySelector('[data-feedback-status]');
+  if (!launcher || !label) return;
+
+  var loading = false;
+  var ready = false;
+  var failed = false;
+  var instanceUrl = 'https://feedback.opencoven.ai';
+  var sdkUrl = `${instanceUrl}/api/widget/sdk.js`;
+
+  function announce(message) {
+    if (status) status.textContent = message;
+  }
+
+  function fail() {
+    loading = false;
+    failed = true;
+    launcher.removeAttribute('aria-busy');
+    launcher.dataset.feedbackState = 'failed';
+    label.textContent = 'Feedback unavailable · open Discord';
+    announce('Feedback widget unavailable. Use the Discord fallback link.');
+  }
+
+  function openFeedback() {
+    if (typeof window.Quackback !== 'function') {
+      fail();
+      return;
+    }
+    window.Quackback('open');
+    announce('Feedback opened.');
+  }
+
+  function activateFeedback(event) {
+    if (failed) return;
+    event.preventDefault();
+    if (ready) {
+      openFeedback();
+      return;
+    }
+    if (loading) return;
+
+    loading = true;
+    launcher.setAttribute('aria-busy', 'true');
+    label.textContent = 'Opening feedback…';
+    var script = document.createElement('script');
+    script.id = 'opencoven-feedback-sdk';
+    script.async = true;
+    script.src = sdkUrl;
+    script.addEventListener('load', function () {
+      try {
+        window.Quackback('init', {
+          instanceUrl,
+          launcher: false,
+        });
+        loading = false;
+        ready = true;
+        launcher.removeAttribute('aria-busy');
+        label.textContent = 'Feedback';
+        openFeedback();
+      } catch {
+        fail();
+      }
+    }, { once: true });
+    script.addEventListener('error', fail, { once: true });
+    document.head.appendChild(script);
+  }
+
+  launcher.addEventListener('click', activateFeedback);
+})();

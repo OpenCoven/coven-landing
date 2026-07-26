@@ -1,21 +1,94 @@
-  // Mobile nav
-  const toggle = document.querySelector('.mobile-toggle');
-  const mobileNav = document.getElementById('mobile-nav');
-  const closeBtn = document.querySelector('.mobile-nav-close');
+(function wireHeader() {
+  var header = document.querySelector('.site-header');
+  if (!header) return;
+  var sync = function () {
+    header.classList.toggle('is-scrolled', window.scrollY > 12);
+  };
+  sync();
+  window.addEventListener('scroll', sync, { passive: true });
+})();
 
-  toggle.addEventListener('click', () => {
-    mobileNav.classList.add('is-open');
+(function wireMobileNavigation() {
+  var toggle = document.querySelector('.mobile-toggle');
+  var dialog = document.getElementById('mobile-nav');
+  var closeButton = dialog?.querySelector('.mobile-nav-close');
+  if (!toggle || !dialog || !closeButton) return;
+
+  var previousFocus = null;
+  var inertTargets = Array.from(document.body.children).filter(function (child) {
+    return child !== dialog && child.tagName !== 'SCRIPT';
+  });
+  var focusableSelector = [
+    'a[href]',
+    'button:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(',');
+
+  function setBackgroundInert(value) {
+    inertTargets.forEach(function (target) {
+      target.inert = value;
+    });
+  }
+
+  function openMobile() {
+    previousFocus = document.activeElement;
+    dialog.hidden = false;
     toggle.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
-  });
+    setBackgroundInert(true);
+    closeButton.focus();
+  }
+
   function closeMobile() {
-    mobileNav.classList.remove('is-open');
+    if (dialog.hidden) return;
+    dialog.hidden = true;
     toggle.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
+    setBackgroundInert(false);
+    if (previousFocus instanceof HTMLElement) previousFocus.focus();
+    else toggle.focus();
   }
-  closeBtn.addEventListener('click', closeMobile);
-  mobileNav.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobile));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobile(); });
+
+  toggle.addEventListener('click', openMobile);
+  closeButton.addEventListener('click', closeMobile);
+  dialog.addEventListener('click', function (event) {
+    if (event.target === dialog) closeMobile();
+  });
+  dialog.querySelectorAll('a').forEach(function (link) {
+    link.addEventListener('click', closeMobile);
+  });
+  dialog.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeMobile();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+
+    var focusable = Array.from(
+      dialog.querySelectorAll(focusableSelector),
+    ).filter(function (element) {
+      return !element.hasAttribute('hidden');
+    });
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  var desktop = window.matchMedia('(min-width: 901px)');
+  var onDesktop = function (event) {
+    if (event.matches) closeMobile();
+  };
+  if (desktop.addEventListener) desktop.addEventListener('change', onDesktop);
+  else desktop.addListener(onDesktop);
+})();
 
   // ── Scroll reveals ────────────────────────────────────────
   (function () {
@@ -70,32 +143,60 @@
   })();
 
   // ── Quick Start: copy-to-clipboard ────────────────────────
-  (function () {
+  (function wireCopyControls() {
     var buttons = document.querySelectorAll('.qs-copy[data-copy]');
-    if (!buttons.length || !navigator.clipboard) return;
+    if (!buttons.length) return;
     var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
     var liveRegion = document.querySelector('[data-copy-live]');
-    buttons.forEach(function (btn) {
-      var originalHTML = btn.innerHTML;
-      // Restore the step-specific label (e.g. "Copy install command")
-      // instead of a hardcoded string.
-      var originalLabel = btn.getAttribute('aria-label') || 'Copy command';
+
+    function announce(message) {
+      if (liveRegion) liveRegion.textContent = message;
+    }
+
+    function selectCommand(button) {
+      var surface = button.closest('[data-copy-surface]') || button.parentElement;
+      var code = surface?.querySelector('code');
+      if (!code) return;
+      var selection = window.getSelection();
+      var range = document.createRange();
+      range.selectNodeContents(code);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
+
+    buttons.forEach(function (button) {
+      var originalHtml = button.innerHTML;
+      var originalLabel = button.getAttribute('aria-label') || 'Copy command';
       var resetTimer = null;
-      btn.addEventListener('click', function () {
-        var cmd = btn.getAttribute('data-copy');
-        navigator.clipboard.writeText(cmd).then(function () {
-          btn.classList.add('is-copied');
-          btn.innerHTML = CHECK_SVG;
-          btn.setAttribute('aria-label', 'Copied');
-          // Announce success to screen readers.
-          if (liveRegion) liveRegion.textContent = 'Copied: ' + cmd;
-          if (resetTimer) clearTimeout(resetTimer);
-          resetTimer = setTimeout(function () {
-            btn.classList.remove('is-copied');
-            btn.innerHTML = originalHTML;
-            btn.setAttribute('aria-label', originalLabel);
-          }, 1400);
-        });
+      button.addEventListener('click', async function () {
+        var command = button.getAttribute('data-copy') || '';
+        try {
+          if (!navigator.clipboard?.writeText) {
+            throw new Error('Clipboard API unavailable');
+          }
+          await navigator.clipboard.writeText(command);
+          button.classList.remove('is-copy-failed');
+          button.classList.add('is-copied');
+          button.innerHTML = CHECK_SVG;
+          button.setAttribute('aria-label', 'Copied');
+          announce(`Copied: ${command}`);
+          if (resetTimer) window.clearTimeout(resetTimer);
+          resetTimer = window.setTimeout(function () {
+            button.classList.remove('is-copied');
+            button.innerHTML = originalHtml;
+            button.setAttribute('aria-label', originalLabel);
+          }, 1_400);
+        } catch {
+          button.classList.remove('is-copied');
+          button.classList.add('is-copy-failed');
+          button.innerHTML = originalHtml;
+          button.setAttribute(
+            'aria-label',
+            'Copy unavailable. Select the command and copy manually.',
+          );
+          selectCommand(button);
+          announce(`Copy unavailable. The command is selected; copy it manually: ${command}`);
+        }
       });
     });
   })();
