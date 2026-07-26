@@ -192,9 +192,7 @@
          they skip the extra layer memory. */
       .panel-inset.is-card,
       .download-primary,
-      .qs-body,
-      .eco-cta,
-      .eco-portal-cue {
+      .qs-body {
         will-change: transform;
       }
     }
@@ -925,7 +923,6 @@
       .header-inner,
       .hero,
       .content-section,
-      .ecosystem-section,
       .footer-inner { max-width: 1440px; }
 
       .hero { gap: 56px; }
@@ -1007,8 +1004,7 @@
        the supporting paragraph keeps a readable measure. */
     @media (min-width: 1101px) {
       .section-header,
-      .section-header--wide,
-      .ecosystem-inner h2 { max-width: none; }
+      .section-header--wide { max-width: none; }
       .section-header p { max-width: 68ch; }
     }
     .section-kicker {
@@ -1258,96 +1254,6 @@
         left: 34px; right: -24px;
         width: auto; height: 1.5px;
         background: linear-gradient(90deg, rgba(154,142,205,0.12) 0%, rgba(180,170,235,0.55) 100%);
-      }
-    }
-
-    /* ── ECOSYSTEM / ARRIVAL SECTION ─────────────────────────
-       The page's closing "choose your door" moment: a dominant community
-       CTA beside a 2×2 grid of descriptive destination cards. */
-    .ecosystem-section {
-      position: relative; z-index: 1;
-      max-width: 1280px; margin: 0 auto;
-      padding: 72px 32px;
-      border-top: 1px solid var(--border);
-    }
-    /* Surface comes from .panel.panel--arrival; this rule owns only layout.
-       Header on top, then one balanced grid: the Discord CTA as a tall
-       featured card (col 1, both rows) + the 2×2 destination portals. */
-    .ecosystem-inner {
-      display: flex; flex-direction: column;
-      gap: 36px;
-      padding: 48px 56px;
-    }
-    .ecosystem-inner .section-header { margin-bottom: 0; }
-    .ecosystem-inner .section-header p {
-      font-size: 1rem; line-height: 1.65;
-      color: var(--muted); max-width: 60ch;
-    }
-
-    .ecosystem-grid {
-      list-style: none;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-    .ecosystem-grid > li { display: flex; min-width: 0; }
-    .eco-featured { grid-row: span 2; }
-
-    /* Featured CTA — Join the Coven (Discord), a full-height violet card */
-    .eco-cta {
-      position: relative;
-      display: flex; flex-direction: column; justify-content: center;
-      gap: 14px;
-      width: 100%;
-      padding: 24px 26px;
-      border-radius: var(--radius-md);
-      text-decoration: none;
-      background: linear-gradient(135deg, var(--violet-cta) 0%, #553f9a 100%);
-      border: 1px solid transparent;
-      color: #fff;
-      box-shadow: 0 8px 24px -8px rgba(109,91,175,0.65), 0 0 0 1px rgba(255,255,255,0.06) inset;
-      transition: transform var(--dur-ui) ease, box-shadow var(--dur-ui) ease, background var(--dur-ui) ease;
-    }
-    .eco-cta-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; background: rgba(255,255,255,0.12); }
-    .eco-cta-icon svg { width: 24px; height: 19px; fill: currentColor; }
-    .eco-cta-text { display: flex; flex-direction: column; gap: 4px; text-align: left; }
-    .eco-cta-title { font-size: 1.0625rem; font-weight: 700; letter-spacing: 0.01em; }
-    .eco-cta-sub { font-size: 0.75rem; font-weight: 500; color: rgba(255,255,255,0.78); line-height: 1.5; }
-    .eco-cta-cue {
-      position: absolute; top: 18px; right: 20px;
-      font-size: 0.9375rem; color: rgba(255,255,255,0.7);
-      transition: transform var(--dur-ui) ease, color var(--dur-ui) ease;
-    }
-    .eco-portal {
-      display: flex; align-items: flex-start; gap: 12px;
-      width: 100%;
-      padding: 16px; text-decoration: none;
-    }
-    .eco-portal-icon {
-      flex: 0 0 auto;
-      width: 38px; height: 38px; border-radius: 9px;
-      display: grid; place-items: center;
-      border: 1px solid rgba(154,142,205,0.5);
-      background: linear-gradient(150deg, rgba(154,142,205,0.28), rgba(154,142,205,0.08));
-      color: var(--vtext);
-      transition: box-shadow var(--dur-ui) ease;
-    }
-    .eco-portal-icon svg { width: 18px; height: 18px; }
-    .eco-portal-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-    .eco-portal-name { font-size: 0.84375rem; font-weight: 700; color: #fff; }
-    .eco-portal-desc { font-size: 0.75rem; line-height: 1.5; color: var(--muted); }
-    .eco-portal-cue {
-      flex: 0 0 auto; margin-left: auto;
-      font-size: 0.8125rem; color: var(--vtext); opacity: 0.55;
-      transition: transform var(--dur-ui) ease, opacity var(--dur-ui) ease;
-    }
-    @media (hover: hover) {
-      .eco-portal:hover .eco-portal-cue { opacity: 1; transform: translate(2px, -2px); }
-      .eco-portal:hover .eco-portal-icon { box-shadow: var(--oc-hover-glow); }
-      .eco-cta:hover {
-        transform: translateY(-1px);
-        background: linear-gradient(135deg, #7e6cc4 0%, #5e479e 100%);
-        box-shadow: 0 12px 28px -8px rgba(109,91,175,0.8), 0 0 0 1px rgba(255,255,255,0.1) inset;
       }
     }
 
@@ -1728,8 +1634,7 @@
          border-color background as an orphan quadrant. */
       .card-grid.three > :nth-child(3):last-child { grid-column: 1 / -1; }
       /* Tighter section spacing */
-      .content-section, .ecosystem-section { padding: 56px 24px; }
-      .ecosystem-inner { padding: 44px 48px; }
+      .content-section { padding: 56px 24px; }
     }
 
     @media (max-width: 900px) {
@@ -1752,18 +1657,6 @@
       /* Sections — uniform 20px gutter (matches hero) */
       .content-section { padding: 48px 20px; }
       .github-trust-panel { padding: 40px 36px; }
-      /* Ecosystem card spans edge-to-edge so its inner 20px gutter aligns
-         with other sections instead of double-indenting */
-      .ecosystem-section { padding: 48px 0; }
-      .ecosystem-inner {
-        padding: 32px 20px; gap: 28px;
-        border-radius: 0;
-        border-left: none; border-right: none;
-      }
-      /* Featured CTA rides on top, portals 2-up beneath */
-      .ecosystem-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .eco-featured { grid-row: auto; grid-column: 1 / -1; }
-      .eco-cta { padding: 20px 22px; }
 
       /* Footer */
       .footer-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
@@ -1873,8 +1766,6 @@
       .roster-hint { display: none; }
       .testimonial-quote { font-size: 1rem; }
       .section-header { margin-bottom: 32px; }
-      .ecosystem-inner { padding: 24px 20px; }
-      .ecosystem-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 400px) {
@@ -1887,8 +1778,6 @@
       .hero { padding: 32px 16px; }
       .github-hero { padding: 32px 16px 40px; }
       .content-section { padding: 40px 16px; }
-      .ecosystem-section { padding: 40px 0; }
-      .ecosystem-inner { padding: 24px 16px; }
     }
 
     /* ── Active / current nav links (mirrors coven-docs globals.css) ── */
@@ -2011,7 +1900,6 @@
     /* ── Headings/labels hardcoded to #fff that now sit on light shell ── */
     html[data-theme="light"] .github-price-card h3,
     html[data-theme="light"] .github-trust-copy h3,
-    html[data-theme="light"] .eco-portal-name,
     html[data-theme="light"] .panel-inset.is-active { color: var(--white); }
 
     /* ═══ Terminal/code surfaces: STAY DARK ═══

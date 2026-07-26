@@ -170,6 +170,61 @@ if (existsSync(distIndex)) {
     );
   }
 
+  const requiredBeginAndBelongCopy = [
+    'Run your first familiar in three commands.',
+    'npm install -g @opencoven/cli',
+    'coven doctor',
+    'coven run codex "explain this repo in 5 bullets"',
+    'Choose any product',
+    'Your familiar, your tools, your machine.',
+  ];
+  const missingBeginAndBelongCopy = requiredBeginAndBelongCopy.filter(
+    (needle) => !renderedText.includes(needle),
+  );
+  if (missingBeginAndBelongCopy.length > 0) {
+    throw new Error(
+      `Missing Begin or Belong copy in dist/index.html: ${missingBeginAndBelongCopy.join(', ')}`,
+    );
+  }
+
+  if (
+    !/<ol(?=[^>]*\bclass="quickstart-preview-steps")(?=[^>]*\brole="list")[^>]*>/.test(
+      html,
+    )
+  ) {
+    throw new Error('Homepage Quick Start preview must be an ordered list');
+  }
+
+  const previewCopyValues = countMatches(
+    html,
+    /\bdata-copy="(?:npm install -g @opencoven\/cli|coven doctor|coven run codex (?:&quot;|&#34;)explain this repo in 5 bullets(?:&quot;|&#34;))"/g,
+  );
+  if (previewCopyValues !== 3) {
+    throw new Error(
+      `Homepage Quick Start must render three canonical copied commands; found ${previewCopyValues}`,
+    );
+  }
+
+  const closingInvitationHtml = html.match(
+    /<section(?=[^>]*\bclass="closing-invitation")[^>]*>([\s\S]*?)<\/section>/,
+  )?.[1] ?? '';
+  if (
+    !/<a(?=[^>]*\bdata-primary-cta)(?=[^>]*\bhref="\/quickstart")[^>]*>\s*Start with OpenCoven\s*<\/a>/.test(
+      closingInvitationHtml,
+    )
+  ) {
+    throw new Error('Closing invitation must repeat Start with OpenCoven → /quickstart');
+  }
+
+  if (
+    /<section(?=[^>]*\bclass="[^"]*\becosystem-section\b)[^>]*>/.test(html)
+  ) {
+    throw new Error('Homepage must not retain the old Discord-primary ecosystem section');
+  }
+  if (html.includes('href="/#ecosystem"')) {
+    throw new Error('Homepage must not retain a dead link to the removed ecosystem section');
+  }
+
   const runtimeTabs = countMatches(html, /\bdata-runtime-tab=/g);
   const runtimePanels = countMatches(html, /\bdata-runtime-panel=/g);
   const runtimeDisclosures = countMatches(
@@ -371,6 +426,24 @@ if (existsSync(distGithub)) {
 
 const sourceCss = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
 const sourceMain = await readFile(path.join(root, 'src/scripts/main.js'), 'utf8');
+const sourceFooter = await readFile(
+  path.join(root, 'src/components/Footer.astro'),
+  'utf8',
+);
+for (const [label, source] of [
+  ['src/components/Footer.astro', sourceFooter],
+  ['src/styles/global.css', sourceCss],
+]) {
+  if (
+    source.includes('Ecosystem')
+    || source.includes('/#ecosystem')
+    || source.includes('ecosystem-section')
+    || source.includes('.ecosystem-')
+    || source.includes('.eco-')
+  ) {
+    throw new Error(`${label} retains source for the removed Ecosystem section`);
+  }
+}
 const requiredDownloadSubs = [
   'CovenCave · .dmg · signed · free',
   'CovenCave · .msi · signed · free',
@@ -400,6 +473,10 @@ const sourceProductConstellation = await readFile(
   path.join(root, 'src/components/ProductConstellation.astro'),
   'utf8',
 ).catch(() => '');
+const sourceQuickStart = await readFile(
+  path.join(root, 'src/components/QuickStart.astro'),
+  'utf8',
+);
 
 if (
   !sourceProductConstellation.includes(
@@ -430,6 +507,18 @@ for (const field of [
 if (sourceProductConstellation.includes('will-change: transform')) {
   throw new Error(
     'ProductConstellation cards must not keep a permanent will-change layer',
+  );
+}
+
+if (
+  !sourceQuickStart.includes(
+    "import { quickstartProducts } from '../data/quickstart'",
+  )
+  || !sourceQuickStart.includes("product.id === 'coven-cli'")
+  || !sourceQuickStart.includes('previewIndexes')
+) {
+  throw new Error(
+    'Homepage QuickStart must derive its compact commands from the Coven CLI quickstart record',
   );
 }
 

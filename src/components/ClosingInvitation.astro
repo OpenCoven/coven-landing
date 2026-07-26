@@ -1,0 +1,137 @@
+<section
+  class="closing-invitation"
+  aria-labelledby="closing-heading"
+>
+  <div class="closing-copy">
+    <p class="section-kicker">Belong on your terms</p>
+    <h2 id="closing-heading">
+      Your familiar, your tools, your machine.
+    </h2>
+    <p>
+      Start with one product, keep the runtime inspectable, and add community
+      only when it helps.
+    </p>
+  </div>
+
+  <div class="closing-primary">
+    <a class="btn-primary" data-primary-cta href="/quickstart">
+      Start with OpenCoven
+    </a>
+  </div>
+
+  <nav class="closing-links" aria-label="OpenCoven destinations">
+    <a href="https://github.com/OpenCoven" target="_blank" rel="noopener noreferrer">
+      GitHub <span aria-hidden="true">↗</span>
+      <span class="sr-only"> (opens in new tab)</span>
+    </a>
+    <a href="https://docs.opencoven.ai" target="_blank" rel="noopener noreferrer">
+      Docs <span aria-hidden="true">↗</span>
+      <span class="sr-only"> (opens in new tab)</span>
+    </a>
+    <a href="https://discord.gg/opencoven" target="_blank" rel="noopener noreferrer">
+      Discord <span aria-hidden="true">↗</span>
+      <span class="sr-only"> (opens in new tab)</span>
+    </a>
+  </nav>
+</section>
+
+<style>
+  .closing-invitation {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: min(calc(100% - 64px), 1216px);
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 48px;
+    margin: 32px auto 112px;
+    padding: clamp(40px, 6vw, 72px);
+    overflow: hidden;
+    border: 1px solid var(--border-v);
+    border-radius: 12px;
+    background:
+      linear-gradient(130deg, rgba(196, 185, 240, 0.14), transparent 52%),
+      var(--surface);
+  }
+
+  .closing-invitation::after {
+    content: '';
+    position: absolute;
+    right: -12%;
+    bottom: -55%;
+    width: 420px;
+    height: 420px;
+    border: 1px solid rgba(196, 185, 240, 0.12);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .closing-copy {
+    position: relative;
+    z-index: 1;
+  }
+
+  .closing-copy h2 {
+    max-width: 16ch;
+  }
+
+  .closing-copy > p:last-child {
+    max-width: 56ch;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .closing-primary {
+    position: relative;
+    z-index: 1;
+    align-self: center;
+  }
+
+  .closing-links {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    gap: 22px;
+    padding-top: 24px;
+    border-top: 1px solid var(--oc-border-subtle);
+  }
+
+  .closing-links a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .closing-links a:hover {
+    color: var(--white);
+  }
+
+  @media (max-width: 760px) {
+    .closing-invitation {
+      width: calc(100% - 40px);
+      grid-template-columns: 1fr;
+      gap: 28px;
+      margin-bottom: 80px;
+      padding: 40px 28px;
+    }
+
+    .closing-primary a {
+      justify-content: center;
+      width: 100%;
+      min-height: 48px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .closing-invitation {
+      width: calc(100% - 32px);
+      padding: 32px 22px;
+    }
+  }
+</style>

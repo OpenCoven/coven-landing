@@ -503,3 +503,63 @@ test('product constellation honors approved responsive breakpoints', async ({
   expect(new Set(mobile.map(({ x }) => x))).toHaveProperty('size', 1);
   expect(new Set(mobile.map(({ width }) => width))).toHaveProperty('size', 1);
 });
+
+test('Quick Start preview uses three canonical selectable commands', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  const preview = page.locator('#quickstart');
+  const steps = preview.locator('.quickstart-preview-step');
+  await expect(steps).toHaveCount(3);
+
+  const expectedCommands = [
+    'npm install -g @opencoven/cli',
+    'coven doctor',
+    'coven run codex "explain this repo in 5 bullets"',
+  ];
+  for (const [index, expectedCommand] of expectedCommands.entries()) {
+    const step = steps.nth(index);
+    await expect(step.locator('code')).toHaveText(expectedCommand);
+    await expect(step.locator('[data-copy]')).toHaveAttribute(
+      'data-copy',
+      expectedCommand,
+    );
+  }
+
+  await expect(preview.locator('a[href="/quickstart"]')).toHaveText(
+    'Choose any product',
+  );
+
+  const cliChoice = page.locator(
+    '[data-product-constellation] a[href="/quickstart#coven-cli"]',
+  );
+  await cliChoice.click();
+  await expect(page).toHaveURL(/\/quickstart#coven-cli$/);
+  await expect(
+    page.locator('#coven-cli').getByRole('heading', {
+      level: 2,
+      name: 'Coven CLI',
+      exact: true,
+    }),
+  ).toBeVisible();
+});
+
+test('closing invitation restores the primary conversion path', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  const closing = page.locator('.closing-invitation');
+  await expect(closing).toContainText(
+    'Your familiar, your tools, your machine.',
+  );
+  await expect(
+    closing.locator('[data-primary-cta][href="/quickstart"]'),
+  ).toHaveText('Start with OpenCoven');
+  await expect(
+    closing.locator('a[href="https://discord.gg/opencoven"]'),
+  ).toBeVisible();
+  await expect(page.locator('.ecosystem-section')).toHaveCount(0);
+  await expect(page.locator('a[href="/#ecosystem"]')).toHaveCount(0);
+});
