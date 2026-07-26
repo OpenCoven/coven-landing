@@ -87,9 +87,7 @@ if (existsSync(distIndex)) {
   const renderedText = toRenderedText(html);
   const requiredCopy = [
     'Persistent AI Familiars',
-    'AI that can stay',
     'familiars',
-    'CastCodes',
     'Coven CLI',
     'Quick Start',
     'https://discord.gg/opencoven',
@@ -99,48 +97,50 @@ if (existsSync(distIndex)) {
     throw new Error(`Missing expected copy in dist/index.html: ${missingCopy.join(', ')}`);
   }
 
-  const downloadLabels = [
-    'Download for macOS', // server-rendered primary (JS retargets per platform)
-    'Download for iOS', // dedicated TestFlight button (JS swaps to macOS on iOS)
+  const requiredHeroCopy = [
+    'Summon agents that remember.',
+    'Start with OpenCoven',
+    'View on GitHub',
+    'example · local',
+    'Download Coven Cave for macOS',
   ];
-  // Scope to the CTA block — words like "Windows" also appear in the
-  // head's JSON-LD, which would confuse a whole-document indexOf.
-  const ctaStart = html.indexOf('data-download-cta');
-  if (ctaStart === -1) {
-    throw new Error('dist/index.html is missing the data-download-cta block');
-  }
-  const ctaHtml = html.slice(ctaStart);
-  const downloadLabelPositions = downloadLabels.map((label) => ({
-    label,
-    index: ctaHtml.indexOf(label),
-  }));
-  const missingDownloadLabels = downloadLabelPositions
-    .filter(({ index }) => index === -1)
-    .map(({ label }) => label);
-  if (missingDownloadLabels.length > 0) {
-    throw new Error(`Missing expected download labels in dist/index.html: ${missingDownloadLabels.join(', ')}`);
-  }
-  for (let i = 1; i < downloadLabelPositions.length; i += 1) {
-    if (downloadLabelPositions[i - 1].index > downloadLabelPositions[i].index) {
-      throw new Error('Download CTA order must be the macOS primary, then the iOS (TestFlight) button');
-    }
-  }
-
-  if (!html.includes('data-download-primary') || !html.includes('data-download-ios')) {
-    throw new Error('Download CTA must render the retargetable primary button and the dedicated iOS button');
-  }
-
-  const quickstartDestinations = countMatches(
-    html,
-    /href="\/quickstart"/g,
+  const missingHeroCopy = requiredHeroCopy.filter(
+    (needle) => !renderedText.includes(needle),
   );
-  if (quickstartDestinations !== 4) {
+  if (missingHeroCopy.length > 0) {
     throw new Error(
-      `Homepage quickstart discovery must render exactly four href="/quickstart" destinations; found ${quickstartDestinations}`,
+      `Missing Living Familiar hero copy in dist/index.html: ${missingHeroCopy.join(', ')}`,
     );
   }
-  if (!/<a\s+class="btn-primary"\s+href="\/quickstart"\s*>\s*Choose any product\s*<\/a>/.test(html)) {
-    throw new Error('Homepage quickstart discovery must include the exact "Choose any product" CTA linking to /quickstart');
+
+  const heroHtml = html.match(
+    /<section(?=[^>]*\bclass="hero")(?=[^>]*\bid="top")[^>]*>([\s\S]*?)<\/section>/,
+  )?.[1];
+  if (!heroHtml) {
+    throw new Error('Homepage must render <section class="hero" id="top">');
+  }
+
+  if (
+    !/<a(?=[^>]*\bdata-primary-cta)(?=[^>]*\bhref="\/quickstart")[^>]*>\s*Start with OpenCoven\s*<\/a>/.test(
+      heroHtml,
+    )
+  ) {
+    throw new Error('Hero primary CTA must be Start with OpenCoven → /quickstart');
+  }
+
+  const familiarTabs = countMatches(heroHtml, /\bdata-familiar-tab=/g);
+  const familiarPanels = countMatches(heroHtml, /\bdata-familiar-panel=/g);
+  if (familiarTabs !== 3 || familiarPanels !== 3) {
+    throw new Error(
+      `Hero must render three manual familiar tabs and panels; found ${familiarTabs} tabs and ${familiarPanels} panels`,
+    );
+  }
+
+  if (!html.includes('data-download-primary')) {
+    throw new Error('Hero must preserve one platform-aware Cave download shortcut');
+  }
+  if (html.includes('data-download-ios')) {
+    throw new Error('The quiet hero shortcut must not render a competing iOS download button');
   }
 
   const previewClarification =
@@ -189,6 +189,9 @@ if (existsSync(distGithub)) {
 
 const sourceCss = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
 const sourceMain = await readFile(path.join(root, 'src/scripts/main.js'), 'utf8');
+if (sourceMain.includes('setInterval(rotate')) {
+  throw new Error('Hero familiars must not rotate automatically');
+}
 const sourceLandingData = await readFile(
   path.join(root, 'src/data/landing.ts'),
   'utf8',

@@ -1,122 +1,312 @@
 ---
-// Hero — "the summoning".
-//
-// Three layers, one thesis (continuity):
-//   1. .hero-main  — copy + platform-aware DownloadCTA on the LEFT,
-//                    a live "summon session" terminal on the RIGHT. The
-//                    terminal reads top-to-bottom like a real session:
-//                    typed command → familiar state as output → roster tabs.
-//   2. .continuity — the signature element: a thin timeline across the
-//                    hero's base plotting one familiar's memory across real
-//                    time, ending in a live "today · still remembers" pulse.
-//                    It replaces the old 4-cell icon grid (whose content
-//                    duplicated ProofGrid) and encodes persistence itself.
-//
-// Terminal rotation + typing + roster switching live in src/scripts/main.js.
-// Everything renders complete without JS; scripts only add motion/emphasis.
 import DownloadCTA from './DownloadCTA.astro';
+import FamiliarLedger from './FamiliarLedger.astro';
+import { heroFamiliars } from '../data/landing';
 ---
-<section class="hero" id="top" aria-label="Hero">
-  <div class="hero-main">
-    <div class="hero-copy" data-reveal>
-      <p class="kicker">
-        <span class="kicker-beta"><span class="beta-dot" aria-hidden="true"></span>public beta</span>
-        free &amp; open source · runs locally
-      </p>
 
-      <h1>Summon agents<br>that <em>remember.</em></h1>
+<section class="hero" id="top" aria-labelledby="hero-heading">
+  <div class="hero-copy">
+    <p class="hero-kicker">
+      <span><i aria-hidden="true"></i>public beta</span>
+      free · open source · local-first
+    </p>
 
-      <p class="hero-lede">
-        Coven gives each AI agent a name, a memory, and a place in your work.
-        Close the terminal tonight — tomorrow <strong>Hexi</strong> still knows
-        your branch, your conventions, and where you left off.
-      </p>
+    <h1 id="hero-heading">Summon agents<br />that <em>remember.</em></h1>
 
-      <DownloadCTA />
+    <p class="hero-lede">
+      Give an AI agent a durable place in your work. A familiar keeps the
+      project context, conventions, and work state worth carrying after the
+      terminal closes.
+    </p>
 
-      <div class="hero-actions-secondary">
-        <a class="btn-ghost" href="https://discord.gg/opencoven">
-          <svg viewBox="0 0 127.14 96.36" aria-hidden="true">
-            <path d="M107.7 8.07A105.15 105.15 0 0 0 81.47 0a72.06 72.06 0 0 0-3.36 6.83 97.68 97.68 0 0 0-29.11 0A72.37 72.37 0 0 0 45.64 0a105.89 105.89 0 0 0-26.25 8.09C2.79 32.65-1.71 56.6.54 80.21A105.73 105.73 0 0 0 32.71 96.36a77.7 77.7 0 0 0 6.89-11.11 68.42 68.42 0 0 1-10.85-5.18c.91-.66 1.8-1.34 2.66-2a75.57 75.57 0 0 0 64.32 0c.87.71 1.76 1.39 2.66 2a68.68 68.68 0 0 1-10.87 5.19 77 77 0 0 0 6.89 11.1 105.25 105.25 0 0 0 32.19-16.14c2.64-27.38-4.51-51.11-18.9-72.15ZM42.45 65.69C36.18 65.69 31 60 31 53s5-12.74 11.43-12.74S54 46 53.89 53s-5.05 12.69-11.44 12.69Zm42.24 0C78.41 65.69 73.25 60 73.25 53s5-12.74 11.44-12.74S96.23 46 96.12 53s-5.05 12.69-11.43 12.69Z"/>
-          </svg>
-          Join Discord
-        </a>
-        <a class="btn-ghost" href="https://docs.opencoven.ai">Read the docs ↗</a>
-      </div>
+    <div class="hero-actions">
+      <a class="btn-primary" data-primary-cta href="/quickstart">
+        Start with OpenCoven
+      </a>
+      <a
+        class="btn-secondary"
+        href="https://github.com/OpenCoven/coven"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="View on GitHub (opens in new tab)"
+      >
+        View on GitHub
+      </a>
     </div>
 
-    <div class="hero-visual" data-reveal>
-      <div class="hero-card" aria-label="Coven session preview">
-        <div class="hero-card-topbar">
-          <div class="hero-card-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-          <span class="hero-card-label">coven · session</span>
-          <span class="hero-card-status">local</span>
-        </div>
+    <DownloadCTA />
+  </div>
 
-        <div class="hero-card-cmdline">
-          <span class="card-prompt" aria-hidden="true">❯</span>
-          <span class="card-cmd">coven attach hexi --project ./opencoven</span>
-          <span class="card-cursor" aria-hidden="true"></span>
-        </div>
+  <div class="hero-ledger" data-familiar-switcher>
+    <p class="hero-ledger-caption">One local runtime. Deliberate memory.</p>
 
-        <div class="hero-card-output" aria-live="polite">
-          <div class="output-identity">
-            <div class="familiar-sigil" data-sigil>H</div>
-            <div class="familiar-info">
-              <span class="familiar-name" data-name>Hexi</span>
-              <span class="familiar-role" data-role>code steward · tools · git</span>
-            </div>
-            <span class="familiar-badge badge-active" data-badge>awake</span>
-          </div>
-          <div class="output-memory">
-            <div class="memory-header">
-              <span class="memory-title">memory restored</span>
-              <span class="memory-count" data-count>128 notes · 47 days</span>
-            </div>
-            <div class="memory-note">
-              <span class="memory-text">resumed feat/runtime-attach · 4 files staged</span>
-              <span class="memory-meta">2h ago</span>
-            </div>
-            <div class="memory-note">
-              <span class="memory-text">prefers terse PR summaries, no trailing recap</span>
-              <span class="memory-meta">persisted</span>
-            </div>
-          </div>
+    <div class="hero-ledger-panels">
+      {heroFamiliars.map((familiar, index) => (
+        <div
+          id={`hero-panel-${familiar.id}`}
+          data-familiar-panel={familiar.id}
+          role="tabpanel"
+          aria-labelledby={`hero-tab-${familiar.id}`}
+          hidden={index !== 0}
+        >
+          <FamiliarLedger
+            snapshot={familiar.snapshot}
+            label={`${familiar.label} illustrative local familiar ledger`}
+          />
         </div>
+      ))}
+    </div>
 
-        <div class="hero-card-roster" role="tablist" aria-label="Switch familiar">
-          <button class="roster-tab active" type="button" data-familiar="hexi" role="tab" aria-selected="true">Hexi</button>
-          <button class="roster-tab" type="button" data-familiar="charm" role="tab" aria-selected="false" tabindex="-1">Charm</button>
-          <button class="roster-tab" type="button" data-familiar="sage" role="tab" aria-selected="false" tabindex="-1">Sage</button>
-          <span class="roster-hint" aria-hidden="true">one runtime · three familiars</span>
-        </div>
-      </div>
+    <div class="hero-tabs" role="tablist" aria-label="Choose an example familiar">
+      {heroFamiliars.map((familiar, index) => (
+        <button
+          id={`hero-tab-${familiar.id}`}
+          type="button"
+          role="tab"
+          data-familiar-tab={familiar.id}
+          aria-controls={`hero-panel-${familiar.id}`}
+          aria-selected={index === 0 ? 'true' : 'false'}
+          tabindex={index === 0 ? '0' : '-1'}
+        >
+          {familiar.label}
+        </button>
+      ))}
     </div>
   </div>
 
-  <div class="continuity" aria-label="One familiar's memory across 47 days">
-    <div class="continuity-track" aria-hidden="true"></div>
-    <ol class="continuity-events">
-      <li class="continuity-event" data-reveal>
-        <span class="continuity-date">day 1</span>
-        <span class="continuity-node" aria-hidden="true"></span>
-        <span class="continuity-text">summoned Hexi, learned the repo</span>
-      </li>
-      <li class="continuity-event" data-reveal>
-        <span class="continuity-date">day 9</span>
-        <span class="continuity-node" aria-hidden="true"></span>
-        <span class="continuity-text">picked up your review style</span>
-      </li>
-      <li class="continuity-event" data-reveal>
-        <span class="continuity-date">day 23</span>
-        <span class="continuity-node" aria-hidden="true"></span>
-        <span class="continuity-text">shipped feat/runtime-attach</span>
-      </li>
-      <li class="continuity-event is-now" data-reveal>
-        <span class="continuity-date">day 47 · today</span>
-        <span class="continuity-node" aria-hidden="true"></span>
-        <span class="continuity-text">still remembers all of it</span>
-      </li>
-    </ol>
-  </div>
+  <a class="hero-thread-cue" href="#how-it-works">
+    <span aria-hidden="true"></span>
+    See what carries forward
+  </a>
 </section>
+
+<style>
+  .hero {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: min(100%, 1280px);
+    min-height: calc(100svh - 60px);
+    grid-template-columns: minmax(0, 5fr) minmax(420px, 7fr);
+    align-items: center;
+    gap: clamp(48px, 7vw, 96px);
+    margin: 0 auto;
+    padding: clamp(72px, 9vh, 112px) 32px 104px;
+  }
+
+  .hero-copy {
+    max-width: 600px;
+  }
+
+  .hero-kicker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    color: var(--muted);
+    font: 700 0.6875rem/1 var(--mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .hero-kicker span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--vtext);
+  }
+
+  .hero-kicker i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  h1 {
+    margin: 0 0 24px;
+    font-family: var(--font-display);
+    font-size: clamp(3.25rem, 6vw, 5.75rem);
+    font-weight: 800;
+    letter-spacing: -0.055em;
+    line-height: 0.96;
+  }
+
+  h1 em {
+    color: var(--oc-purple-accent);
+    font-style: normal;
+    font-weight: inherit;
+  }
+
+  .hero-lede {
+    max-width: 58ch;
+    margin-bottom: 30px;
+    color: var(--muted);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .hero-ledger {
+    min-width: 0;
+  }
+
+  .hero-ledger-caption {
+    margin: 0 0 12px 4px;
+    color: var(--muted);
+    font: 0.6875rem/1.4 var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .hero-ledger-panels {
+    position: relative;
+  }
+
+  .hero-tabs {
+    display: none;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 14px;
+  }
+
+  :global(.js-on) .hero-tabs {
+    display: flex;
+  }
+
+  .hero-tabs button {
+    min-width: 72px;
+    min-height: 44px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font: 700 0.6875rem/1 var(--mono);
+  }
+
+  .hero-tabs button[aria-selected='true'] {
+    border-color: var(--border-v);
+    background: rgba(154, 142, 205, 0.1);
+    color: var(--white);
+  }
+
+  .hero-thread-cue {
+    position: absolute;
+    bottom: 34px;
+    left: 32px;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font: 0.6875rem/1 var(--mono);
+    text-decoration: none;
+  }
+
+  .hero-thread-cue span {
+    width: 42px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--oc-purple-accent), transparent);
+  }
+
+  :global(.motion-on) .hero-copy {
+    animation: hero-arrive 620ms var(--ease-out) both;
+  }
+
+  :global(.motion-on) .hero-ledger {
+    animation: ledger-arrive 720ms 120ms var(--ease-out) both;
+  }
+
+  :global(.motion-on) .hero-thread-cue span {
+    animation: thread-arrive 460ms 420ms var(--ease-out) both;
+    transform-origin: left;
+  }
+
+  @keyframes hero-arrive {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes ledger-arrive {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.99);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes thread-arrive {
+    from {
+      transform: scaleX(0);
+    }
+
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      min-height: auto;
+      grid-template-columns: 1fr;
+      gap: 44px;
+      padding: 72px 20px 88px;
+    }
+
+    .hero-copy {
+      max-width: 680px;
+      order: 0;
+    }
+
+    .hero-ledger {
+      order: 1;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .hero {
+      gap: 36px;
+      padding: 56px 16px 80px;
+    }
+
+    h1 {
+      font-size: clamp(2.75rem, 14vw, 4rem);
+    }
+
+    .hero-lede {
+      font-size: 0.9375rem;
+    }
+
+    .hero-actions {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .hero-actions a {
+      justify-content: center;
+      min-height: 48px;
+    }
+
+    .hero-thread-cue {
+      bottom: 22px;
+      left: 16px;
+    }
+  }
+</style>

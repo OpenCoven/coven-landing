@@ -69,154 +69,6 @@
     }, { passive: true });
   })();
 
-  // ── Hero terminal: live summon session ────────────────────
-  (function () {
-    var tabs = document.querySelectorAll('.roster-tab[data-familiar]');
-    if (tabs.length === 0) return;
-    var card     = document.querySelector('.hero-card');
-    var output   = document.querySelector('.hero-card-output');
-    var sigilEl  = document.querySelector('[data-sigil]');
-    var nameEl   = document.querySelector('[data-name]');
-    var roleEl   = document.querySelector('[data-role]');
-    var countEl  = document.querySelector('[data-count]');
-    var memNotes = document.querySelectorAll('.memory-note');
-    var cliCmd   = document.querySelector('.card-cmd');
-    var motionOn = document.documentElement.classList.contains('motion-on');
-
-    var FAMILIARS = {
-      hexi: {
-        name: 'Hexi',
-        sigil: 'H',
-        role: 'code steward · tools · git',
-        count: '128 notes · 47 days',
-        command: 'coven attach hexi --project ./opencoven',
-        notes: [
-          { text: 'resumed feat/runtime-attach · 4 files staged', meta: '2h ago' },
-          { text: 'prefers terse PR summaries, no trailing recap', meta: 'persisted' }
-        ]
-      },
-      charm: {
-        name: 'Charm',
-        sigil: 'C',
-        role: 'voice · social · presence',
-        count: '64 notes · 21 days',
-        command: 'coven attach charm --voice on --thread design-sync',
-        notes: [
-          { text: 'drafted reply for #design-sync · awaiting review', meta: '12m ago' },
-          { text: 'tone: warm + concise — no exclamation marks', meta: 'persisted' }
-        ]
-      },
-      sage: {
-        name: 'Sage',
-        sigil: 'S',
-        role: 'research · docs · long context',
-        count: '203 notes · 65 days',
-        command: 'coven attach sage --context ./docs --long',
-        notes: [
-          { text: 'loaded 4 docs into context · 18k tokens', meta: '40m ago' },
-          { text: 'model: long-context first, summarize before answer', meta: 'persisted' }
-        ]
-      }
-    };
-    var order = ['hexi', 'charm', 'sage'];
-    var current = 'hexi';
-    var userTook = false;
-    var rotateTimer = null;
-    var typeTimer = null;
-
-    function typeCommand(cmd) {
-      if (typeTimer) { clearTimeout(typeTimer); typeTimer = null; }
-      if (!cliCmd) return;
-      if (!motionOn) { cliCmd.textContent = cmd; return; }
-      cliCmd.textContent = '';
-      var i = 0;
-      function step() {
-        if (i >= cmd.length) return;
-        cliCmd.textContent += cmd.charAt(i++);
-        typeTimer = setTimeout(step, 24 + Math.random() * 28);
-      }
-      step();
-    }
-
-    function paintOutput(data) {
-      if (sigilEl) sigilEl.textContent = data.sigil;
-      if (nameEl)  nameEl.textContent = data.name;
-      if (roleEl)  roleEl.textContent = data.role;
-      if (countEl) countEl.textContent = data.count;
-      for (var i = 0; i < memNotes.length; i++) {
-        var note = data.notes[i];
-        if (!note) continue;
-        var t = memNotes[i].querySelector('.memory-text');
-        var m = memNotes[i].querySelector('.memory-meta');
-        if (t) t.textContent = note.text;
-        if (m) m.textContent = note.meta;
-      }
-    }
-
-    function applyFamiliar(id, animate) {
-      if (!FAMILIARS[id]) return;
-      current = id;
-      tabs.forEach(function (tab) {
-        var isActive = tab.getAttribute('data-familiar') === id;
-        tab.classList.toggle('active', isActive);
-        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        tab.setAttribute('tabindex', isActive ? '0' : '-1');
-      });
-      var data = FAMILIARS[id];
-      if (animate && output && motionOn) {
-        output.classList.add('memory-swap');
-        setTimeout(function () {
-          paintOutput(data);
-          output.classList.remove('memory-swap');
-        }, 200);
-      } else {
-        paintOutput(data);
-      }
-      typeCommand(data.command);
-    }
-
-    function rotate() {
-      var idx = order.indexOf(current);
-      applyFamiliar(order[(idx + 1) % order.length], true);
-    }
-    function startRotate() {
-      if (userTook) return;
-      stopRotate();
-      rotateTimer = setInterval(rotate, 6000);
-    }
-    function stopRotate() {
-      if (rotateTimer) { clearInterval(rotateTimer); rotateTimer = null; }
-    }
-
-    tabs.forEach(function (tab, i) {
-      tab.addEventListener('click', function () {
-        userTook = true;
-        stopRotate();
-        applyFamiliar(tab.getAttribute('data-familiar'), true);
-      });
-      // Roving tabindex + arrow keys (standard tablist keyboard pattern)
-      tab.addEventListener('keydown', function (e) {
-        var dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
-        if (!dir) return;
-        e.preventDefault();
-        var next = tabs[(i + dir + tabs.length) % tabs.length];
-        userTook = true;
-        stopRotate();
-        applyFamiliar(next.getAttribute('data-familiar'), true);
-        next.focus();
-      });
-    });
-
-    if (card) {
-      card.addEventListener('mouseenter', stopRotate);
-      card.addEventListener('mouseleave', function () { if (!userTook) startRotate(); });
-      card.addEventListener('focusin', stopRotate);
-      card.addEventListener('focusout', function () { if (!userTook) startRotate(); });
-    }
-
-    if (motionOn) startRotate();
-  })();
-
   // ── Quick Start: copy-to-clipboard ────────────────────────
   (function () {
     var buttons = document.querySelectorAll('.qs-copy[data-copy]');
@@ -318,10 +170,10 @@
     }
 
     var COPY = {
-      mac:   { label: 'Download for macOS',   sub: 'CovenCave · .dmg · signed · free',      href: DOWNLOAD.mac },
-      win:   { label: 'Download for Windows', sub: 'CovenCave · .msi · signed · free',      href: DOWNLOAD.win },
-      linux: { label: 'Download for Linux',   sub: 'CovenCave · .AppImage · x86_64 · free', href: DOWNLOAD.linux },
-      ios:   { label: 'Get the iOS beta',     sub: 'CovenCave · TestFlight · iPhone & iPad', href: testflightUrl },
+      mac: { label: 'Download Coven Cave for macOS', href: DOWNLOAD.mac },
+      win: { label: 'Download Coven Cave for Windows', href: DOWNLOAD.win },
+      linux: { label: 'Download Coven Cave for Linux', href: DOWNLOAD.linux },
+      ios: { label: 'Get Coven Cave for iOS beta', href: testflightUrl },
     };
 
     var copy = COPY[detected] || COPY.mac;
