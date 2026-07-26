@@ -295,3 +295,36 @@ test('runtime proof remains complete without JavaScript', async ({ browser }) =>
     await context.close();
   }
 });
+
+test('product constellation exposes five complete keyboard links', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  const cards = page.locator('[data-product-constellation] .product-card');
+  await expect(cards).toHaveCount(5);
+
+  const expectedProducts = [
+    { name: 'Coven CLI', href: '/quickstart#coven-cli' },
+    { name: 'Coven Code', href: '/quickstart#coven-code' },
+    { name: 'Coven Cave', href: '/quickstart#coven-cave' },
+    { name: 'CastCodes', href: '/quickstart#castcodes' },
+    { name: 'OpenCoven for GitHub', href: '/quickstart#github' },
+  ];
+
+  for (const [index, product] of expectedProducts.entries()) {
+    await expect(cards.nth(index)).toHaveAttribute('href', product.href);
+    await expect(cards.nth(index)).toContainText(product.name);
+  }
+
+  const thirdCard = cards.nth(2);
+  await thirdCard.focus();
+  await expect(thirdCard).toBeFocused();
+  await expect
+    .poll(() =>
+      thirdCard
+        .locator('.product-trace')
+        .evaluate((trace) => window.getComputedStyle(trace).opacity),
+    )
+    .toBe('1');
+});

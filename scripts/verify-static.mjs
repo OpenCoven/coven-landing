@@ -35,6 +35,14 @@ const toRenderedText = (content) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+const productContracts = [
+  { id: 'coven-cli', name: 'Coven CLI' },
+  { id: 'coven-code', name: 'Coven Code' },
+  { id: 'coven-cave', name: 'Coven Cave' },
+  { id: 'castcodes', name: 'CastCodes' },
+  { id: 'github', name: 'OpenCoven for GitHub' },
+];
+
 const requiredPublicFiles = [
   'favicon.svg',
   'apple-touch-icon.png',
@@ -157,6 +165,39 @@ if (existsSync(distIndex)) {
   if (runtimeTabs !== 3 || runtimePanels !== 3 || runtimeDisclosures !== 3) {
     throw new Error(
       `Runtime proof must render 3 tabs, 3 panels, and 3 mobile disclosures; found ${runtimeTabs}, ${runtimePanels}, and ${runtimeDisclosures}`,
+    );
+  }
+
+  const constellationHtml = html.match(
+    /<ul(?=[^>]*\bdata-product-constellation(?:\s|=|>))[^>]*>([\s\S]*?)<\/ul>/,
+  )?.[1];
+  if (!constellationHtml) {
+    throw new Error('Homepage product constellation list is missing');
+  }
+
+  const constellationAnchors =
+    constellationHtml.match(/<a\b[^>]*>[\s\S]*?<\/a>/g) ?? [];
+  for (const { id, name } of productContracts) {
+    const href = `/quickstart#${id}`;
+    const linkCount = constellationAnchors.filter(
+      (anchor) =>
+        new RegExp(`\\bhref="${escapeRegExp(href)}"`).test(anchor)
+        && toRenderedText(anchor).includes(name),
+    ).length;
+    if (linkCount !== 1) {
+      throw new Error(
+        `${name} (${id}) must render exactly one homepage product constellation link; found ${linkCount}`,
+      );
+    }
+  }
+
+  const productCardCount = countMatches(
+    constellationHtml,
+    /\bclass="product-card"/g,
+  );
+  if (productCardCount !== 5) {
+    throw new Error(
+      `Homepage product constellation must render exactly five class="product-card" links; found ${productCardCount}`,
     );
   }
 
@@ -295,6 +336,21 @@ const sourceLedger = await readFile(
   path.join(root, 'src/components/FamiliarLedger.astro'),
   'utf8',
 );
+const sourceProductConstellation = await readFile(
+  path.join(root, 'src/components/ProductConstellation.astro'),
+  'utf8',
+).catch(() => '');
+
+if (
+  !sourceProductConstellation.includes(
+    "import { quickstartProducts } from '../data/quickstart'",
+  )
+  || !sourceProductConstellation.includes('quickstartProducts.map')
+) {
+  throw new Error(
+    'ProductConstellation must render from the shared quickstartProducts registry',
+  );
+}
 
 for (const exportName of [
   'heroFamiliars',
@@ -426,14 +482,6 @@ if (prerequisiteListMatches.length !== 5) {
 if (!quickstartHtml.includes('Step 1 of 4:') || !quickstartHtml.includes('Step 4 of 4:')) {
   throw new Error('Quickstart ordered lists must include accessible spoken step labels');
 }
-
-const productContracts = [
-  { id: 'coven-cli', name: 'Coven CLI' },
-  { id: 'coven-code', name: 'Coven Code' },
-  { id: 'coven-cave', name: 'Coven Cave' },
-  { id: 'castcodes', name: 'CastCodes' },
-  { id: 'github', name: 'OpenCoven for GitHub' },
-];
 
 const chooserHtml = quickstartHtml.match(
   /<nav\s+class="onboard-chooser-nav"[^>]*>([\s\S]*?)<\/nav>/,
