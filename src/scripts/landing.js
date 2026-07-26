@@ -38,3 +38,81 @@ wireRovingTabs(
   '[data-familiar-panel]',
   'data-familiar-tab',
 );
+
+(function wireContinuityStory() {
+  var root = document.querySelector('[data-continuity-story]');
+  if (!root) return;
+
+  var stages = Array.from(root.querySelectorAll('[data-story-stage]'));
+  var anchors = Array.from(root.querySelectorAll('[data-story-anchor]'));
+  var panels = Array.from(root.querySelectorAll('[data-story-panel]'));
+  var visual = root.querySelector('.story-visual');
+  var transitionTimer = null;
+  var activeId = stages[0]?.getAttribute('data-story-stage');
+  var motionOn = document.documentElement.classList.contains('motion-on');
+
+  function paint(id) {
+    var index = stages.findIndex(function (stage) {
+      return stage.getAttribute('data-story-stage') === id;
+    });
+    if (index < 0 || id === activeId) return;
+    activeId = id;
+
+    stages.forEach(function (stage) {
+      stage.classList.toggle(
+        'is-active',
+        stage.getAttribute('data-story-stage') === id,
+      );
+    });
+    anchors.forEach(function (anchor) {
+      var selected = anchor.getAttribute('data-story-anchor') === id;
+      if (selected) anchor.setAttribute('aria-current', 'step');
+      else anchor.removeAttribute('aria-current');
+    });
+
+    var updatePanels = function () {
+      panels.forEach(function (panel) {
+        panel.hidden = panel.getAttribute('data-story-panel') !== id;
+      });
+      root.style.setProperty(
+        '--story-progress',
+        `${(index / Math.max(stages.length - 1, 1)) * 100}%`,
+      );
+    };
+
+    if (!motionOn || !visual) {
+      updatePanels();
+      return;
+    }
+
+    if (transitionTimer) window.clearTimeout(transitionTimer);
+    visual.classList.add('is-transitioning');
+    transitionTimer = window.setTimeout(function () {
+      updatePanels();
+      requestAnimationFrame(function () {
+        visual.classList.remove('is-transitioning');
+      });
+    }, 180);
+  }
+
+  anchors.forEach(function (anchor) {
+    anchor.addEventListener('click', function () {
+      paint(anchor.getAttribute('data-story-anchor'));
+    });
+  });
+
+  if (!('IntersectionObserver' in window)) return;
+  var observer = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          paint(entry.target.getAttribute('data-story-stage'));
+        }
+      });
+    },
+    { rootMargin: '-35% 0px -55% 0px', threshold: 0 },
+  );
+  stages.forEach(function (stage) {
+    observer.observe(stage);
+  });
+})();

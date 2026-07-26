@@ -113,6 +113,38 @@ if (existsSync(distIndex)) {
     );
   }
 
+  const requiredStoryCopy = [
+    'Codex · Claude Code',
+    'Open source',
+    'Local-first',
+    'Provider-owned',
+    'Start inside one explicit project.',
+    'Keep the conventions worth carrying.',
+    'Change surfaces without starting over.',
+    'Resume with the relevant state intact.',
+  ];
+  const missingStoryCopy = requiredStoryCopy.filter(
+    (needle) => !renderedText.includes(needle),
+  );
+  if (missingStoryCopy.length > 0) {
+    throw new Error(
+      `Missing continuity story copy in dist/index.html: ${missingStoryCopy.join(', ')}`,
+    );
+  }
+
+  if (!/<ol(?=[^>]*\bclass="continuity-stages")(?=[^>]*\brole="list")[^>]*>/.test(html)) {
+    throw new Error('Continuity story must render an ordered list with role="list"');
+  }
+
+  for (const stageId of ['summoned', 'learned', 'moved', 'returned']) {
+    const stagePattern = new RegExp(
+      `<li(?=[^>]*\\bid="stage-${stageId}")(?=[^>]*\\bdata-story-stage="${stageId}")[^>]*>`,
+    );
+    if (!stagePattern.test(html)) {
+      throw new Error(`Continuity story is missing semantic stage ${stageId}`);
+    }
+  }
+
   const heroHtml = html.match(
     /<section(?=[^>]*\bclass="hero")(?=[^>]*\bid="top")[^>]*>([\s\S]*?)<\/section>/,
   )?.[1];

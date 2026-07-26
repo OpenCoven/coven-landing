@@ -91,3 +91,41 @@ test('hero emphasis meets light-theme contrast', async ({ page }) => {
 
   expect(contrastRatio).toBeGreaterThanOrEqual(3);
 });
+
+test('continuity anchors and passive scroll select story state', async ({ page }) => {
+  await page.goto('/');
+
+  const story = page.locator('[data-continuity-story]');
+  await expect(story.locator('[data-story-stage]')).toHaveCount(4);
+  await expect(story.locator('[data-story-panel]:not([hidden])')).toHaveAttribute(
+    'data-story-panel',
+    'summoned',
+  );
+
+  await story.locator('a[href="#stage-moved"]').click();
+  await expect(page).toHaveURL(/#stage-moved$/);
+  await expect(story.locator('[data-story-panel]:not([hidden])')).toHaveAttribute(
+    'data-story-panel',
+    'moved',
+  );
+
+  await page.goto('/');
+  await story.locator('#stage-returned').scrollIntoViewIfNeeded();
+  await expect(story.locator('[data-story-panel]:not([hidden])')).toHaveAttribute(
+    'data-story-panel',
+    'returned',
+  );
+  await expect(page).toHaveURL('http://127.0.0.1:4173/');
+});
+
+test('mobile story renders a readable ledger snapshot per stage', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  const stages = page.locator('[data-story-stage]');
+  await expect(stages).toHaveCount(4);
+  for (let index = 0; index < 4; index += 1) {
+    await expect(stages.nth(index).locator('.stage-snapshot')).toBeVisible();
+  }
+  await expect(page.locator('.story-visual')).toBeHidden();
+});
