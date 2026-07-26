@@ -2016,6 +2016,14 @@
     html[data-theme="light"] .testimonial-strip { background: rgba(255, 255, 255, 0.58); }
     html[data-theme="light"] .mobile-nav-overlay { background: rgba(251, 250, 255, 0.97); }
 
+    /* ── iOS (TestFlight) download button ──
+       The base button hardcodes #fff text for the dark macOS gradient,
+       but the iOS variant sits on a pale lavender wash in light mode —
+       white label/icon were invisible. Swap to ink + brand violet. */
+    html[data-theme="light"] .download-primary--ios { color: var(--oc-text); }
+    html[data-theme="light"] .download-primary--ios .download-primary-icon { color: #5A4C9E; }
+    html[data-theme="light"] .download-primary--ios .download-primary-sub { color: rgba(27, 23, 38, 0.68); }
+
     /* ── Inline prose code (not the terminal) ── */
     html[data-theme="light"] :not(pre) > code {
       background: rgba(122, 111, 179, 0.10);
