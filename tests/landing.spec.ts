@@ -545,6 +545,42 @@ test('Quick Start preview uses three canonical selectable commands', async ({
   ).toBeVisible();
 });
 
+test('Quick Start mobile controls remain readable and touch sized', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  const preview = page.locator('#quickstart');
+  const copyControls = preview.locator('.quickstart-copy');
+  const expectedResults = preview.locator('.preview-expected');
+  await expect(copyControls).toHaveCount(3);
+  await expect(expectedResults).toHaveCount(3);
+
+  for (const copyControl of await copyControls.all()) {
+    const box = await copyControl.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThanOrEqual(44);
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
+
+  for (const expectedResult of await expectedResults.all()) {
+    const fontSize = await expectedResult.evaluate((element) =>
+      Number.parseFloat(window.getComputedStyle(element).fontSize),
+    );
+    expect(fontSize).toBeGreaterThanOrEqual(13);
+  }
+
+  for (const command of await preview.locator('.preview-command').all()) {
+    await expect(command).toHaveCSS('overflow-x', 'auto');
+  }
+
+  const horizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - window.innerWidth,
+  );
+  expect(horizontalOverflow).toBeLessThanOrEqual(1);
+});
+
 test('closing invitation restores the primary conversion path', async ({
   page,
 }) => {
@@ -562,4 +598,48 @@ test('closing invitation restores the primary conversion path', async ({
   ).toBeVisible();
   await expect(page.locator('.ecosystem-section')).toHaveCount(0);
   await expect(page.locator('a[href="/#ecosystem"]')).toHaveCount(0);
+});
+
+test('closing invitation uses the approved mobile layout at 767px', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 767, height: 1000 });
+  await page.goto('/');
+
+  const layout = await page.locator('.closing-invitation').evaluate((closing) => {
+    const copy = closing.querySelector<HTMLElement>('.closing-copy')!;
+    const primary = closing.querySelector<HTMLElement>('.closing-primary')!;
+    const cta = primary.querySelector<HTMLElement>('[data-primary-cta]')!;
+    const copyBox = copy.getBoundingClientRect();
+    const primaryBox = primary.getBoundingClientRect();
+    const ctaBox = cta.getBoundingClientRect();
+
+    return {
+      copy: {
+        x: copyBox.x,
+        y: copyBox.y,
+        width: copyBox.width,
+        bottom: copyBox.bottom,
+      },
+      primary: {
+        x: primaryBox.x,
+        y: primaryBox.y,
+        width: primaryBox.width,
+      },
+      cta: {
+        x: ctaBox.x,
+        width: ctaBox.width,
+      },
+    };
+  });
+
+  expect(Math.abs(layout.primary.x - layout.copy.x)).toBeLessThanOrEqual(1);
+  expect(layout.primary.y).toBeGreaterThanOrEqual(layout.copy.bottom);
+  expect(Math.abs(layout.primary.width - layout.copy.width)).toBeLessThanOrEqual(
+    1,
+  );
+  expect(Math.abs(layout.cta.x - layout.primary.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(layout.cta.width - layout.primary.width)).toBeLessThanOrEqual(
+    1,
+  );
 });
