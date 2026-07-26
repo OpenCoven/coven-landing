@@ -170,6 +170,10 @@ test('runtime proof uses accessible desktop tabs', async ({ page }) => {
   const proof = page.locator('[data-runtime-proof]');
   const tabs = proof.locator('[data-runtime-tab]');
   await expect(tabs).toHaveCount(3);
+  await expect(page.locator('[id="how-it-works"]')).toHaveCount(1);
+  await expect(
+    page.locator('footer a[href="/#how-it-works"]'),
+  ).toHaveCount(1);
   await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
   await expect(
     proof.locator('[data-runtime-panel].is-active'),
@@ -195,6 +199,41 @@ test('runtime proof becomes native disclosures on mobile', async ({ page }) => {
   await expect(page.locator('.runtime-desktop')).toBeHidden();
   const disclosures = page.locator('details.runtime-disclosure');
   await expect(disclosures).toHaveCount(3);
+  await expect(disclosures.nth(1)).toHaveAttribute('open', '');
   await disclosures.nth(0).locator('summary').click();
   await expect(disclosures.nth(0)).toHaveAttribute('open', '');
+});
+
+test('runtime proof remains complete without JavaScript', async ({ browser }) => {
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { width: 1440, height: 1000 },
+  });
+
+  try {
+    const page = await context.newPage();
+    await page.goto('/');
+
+    const proof = page.locator('[data-runtime-proof]');
+    await expect(proof.locator('[data-runtime-tab]')).toHaveCount(3);
+    await expect(proof.locator('.runtime-tabs')).toBeHidden();
+
+    const panels = proof.locator('[data-runtime-panel]');
+    await expect(panels).toHaveCount(3);
+    for (let index = 0; index < 3; index += 1) {
+      await expect.soft(panels.nth(index)).toBeVisible();
+    }
+
+    for (const title of [
+      'Harness or product surface',
+      'Coven',
+      'Your project',
+    ]) {
+      await expect(
+        proof.getByRole('heading', { level: 3, name: title, exact: true }),
+      ).toBeVisible();
+    }
+  } finally {
+    await context.close();
+  }
 });

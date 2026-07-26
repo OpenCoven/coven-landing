@@ -160,6 +160,16 @@ if (existsSync(distIndex)) {
     );
   }
 
+  const howItWorksAnchors = countMatches(
+    html,
+    /\bid="how-it-works"/g,
+  );
+  if (howItWorksAnchors !== 1) {
+    throw new Error(
+      `Homepage must render exactly one id="how-it-works"; found ${howItWorksAnchors}`,
+    );
+  }
+
   for (const obsoleteClass of [
     'architecture-section',
     'howitworks-section',
