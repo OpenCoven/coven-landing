@@ -116,3 +116,68 @@ wireRovingTabs(
     observer.observe(stage);
   });
 })();
+
+(function wireRuntimeProof() {
+  var root = document.querySelector('[data-runtime-proof]');
+  if (!root) return;
+
+  var tabs = Array.from(root.querySelectorAll('[data-runtime-tab]'));
+  var panels = Array.from(root.querySelectorAll('[data-runtime-panel]'));
+  var panelRoot = root.querySelector('.runtime-panels');
+  var timer = null;
+  var motionOn = document.documentElement.classList.contains('motion-on');
+
+  function select(tab, moveFocus) {
+    var id = tab.getAttribute('data-runtime-tab');
+    var apply = function () {
+      tabs.forEach(function (candidate) {
+        var active = candidate === tab;
+        candidate.setAttribute('aria-selected', active ? 'true' : 'false');
+        candidate.setAttribute('tabindex', active ? '0' : '-1');
+      });
+      panels.forEach(function (panel) {
+        panel.classList.toggle(
+          'is-active',
+          panel.getAttribute('data-runtime-panel') === id,
+        );
+      });
+      if (moveFocus) tab.focus();
+    };
+
+    if (!motionOn || !panelRoot) {
+      apply();
+      return;
+    }
+
+    if (timer) window.clearTimeout(timer);
+    panelRoot.style.opacity = '0.12';
+    timer = window.setTimeout(function () {
+      apply();
+      requestAnimationFrame(function () {
+        panelRoot.style.opacity = '';
+      });
+    }, 180);
+  }
+
+  tabs.forEach(function (tab, index) {
+    tab.addEventListener('click', function () {
+      select(tab, false);
+    });
+    tab.addEventListener('keydown', function (event) {
+      var nextIndex = index;
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        nextIndex = (index + 1) % tabs.length;
+      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        nextIndex = (index - 1 + tabs.length) % tabs.length;
+      } else if (event.key === 'Home') {
+        nextIndex = 0;
+      } else if (event.key === 'End') {
+        nextIndex = tabs.length - 1;
+      } else {
+        return;
+      }
+      event.preventDefault();
+      select(tabs[nextIndex], true);
+    });
+  });
+})();

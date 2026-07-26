@@ -132,6 +132,45 @@ if (existsSync(distIndex)) {
     );
   }
 
+  const requiredRuntimeCopy = [
+    'One runtime between the surface and your work.',
+    'Harness or product surface',
+    'Coven',
+    'Your project',
+    'Sessions, familiar memory, adapters, and controlled tool access',
+  ];
+  const missingRuntimeCopy = requiredRuntimeCopy.filter(
+    (needle) => !renderedText.includes(needle),
+  );
+  if (missingRuntimeCopy.length > 0) {
+    throw new Error(
+      `Missing condensed runtime proof in dist/index.html: ${missingRuntimeCopy.join(', ')}`,
+    );
+  }
+
+  const runtimeTabs = countMatches(html, /\bdata-runtime-tab=/g);
+  const runtimePanels = countMatches(html, /\bdata-runtime-panel=/g);
+  const runtimeDisclosures = countMatches(
+    html,
+    /<details(?=[^>]*\bclass="runtime-disclosure")/g,
+  );
+  if (runtimeTabs !== 3 || runtimePanels !== 3 || runtimeDisclosures !== 3) {
+    throw new Error(
+      `Runtime proof must render 3 tabs, 3 panels, and 3 mobile disclosures; found ${runtimeTabs}, ${runtimePanels}, and ${runtimeDisclosures}`,
+    );
+  }
+
+  for (const obsoleteClass of [
+    'architecture-section',
+    'howitworks-section',
+    'compare-section',
+    'proof-section',
+  ]) {
+    if (html.includes(obsoleteClass)) {
+      throw new Error(`Homepage still renders obsolete ${obsoleteClass}`);
+    }
+  }
+
   if (!/<ol(?=[^>]*\bclass="continuity-stages")(?=[^>]*\brole="list")[^>]*>/.test(html)) {
     throw new Error('Continuity story must render an ordered list with role="list"');
   }

@@ -78,8 +78,7 @@
       --accent-strong:    rgba(154, 142, 205, 0.45);
     }
 
-    /* Screen-reader-only utility — used for invisible landmark headings
-       (e.g. the proof-section <h2>) and the live-demo SR transcript. */
+    /* Screen-reader-only utility for visually hidden explanatory text. */
     .sr-only {
       position: absolute;
       width: 1px; height: 1px;
@@ -134,8 +133,8 @@
     }
 
     /* ── Shared panel primitives (hero-grade glass frame + interactive
-       inset). Consumed by Architecture, HowItWorks, Compare, Ecosystem so
-       every module reads as one family instead of five experiments. ── */
+       inset). Consumed by the remaining panel modules so every section
+       reads as one family instead of separate experiments. ── */
     .panel {
       background: var(--panel-bg);
       border: 1px solid var(--border-v);
@@ -925,7 +924,6 @@
     @media (min-width: 1680px) {
       .header-inner,
       .hero,
-      .proof-section,
       .content-section,
       .ecosystem-section,
       .footer-inner { max-width: 1440px; }
@@ -980,46 +978,6 @@
       font-family: var(--mono);
       font-size: 0.6875rem; font-weight: 500;
       letter-spacing: 0.1em;
-      color: var(--muted);
-    }
-
-    /* ── PROOF SECTION ───────────────────────────────────── */
-    .proof-section {
-      position: relative; z-index: 1;
-      max-width: 1280px; margin: 0 auto;
-      padding: 72px 32px;
-    }
-    .proof-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .proof-card {
-      background: var(--bg);
-      padding: 28px 24px;
-      position: relative;
-      transition: background 0.25s ease;
-    }
-    .proof-num {
-      font-family: var(--mono);
-      font-size: 0.625rem; font-weight: 700;
-      letter-spacing: 0.14em;
-      color: var(--vtext); opacity: 0.6;
-      margin-bottom: 14px;
-      transition: opacity 0.25s ease, color 0.25s ease;
-    }
-    .proof-card h3 {
-      font-size: 0.875rem; font-weight: 700;
-      color: var(--white);
-      line-height: 1.35; margin-bottom: 8px;
-      transition: color 0.25s ease;
-    }
-    .proof-card p {
-      font-size: 0.75rem; line-height: 1.6;
       color: var(--muted);
     }
 
@@ -1697,12 +1655,9 @@
     /* Hover states isolated to (hover: hover) so touch devices don't latch
        sticky :hover state after a tap. Same easing/timing everywhere. */
     @media (hover: hover) {
-      .proof-card:hover,
       .glass-card:hover {
         background: linear-gradient(180deg, rgba(142,61,255,0.07) 0%, var(--surface) 100%);
       }
-      .proof-card:hover .proof-num { opacity: 1; color: var(--vtext); }
-      .proof-card:hover h3 { color: var(--vtext); }
       .glass-card:hover .card-kicker { opacity: 1; color: var(--vtext); }
       .glass-card:hover h3 { color: #fff; }
 
@@ -1729,14 +1684,14 @@
       transform: none;
     }
     /* Stagger items within a container — same timing everywhere. Existing
-       grids (.proof-grid, .card-grid) keep working; new containers opt in
-       with the .reveal-stagger utility. (.continuity-events has its own
-       load orchestration below, so it's intentionally not in this list.) */
-    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(2) { transition-delay: 0.08s; }
-    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(3) { transition-delay: 0.16s; }
-    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(4) { transition-delay: 0.24s; }
-    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(5) { transition-delay: 0.32s; }
-    .motion-on :is(.reveal-stagger, .proof-grid, .card-grid) [data-reveal]:nth-child(6) { transition-delay: 0.40s; }
+       card grids keep working; new containers opt in with the
+       .reveal-stagger utility. (.continuity-events has its own load
+       orchestration below, so it's intentionally not in this list.) */
+    .motion-on :is(.reveal-stagger, .card-grid) [data-reveal]:nth-child(2) { transition-delay: 0.08s; }
+    .motion-on :is(.reveal-stagger, .card-grid) [data-reveal]:nth-child(3) { transition-delay: 0.16s; }
+    .motion-on :is(.reveal-stagger, .card-grid) [data-reveal]:nth-child(4) { transition-delay: 0.24s; }
+    .motion-on :is(.reveal-stagger, .card-grid) [data-reveal]:nth-child(5) { transition-delay: 0.32s; }
+    .motion-on :is(.reveal-stagger, .card-grid) [data-reveal]:nth-child(6) { transition-delay: 0.40s; }
 
     /* Hero load orchestration: copy lands first, the terminal answers,
        then the continuity thread grows node by node left to right. */
@@ -1768,13 +1723,12 @@
       /* Card grids: 2-col on tablet instead of jumping to 1 */
       .card-grid.three { grid-template-columns: repeat(2, 1fr); }
       .card-grid.four  { grid-template-columns: repeat(2, 1fr); }
-      .proof-grid { grid-template-columns: repeat(2, 1fr); }
       /* Three-card grids in 2-col mode: span the last card across both
          columns so the empty grid cell doesn't expose the container's
          border-color background as an orphan quadrant. */
       .card-grid.three > :nth-child(3):last-child { grid-column: 1 / -1; }
       /* Tighter section spacing */
-      .content-section, .proof-section, .ecosystem-section { padding: 56px 24px; }
+      .content-section, .ecosystem-section { padding: 56px 24px; }
       .ecosystem-inner { padding: 44px 48px; }
     }
 
@@ -1793,11 +1747,10 @@
          landscape phones ≥701px wide keep a compact two-column hero. */
 
       /* Grids */
-      .proof-grid { grid-template-columns: repeat(2, 1fr); }
       .card-grid.three, .card-grid.four { grid-template-columns: repeat(2, 1fr); }
 
       /* Sections — uniform 20px gutter (matches hero) */
-      .content-section, .proof-section { padding: 48px 20px; }
+      .content-section { padding: 48px 20px; }
       .github-trust-panel { padding: 40px 36px; }
       /* Ecosystem card spans edge-to-edge so its inner 20px gutter aligns
          with other sections instead of double-indenting */
@@ -1902,7 +1855,6 @@
     @media (max-width: 520px) {
       h1 { font-size: 2.375rem; }
       /* hero card naturally sized at 520px */
-      .proof-grid { grid-template-columns: 1fr 1fr; }
       .card-grid.three, .card-grid.four { grid-template-columns: 1fr; }
       .github-hero-actions,
       .github-final-actions { align-items: stretch; flex-direction: column; }
@@ -1923,7 +1875,6 @@
       .section-header { margin-bottom: 32px; }
       .ecosystem-inner { padding: 24px 20px; }
       .ecosystem-grid { grid-template-columns: 1fr; }
-      .proof-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 400px) {
@@ -1935,7 +1886,7 @@
       footer { padding: 28px 16px; }
       .hero { padding: 32px 16px; }
       .github-hero { padding: 32px 16px 40px; }
-      .content-section, .proof-section { padding: 40px 16px; }
+      .content-section { padding: 40px 16px; }
       .ecosystem-section { padding: 40px 0; }
       .ecosystem-inner { padding: 24px 16px; }
     }

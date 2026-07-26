@@ -162,3 +162,39 @@ test('desktop story remains complete without JavaScript', async ({ browser }) =>
     await context.close();
   }
 });
+
+test('runtime proof uses accessible desktop tabs', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/');
+
+  const proof = page.locator('[data-runtime-proof]');
+  const tabs = proof.locator('[data-runtime-tab]');
+  await expect(tabs).toHaveCount(3);
+  await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
+  await expect(
+    proof.locator('[data-runtime-panel].is-active'),
+  ).toHaveAttribute('data-runtime-panel', 'coven');
+
+  await tabs.nth(1).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(tabs.nth(2)).toBeFocused();
+  await expect(
+    proof.locator('[data-runtime-panel].is-active'),
+  ).toHaveAttribute('data-runtime-panel', 'project');
+
+  await page.keyboard.press('Home');
+  await expect(tabs.nth(0)).toBeFocused();
+  await page.keyboard.press('End');
+  await expect(tabs.nth(2)).toBeFocused();
+});
+
+test('runtime proof becomes native disclosures on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  await expect(page.locator('.runtime-desktop')).toBeHidden();
+  const disclosures = page.locator('details.runtime-disclosure');
+  await expect(disclosures).toHaveCount(3);
+  await disclosures.nth(0).locator('summary').click();
+  await expect(disclosures.nth(0)).toHaveAttribute('open', '');
+});
