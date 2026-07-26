@@ -227,6 +227,24 @@ if (productProcedureLists.length !== 5) {
   throw new Error('Quickstart product procedures must include exactly five ordered lists with role="list"');
 }
 
+const foundationListMatches = quickstartHtml.match(
+  /<ul\s+class="onboard-foundation-grid"\s+role="list"\s*>/g,
+) ?? [];
+if (foundationListMatches.length !== 1) {
+  throw new Error(
+    'Quickstart foundation list semantics must render exactly one <ul class="onboard-foundation-grid" role="list"> in dist/quickstart/index.html',
+  );
+}
+
+const prerequisiteListMatches = quickstartHtml.match(
+  /<ul\s+class="onboard-requirements-list"\s+role="list"\s*>/g,
+) ?? [];
+if (prerequisiteListMatches.length !== 5) {
+  throw new Error(
+    'Quickstart prerequisite list semantics must render exactly five <ul class="onboard-requirements-list" role="list"> blocks in dist/quickstart/index.html',
+  );
+}
+
 if (!quickstartHtml.includes('Step 1 of 4:') || !quickstartHtml.includes('Step 4 of 4:')) {
   throw new Error('Quickstart ordered lists must include accessible spoken step labels');
 }

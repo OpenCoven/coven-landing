@@ -48,7 +48,7 @@ const COPY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
       aria-label={`${product.name} prerequisites`}
     >
       <p class="onboard-label">Before you start</p>
-      <ul>
+      <ul class="onboard-requirements-list" role="list">
         {product.requires.map((requirement) => <li>{requirement}</li>)}
       </ul>
     </aside>
