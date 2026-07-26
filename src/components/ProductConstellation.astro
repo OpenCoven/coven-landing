@@ -6,6 +6,7 @@ import { quickstartProducts } from '../data/quickstart';
   class="product-constellation"
   id="products"
   aria-labelledby="products-heading"
+  aria-describedby="products-foundation-description"
 >
   <header class="constellation-header">
     <p class="section-kicker">Choose a surface</p>
@@ -15,6 +16,9 @@ import { quickstartProducts } from '../data/quickstart';
       leads to its own verifiable Quick Start.
     </p>
   </header>
+  <p id="products-foundation-description" class="sr-only">
+    Coven is the shared local-first runtime foundation behind all five surfaces.
+  </p>
 
   <div class="constellation-shell">
     <div class="constellation-core" aria-hidden="true">
@@ -249,10 +253,6 @@ import { quickstartProducts } from '../data/quickstart';
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .product-card {
-      will-change: transform;
-    }
-
     .product-card:hover:not(:focus-visible) {
       transform: translateY(-2px);
       border-color: var(--accent-strong);

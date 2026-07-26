@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { quickstartProducts } from '../src/data/quickstart.ts';
 
 /**
  * Sanity checks for the Astro landing site.
@@ -35,13 +36,10 @@ const toRenderedText = (content) =>
     .replace(/\s+/g, ' ')
     .trim();
 
-const productContracts = [
-  { id: 'coven-cli', name: 'Coven CLI' },
-  { id: 'coven-code', name: 'Coven Code' },
-  { id: 'coven-cave', name: 'Coven Cave' },
-  { id: 'castcodes', name: 'CastCodes' },
-  { id: 'github', name: 'OpenCoven for GitHub' },
-];
+const productContracts = quickstartProducts.map(({ id, name }) => ({
+  id,
+  name,
+}));
 
 const requiredPublicFiles = [
   'favicon.svg',
@@ -168,36 +166,77 @@ if (existsSync(distIndex)) {
     );
   }
 
-  const constellationHtml = html.match(
+  const constellationListHtml = html.match(
     /<ul(?=[^>]*\bdata-product-constellation(?:\s|=|>))[^>]*>([\s\S]*?)<\/ul>/,
   )?.[1];
-  if (!constellationHtml) {
+  if (!constellationListHtml) {
     throw new Error('Homepage product constellation list is missing');
   }
 
+  const constellationItems =
+    constellationListHtml.match(/<li\b[^>]*>[\s\S]*?<\/li>/g) ?? [];
   const constellationAnchors =
-    constellationHtml.match(/<a\b[^>]*>[\s\S]*?<\/a>/g) ?? [];
-  for (const { id, name } of productContracts) {
-    const href = `/quickstart#${id}`;
-    const linkCount = constellationAnchors.filter(
-      (anchor) =>
-        new RegExp(`\\bhref="${escapeRegExp(href)}"`).test(anchor)
-        && toRenderedText(anchor).includes(name),
-    ).length;
-    if (linkCount !== 1) {
+    constellationListHtml.match(/<a\b[^>]*>[\s\S]*?<\/a>/g) ?? [];
+  if (constellationItems.length !== 5 || constellationAnchors.length !== 5) {
+    throw new Error(
+      `Homepage product constellation must render exactly five list items and five links; found ${constellationItems.length} items and ${constellationAnchors.length} links`,
+    );
+  }
+
+  for (const [index, product] of quickstartProducts.entries()) {
+    const itemHtml = constellationItems[index];
+    const itemAnchors = itemHtml.match(/<a\b[^>]*>[\s\S]*?<\/a>/g) ?? [];
+    const href = `/quickstart#${product.id}`;
+    if (
+      itemAnchors.length !== 1
+      || !new RegExp(`\\bhref="${escapeRegExp(href)}"`).test(itemAnchors[0])
+    ) {
       throw new Error(
-        `${name} (${id}) must render exactly one homepage product constellation link; found ${linkCount}`,
+        `${product.name} (${product.id}) must render exactly one homepage product constellation link to ${href}; found ${itemAnchors.length}`,
       );
+    }
+
+    const cardText = toRenderedText(itemAnchors[0]);
+    for (const field of [
+      'sigil',
+      'eyebrow',
+      'name',
+      'summary',
+      'bestFor',
+      'status',
+      'platforms',
+    ]) {
+      if (!cardText.includes(product[field])) {
+        throw new Error(
+          `${product.name} (${product.id}) homepage card is missing registry field ${field}: ${product[field]}`,
+        );
+      }
     }
   }
 
   const productCardCount = countMatches(
-    constellationHtml,
+    constellationListHtml,
     /\bclass="product-card"/g,
   );
   if (productCardCount !== 5) {
     throw new Error(
       `Homepage product constellation must render exactly five class="product-card" links; found ${productCardCount}`,
+    );
+  }
+
+  const constellationSectionTag = html.match(
+    /<section(?=[^>]*\bclass="product-constellation")[^>]*>/,
+  )?.[0];
+  if (
+    !constellationSectionTag?.includes(
+      'aria-describedby="products-foundation-description"',
+    )
+    || !/<p(?=[^>]*\bid="products-foundation-description")(?=[^>]*\bclass="sr-only")[^>]*>\s*Coven is the shared local-first runtime foundation behind all five surfaces\.\s*<\/p>/.test(
+      html,
+    )
+  ) {
+    throw new Error(
+      'Homepage product constellation must associate the five surfaces with the shared local-first Coven runtime foundation',
     );
   }
 
@@ -349,6 +388,27 @@ if (
 ) {
   throw new Error(
     'ProductConstellation must render from the shared quickstartProducts registry',
+  );
+}
+for (const field of [
+  'id',
+  'sigil',
+  'eyebrow',
+  'name',
+  'summary',
+  'bestFor',
+  'status',
+  'platforms',
+]) {
+  if (!sourceProductConstellation.includes(`product.${field}`)) {
+    throw new Error(
+      `ProductConstellation must render product.${field} from the shared quickstartProducts registry`,
+    );
+  }
+}
+if (sourceProductConstellation.includes('will-change: transform')) {
+  throw new Error(
+    'ProductConstellation cards must not keep a permanent will-change layer',
   );
 }
 

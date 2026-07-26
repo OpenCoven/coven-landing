@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { quickstartProducts } from '../src/data/quickstart';
 
 for (const pathname of ['/', '/quickstart', '/github']) {
   test(`${pathname} renders without runtime errors`, async ({ page }) => {
@@ -299,34 +300,92 @@ test('runtime proof remains complete without JavaScript', async ({ browser }) =>
 test('product constellation exposes five complete keyboard links', async ({
   page,
 }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
 
+  const constellation = page.locator('.product-constellation');
+  await expect(constellation).toHaveAttribute(
+    'aria-describedby',
+    'products-foundation-description',
+  );
+  await expect(constellation).toHaveAccessibleDescription(
+    'Coven is the shared local-first runtime foundation behind all five surfaces.',
+  );
+  await expect(constellation.locator('.constellation-core')).toHaveAttribute(
+    'aria-hidden',
+    'true',
+  );
+
+  const items = constellation.locator(
+    '[data-product-constellation] > li',
+  );
   const cards = page.locator('[data-product-constellation] .product-card');
+  await expect(items).toHaveCount(5);
   await expect(cards).toHaveCount(5);
 
-  const expectedProducts = [
-    { name: 'Coven CLI', href: '/quickstart#coven-cli' },
-    { name: 'Coven Code', href: '/quickstart#coven-code' },
-    { name: 'Coven Cave', href: '/quickstart#coven-cave' },
-    { name: 'CastCodes', href: '/quickstart#castcodes' },
-    { name: 'OpenCoven for GitHub', href: '/quickstart#github' },
-  ];
-
-  for (const [index, product] of expectedProducts.entries()) {
-    await expect(cards.nth(index)).toHaveAttribute('href', product.href);
-    await expect(cards.nth(index)).toContainText(product.name);
+  for (const [index, product] of quickstartProducts.entries()) {
+    const item = items.nth(index);
+    const card = cards.nth(index);
+    await expect(item.locator(':scope > a.product-card')).toHaveCount(1);
+    await expect(card).toHaveAttribute(
+      'href',
+      `/quickstart#${product.id}`,
+    );
+    await expect(card.locator('.product-sigil')).toHaveText(product.sigil);
+    await expect(card.locator('.product-heading small')).toHaveText(
+      product.eyebrow,
+    );
+    await expect(card.locator('.product-heading strong')).toHaveText(
+      product.name,
+    );
+    await expect(card.locator('.product-summary')).toHaveText(product.summary);
+    await expect(card.locator('.product-best')).toContainText(product.bestFor);
+    await expect(card.locator('.product-meta span').nth(0)).toHaveText(
+      product.status,
+    );
+    await expect(card.locator('.product-meta span').nth(1)).toHaveText(
+      product.platforms,
+    );
+    await expect(card).toHaveAccessibleName(
+      [
+        product.eyebrow,
+        product.name,
+        product.summary,
+        'Best for',
+        product.bestFor,
+        product.status,
+        product.platforms,
+      ].join(' '),
+    );
   }
 
-  const thirdCard = cards.nth(2);
-  await thirdCard.focus();
-  await expect(thirdCard).toBeFocused();
-  await expect
-    .poll(() =>
-      thirdCard
-        .locator('.product-trace')
-        .evaluate((trace) => window.getComputedStyle(trace).opacity),
-    )
-    .toBe('1');
+  await page.locator('.runtime-docs').focus();
+  for (const card of await cards.all()) {
+    await page.keyboard.press('Tab');
+    await expect(card).toBeFocused();
+    await expect
+      .poll(() =>
+        card.evaluate((element) => {
+          const focusRingProbe = document.createElement('span');
+          focusRingProbe.style.boxShadow = 'var(--oc-focus-ring)';
+          document.body.append(focusRingProbe);
+          const hasSharedFocusRing =
+            element.matches(':focus-visible')
+            && window.getComputedStyle(element).boxShadow
+              === window.getComputedStyle(focusRingProbe).boxShadow;
+          focusRingProbe.remove();
+          return hasSharedFocusRing;
+        }),
+      )
+      .toBe(true);
+    await expect
+      .poll(() =>
+        card
+          .locator('.product-trace')
+          .evaluate((trace) => window.getComputedStyle(trace).opacity),
+      )
+      .toBe('1');
+  }
 });
 
 test('product constellation preserves the focus ring while hovered', async ({
@@ -345,6 +404,11 @@ test('product constellation preserves the focus ring while hovered', async ({
   await expect
     .poll(() => firstCard.evaluate((card) => card.matches(':hover')))
     .toBe(true);
+  await expect
+    .poll(() =>
+      firstCard.evaluate((card) => window.getComputedStyle(card).transform),
+    )
+    .toBe('matrix(1, 0, 0, 1, 0, -2)');
 
   await page.keyboard.press('Tab');
   await expect(firstCard).toBeFocused();
@@ -368,4 +432,5 @@ test('product constellation preserves the focus ring while hovered', async ({
   expect(focusState.focusVisible).toBe(true);
   expect(focusState.hovered).toBe(true);
   expect(focusState.boxShadow).toBe(focusState.focusRing);
+  await expect(firstCard).toHaveCSS('transform', 'none');
 });
