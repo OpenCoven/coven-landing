@@ -1,12 +1,14 @@
 ---
 // Fullscreen overlay opened by the header hamburger. Toggle wiring lives in
 // src/scripts/main.js.
-const isGithub = Astro.url.pathname.replace(/\/$/, '') === '/github';
+const pathname = Astro.url.pathname.replace(/\/$/, '');
+const isGithub = pathname === '/github';
+const isQuickstart = pathname === '/quickstart';
 ---
 <nav class="mobile-nav-overlay" id="mobile-nav" aria-label="Mobile navigation">
   <button class="mobile-nav-close" aria-label="Close menu">×</button>
   <a href="/#how-it-works">How It Works</a>
-  <a href="/#quickstart">Quick Start</a>
+  <a href="/quickstart" aria-current={isQuickstart ? 'page' : undefined}>Quick Start</a>
   <a href="/github" aria-current={isGithub ? 'page' : undefined}>GitHub App</a>
   <a href="https://docs.opencoven.ai">Docs</a>
   <a href="https://github.com/OpenCoven/coven">GitHub</a>

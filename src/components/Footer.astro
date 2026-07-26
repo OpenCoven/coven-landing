@@ -1,5 +1,7 @@
 ---
-const isGithub = Astro.url.pathname.replace(/\/$/, '') === '/github';
+const pathname = Astro.url.pathname.replace(/\/$/, '');
+const isGithub = pathname === '/github';
+const isQuickstart = pathname === '/quickstart';
 ---
 <footer>
   <div class="footer-inner">
@@ -10,7 +12,7 @@ const isGithub = Astro.url.pathname.replace(/\/$/, '') === '/github';
     <nav class="footer-nav" aria-label="Footer">
       <a href="/#architecture">Architecture</a>
       <a href="/#how-it-works">How It Works</a>
-      <a href="/#quickstart">Quick Start</a>
+      <a href="/quickstart" aria-current={isQuickstart ? 'page' : undefined}>Quick Start</a>
       <a href="/#ecosystem">Ecosystem</a>
       <a href="/github" aria-current={isGithub ? 'page' : undefined}>GitHub App</a>
       <a href="https://docs.opencoven.ai">Docs</a>

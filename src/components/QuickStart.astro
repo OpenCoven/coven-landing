@@ -16,34 +16,35 @@ const steps = [
       { t: '-g', c: 'flag' },
       { t: '@opencoven/cli', c: 'pkg' },
     ],
-    out: '✓ coven ready on PATH',
+    out: '✓ coven is available on PATH',
     note: 'Installs the coven command globally through npm.',
     copyLabel: 'Copy install command',
   },
   {
-    kicker: 'Step 2 · Verify',
-    title: 'Check your environment',
+    kicker: 'Step 2 · Prepare',
+    title: 'Run the guided preflight',
     command: 'coven doctor',
     tokens: [
       { t: 'coven', c: 'bin' },
       { t: 'doctor', c: 'sub' },
     ],
-    out: '✓ Claude Code · Codex detected',
-    note: 'Detects the supported harnesses on your machine and confirms the runtime is healthy.',
-    copyLabel: 'Copy verify command',
+    out: '✓ project and at least one harness ready',
+    note: "Follow doctor's exact Codex or Claude Code install/auth next step.",
+    copyLabel: 'Copy preflight command',
   },
   {
-    kicker: 'Step 3 · Summon',
-    title: 'Wake your first familiar',
-    command: 'coven run "hai world"',
+    kicker: 'Step 3 · Run',
+    title: 'Create your first recorded session',
+    command: 'coven run codex "explain this repo in 5 bullets"',
     tokens: [
       { t: 'coven', c: 'bin' },
       { t: 'run', c: 'sub' },
-      { t: '"hai world"', c: 'str' },
+      { t: 'codex', c: 'arg' },
+      { t: '"explain this repo in 5 bullets"', c: 'str' },
     ],
-    out: '✦ Hexi awake · 128 notes · 47 days restored',
-    note: "Launches a project-scoped session through Coven's managed PTY, bound to the current directory — with Hexi's memory already loaded.",
-    copyLabel: 'Copy summon command',
+    out: '✓ session created · output attached · history recorded',
+    note: 'Creates a recorded session with attached output and durable history.',
+    copyLabel: 'Copy run command',
     now: true,
   },
 ];
@@ -83,8 +84,8 @@ const steps = [
   </ol>
 
   <div class="qs-actions" data-reveal>
-    <a class="btn-primary" href="https://docs.opencoven.ai">Read the full docs</a>
-    <a class="btn-secondary" href="https://github.com/OpenCoven/coven">View on GitHub ↗</a>
+    <a class="btn-primary" href="/quickstart">Choose any product</a>
+    <a class="btn-secondary" href="https://docs.opencoven.ai">Read the full docs</a>
   </div>
 
   <!-- Announces copy success to screen readers (written by main.js) -->
