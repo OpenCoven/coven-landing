@@ -2090,6 +2090,13 @@
        .section-kicker, .content-section, buttons, focus ring, and the
        shared semantic tokens instead of inventing a parallel theme.
        ═══════════════════════════════════════════════════════════ */
+    .quickstart-page {
+      --onboard-success-foreground: var(--green);
+    }
+
+    html[data-theme="light"] .quickstart-page {
+      --onboard-success-foreground: #1F7A34;
+    }
 
     /* ── Hero: two-column composition — copy left, the "mission trace"
        route panel right. The route panel IS the signature artifact,
@@ -2180,14 +2187,14 @@
     .onboard-route-step.is-arrival .onboard-route-marker {
       background: rgba(48,209,88,0.14);
       border-color: rgba(48,209,88,0.5);
-      color: var(--green);
+      color: var(--onboard-success-foreground);
     }
     .onboard-route-arrival-tag {
       display: inline-flex; align-items: center; gap: 6px;
       margin-top: 6px;
       font-family: var(--mono); font-size: 0.625rem; font-weight: 700;
       letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--green);
+      color: var(--onboard-success-foreground);
     }
 
     /* ── Chooser: five alternatives, never numbered ── */
@@ -2439,13 +2446,13 @@
       display: grid; place-items: center;
       background: rgba(48,209,88,0.16);
       border: 1px solid rgba(48,209,88,0.45);
-      color: var(--green);
+      color: var(--onboard-success-foreground);
       font-weight: 700;
     }
     .onboard-arrival p {
       font-family: var(--mono); font-size: 0.625rem; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--green); opacity: 0.9;
+      color: var(--onboard-success-foreground); opacity: 0.9;
       margin-bottom: 4px;
     }
     .onboard-arrival strong {
