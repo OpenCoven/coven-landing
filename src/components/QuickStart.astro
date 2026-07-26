@@ -57,6 +57,12 @@ const previewSteps = previewIndexes.map((stepIndex) => {
           >
             <Fragment set:html={COPY_ICON} />
           </button>
+          <span
+            class="copy-guidance"
+            data-copy-guidance
+            aria-hidden="true"
+            hidden
+          ></span>
         </div>
         <p class="preview-expected">
           <strong>Expect:</strong> {step.expected}
@@ -83,13 +89,7 @@ const previewSteps = previewIndexes.map((stepIndex) => {
     </a>
   </div>
 
-  <div
-    class="sr-only"
-    role="status"
-    aria-live="polite"
-    data-copy-live
-    data-copy-guidance
-  ></div>
+  <div class="sr-only" role="status" aria-live="polite" data-copy-live></div>
 </section>
 
 <style>

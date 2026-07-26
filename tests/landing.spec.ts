@@ -1142,6 +1142,9 @@ test('clipboard failure selects the command and gives a concrete fallback', asyn
 
   const preview = page.locator('#quickstart');
   const button = preview.locator('[data-copy]').first();
+  const surface = button.locator(
+    'xpath=ancestor::*[@data-copy-surface][1]',
+  );
   const command = await preview.locator('code').first().textContent();
   await button.click();
 
@@ -1152,14 +1155,242 @@ test('clipboard failure selects the command and gives a concrete fallback', asyn
   await expect(preview.locator('[data-copy-live]')).toContainText(
     'Copy unavailable',
   );
-  await expect(preview.locator('[data-copy-guidance]').first()).toBeVisible();
-  await expect(preview.locator('[data-copy-guidance]').first()).toHaveText(
+  await expect(surface.locator('[data-copy-guidance]')).toBeVisible();
+  await expect(surface.locator('[data-copy-guidance]')).toHaveText(
     'Copy unavailable. Command selected. Press Ctrl+C or Command+C to copy manually.',
   );
   await expect(button).toBeFocused();
   expect(await page.evaluate(() => window.getSelection()?.toString())).toBe(
     command,
   );
+});
+
+test('clipboard fallback stays inline below the mobile dialog and away from the footer', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: () => Promise.reject(new Error('denied')),
+      },
+    });
+  });
+  await page.goto('/quickstart');
+
+  const button = page.locator('[data-copy]').first();
+  const surface = button.locator(
+    'xpath=ancestor::*[@data-copy-surface][1]',
+  );
+  const guidance = surface.locator('[data-copy-guidance]');
+  await button.click();
+
+  await expect(guidance).toBeVisible();
+  const inlineGeometry = await guidance.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const surfaceBox = element
+      .closest('[data-copy-surface]')!
+      .getBoundingClientRect();
+    const style = window.getComputedStyle(element);
+    return {
+      left: box.left,
+      right: box.right,
+      position: style.position,
+      surfaceLeft: surfaceBox.left,
+      surfaceRight: surfaceBox.right,
+      viewportWidth: window.innerWidth,
+      zIndex: style.zIndex,
+    };
+  });
+  expect.soft(inlineGeometry.position).toBe('static');
+  expect.soft(inlineGeometry.zIndex).toBe('auto');
+  expect.soft(inlineGeometry.left).toBeGreaterThanOrEqual(
+    inlineGeometry.surfaceLeft,
+  );
+  expect.soft(inlineGeometry.right).toBeLessThanOrEqual(
+    inlineGeometry.surfaceRight,
+  );
+  expect.soft(inlineGeometry.left).toBeGreaterThanOrEqual(0);
+  expect.soft(inlineGeometry.right).toBeLessThanOrEqual(
+    inlineGeometry.viewportWidth,
+  );
+
+  await page.locator('.mobile-toggle').evaluate((toggle: HTMLButtonElement) => {
+    toggle.click();
+  });
+  await expect(page.locator('#mobile-nav')).toBeVisible();
+  const guidanceObscuresDialog = await guidance.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const topElement = document.elementFromPoint(
+      box.left + box.width / 2,
+      box.top + box.height / 2,
+    );
+    return topElement === element || element.contains(topElement);
+  });
+  expect(guidanceObscuresDialog).toBe(false);
+
+  await page.keyboard.press('Escape');
+  const footer = page.locator('footer');
+  await footer.scrollIntoViewIfNeeded();
+  const overlapsFooter = await guidance.evaluate((element) => {
+    const guidanceBox = element.getBoundingClientRect();
+    const footerBox = document.querySelector('footer')!.getBoundingClientRect();
+    return !(
+      guidanceBox.right <= footerBox.left ||
+      guidanceBox.left >= footerBox.right ||
+      guidanceBox.bottom <= footerBox.top ||
+      guidanceBox.top >= footerBox.bottom
+    );
+  });
+  expect(overlapsFooter).toBe(false);
+});
+
+test('the newest clipboard request owns shared feedback across buttons', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const attempts: Array<{
+      resolve: () => void;
+      reject: () => void;
+    }> = [];
+    Object.defineProperty(window, '__clipboardAttempts', {
+      value: attempts,
+    });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: () =>
+          new Promise<void>((resolve, reject) => {
+            attempts.push({
+              resolve,
+              reject: () => reject(new Error('denied')),
+            });
+          }),
+      },
+    });
+  });
+  await page.goto('/');
+
+  const buttons = page.locator('#quickstart [data-copy]');
+  const first = buttons.nth(0);
+  const second = buttons.nth(1);
+  const firstOriginalLabel = await first.getAttribute('aria-label');
+  const secondCommand = await second
+    .locator('xpath=ancestor::*[@data-copy-surface][1]')
+    .locator('code')
+    .textContent();
+  const secondGuidance = second
+    .locator('xpath=ancestor::*[@data-copy-surface][1]')
+    .locator('[data-copy-guidance]');
+  const liveRegion = page.locator('#quickstart [data-copy-live]');
+  const fallbackMessage =
+    'Copy unavailable. Command selected. Press Ctrl+C or Command+C to copy manually.';
+
+  await first.click();
+  await second.click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (
+            window as Window & {
+              __clipboardAttempts: unknown[];
+            }
+          ).__clipboardAttempts.length,
+      ),
+    )
+    .toBe(2);
+
+  await page.evaluate(() => {
+    (
+      window as Window & {
+        __clipboardAttempts: Array<{ reject: () => void }>;
+      }
+    ).__clipboardAttempts[1].reject();
+  });
+  await expect(liveRegion).toHaveText(fallbackMessage);
+
+  await page.evaluate(() => {
+    (
+      window as Window & {
+        __clipboardAttempts: Array<{ reject: () => void }>;
+      }
+    ).__clipboardAttempts[0].reject();
+  });
+  await expect(first).toHaveAttribute('aria-label', firstOriginalLabel!, {
+    timeout: 250,
+  });
+  await expect(liveRegion).toHaveText(fallbackMessage);
+  await expect(secondGuidance).toBeVisible();
+  await expect(secondGuidance).toHaveText(fallbackMessage);
+  await expect(second).toBeFocused();
+  expect(await page.evaluate(() => window.getSelection()?.toString())).toBe(
+    secondCommand,
+  );
+});
+
+test('a newer button attempt preserves an already-rendered success reset', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const attempts: Array<{ resolve: () => void }> = [];
+    Object.defineProperty(window, '__clipboardAttempts', {
+      value: attempts,
+    });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: () =>
+          new Promise<void>((resolve) => {
+            attempts.push({ resolve });
+          }),
+      },
+    });
+  });
+  await page.goto('/');
+
+  const buttons = page.locator('#quickstart [data-copy]');
+  const first = buttons.nth(0);
+  const second = buttons.nth(1);
+  const firstOriginalLabel = await first.getAttribute('aria-label');
+
+  await first.click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (
+            window as Window & {
+              __clipboardAttempts: unknown[];
+            }
+          ).__clipboardAttempts.length,
+      ),
+    )
+    .toBe(1);
+  await page.evaluate(() => {
+    (
+      window as Window & {
+        __clipboardAttempts: Array<{ resolve: () => void }>;
+      }
+    ).__clipboardAttempts[0].resolve();
+  });
+  await expect(first).toHaveAttribute('aria-label', 'Copied');
+
+  await second.click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (
+            window as Window & {
+              __clipboardAttempts: unknown[];
+            }
+          ).__clipboardAttempts.length,
+      ),
+    )
+    .toBe(2);
+  await expect(first).toHaveAttribute('aria-label', firstOriginalLabel!);
 });
 
 test('clipboard ignores an older success after a newer failure', async ({

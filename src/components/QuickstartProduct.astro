@@ -76,6 +76,12 @@ const COPY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
                   >
                     <Fragment set:html={COPY_ICON} />
                   </button>
+                  <span
+                    class="copy-guidance"
+                    data-copy-guidance
+                    aria-hidden="true"
+                    hidden
+                  ></span>
                 </div>
               ))}
               {step.action && (

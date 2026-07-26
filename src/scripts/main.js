@@ -167,12 +167,30 @@
     var buttons = document.querySelectorAll('.qs-copy[data-copy]');
     if (!buttons.length) return;
     var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+    var FALLBACK_MESSAGE = 'Copy unavailable. Command selected. Press Ctrl+C or Command+C to copy manually.';
     var liveRegion = document.querySelector('[data-copy-live]');
+    var guidanceNodes = document.querySelectorAll('[data-copy-guidance]');
+    var latestRequestToken = 0;
 
-    function announce(message, showGuidance) {
-      if (!liveRegion) return;
-      liveRegion.textContent = message;
-      liveRegion.classList.toggle('is-copy-guidance', Boolean(showGuidance));
+    function announce(message) {
+      if (liveRegion) liveRegion.textContent = message;
+    }
+
+    function hideGuidance() {
+      guidanceNodes.forEach(function (guidance) {
+        guidance.hidden = true;
+        guidance.textContent = '';
+        guidance.closest('[data-copy-surface]')?.classList.remove('has-copy-guidance');
+      });
+    }
+
+    function showGuidance(button) {
+      var surface = button.closest('[data-copy-surface]');
+      var guidance = surface?.querySelector('[data-copy-guidance]');
+      if (!surface || !guidance) return;
+      guidance.textContent = FALLBACK_MESSAGE;
+      guidance.hidden = false;
+      surface.classList.add('has-copy-guidance');
     }
 
     function selectCommand(button) {
@@ -193,6 +211,8 @@
       var attemptToken = 0;
       button.addEventListener('click', async function () {
         var currentAttempt = ++attemptToken;
+        var requestToken = ++latestRequestToken;
+        hideGuidance();
         if (resetTimer) {
           window.clearTimeout(resetTimer);
           resetTimer = null;
@@ -203,12 +223,15 @@
             throw new Error('Clipboard API unavailable');
           }
           await navigator.clipboard.writeText(command);
-          if (currentAttempt !== attemptToken) return;
+          if (
+            currentAttempt !== attemptToken ||
+            requestToken !== latestRequestToken
+          ) return;
           button.classList.remove('is-copy-failed');
           button.classList.add('is-copied');
           button.innerHTML = CHECK_SVG;
           button.setAttribute('aria-label', 'Copied');
-          announce(`Copied: ${command}`, false);
+          announce(`Copied: ${command}`);
           resetTimer = window.setTimeout(function () {
             if (currentAttempt !== attemptToken) return;
             button.classList.remove('is-copied');
@@ -217,7 +240,10 @@
             resetTimer = null;
           }, 1_400);
         } catch {
-          if (currentAttempt !== attemptToken) return;
+          if (
+            currentAttempt !== attemptToken ||
+            requestToken !== latestRequestToken
+          ) return;
           button.classList.remove('is-copied');
           button.classList.add('is-copy-failed');
           button.innerHTML = originalHtml;
@@ -226,10 +252,8 @@
             'Copy unavailable. Select the command and copy manually.',
           );
           selectCommand(button);
-          announce(
-            'Copy unavailable. Command selected. Press Ctrl+C or Command+C to copy manually.',
-            true,
-          );
+          showGuidance(button);
+          announce(FALLBACK_MESSAGE);
         }
       });
     });
