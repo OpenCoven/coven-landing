@@ -11,6 +11,7 @@ import path from 'node:path';
  *  - canonical OpenCoven logo treatment in favicon.svg and og.svg
  *  - rendered dist/index.html exists and contains load-bearing copy
  *  - rendered dist/github/index.html exists and contains hosted GitHub beta copy
+ *  - rendered dist/quickstart/index.html exists and contains the comprehensive quickstart page
  */
 
 const root = process.cwd();
@@ -155,4 +156,49 @@ if (!sourceMain.includes("document.documentElement.classList.add('reveal-ready')
 
 console.log(
   `Verified ${requiredGithubCopy.length} required copy strings in dist/github/index.html.`,
+);
+
+const distQuickstart = path.join(distDir, 'quickstart', 'index.html');
+if (!existsSync(distQuickstart)) {
+  throw new Error('dist/quickstart/index.html is missing — the onboarding hub must ship at /quickstart');
+}
+
+const quickstartHtml = await readFile(distQuickstart, 'utf8');
+const requiredQuickstartCopy = [
+  'Choose your way into OpenCoven.',
+  'Coven CLI',
+  'Coven Code',
+  'Coven Cave',
+  'CastCodes',
+  'OpenCoven for GitHub',
+  'npm install -g @opencoven/cli',
+  'coven doctor',
+  'coven run codex',
+  'coven sessions --plain',
+  'Your first success',
+];
+const missingQuickstartCopy = requiredQuickstartCopy.filter((needle) => !quickstartHtml.includes(needle));
+if (missingQuickstartCopy.length > 0) {
+  throw new Error(`Missing expected copy in dist/quickstart/index.html: ${missingQuickstartCopy.join(', ')}`);
+}
+
+const requiredQuickstartLinks = [
+  'https://docs.opencoven.ai/docs/guides/install-and-first-run',
+  'https://github.com/OpenCoven/coven-code',
+  'https://github.com/OpenCoven/coven-cave/releases/latest',
+  'https://testflight.apple.com/join/61Dqw8y4',
+  'https://github.com/OpenCoven/cast-codes/releases/latest',
+  'https://github.com/OpenCoven/coven-github',
+];
+const missingQuickstartLinks = requiredQuickstartLinks.filter((needle) => !quickstartHtml.includes(needle));
+if (missingQuickstartLinks.length > 0) {
+  throw new Error(`Missing canonical links in dist/quickstart/index.html: ${missingQuickstartLinks.join(', ')}`);
+}
+
+if (!quickstartHtml.includes('href="/quickstart" aria-current="page"')) {
+  throw new Error('Quickstart page navigation must mark /quickstart as the current page');
+}
+
+console.log(
+  `Verified ${requiredQuickstartCopy.length} required copy strings, ${requiredQuickstartLinks.length} canonical links, and /quickstart navigation in dist/quickstart/index.html.`,
 );
