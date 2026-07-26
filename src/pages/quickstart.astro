@@ -45,19 +45,19 @@ const routeStages = [
 const foundationItems = [
   {
     label: 'Bring a project',
-    body: 'Every path starts inside a Git-tracked local project you already control. Nothing here asks you to move your code anywhere else.',
+    body: 'Local product paths start inside a Git-tracked project you already control. Hosted or self-hosted GitHub automation begins with repository and access setup.',
   },
   {
     label: 'Authenticate your provider',
-    body: 'Connect Anthropic or OpenAI directly. Your account and credentials stay owned and managed by that provider, not by OpenCoven.',
+    body: 'For local provider-backed paths, connect Anthropic or OpenAI directly; those credentials remain provider-owned. Self-hosted GitHub workers require their own provider setup, while hosted beta users follow the access path they receive.',
   },
   {
     label: 'Keep the runtime local-first',
-    body: 'The runtime and session history run on your machine, so switching to a second surface later does not restart what you already built.',
+    body: 'Coven CLI, Coven Code, Cave, and CastCodes share a local runtime and session history, so switching among those surfaces does not restart what you already built.',
   },
   {
     label: 'Install one surface at a time',
-    body: 'Set up only the product you chose above. Add Coven Code, Cave, CastCodes, or GitHub automation later without repeating this setup.',
+    body: 'Add local surfaces one at a time without repeating their shared setup. GitHub automation has separate hosted-access or self-hosted operator setup.',
   },
 ];
 
@@ -135,8 +135,9 @@ const collectionJsonLd = {
           Every path ends the same way: concrete, checkable proof that it worked.
         </p>
         <p class="onboard-hero-foundation">
-          <strong>One foundation, five surfaces.</strong> Adding a second or third product later
-          does not restart your local session history — it shares the runtime you already set up.
+          <strong>Four local surfaces, one foundation.</strong> Coven CLI, Coven Code, Cave, and
+          CastCodes share the runtime and session history you already set up. GitHub automation
+          has its own hosted or self-hosted access path.
         </p>
         <div class="onboard-hero-actions">
           <a class="btn-primary" href="#onboard-chooser">Choose a product</a>
@@ -233,10 +234,11 @@ const collectionJsonLd = {
       <div class="onboard-support-panel panel">
         <div class="onboard-support-copy">
           <p class="section-kicker">Keep going</p>
-          <h2 id="onboard-support-heading">The next surface uses the same foundation.</h2>
+          <h2 id="onboard-support-heading">Local surfaces reuse the foundation.</h2>
           <p>
-            Whichever guide you finish first, the runtime, provider connection, and local session
-            history you just set up carry over to the next one. Nothing here has to be repeated.
+            Coven CLI, Coven Code, Cave, and CastCodes reuse the local runtime, provider connection,
+            and session history. GitHub automation connects separately through the hosted beta or a
+            self-hosted deployment.
           </p>
         </div>
         <nav class="onboard-support-links" aria-label="OpenCoven community and documentation">

@@ -18,6 +18,23 @@ const root = process.cwd();
 const publicDir = path.join(root, 'public');
 const distDir = path.join(root, 'dist');
 
+const escapeRegExp = (value) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const countMatches = (content, pattern) =>
+  [...content.matchAll(pattern)].length;
+
+const toRenderedText = (content) =>
+  content
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/(?:&#39;|&#x27;)/gi, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+
 const requiredPublicFiles = [
   'favicon.svg',
   'apple-touch-icon.png',
@@ -67,6 +84,7 @@ if (existsSync(distIndex)) {
     throw new Error('dist/sitemap-index.xml is missing — is the @astrojs/sitemap integration still configured?');
   }
   const html = await readFile(distIndex, 'utf8');
+  const renderedText = toRenderedText(html);
   const requiredCopy = [
     'Persistent AI Familiars',
     'AI that can stay',
@@ -111,6 +129,26 @@ if (existsSync(distIndex)) {
   if (!html.includes('data-download-primary') || !html.includes('data-download-ios')) {
     throw new Error('Download CTA must render the retargetable primary button and the dedicated iOS button');
   }
+
+  const quickstartDestinations = countMatches(
+    html,
+    /href="\/quickstart"/g,
+  );
+  if (quickstartDestinations !== 4) {
+    throw new Error(
+      `Homepage quickstart discovery must render exactly four href="/quickstart" destinations; found ${quickstartDestinations}`,
+    );
+  }
+  if (!/<a\s+class="btn-primary"\s+href="\/quickstart"\s*>\s*Choose any product\s*<\/a>/.test(html)) {
+    throw new Error('Homepage quickstart discovery must include the exact "Choose any product" CTA linking to /quickstart');
+  }
+
+  const previewClarification =
+    "Follow doctor's exact Codex or Claude Code install/auth next step. This compact preview uses Codex; the full product guide includes the Claude run.";
+  if (!renderedText.includes(previewClarification)) {
+    throw new Error('Homepage compact quickstart must clarify that its Codex preview links to a full guide with the Claude run');
+  }
+
   console.log(
     `Verified ${requiredPublicFiles.length} required public files, canonical favicon + OG logos, and ${requiredCopy.length} required copy strings in dist/index.html.`,
   );
@@ -170,6 +208,7 @@ if (!existsSync(distQuickstart)) {
 }
 
 const quickstartHtml = await readFile(distQuickstart, 'utf8');
+const quickstartText = toRenderedText(quickstartHtml);
 const requiredQuickstartCopy = [
   'Choose your way into OpenCoven.',
   'Coven CLI',
@@ -180,10 +219,18 @@ const requiredQuickstartCopy = [
   'npm install -g @opencoven/cli',
   'coven doctor',
   'coven run codex',
+  'coven run claude "explain this repo in 5 bullets"',
   'coven sessions --plain',
+  'macOS Apple Silicon · glibc Linux x64 · Windows x64',
+  'Local product paths start inside a Git-tracked project you already control. Hosted or self-hosted GitHub automation begins with repository and access setup.',
+  'For local provider-backed paths, connect Anthropic or OpenAI directly; those credentials remain provider-owned. Self-hosted GitHub workers require their own provider setup, while hosted beta users follow the access path they receive.',
+  'Coven CLI, Coven Code, Cave, and CastCodes share a local runtime and session history, so switching among those surfaces does not restart what you already built.',
+  'Add local surfaces one at a time without repeating their shared setup. GitHub automation has separate hosted-access or self-hosted operator setup.',
+  'Coven CLI, Coven Code, Cave, and CastCodes share the runtime and session history you already set up. GitHub automation has its own hosted or self-hosted access path.',
+  'Coven CLI, Coven Code, Cave, and CastCodes reuse the local runtime, provider connection, and session history. GitHub automation connects separately through the hosted beta or a self-hosted deployment.',
   'Your first success',
 ];
-const missingQuickstartCopy = requiredQuickstartCopy.filter((needle) => !quickstartHtml.includes(needle));
+const missingQuickstartCopy = requiredQuickstartCopy.filter((needle) => !quickstartText.includes(needle));
 if (missingQuickstartCopy.length > 0) {
   throw new Error(`Missing expected copy in dist/quickstart/index.html: ${missingQuickstartCopy.join(', ')}`);
 }
@@ -249,10 +296,154 @@ if (!quickstartHtml.includes('Step 1 of 4:') || !quickstartHtml.includes('Step 4
   throw new Error('Quickstart ordered lists must include accessible spoken step labels');
 }
 
-if (!quickstartHtml.includes('href="/quickstart" aria-current="page"')) {
-  throw new Error('Quickstart page navigation must mark /quickstart as the current page');
+const productContracts = [
+  { id: 'coven-cli', name: 'Coven CLI' },
+  { id: 'coven-code', name: 'Coven Code' },
+  { id: 'coven-cave', name: 'Coven Cave' },
+  { id: 'castcodes', name: 'CastCodes' },
+  { id: 'github', name: 'OpenCoven for GitHub' },
+];
+
+const chooserHtml = quickstartHtml.match(
+  /<nav\s+class="onboard-chooser-nav"[^>]*>([\s\S]*?)<\/nav>/,
+)?.[1];
+if (!chooserHtml) {
+  throw new Error('Quickstart product chooser navigation is missing');
+}
+
+for (const { id, name } of productContracts) {
+  const escapedId = escapeRegExp(id);
+  const escapedName = escapeRegExp(name);
+  const articlePattern = new RegExp(
+    `<article(?=[^>]*\\bid="${escapedId}")(?=[^>]*\\baria-labelledby="${escapedId}-heading")[^>]*>`,
+    'g',
+  );
+  const articleCount = countMatches(quickstartHtml, articlePattern);
+  if (articleCount !== 1) {
+    throw new Error(
+      `${name} must render exactly one product article with id="${id}" and aria-labelledby="${id}-heading"; found ${articleCount}`,
+    );
+  }
+
+  const headingPattern = new RegExp(
+    `<h2\\s+id="${escapedId}-heading">${escapedName}</h2>`,
+    'g',
+  );
+  const headingCount = countMatches(quickstartHtml, headingPattern);
+  if (headingCount !== 1) {
+    throw new Error(
+      `${name} must render exactly one <h2 id="${id}-heading">${name}</h2>; found ${headingCount}`,
+    );
+  }
+
+  const chooserLinkPattern = new RegExp(`href="#${escapedId}"`, 'g');
+  const chooserLinkCount = countMatches(chooserHtml, chooserLinkPattern);
+  if (chooserLinkCount !== 1) {
+    throw new Error(
+      `${name} chooser must render exactly one href="#${id}" link; found ${chooserLinkCount}`,
+    );
+  }
+}
+
+const arrivalCount = countMatches(
+  quickstartHtml,
+  /<div\s+class="onboard-arrival">/g,
+);
+if (arrivalCount !== 5) {
+  throw new Error(`Quickstart must render exactly five .onboard-arrival success blocks; found ${arrivalCount}`);
+}
+
+const recoveryCount = countMatches(
+  quickstartHtml,
+  /<details\s+class="onboard-recovery">/g,
+);
+if (recoveryCount !== 5) {
+  throw new Error(`Quickstart must render exactly five <details class="onboard-recovery"> disclosures; found ${recoveryCount}`);
+}
+
+const currentQuickstartLinkCount = countMatches(
+  quickstartHtml,
+  /href="\/quickstart"\s+aria-current="page"/g,
+);
+if (currentQuickstartLinkCount !== 3) {
+  throw new Error(
+    `Quickstart page must render exactly three current /quickstart links across desktop, mobile, and footer navigation; found ${currentQuickstartLinkCount}`,
+  );
+}
+
+const expectedQuickstartTitle =
+  '<title>OpenCoven Quickstart — Choose Your First Product</title>';
+if (!quickstartHtml.includes(expectedQuickstartTitle)) {
+  throw new Error(`Quickstart page must render the expected title: ${expectedQuickstartTitle}`);
+}
+const expectedQuickstartCanonical =
+  '<link rel="canonical" href="https://opencoven.ai/quickstart">';
+if (!quickstartHtml.includes(expectedQuickstartCanonical)) {
+  throw new Error(`Quickstart page must render the exact canonical link: ${expectedQuickstartCanonical}`);
+}
+
+const jsonLdSource = quickstartHtml.match(
+  /<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/,
+)?.[1];
+if (!jsonLdSource) {
+  throw new Error('Quickstart page must render an application/ld+json script');
+}
+
+let quickstartJsonLd;
+try {
+  quickstartJsonLd = JSON.parse(jsonLdSource);
+} catch (error) {
+  throw new Error(`Quickstart application/ld+json must be valid JSON: ${error.message}`);
+}
+if (quickstartJsonLd['@type'] !== 'CollectionPage') {
+  throw new Error('Quickstart JSON-LD @type must be CollectionPage');
+}
+if (quickstartJsonLd.mainEntity?.['@type'] !== 'ItemList') {
+  throw new Error('Quickstart JSON-LD mainEntity @type must be ItemList');
+}
+
+const expectedJsonLdItems = productContracts.map(({ id, name }, index) => ({
+  '@type': 'ListItem',
+  position: index + 1,
+  name,
+  url: `https://opencoven.ai/quickstart#${id}`,
+}));
+if (
+  JSON.stringify(quickstartJsonLd.mainEntity.itemListElement)
+  !== JSON.stringify(expectedJsonLdItems)
+) {
+  throw new Error(
+    'Quickstart JSON-LD must list exactly the five product contracts in chooser order with matching positions, names, and canonical fragment URLs',
+  );
+}
+
+const lightThemeCurrentLink = getCssDeclarationBlock(
+  sourceCss,
+  'html[data-theme="light"] a[aria-current="page"]',
+);
+if (!/color\s*:\s*var\(--vtext\)\s*;/.test(lightThemeCurrentLink)) {
+  throw new Error('Light-theme current-page links must explicitly use color: var(--vtext);');
+}
+
+for (const { id, name } of productContracts.filter(({ id }) =>
+  ['coven-cli', 'coven-code', 'coven-cave'].includes(id)
+)) {
+  const articleHtml = quickstartHtml.match(
+    new RegExp(
+      `<article(?=[^>]*\\bid="${escapeRegExp(id)}")[^>]*>[\\s\\S]*?</article>`,
+    ),
+  )?.[0];
+  if (!articleHtml) {
+    throw new Error(`Could not extract the ${name} product article for cross-platform command checks`);
+  }
+  if (articleHtml.includes('/path/to/your/project')) {
+    throw new Error(`${name} must not use the POSIX-specific /path/to/your/project placeholder`);
+  }
+  if (/&&|&amp;&amp;|&#38;&#38;|&#x26;&#x26;/i.test(articleHtml)) {
+    throw new Error(`${name} must not use POSIX compound && commands in copied command blocks`);
+  }
 }
 
 console.log(
-  `Verified ${requiredQuickstartCopy.length} required copy strings, ${requiredQuickstartLinks.length} canonical links, and /quickstart navigation in dist/quickstart/index.html.`,
+  `Verified quickstart content, five product contracts, discovery links, navigation, command portability, and structured data in dist/quickstart/index.html.`,
 );

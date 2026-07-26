@@ -63,7 +63,7 @@ export const quickstartProducts: QuickstartProduct[] = [
     bestFor:
       'Terminal-first control, scripts, and a shared runtime for the OpenCoven ecosystem.',
     status: 'Recommended foundation',
-    platforms: 'macOS · Linux · Windows x64',
+    platforms: 'macOS Apple Silicon · glibc Linux x64 · Windows x64',
     requires: [
       'Node 18 or newer and npm',
       'Git and a local project',
@@ -96,10 +96,10 @@ export const quickstartProducts: QuickstartProduct[] = [
         label: 'Check',
         title: 'Check your project',
         body:
-          'Start in /path/to/your/project so Coven can inspect the intended Git workspace.',
+          'Open a terminal in the intended Git project so Coven can inspect that workspace.',
         commands: [
           {
-            value: 'cd /path/to/your/project && coven doctor',
+            value: 'coven doctor',
             label: 'Copy the project check command',
           },
         ],
@@ -113,27 +113,38 @@ export const quickstartProducts: QuickstartProduct[] = [
           'Choose either provider. Your credentials remain owned and managed by that provider.',
         commands: [
           {
-            value: 'npm install -g @openai/codex && codex login',
-            label: 'Copy the Codex install and login command',
+            value: 'npm install -g @openai/codex',
+            label: 'Copy the Codex install command',
           },
           {
-            value:
-              'npm install -g @anthropic-ai/claude-code && claude doctor',
-            label: 'Copy the Claude Code install and check command',
+            value: 'codex login',
+            label: 'Copy the Codex authentication command',
+          },
+          {
+            value: 'npm install -g @anthropic-ai/claude-code',
+            label: 'Copy the Claude Code install command',
+          },
+          {
+            value: 'claude',
+            label: 'Copy the Claude Code launch and authentication command',
           },
         ],
         expected:
-          'The selected provider harness reports that its account is ready for use.',
+          'The selected provider completes authentication and its harness is ready for use.',
       },
       {
         label: 'Run',
         title: 'Start and inspect a session',
         body:
-          'Give Codex a bounded repository task, then inspect the plain-text session list.',
+          'Run the command that matches your authenticated provider, then inspect the plain-text session history.',
         commands: [
           {
             value: 'coven run codex "explain this repo in 5 bullets"',
-            label: 'Copy the first Coven session command',
+            label: 'Copy the Codex session command',
+          },
+          {
+            value: 'coven run claude "explain this repo in 5 bullets"',
+            label: 'Copy the Claude session command',
           },
           {
             value: 'coven sessions --plain',
@@ -205,7 +216,7 @@ export const quickstartProducts: QuickstartProduct[] = [
           'Launch from the project you want to work on. The first run automatically installs the compatible engine.',
         commands: [
           {
-            value: 'cd /path/to/your/project && coven',
+            value: 'coven',
             label: 'Copy the Coven Code launch command',
           },
         ],
@@ -281,8 +292,12 @@ export const quickstartProducts: QuickstartProduct[] = [
             label: 'Copy the Coven runtime install command',
           },
           {
-            value: 'coven doctor && coven daemon start',
-            label: 'Copy the runtime check and daemon start command',
+            value: 'coven doctor',
+            label: 'Copy the runtime check command',
+          },
+          {
+            value: 'coven daemon start',
+            label: 'Copy the daemon start command',
           },
         ],
         expected:

@@ -1946,6 +1946,9 @@
       color: var(--coven-violet-dark);
       font-weight: 600;
     }
+    html[data-theme="light"] a[aria-current="page"] {
+      color: var(--vtext);
+    }
     nav a:hover,
     footer a:hover {
       color: var(--coven-violet-light);
