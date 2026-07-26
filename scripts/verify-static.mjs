@@ -151,6 +151,12 @@ if (existsSync(distGithub)) {
 
 const sourceCss = await readFile(path.join(root, 'src/styles/global.css'), 'utf8');
 const sourceMain = await readFile(path.join(root, 'src/scripts/main.js'), 'utf8');
+
+function getCssDeclarationBlock(css, selector) {
+  const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return css.match(new RegExp(`(?:^|})\\s*${escapedSelector}\\s*{([^}]*)}`, 'm'))?.[1] ?? '';
+}
+
 if (!sourceCss.includes('.motion-on.reveal-ready [data-reveal]')) {
   throw new Error('Scroll reveal hidden state must wait for the reveal-ready class so first paint is readable');
 }
@@ -195,6 +201,34 @@ const missingQuickstartLinks = requiredQuickstartLinks.filter(
 );
 if (missingQuickstartLinks.length > 0) {
   throw new Error(`Missing canonical links in dist/quickstart/index.html: ${missingQuickstartLinks.join(', ')}`);
+}
+
+const lightThemeCommandCode = getCssDeclarationBlock(
+  sourceCss,
+  'html[data-theme="light"] .quickstart-page .onboard-command code',
+);
+const hasLightThemeCommandReset = [
+  /background\s*:\s*transparent\s*;/,
+  /color\s*:\s*rgba\(\s*232\s*,\s*224\s*,\s*240\s*,\s*0\.92\s*\)\s*;/,
+  /border\s*:\s*0\s*;/,
+  /padding\s*:\s*0\s*;/,
+].every((declaration) => declaration.test(lightThemeCommandCode));
+if (!hasLightThemeCommandReset) {
+  throw new Error('Light-theme quickstart commands must reset inline-code chrome on the dark command surface');
+}
+
+if (!/<ol\s+class="onboard-route-list"\s+role="list"\s*>/.test(quickstartHtml)) {
+  throw new Error('Quickstart route must preserve ordered-list semantics with role="list"');
+}
+
+const productProcedureLists =
+  quickstartHtml.match(/<ol\s+class="onboard-steps"\s+role="list"\s*>/g) ?? [];
+if (productProcedureLists.length !== 5) {
+  throw new Error('Quickstart product procedures must include exactly five ordered lists with role="list"');
+}
+
+if (!quickstartHtml.includes('Step 1 of 4:') || !quickstartHtml.includes('Step 4 of 4:')) {
+  throw new Error('Quickstart ordered lists must include accessible spoken step labels');
 }
 
 if (!quickstartHtml.includes('href="/quickstart" aria-current="page"')) {

@@ -147,9 +147,10 @@ const collectionJsonLd = {
       <div class="onboard-route panel" aria-labelledby="onboard-route-heading">
         <p class="section-kicker">Mission trace</p>
         <h2 id="onboard-route-heading">The sequence that actually runs.</h2>
-        <ol class="onboard-route-list">
-          {routeStages.map((stage) => (
+        <ol class="onboard-route-list" role="list">
+          {routeStages.map((stage, stageIndex) => (
             <li class:list={['onboard-route-step', { 'is-arrival': stage.isArrival }]}>
+              <span class="sr-only">Step {stageIndex + 1} of {routeStages.length}: </span>
               <span class="onboard-route-marker" aria-hidden="true">{stage.mark}</span>
               <div class="onboard-route-body">
                 <p class="onboard-route-label">{stage.label}</p>

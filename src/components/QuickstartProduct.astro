@@ -53,10 +53,11 @@ const COPY_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
       </ul>
     </aside>
 
-    <ol class="onboard-steps">
+    <ol class="onboard-steps" role="list">
       {
         product.steps.map((step, stepIndex) => (
           <li class="onboard-step">
+            <span class="sr-only">Step {stepIndex + 1} of {product.steps.length}: </span>
             <span class="onboard-step-index" aria-hidden="true">
               {stepIndex + 1}
             </span>

@@ -2411,7 +2411,18 @@
     }
     .onboard-command code {
       font-family: inherit; font-size: inherit;
-      color: rgba(232,224,240,0.92);
+      background: transparent;
+      color: rgba(232, 224, 240, 0.92);
+      border: 0;
+      border-radius: 0;
+      padding: 0;
+    }
+    html[data-theme="light"] .quickstart-page .onboard-command code {
+      background: transparent;
+      color: rgba(232, 224, 240, 0.92);
+      border: 0;
+      border-radius: 0;
+      padding: 0;
     }
 
     .onboard-step-action {
