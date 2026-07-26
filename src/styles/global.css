@@ -181,6 +181,23 @@
         background: var(--accent-active);
         border-color: var(--accent-strong);
       }
+
+      /* Hover-lift elements stay on persistent compositor layers.
+         Without this, the transform transition promotes a fresh GPU
+         layer at hover start and demotes it after — every layer-tree
+         rebuild invalidates the backdrop-filter surfaces around it
+         (sticky header, .panel, .hero-card) and the page visibly
+         flickered. Same family as the body::before scroll-flicker fix
+         above: keep layers stable so hover only animates an existing
+         one. Gated on (hover: hover) — touch devices never lift, so
+         they skip the extra layer memory. */
+      .panel-inset.is-card,
+      .download-primary,
+      .qs-body,
+      .eco-cta,
+      .eco-portal-cue {
+        will-change: transform;
+      }
     }
 
     /* ── Inline code (matches coven-docs dark code style) ── */
