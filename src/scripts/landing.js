@@ -189,6 +189,12 @@ wireRovingTabs(
   var loading = false;
   var ready = false;
   var failed = false;
+  var attemptToken = 0;
+  var loadTimer = null;
+  var activeScript = null;
+  var loadHandler = null;
+  var errorHandler = null;
+  var SDK_LOAD_TIMEOUT_MS = 5_000;
   var instanceUrl = 'https://feedback.opencoven.ai';
   var sdkUrl = `${instanceUrl}/api/widget/sdk.js`;
 
@@ -196,8 +202,28 @@ wireRovingTabs(
     if (status) status.textContent = message;
   }
 
-  function fail() {
+  function cleanupAttempt() {
+    if (loadTimer) {
+      window.clearTimeout(loadTimer);
+      loadTimer = null;
+    }
+    if (activeScript && loadHandler) {
+      activeScript.removeEventListener('load', loadHandler);
+    }
+    if (activeScript && errorHandler) {
+      activeScript.removeEventListener('error', errorHandler);
+    }
+    activeScript = null;
+    loadHandler = null;
+    errorHandler = null;
+  }
+
+  function fail(attempt) {
+    if (failed || (attempt !== undefined && attempt !== attemptToken)) return;
+    cleanupAttempt();
+    attemptToken += 1;
     loading = false;
+    ready = false;
     failed = true;
     launcher.removeAttribute('aria-busy');
     launcher.dataset.feedbackState = 'failed';
@@ -206,12 +232,15 @@ wireRovingTabs(
   }
 
   function openFeedback() {
-    if (typeof window.Quackback !== 'function') {
+    try {
+      if (typeof window.Quackback !== 'function') {
+        throw new Error('Feedback SDK unavailable');
+      }
+      window.Quackback('open');
+      announce('Feedback opened.');
+    } catch {
       fail();
-      return;
     }
-    window.Quackback('open');
-    announce('Feedback opened.');
   }
 
   function activateFeedback(event) {
@@ -224,13 +253,17 @@ wireRovingTabs(
     if (loading) return;
 
     loading = true;
+    var currentAttempt = ++attemptToken;
     launcher.setAttribute('aria-busy', 'true');
     label.textContent = 'Opening feedback…';
     var script = document.createElement('script');
     script.id = 'opencoven-feedback-sdk';
     script.async = true;
     script.src = sdkUrl;
-    script.addEventListener('load', function () {
+    activeScript = script;
+    loadHandler = function () {
+      if (failed || currentAttempt !== attemptToken) return;
+      cleanupAttempt();
       try {
         window.Quackback('init', {
           instanceUrl,
@@ -244,8 +277,15 @@ wireRovingTabs(
       } catch {
         fail();
       }
-    }, { once: true });
-    script.addEventListener('error', fail, { once: true });
+    };
+    errorHandler = function () {
+      fail(currentAttempt);
+    };
+    script.addEventListener('load', loadHandler);
+    script.addEventListener('error', errorHandler);
+    loadTimer = window.setTimeout(function () {
+      fail(currentAttempt);
+    }, SDK_LOAD_TIMEOUT_MS);
     document.head.appendChild(script);
   }
 

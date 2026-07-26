@@ -1,5 +1,6 @@
 ---
 const pathname = Astro.url.pathname.replace(/\/$/, '');
+const isGithub = pathname === '/github';
 const isQuickstart = pathname === '/quickstart';
 ---
 
@@ -28,7 +29,9 @@ const isQuickstart = pathname === '/quickstart';
       >
         Quick Start
       </a>
-      <a href="/github">GitHub App</a>
+      <a href="/github" aria-current={isGithub ? 'page' : undefined}>
+        GitHub App
+      </a>
       <a href="https://docs.opencoven.ai">Docs</a>
     </nav>
 

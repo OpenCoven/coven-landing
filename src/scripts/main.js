@@ -15,38 +15,57 @@
   if (!toggle || !dialog || !closeButton) return;
 
   var previousFocus = null;
-  var inertTargets = Array.from(document.body.children).filter(function (child) {
-    return child !== dialog && child.tagName !== 'SCRIPT';
-  });
+  var inertTargets = new Map();
+  var bodyObserver = null;
+  var previousOverflow = '';
   var focusableSelector = [
     'a[href]',
     'button:not([disabled])',
     '[tabindex]:not([tabindex="-1"])',
   ].join(',');
 
-  function setBackgroundInert(value) {
-    inertTargets.forEach(function (target) {
-      target.inert = value;
-    });
+  function makeBackgroundInert(target) {
+    if (
+      !(target instanceof HTMLElement)
+      || target === dialog
+      || target.tagName === 'SCRIPT'
+      || inertTargets.has(target)
+    ) return;
+    inertTargets.set(target, target.inert);
+    target.inert = true;
   }
 
   function openMobile() {
     previousFocus = document.activeElement;
+    previousOverflow = document.body.style.overflow;
     dialog.hidden = false;
     toggle.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
-    setBackgroundInert(true);
+    Array.from(document.body.children).forEach(makeBackgroundInert);
+    bodyObserver = new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        Array.from(mutation.addedNodes).forEach(makeBackgroundInert);
+      });
+    });
+    bodyObserver.observe(document.body, { childList: true });
     closeButton.focus();
   }
 
   function closeMobile() {
     if (dialog.hidden) return;
+    bodyObserver?.disconnect();
+    bodyObserver = null;
     dialog.hidden = true;
     toggle.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-    setBackgroundInert(false);
+    document.body.style.overflow = previousOverflow;
+    inertTargets.forEach(function (wasInert, target) {
+      target.inert = wasInert;
+    });
+    inertTargets.clear();
     if (previousFocus instanceof HTMLElement) previousFocus.focus();
     else toggle.focus();
+    previousFocus = null;
+    previousOverflow = '';
   }
 
   toggle.addEventListener('click', openMobile);
@@ -168,25 +187,34 @@
       var originalHtml = button.innerHTML;
       var originalLabel = button.getAttribute('aria-label') || 'Copy command';
       var resetTimer = null;
+      var attemptToken = 0;
       button.addEventListener('click', async function () {
+        var currentAttempt = ++attemptToken;
+        if (resetTimer) {
+          window.clearTimeout(resetTimer);
+          resetTimer = null;
+        }
         var command = button.getAttribute('data-copy') || '';
         try {
           if (!navigator.clipboard?.writeText) {
             throw new Error('Clipboard API unavailable');
           }
           await navigator.clipboard.writeText(command);
+          if (currentAttempt !== attemptToken) return;
           button.classList.remove('is-copy-failed');
           button.classList.add('is-copied');
           button.innerHTML = CHECK_SVG;
           button.setAttribute('aria-label', 'Copied');
           announce(`Copied: ${command}`);
-          if (resetTimer) window.clearTimeout(resetTimer);
           resetTimer = window.setTimeout(function () {
+            if (currentAttempt !== attemptToken) return;
             button.classList.remove('is-copied');
             button.innerHTML = originalHtml;
             button.setAttribute('aria-label', originalLabel);
+            resetTimer = null;
           }, 1_400);
         } catch {
+          if (currentAttempt !== attemptToken) return;
           button.classList.remove('is-copied');
           button.classList.add('is-copy-failed');
           button.innerHTML = originalHtml;

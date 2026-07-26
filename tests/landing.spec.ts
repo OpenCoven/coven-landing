@@ -9,7 +9,7 @@ const productContracts = [
   { id: 'github', name: 'OpenCoven for GitHub' },
 ] as const;
 
-for (const pathname of ['/', '/quickstart', '/github']) {
+for (const pathname of ['/', '/quickstart', '/github', '/terms', '/privacy']) {
   test(`${pathname} renders without runtime errors`, async ({ page }) => {
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
@@ -676,6 +676,51 @@ test('mobile menu is modal, traps focus, and restores the opener', async ({
   await expect(page.locator('main')).toHaveJSProperty('inert', false);
 });
 
+test('mobile menu marks the GitHub App route as current', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/github');
+
+  await page.locator('.mobile-toggle').click();
+  await expect(
+    page.locator('#mobile-nav a[href="/github"]'),
+  ).toHaveAttribute('aria-current', 'page');
+});
+
+test('mobile menu preserves body state and inerts siblings added while open', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  await page.evaluate(() => {
+    document.body.style.overflow = 'clip';
+    document.querySelector('main')!.inert = true;
+  });
+
+  await page.locator('.mobile-toggle').click();
+  await page.evaluate(() => {
+    const sibling = document.createElement('button');
+    sibling.id = 'late-body-sibling';
+    sibling.textContent = 'Late action';
+    document.body.appendChild(sibling);
+  });
+
+  await expect(page.locator('#late-body-sibling')).toHaveJSProperty(
+    'inert',
+    true,
+  );
+
+  await page.keyboard.press('Escape');
+  await expect(page.locator('main')).toHaveJSProperty('inert', true);
+  await expect(page.locator('#late-body-sibling')).toHaveJSProperty(
+    'inert',
+    false,
+  );
+  await expect
+    .poll(() => page.evaluate(() => document.body.style.overflow))
+    .toBe('clip');
+});
+
 test('header becomes opaque only after scrolling', async ({ page }) => {
   await page.goto('/');
   const header = page.locator('.site-header');
@@ -755,6 +800,99 @@ test('feedback SDK failure preserves a working Discord fallback', async ({
   await expect(page.locator('[data-feedback-status]')).toHaveText(
     'Feedback widget unavailable. Use the Discord fallback link.',
   );
+
+  await launcher.click();
+  await expect(page).toHaveURL('https://discord.gg/opencoven');
+  await expect(page).toHaveTitle('Discord fallback');
+});
+
+test('stalled feedback SDK load fails once and exposes the Discord fallback', async ({
+  page,
+}) => {
+  let releaseSdk: (() => void) | undefined;
+  const sdkRelease = new Promise<void>((resolve) => {
+    releaseSdk = resolve;
+  });
+  let sdkRequests = 0;
+  await page.route('**/api/widget/sdk.js', async (route) => {
+    sdkRequests += 1;
+    await sdkRelease;
+    await route.fulfill({
+      contentType: 'application/javascript',
+      body: 'window.Quackback = function () {};',
+    });
+  });
+  await page.route('https://discord.gg/opencoven', async (route) => {
+    await route.fulfill({
+      contentType: 'text/html',
+      body: '<title>Discord fallback</title>',
+    });
+  });
+
+  try {
+    await page.goto('/');
+    expect(sdkRequests).toBe(0);
+
+    const launcher = page.locator('[data-feedback-launcher]');
+    await launcher.click();
+    await expect.poll(() => sdkRequests).toBe(1);
+    await expect(launcher).toHaveAttribute(
+      'data-feedback-state',
+      'failed',
+      { timeout: 7_000 },
+    );
+    await expect(launcher).not.toHaveAttribute('aria-busy', 'true');
+
+    releaseSdk();
+    await page.waitForTimeout(200);
+    await expect(launcher).toHaveAttribute('data-feedback-state', 'failed');
+    expect(sdkRequests).toBe(1);
+
+    await launcher.click();
+    await expect(page).toHaveURL('https://discord.gg/opencoven');
+    await expect(page).toHaveTitle('Discord fallback');
+  } finally {
+    releaseSdk?.();
+  }
+});
+
+test('later feedback open exceptions fail once and expose the Discord fallback', async ({
+  page,
+}) => {
+  const pageErrors: string[] = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  await page.route('**/api/widget/sdk.js', async (route) => {
+    await route.fulfill({
+      contentType: 'application/javascript',
+      body: `
+        window.__feedbackOpenCalls = 0;
+        window.Quackback = function (command) {
+          if (command !== 'open') return;
+          window.__feedbackOpenCalls += 1;
+          if (window.__feedbackOpenCalls > 1) {
+            throw new Error('later open failed');
+          }
+        };
+      `,
+    });
+  });
+  await page.route('https://discord.gg/opencoven', async (route) => {
+    await route.fulfill({
+      contentType: 'text/html',
+      body: '<title>Discord fallback</title>',
+    });
+  });
+
+  await page.goto('/');
+  const launcher = page.locator('[data-feedback-launcher]');
+  await launcher.click();
+  await expect(page.locator('[data-feedback-status]')).toHaveText(
+    'Feedback opened.',
+  );
+
+  await launcher.click();
+  await expect(launcher).toHaveAttribute('data-feedback-state', 'failed');
+  expect(pageErrors).toEqual([]);
 
   await launcher.click();
   await expect(page).toHaveURL('https://discord.gg/opencoven');
@@ -913,4 +1051,121 @@ test('clipboard failure selects the command and gives a concrete fallback', asyn
   expect(await page.evaluate(() => window.getSelection()?.toString())).toBe(
     command,
   );
+});
+
+test('clipboard ignores an older success after a newer failure', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const attempts: Array<{
+      resolve: () => void;
+      reject: () => void;
+    }> = [];
+    Object.defineProperty(window, '__clipboardAttempts', {
+      value: attempts,
+    });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: () =>
+          new Promise<void>((resolve, reject) => {
+            attempts.push({
+              resolve,
+              reject: () => reject(new Error('denied')),
+            });
+          }),
+      },
+    });
+  });
+  await page.goto('/');
+
+  const button = page.locator('#quickstart [data-copy]').first();
+  await button.click();
+  await button.click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (
+            window as Window & {
+              __clipboardAttempts: unknown[];
+            }
+          ).__clipboardAttempts.length,
+      ),
+    )
+    .toBe(2);
+
+  await page.evaluate(() => {
+    (
+      window as Window & {
+        __clipboardAttempts: Array<{ reject: () => void }>;
+      }
+    ).__clipboardAttempts[1].reject();
+  });
+  await expect(button).toHaveAttribute(
+    'aria-label',
+    'Copy unavailable. Select the command and copy manually.',
+  );
+
+  await page.evaluate(() => {
+    (
+      window as Window & {
+        __clipboardAttempts: Array<{ resolve: () => void }>;
+      }
+    ).__clipboardAttempts[0].resolve();
+  });
+  await expect(button).toHaveAttribute(
+    'aria-label',
+    'Copy unavailable. Select the command and copy manually.',
+  );
+});
+
+test('a new clipboard attempt cancels the earlier reset timer', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const attempts: Array<{ resolve: () => void }> = [];
+    Object.defineProperty(window, '__clipboardAttempts', {
+      value: attempts,
+    });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: () =>
+          new Promise<void>((resolve) => {
+            attempts.push({ resolve });
+          }),
+      },
+    });
+  });
+  await page.goto('/');
+
+  const button = page.locator('#quickstart [data-copy]').first();
+  await button.click();
+  await page.evaluate(() => {
+    (
+      window as Window & {
+        __clipboardAttempts: Array<{ resolve: () => void }>;
+      }
+    ).__clipboardAttempts[0].resolve();
+  });
+  await expect(button).toHaveAttribute('aria-label', 'Copied');
+
+  await page.waitForTimeout(1_000);
+  await button.click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          (
+            window as Window & {
+              __clipboardAttempts: unknown[];
+            }
+          ).__clipboardAttempts.length,
+      ),
+    )
+    .toBe(2);
+  await page.waitForTimeout(500);
+
+  await expect(button).toHaveAttribute('aria-label', 'Copied');
 });
