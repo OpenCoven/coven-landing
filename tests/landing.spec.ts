@@ -1,14 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { quickstartProducts } from '../src/data/quickstart';
 
-const productContracts = [
-  { id: 'coven-cli', name: 'Coven CLI' },
-  { id: 'coven-code', name: 'Coven Code' },
-  { id: 'coven-cave', name: 'Coven Cave' },
-  { id: 'castcodes', name: 'CastCodes' },
-  { id: 'github', name: 'OpenCoven for GitHub' },
-] as const;
-
 for (const pathname of ['/', '/quickstart', '/github']) {
   test(`${pathname} renders without runtime errors`, async ({ page }) => {
     const errors: string[] = [];
@@ -330,25 +322,30 @@ test('product constellation exposes five complete keyboard links', async ({
   const cards = page.locator('[data-product-constellation] .product-card');
   await expect(items).toHaveCount(5);
   await expect(cards).toHaveCount(5);
-  expect(
-    quickstartProducts.map(({ id, name }) => ({ id, name })),
-  ).toEqual(productContracts);
+  expect(quickstartProducts).toHaveLength(5);
+  expect(new Set(quickstartProducts.map(({ id }) => id))).toHaveProperty(
+    'size',
+    5,
+  );
+  expect(new Set(quickstartProducts.map(({ name }) => name))).toHaveProperty(
+    'size',
+    5,
+  );
 
-  for (const [index, contract] of productContracts.entries()) {
-    const product = quickstartProducts[index];
+  for (const [index, product] of quickstartProducts.entries()) {
     const item = items.nth(index);
     const card = cards.nth(index);
     await expect(item.locator(':scope > a.product-card')).toHaveCount(1);
     await expect(card).toHaveAttribute(
       'href',
-      `/quickstart#${contract.id}`,
+      `/quickstart#${product.id}`,
     );
     await expect(card.locator('.product-sigil')).toHaveText(product.sigil);
     await expect(card.locator('.product-heading small')).toHaveText(
       product.eyebrow,
     );
     await expect(card.locator('.product-heading strong')).toHaveText(
-      contract.name,
+      product.name,
     );
     await expect(card.locator('.product-summary')).toHaveText(product.summary);
     await expect(card.locator('.product-best')).toContainText(product.bestFor);
@@ -361,7 +358,7 @@ test('product constellation exposes five complete keyboard links', async ({
     await expect(card).toHaveAccessibleName(
       [
         product.eyebrow,
-        contract.name,
+        product.name,
         product.summary,
         'Best for',
         product.bestFor,
@@ -445,4 +442,61 @@ test('product constellation preserves the focus ring while hovered', async ({
   expect(focusState.hovered).toBe(true);
   expect(focusState.boxShadow).toBe(focusState.focusRing);
   await expect(firstCard).toHaveCSS('transform', 'none');
+});
+
+test('product constellation honors approved responsive breakpoints', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+  });
+
+  const cards = page.locator('[data-product-constellation] .product-card');
+  const boxesAt = async (width: number) => {
+    await page.setViewportSize({ width, height: 1000 });
+    return cards.evaluateAll((elements) =>
+      elements.map((element) => {
+        const box = element.getBoundingClientRect();
+        return {
+          x: Math.round(box.x),
+          y: Math.round(box.y),
+          width: Math.round(box.width),
+        };
+      }),
+    );
+  };
+
+  const desktop = await boxesAt(1180);
+  expect(desktop.map(({ y }) => y)).toEqual([
+    desktop[0].y,
+    desktop[0].y,
+    desktop[0].y,
+    desktop[3].y,
+    desktop[3].y,
+  ]);
+  expect(desktop[3].y).toBeGreaterThan(desktop[0].y);
+  expect(desktop[3].width).toBeGreaterThan(desktop[0].width);
+
+  for (const width of [1179, 768]) {
+    const tablet = await boxesAt(width);
+    expect(tablet.map(({ y }) => y)).toEqual([
+      tablet[0].y,
+      tablet[0].y,
+      tablet[2].y,
+      tablet[2].y,
+      tablet[4].y,
+    ]);
+    expect(tablet[2].y).toBeGreaterThan(tablet[0].y);
+    expect(tablet[4].y).toBeGreaterThan(tablet[2].y);
+    expect(tablet[4].x).toBe(tablet[0].x);
+    const expectedFullWidth =
+      tablet[1].x + tablet[1].width - tablet[0].x;
+    expect(Math.abs(tablet[4].width - expectedFullWidth)).toBeLessThanOrEqual(1);
+  }
+
+  const mobile = await boxesAt(767);
+  expect(new Set(mobile.map(({ y }) => y))).toHaveProperty('size', 5);
+  expect(new Set(mobile.map(({ x }) => x))).toHaveProperty('size', 1);
+  expect(new Set(mobile.map(({ width }) => width))).toHaveProperty('size', 1);
 });

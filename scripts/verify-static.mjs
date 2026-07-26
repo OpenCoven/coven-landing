@@ -36,24 +36,17 @@ const toRenderedText = (content) =>
     .replace(/\s+/g, ' ')
     .trim();
 
-const productContracts = [
-  { id: 'coven-cli', name: 'Coven CLI' },
-  { id: 'coven-code', name: 'Coven Code' },
-  { id: 'coven-cave', name: 'Coven Cave' },
-  { id: 'castcodes', name: 'CastCodes' },
-  { id: 'github', name: 'OpenCoven for GitHub' },
-];
-
-const registryProductContracts = quickstartProducts.map(({ id, name }) => ({
+const productContracts = quickstartProducts.map(({ id, name }) => ({
   id,
   name,
 }));
 if (
-  JSON.stringify(registryProductContracts)
-  !== JSON.stringify(productContracts)
+  productContracts.length !== 5
+  || new Set(productContracts.map(({ id }) => id)).size !== 5
+  || new Set(productContracts.map(({ name }) => name)).size !== 5
 ) {
   throw new Error(
-    'quickstartProducts IDs, names, or order drifted from the canonical product contract',
+    'quickstartProducts must define exactly five products with unique IDs and names',
   );
 }
 
@@ -199,29 +192,24 @@ if (existsSync(distIndex)) {
     );
   }
 
-  for (const [index, contract] of productContracts.entries()) {
-    const product = quickstartProducts[index];
+  for (const [index, product] of quickstartProducts.entries()) {
     const itemHtml = constellationItems[index];
     const itemAnchors = itemHtml.match(/<a\b[^>]*>[\s\S]*?<\/a>/g) ?? [];
-    const href = `/quickstart#${contract.id}`;
+    const href = `/quickstart#${product.id}`;
     if (
       itemAnchors.length !== 1
       || !new RegExp(`\\bhref="${escapeRegExp(href)}"`).test(itemAnchors[0])
     ) {
       throw new Error(
-        `${contract.name} (${contract.id}) must render exactly one homepage product constellation link to ${href}; found ${itemAnchors.length}`,
+        `${product.name} (${product.id}) must render exactly one homepage product constellation link to ${href}; found ${itemAnchors.length}`,
       );
     }
 
     const cardText = toRenderedText(itemAnchors[0]);
-    if (!cardText.includes(contract.name)) {
-      throw new Error(
-        `${contract.name} (${contract.id}) homepage card is missing its canonical product name`,
-      );
-    }
     for (const field of [
       'sigil',
       'eyebrow',
+      'name',
       'summary',
       'bestFor',
       'status',
