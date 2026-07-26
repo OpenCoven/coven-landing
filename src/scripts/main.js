@@ -169,8 +169,10 @@
     var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
     var liveRegion = document.querySelector('[data-copy-live]');
 
-    function announce(message) {
-      if (liveRegion) liveRegion.textContent = message;
+    function announce(message, showGuidance) {
+      if (!liveRegion) return;
+      liveRegion.textContent = message;
+      liveRegion.classList.toggle('is-copy-guidance', Boolean(showGuidance));
     }
 
     function selectCommand(button) {
@@ -206,7 +208,7 @@
           button.classList.add('is-copied');
           button.innerHTML = CHECK_SVG;
           button.setAttribute('aria-label', 'Copied');
-          announce(`Copied: ${command}`);
+          announce(`Copied: ${command}`, false);
           resetTimer = window.setTimeout(function () {
             if (currentAttempt !== attemptToken) return;
             button.classList.remove('is-copied');
@@ -224,7 +226,10 @@
             'Copy unavailable. Select the command and copy manually.',
           );
           selectCommand(button);
-          announce(`Copy unavailable. The command is selected; copy it manually: ${command}`);
+          announce(
+            'Copy unavailable. Command selected. Press Ctrl+C or Command+C to copy manually.',
+            true,
+          );
         }
       });
     });
@@ -367,11 +372,13 @@
       }
     }
 
-    apply(getPref());
+    var currentPref = getPref();
+    apply(currentPref);
 
     if (btn) {
       btn.addEventListener('click', function () {
-        var next = ORDER[(ORDER.indexOf(getPref()) + 1) % ORDER.length];
+        var next = ORDER[(ORDER.indexOf(currentPref) + 1) % ORDER.length];
+        currentPref = next;
         try { localStorage.setItem(STORAGE_KEY, next); } catch (e) {}
         apply(next);
       });
@@ -379,7 +386,7 @@
 
     // While in system mode, follow live OS light/dark changes.
     if (mql) {
-      var onChange = function () { if (getPref() === 'system') apply('system'); };
+      var onChange = function () { if (currentPref === 'system') apply('system'); };
       if (mql.addEventListener) mql.addEventListener('change', onChange);
       else if (mql.addListener) mql.addListener(onChange);
     }

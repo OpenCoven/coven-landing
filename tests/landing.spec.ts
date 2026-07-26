@@ -1152,6 +1152,11 @@ test('clipboard failure selects the command and gives a concrete fallback', asyn
   await expect(preview.locator('[data-copy-live]')).toContainText(
     'Copy unavailable',
   );
+  await expect(preview.locator('[data-copy-guidance]').first()).toBeVisible();
+  await expect(preview.locator('[data-copy-guidance]').first()).toHaveText(
+    'Copy unavailable. Command selected. Press Ctrl+C or Command+C to copy manually.',
+  );
+  await expect(button).toBeFocused();
   expect(await page.evaluate(() => window.getSelection()?.toString())).toBe(
     command,
   );
@@ -1397,6 +1402,54 @@ test('theme control cycles system to light to dark', async ({ page }) => {
   await toggle.click();
   await expect(page.locator('html')).toHaveAttribute('data-theme-pref', 'dark');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
+
+test('theme control cycles in memory when storage is unavailable', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.addInitScript(() => {
+    Storage.prototype.getItem = () => {
+      throw new Error('storage disabled');
+    };
+    Storage.prototype.setItem = () => {
+      throw new Error('storage disabled');
+    };
+  });
+  await page.goto('/');
+
+  const html = page.locator('html');
+  const toggle = page.locator('[data-theme-toggle]');
+  await expect(html).toHaveAttribute('data-theme-pref', 'system');
+  await toggle.click();
+  await expect(html).toHaveAttribute('data-theme-pref', 'light');
+  await toggle.click();
+  await expect(html).toHaveAttribute('data-theme-pref', 'dark');
+  await expect(html).toHaveAttribute('data-theme', 'dark');
+});
+
+test('an in-memory theme choice survives OS preference changes', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.addInitScript(() => {
+    Storage.prototype.getItem = () => {
+      throw new Error('storage disabled');
+    };
+    Storage.prototype.setItem = () => {
+      throw new Error('storage disabled');
+    };
+  });
+  await page.goto('/');
+
+  const html = page.locator('html');
+  await page.locator('[data-theme-toggle]').click();
+  await expect(html).toHaveAttribute('data-theme-pref', 'light');
+  await page.emulateMedia({ colorScheme: 'light' });
+  await expect.soft(html).toHaveAttribute('data-theme-pref', 'light');
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await expect(html).toHaveAttribute('data-theme-pref', 'light');
+  await expect(html).toHaveAttribute('data-theme', 'light');
 });
 
 test('platform shortcut resolves Windows without changing the primary path', async ({
