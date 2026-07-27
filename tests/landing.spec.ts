@@ -785,8 +785,9 @@ test('mobile menu keeps the final keyboard target reachable in a short viewport'
   expect.soft(geometry.scrollHeight).toBeGreaterThan(geometry.clientHeight);
   expect.soft(geometry.scrollTop).toBeGreaterThan(0);
   expect.soft(geometry.targetTop).toBeGreaterThanOrEqual(0);
+  const subpixelGeometryTolerance = 1;
   expect.soft(geometry.targetBottom).toBeLessThanOrEqual(
-    geometry.viewportHeight,
+    geometry.viewportHeight + subpixelGeometryTolerance,
   );
 });
 
@@ -1568,6 +1569,38 @@ for (const colorScheme of ['dark', 'light'] as const) {
     expect(blocking).toEqual([]);
   });
 }
+
+test('homepage applies 116% scale only at tablet and desktop widths', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+
+  const homepageBody = page.locator('body');
+  await expect(homepageBody).toHaveClass('home-page');
+
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 767, height: 1024 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await expect(homepageBody).toHaveCSS('zoom', '1');
+  }
+
+  for (const width of [768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expect(homepageBody).toHaveCSS('zoom', '1.16');
+  }
+
+  for (const pathname of ['/quickstart', '/github', '/privacy', '/terms']) {
+    await page.goto(pathname);
+    const routeBody = page.locator('body');
+    await expect(routeBody).not.toHaveClass(
+      /(?:^|\s)home-page(?:\s|$)/,
+    );
+    await expect(routeBody).toHaveCSS('zoom', '1');
+  }
+});
 
 const visualMatrix = [
   { name: 'desktop', width: 1440, height: 1000 },

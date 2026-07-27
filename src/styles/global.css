@@ -104,6 +104,11 @@
       overflow-x: hidden;
       -webkit-tap-highlight-color: transparent;
     }
+    @media (min-width: 768px) {
+      body.home-page {
+        zoom: 116%;
+      }
+    }
     /* Viewport-anchored mist gradients (glow follows the viewport, not the
        scroll). These used to live on html/body via background-attachment:
        fixed, which disables composited scrolling in Chromium/WebKit — every
