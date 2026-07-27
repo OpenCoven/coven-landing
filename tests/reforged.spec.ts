@@ -971,6 +971,99 @@ test.describe('Reforged landing', () => {
     );
   });
 
+  test('short landscape keeps the hero compact and uses its available width', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.goto('/');
+    await page.evaluate(() => document.fonts.ready);
+
+    const geometry = await page.locator('.reforged-hero').evaluate((hero) => {
+      const card = hero.querySelector('.hero-card')?.getBoundingClientRect();
+      const portal = hero
+        .querySelector('.hero-portal')
+        ?.getBoundingClientRect();
+      const rect = hero.getBoundingClientRect();
+
+      return {
+        height: rect.height,
+        cardRight: card?.right ?? -1,
+        cardTop: card?.top ?? -1,
+        portalLeft: portal?.left ?? -1,
+        portalTop: portal?.top ?? -1,
+      };
+    });
+
+    expect(geometry.portalLeft).toBeGreaterThan(geometry.cardRight);
+    expect(Math.abs(geometry.portalTop - geometry.cardTop)).toBeLessThanOrEqual(
+      80,
+    );
+    expect(geometry.height).toBeLessThanOrEqual(390);
+  });
+
+  test('pinned chapters select the same phase while scrolling forward and back', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto('/');
+
+    const scrollChapter = async (id: string, progress: number) => {
+      await page.evaluate(
+        ({ targetId, nextProgress }) => {
+          const chapter = document.getElementById(targetId);
+          if (!chapter) throw new Error(`Missing chapter: ${targetId}`);
+          const previous = document.documentElement.style.scrollBehavior;
+          document.documentElement.style.scrollBehavior = 'auto';
+          window.scrollTo(
+            0,
+            chapter.offsetTop +
+              (chapter.offsetHeight - window.innerHeight) * nextProgress,
+          );
+          document.documentElement.style.scrollBehavior = previous;
+        },
+        { targetId: id, nextProgress: progress },
+      );
+      await page.evaluate(
+        () =>
+          new Promise<void>((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+          ),
+      );
+    };
+
+    const chapters = [
+      {
+        id: 'boundary',
+        read: () =>
+          page.locator('[data-boundary]').getAttribute('data-active-layer'),
+        phases: ['surface', 'runtime', 'boundary', 'runtime', 'surface'],
+      },
+      {
+        id: 'surfaces',
+        read: () =>
+          page
+            .locator('[data-surface-card][data-expanded="true"]')
+            .getAttribute('data-surface-card'),
+        phases: ['cave', 'cli', 'code', 'cli', 'cave'],
+      },
+      {
+        id: 'invocation',
+        read: () =>
+          page
+            .locator('[data-invocation-step][aria-pressed="true"]')
+            .getAttribute('data-invocation-step'),
+        phases: ['install', 'check', 'run', 'check', 'install'],
+      },
+    ];
+
+    for (const chapter of chapters) {
+      for (const [index, progress] of [0.1, 0.45, 0.85, 0.45, 0.1].entries()) {
+        await scrollChapter(chapter.id, progress);
+        await expect.poll(chapter.read).toBe(chapter.phases[index]);
+      }
+    }
+  });
+
   test('resizing out of pinned choreography restores hero presentation', async ({
     page,
   }) => {
