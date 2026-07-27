@@ -1,0 +1,133 @@
+---
+import { boundaryLayers } from '../../data/reforged';
+---
+
+<section
+  class="chapter chapter--boundary boundary"
+  id="boundary"
+  aria-labelledby="boundary-heading"
+  data-boundary
+>
+  <div class="chapter__sticky">
+    <div class="chapter-panel">
+      <header class="chapter-heading">
+        <p>
+          <span>I</span>
+          the boundary
+          <small>surface · runtime · project</small>
+        </p>
+        <div>
+          <h2 id="boundary-heading">Three layers. Only one is yours to defend.</h2>
+          <p>
+            OpenCoven is the substrate under your AI tools — an agent’s memory
+            lives inside your project, not in the tool. Change the surface as
+            often as the work calls for it. Continuity lives in the substrate,
+            and the project boundary never leaves your machine.
+          </p>
+        </div>
+      </header>
+
+      <div class="boundary-layout">
+        <div class="boundary-control">
+          <div class="boundary-stack" aria-hidden="true">
+            {boundaryLayers.map((layer) => (
+              <i data-layer-slab={layer.id}></i>
+            ))}
+          </div>
+
+          <div class="boundary-tabs" role="tablist" aria-label="OpenCoven layers">
+            {boundaryLayers.map((layer, index) => (
+              <button
+                id={`boundary-tab-${layer.id}`}
+                type="button"
+                role="tab"
+                data-boundary-tab={layer.id}
+                aria-controls={`boundary-panel-${layer.id}`}
+                aria-selected={index === 1 ? 'true' : 'false'}
+                tabindex={index === 1 ? '0' : '-1'}
+              >
+                <i aria-hidden="true"></i>
+                <span>{layer.index} · {layer.label}</span>
+                <strong>{layer.title}</strong>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div class="boundary-panels">
+          {boundaryLayers.map((layer, index) => (
+            <article
+              id={`boundary-panel-${layer.id}`}
+              class="boundary-panel"
+              role="tabpanel"
+              data-boundary-panel={layer.id}
+              aria-labelledby={`boundary-tab-${layer.id}`}
+              data-active={index === 1 ? 'true' : 'false'}
+            >
+              <p class="boundary-panel__eyebrow"><span></span>{layer.label}</p>
+              <h3>{layer.title}</h3>
+              <strong>{layer.summary}</strong>
+              <p>{layer.detail}</p>
+
+              <div class="boundary-proof">
+                <small>{layer.assetLabel}</small>
+
+                {layer.id === 'surface' && (
+                  <div class="cave-proof">
+                    <div class="cave-proof__desktop">
+                      <header><i></i><i></i><i></i><span>familiar.ledger</span><b>local</b></header>
+                      <div>
+                        <p><b>H</b><span>Hexi · code steward</span><em>● ready</em></p>
+                        <p><small>SESSION</small>feat/runtime-attach</p>
+                        <p><small>MEMORY</small>project memory restored</p>
+                        <p>4 files staged · tests pending</p>
+                      </div>
+                    </div>
+                    <div class="cave-proof__phone">
+                      <i></i><strong>Hexi</strong><em>● synced</em><span>memory ✓</span><i></i>
+                    </div>
+                  </div>
+                )}
+
+                {layer.id === 'runtime' && (
+                  <div class="memory-proof">
+                    <header><i></i><i></i><i></i><span>coven-memory</span><b>local</b></header>
+                    <p><i></i>prefers terse PR summaries <small>remembered</small></p>
+                    <p><i></i>smallest correct patch <small>remembered</small></p>
+                    <p><i></i>verify before commit <small>remembered</small></p>
+                    <footer>— portable · travels with the project</footer>
+                  </div>
+                )}
+
+                {layer.id === 'boundary' && (
+                  <div class="isolation-proof">
+                    <div>
+                      <strong>inside · ./opencoven</strong>
+                      <p><span>filesystem</span><span>.git</span><span>terminals</span><span>docs</span></p>
+                      <small>sessions read and write here — nowhere else</small>
+                    </div>
+                    <div>
+                      <strong>outside the wall</strong>
+                      <p><span>provider keys</span><span>other projects</span></p>
+                      <small>no session crosses in</small>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div class="boundary-holds">
+                <small>what stays here</small>
+                {layer.holds.map((hold) => (
+                  <p><i></i>{hold.what}<span>{hold.where}</span></p>
+                ))}
+              </div>
+              <a href="https://docs.opencoven.ai" target="_blank" rel="noopener noreferrer">
+                Read the architecture docs ↗
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
