@@ -1,3 +1,5 @@
+import { DOWNLOAD_ROUTES, detectPlatform } from './download-platform.js';
+
 const clamp = (value, minimum = 0, maximum = 1) =>
   Math.min(maximum, Math.max(minimum, value));
 
@@ -423,6 +425,243 @@ function wireCopyControls() {
 }
 
 wireCopyControls();
+
+// ── Hero download cards: platform detection + streamed download ────
+//
+// The server-rendered default is macOS. On load we retarget the primary
+// card to the visitor's platform (shared detection with the classic
+// landing), and on iOS we promote the TestFlight card to primary instead
+// of rewriting copy — each card keeps its own icon and wording.
+//
+// Clicking the desktop card streams the installer through fetch +
+// ReadableStream so the card itself can act as the progress track
+// (percent + byte counts in the sublabel, fill via --download-progress).
+// Every failure mode degrades to the plain <a href> navigation, so the
+// button always produces a download even without JS, CORS, or streams.
+function wireDownloadCards() {
+  const cta = document.querySelector('[data-download-cta]');
+  const primary = cta?.querySelector('[data-download-primary]');
+  if (!cta || !primary) return;
+
+  const iosCard = cta.querySelector('[data-download-ios]');
+  const labelNode = primary.querySelector('[data-download-label]');
+  const subNode = primary.querySelector('[data-download-sub]');
+  const liveNode = cta.querySelector('[data-download-live]');
+
+  const COPY = {
+    mac: {
+      label: 'Download for macOS',
+      sub: 'CovenCave · .dmg · signed · free',
+      href: DOWNLOAD_ROUTES.mac,
+    },
+    win: {
+      label: 'Download for Windows',
+      sub: 'CovenCave · .msi · signed · free',
+      href: DOWNLOAD_ROUTES.win,
+    },
+    linux: {
+      label: 'Download for Linux',
+      sub: 'CovenCave · .AppImage · x86_64 · free',
+      href: DOWNLOAD_ROUTES.linux,
+    },
+  };
+
+  const detected = detectPlatform();
+  cta.dataset.detected = detected;
+
+  if (detected === 'ios' && iosCard) {
+    // Lead with the card the visitor can actually install here; the
+    // macOS card stays available as the secondary option.
+    iosCard.classList.add('download-card--primary');
+    primary.classList.remove('download-card--primary');
+    cta.insertBefore(iosCard, primary);
+  } else if (detected !== 'ios') {
+    const copy = COPY[detected] ?? COPY.mac;
+    if (labelNode) labelNode.textContent = copy.label;
+    if (subNode) subNode.textContent = copy.sub;
+    primary.setAttribute('href', copy.href);
+    primary.dataset.platform = detected;
+  }
+
+  const idleLabel = labelNode?.textContent ?? '';
+  const idleSub = subNode?.textContent ?? '';
+  const announce = (message) => {
+    if (liveNode) liveNode.textContent = message;
+  };
+
+  const setState = (state, { label, sub } = {}) => {
+    primary.dataset.state = state;
+    primary.setAttribute(
+      'aria-busy',
+      String(state === 'preparing' || state === 'downloading'),
+    );
+    if (label !== undefined && labelNode) labelNode.textContent = label;
+    if (sub !== undefined && subNode) subNode.textContent = sub;
+  };
+
+  const setProgress = (ratio) => {
+    primary.style.setProperty('--download-progress', clamp(ratio).toFixed(4));
+  };
+
+  const formatMegabytes = (bytes) =>
+    `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+
+  // Streaming sources, cheapest first: the Cloudflare proxy
+  // (workers/download-proxy, free egress) when one is configured, then
+  // the same-origin Vercel edge proxy (/stream, counts against the
+  // plan's data transfer). Each candidate that fails — network, CORS,
+  // paused functions at a usage cap, HTML error pages — is skipped at
+  // click time, and when none stream the click degrades to the plain
+  // /download navigation. Read at click time so tests can inject one.
+  const streamCandidatesFor = (href) => {
+    const platform = href.split('/').pop();
+    if (!platform) return [];
+    const candidates = [];
+    const workerOrigin = (cta.dataset.streamOrigin ?? '').replace(/\/+$/, '');
+    if (workerOrigin) candidates.push(`${workerOrigin}/${platform}`);
+    candidates.push(`/stream/${platform}`);
+    return candidates;
+  };
+
+  const filenameFor = (response, sourceUrl) => {
+    const disposition = response.headers.get('Content-Disposition') ?? '';
+    const fromDisposition = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(
+      disposition,
+    )?.[1];
+    if (fromDisposition) return fromDisposition;
+    try {
+      const basename = decodeURIComponent(
+        new URL(sourceUrl, window.location.href).pathname.split('/').pop() ?? '',
+      );
+      // Only trust names that look like files; redirect-route paths
+      // like /download/mac end in a bare platform token.
+      if (basename.includes('.')) return basename;
+    } catch {
+      // Fall through to the default name.
+    }
+    return 'CovenCave.dmg';
+  };
+
+  const saveBlob = (blob, filename) => {
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = objectUrl;
+    anchor.download = filename;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(objectUrl);
+  };
+
+  // → 'done' | 'error' (mid-stream drop, worth a retry) |
+  //   'native' (no fetch/CORS/stream — hand back to the browser).
+  const runDownload = async (href) => {
+    setState('preparing', { sub: 'Preparing your download…' });
+    setProgress(0);
+    announce('Download started.');
+
+    let response = null;
+    for (const candidate of streamCandidatesFor(href)) {
+      let attempt;
+      try {
+        attempt = await fetch(candidate);
+      } catch {
+        continue;
+      }
+      if (!attempt.ok || !attempt.body) continue;
+      // A redirect chain can land on the HTML releases page (e.g. a
+      // proxy's degraded mode) — never save markup as an installer.
+      if ((attempt.headers.get('Content-Type') ?? '').includes('text/html')) {
+        continue;
+      }
+      response = attempt;
+      break;
+    }
+    if (!response) return 'native';
+
+    const total = Number(response.headers.get('Content-Length')) || 0;
+    const reader = response.body.getReader();
+    const chunks = [];
+    let received = 0;
+
+    try {
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        if (total) {
+          setProgress(received / total);
+          setState('downloading', {
+            sub: `${Math.round((received / total) * 100)}% · ${formatMegabytes(received)} of ${formatMegabytes(total)}`,
+          });
+        } else {
+          // No exposed Content-Length: keep the working sheen and show
+          // bytes so the card still visibly moves.
+          setState('downloading', {
+            sub: `${formatMegabytes(received)} downloaded…`,
+          });
+        }
+      }
+    } catch {
+      return 'error';
+    }
+
+    setProgress(1);
+    saveBlob(new Blob(chunks), filenameFor(response, response.url || href));
+    return 'done';
+  };
+
+  const resetToIdle = () => {
+    setState('idle', { label: idleLabel, sub: idleSub });
+    setProgress(0);
+  };
+
+  let resetTimer;
+  let nativeOnly =
+    typeof window.fetch !== 'function' ||
+    typeof window.ReadableStream !== 'function';
+
+  primary.addEventListener('click', (event) => {
+    if (nativeOnly) return;
+    const state = primary.dataset.state;
+    if (state === 'preparing' || state === 'downloading') {
+      event.preventDefault();
+      return;
+    }
+
+    event.preventDefault();
+    window.clearTimeout(resetTimer);
+    const href = primary.getAttribute('href') ?? '';
+
+    runDownload(href).then((outcome) => {
+      if (outcome === 'native') {
+        // Streaming isn't available for this origin — do the plain
+        // navigation download and stop intercepting future clicks.
+        nativeOnly = true;
+        resetToIdle();
+        window.location.assign(href);
+        return;
+      }
+      if (outcome === 'error') {
+        setState('error', {
+          label: 'Retry download',
+          sub: 'Connection dropped — click to try again',
+        });
+        announce('Download interrupted. Click retry to start again.');
+        return;
+      }
+      setState('done', {
+        label: 'Saved to your device',
+        sub: 'Check your browser downloads',
+      });
+      announce('Download complete. Check your browser downloads.');
+      resetTimer = window.setTimeout(resetToIdle, 4000);
+    });
+  });
+}
+
+wireDownloadCards();
 document.documentElement.classList.add('reforged-ready');
 
 const progressBar = document.querySelector('[data-scroll-progress]');
