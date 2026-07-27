@@ -1,105 +1,99 @@
 ---
-// Self-host the variable-weight fonts to remove the render-blocking Google
-// Fonts chain (was costing ~1s of mobile LCP). Both packages ship one .woff2
-// per Unicode subset with font-display: swap, so text renders in a fallback
-// immediately and re-flows when the font arrives.
 import '@fontsource-variable/inter/wght.css';
 import '@fontsource-variable/jetbrains-mono/wght.css';
-// Geist is the display voice per DESIGN.md (Satoshi preferred but not
-// self-hostable; Geist is the sanctioned fallback in the brand font stack).
 import '@fontsource-variable/geist/wght.css';
-import '../styles/global.css';
+import '../styles/reforged.css';
 
-import ThemeInit   from '../components/ThemeInit.astro';
-import Header      from '../components/Header.astro';
-import MobileNav   from '../components/MobileNav.astro';
-import Hero        from '../components/Hero.astro';
-import TrustBar    from '../components/TrustBar.astro';
-import ContinuityStory from '../components/ContinuityStory.astro';
-import RuntimeProof from '../components/RuntimeProof.astro';
-import ProductConstellation from '../components/ProductConstellation.astro';
-import QuickStart   from '../components/QuickStart.astro';
-import ClosingInvitation from '../components/ClosingInvitation.astro';
-import Footer         from '../components/Footer.astro';
-import FeedbackLauncher from '../components/FeedbackLauncher.astro';
+import ReforgedHeader from '../components/reforged/ReforgedHeader.astro';
+import ReforgedHero from '../components/reforged/ReforgedHero.astro';
+import Threshold from '../components/reforged/Threshold.astro';
+import RuntimeMarquee from '../components/reforged/RuntimeMarquee.astro';
+import Boundary from '../components/reforged/Boundary.astro';
+import Surfaces from '../components/reforged/Surfaces.astro';
+import Invocation from '../components/reforged/Invocation.astro';
+import Summoning from '../components/reforged/Summoning.astro';
+import ReforgedFooter from '../components/reforged/ReforgedFooter.astro';
 ---
+
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <ThemeInit />
-  <title>OpenCoven — Persistent AI Familiars</title>
-  <meta name="description" content="An open ecosystem for persistent AI familiars: named agents with memory, tools, identity, roles, and continuity." />
-  <meta property="og:title" content="OpenCoven" />
-  <meta property="og:description" content="An open ecosystem for persistent AI familiars that remember, coordinate, and belong to you." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://opencoven.ai/" />
-  <meta property="og:image" content="https://opencoven.ai/og.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="OpenCoven — Persistent AI Familiars" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@OpenCvn" />
-  <meta name="twitter:title" content="OpenCoven" />
-  <meta name="twitter:description" content="An open ecosystem for persistent AI familiars that remember, coordinate, and belong to you." />
-  <meta name="twitter:image" content="https://opencoven.ai/og.png" />
-  <meta name="twitter:image:alt" content="OpenCoven — Persistent AI Familiars" />
-  <meta name="theme-color" content="#050409" />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://opencoven.ai/" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenCoven — Persistent AI Familiars</title>
+    <meta
+      name="description"
+      content="Summon a persistent AI familiar with project-scoped memory, a local-first runtime, and a boundary you control."
+    />
+    <meta property="og:title" content="OpenCoven — Persistent AI Familiars" />
+    <meta
+      property="og:description"
+      content="A familiar is an AI agent with a memory, bound to your project."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://opencoven.ai/" />
+    <meta property="og:image" content="https://opencoven.ai/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="OpenCoven — Persistent AI Familiars" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@OpenCvn" />
+    <meta name="twitter:title" content="OpenCoven — Persistent AI Familiars" />
+    <meta
+      name="twitter:description"
+      content="A familiar is an AI agent with a memory, bound to your project."
+    />
+    <meta name="twitter:image" content="https://opencoven.ai/og.png" />
+    <meta name="theme-color" content="#050409" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://opencoven.ai/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-  <script type="application/ld+json" set:html={JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'OpenCoven',
-    alternateName: 'Coven',
-    description: 'An open ecosystem for persistent AI familiars: named agents with memory, tools, identity, roles, and continuity.',
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'macOS, Linux, Windows',
-    url: 'https://opencoven.ai/',
-    downloadUrl: 'https://github.com/OpenCoven/coven',
-    softwareHelp: { '@type': 'CreativeWork', url: 'https://docs.opencoven.ai/' },
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    sameAs: [
-      'https://github.com/OpenCoven',
-      'https://discord.gg/opencoven',
-    ],
-  })} />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'OpenCoven',
+        alternateName: 'Coven',
+        description:
+          'An open-source, local-first runtime for persistent AI familiars with project-scoped memory.',
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'macOS, Linux, Windows, iOS',
+        url: 'https://opencoven.ai/',
+        downloadUrl:
+          'https://github.com/opencoven/coven-cave/releases/latest',
+        softwareHelp: {
+          '@type': 'CreativeWork',
+          url: 'https://docs.opencoven.ai/',
+        },
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        sameAs: [
+          'https://github.com/OpenCoven',
+          'https://discord.gg/opencoven',
+        ],
+      })}
+    />
 
-  <script is:inline>
-    /* Runs before paint: motion-on enables the bounded arrival sequence only
-       when motion is allowed. Each interactive controller opts its own
-       component into enhanced CSS after it wires successfully. */
-    (function () {
-      var html = document.documentElement;
-      if (!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        html.classList.add('motion-on');
-      }
-    })();
-  </script>
+  </head>
+  <body class="reforged-page">
+    <div class="reforged-atmosphere" aria-hidden="true"></div>
+    <ReforgedHeader />
+    <main id="content" tabindex="-1">
+      <ReforgedHero />
+      <Threshold />
+      <RuntimeMarquee />
+      <Boundary />
+      <Surfaces />
+      <Invocation />
+      <Summoning />
+    </main>
+    <ReforgedFooter />
+    <p class="copy-live" data-copy-live aria-live="polite"></p>
 
-</head>
-<body>
-  <Header />
-  <MobileNav />
-  <main id="content" tabindex="-1">
-    <Hero />
-    <TrustBar />
-    <ContinuityStory />
-    <RuntimeProof />
-    <ProductConstellation />
-    <QuickStart />
-    <ClosingInvitation />
-  </main>
-  <Footer />
-  <FeedbackLauncher />
-
-  <script>
-    import '../scripts/main.js';
-    import '../scripts/landing.js';
-  </script>
-</body>
+    <script>
+      import '../scripts/reforged.js';
+    </script>
+  </body>
 </html>

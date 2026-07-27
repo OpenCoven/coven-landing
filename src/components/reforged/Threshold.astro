@@ -1,0 +1,77 @@
+<section
+  class="threshold"
+  id="threshold"
+  aria-labelledby="threshold-heading"
+  data-threshold
+>
+  <div class="threshold__stage">
+    <div class="threshold__aperture" data-threshold-aperture aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i>
+    </div>
+
+    <div class="threshold__window">
+      <video
+        class="threshold__video"
+        data-threshold-video
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster="/reforged/coven-cave-explainer-poster.webp"
+        aria-hidden="true"
+      >
+        <source
+          src="/reforged/coven-cave-explainer.mp4"
+          type="video/mp4"
+        />
+      </video>
+    </div>
+
+    <div class="threshold__invitation">
+      <p><span></span>the threshold<span></span></p>
+      <a
+        href="/reforged/coven-cave-explainer.mp4"
+        data-threshold-theater-trigger
+        aria-label="Play Coven Cave explainer with audio"
+      >
+        ▶
+      </a>
+      <h2 id="threshold-heading">Step inside the coven</h2>
+      <span>One record. Every supported surface.</span>
+    </div>
+  </div>
+  <dialog
+    class="threshold-theater"
+    id="threshold-video-theater"
+    data-threshold-theater
+    aria-labelledby="threshold-theater-title"
+  >
+    <h2 class="threshold-theater__title" id="threshold-theater-title">
+      Coven Cave explainer
+    </h2>
+    <button
+      class="threshold-theater__close"
+      type="button"
+      data-threshold-theater-close
+      aria-label="Close video"
+    >
+      ×
+    </button>
+    <video
+      class="threshold-theater__video"
+      data-threshold-theater-video
+      controls
+      muted
+      playsinline
+      preload="metadata"
+      poster="/reforged/coven-cave-explainer-poster.webp"
+      tabindex="0"
+      aria-labelledby="threshold-theater-title"
+    >
+      <source
+        src="/reforged/coven-cave-explainer.mp4"
+        type="video/mp4"
+      />
+    </video>
+  </dialog>
+</section>
