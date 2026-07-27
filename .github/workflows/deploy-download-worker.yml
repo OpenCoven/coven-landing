@@ -1,0 +1,62 @@
+name: Deploy download worker
+
+# Deploys workers/download-proxy (the CORS streaming proxy for CovenCave
+# installers) to Cloudflare whenever it changes on main. One-time setup:
+# add CLOUDFLARE_API_TOKEN (Workers Scripts: Edit) and
+# CLOUDFLARE_ACCOUNT_ID as repository secrets.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'workers/download-proxy/**'
+      - '.github/workflows/deploy-download-worker.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'workers/download-proxy/**'
+      - '.github/workflows/deploy-download-worker.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-download-worker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Unit tests
+        run: node --test "workers/download-proxy/test/*.test.mjs"
+
+  deploy:
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    # Deploying is opt-in: without the Cloudflare secrets configured the
+    # steps below skip (green, not failed) and the site keeps using the
+    # same-origin /stream fallback. See README "Download pipeline".
+    # (The secrets context is not available in job-level `if`, so the
+    # gate lives in job env + step conditions.)
+    env:
+      HAS_CLOUDFLARE_SECRETS: ${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        if: env.HAS_CLOUDFLARE_SECRETS == 'true'
+
+      - name: Deploy to Cloudflare
+        if: env.HAS_CLOUDFLARE_SECRETS == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: workers/download-proxy
+
+      - name: Skipped (secrets not configured)
+        if: env.HAS_CLOUDFLARE_SECRETS != 'true'
+        run: echo "CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID not set — worker deploy skipped; /stream fallback remains active."

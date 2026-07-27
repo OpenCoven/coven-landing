@@ -1,0 +1,11 @@
+name = "coven-download"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+
+# Comma-separated origin allowlist for CORS. `*` wildcards are allowed in
+# the host (preview deploys) and as a port wildcard for local dev.
+[vars]
+ALLOWED_ORIGINS = "https://opencoven.ai,https://www.opencoven.ai,https://*.vercel.app,http://localhost:*,http://127.0.0.1:*"
+
+# Optional: `wrangler secret put GITHUB_TOKEN` raises the GitHub API rate
+# limit for release resolution. Not required — responses are edge-cached.
