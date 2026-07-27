@@ -2624,6 +2624,71 @@ html.threshold-theater-open body {
   }
 }
 
+@media (min-width: 701px) and (max-width: 900px) and (max-height: 520px) {
+  .reforged-hero {
+    min-height: 100svh;
+    grid-template-columns: minmax(0, 1.3fr) minmax(200px, 0.7fr);
+    gap: 20px;
+    padding: 56px 20px 34px;
+  }
+
+  .hero-card {
+    padding: 16px 22px 18px;
+  }
+
+  .hero-kicker {
+    margin-bottom: 10px;
+  }
+
+  .hero-card h1 {
+    margin-bottom: 12px;
+    font-size: clamp(2.2rem, 5vw, 2.8rem);
+  }
+
+  .hero-lede {
+    margin-bottom: 12px;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  .hero-downloads {
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .download-card {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .download-card svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .download-card strong {
+    font-size: 0.8125rem;
+  }
+
+  .download-card small {
+    font-size: 0.53125rem;
+  }
+
+  .hero-links {
+    gap: 16px;
+  }
+
+  .hero-portal {
+    height: 250px;
+  }
+
+  .hero-cue {
+    bottom: 8px;
+    min-width: 0;
+  }
+}
+
 @media (max-width: 700px) {
   .reforged-hero {
     padding-inline: 16px;
