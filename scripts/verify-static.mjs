@@ -249,7 +249,6 @@ if (existsSync(distIndex)) {
   const renderedText = toRenderedText(html);
   const narrativeOrder = [
     'id="top"',
-    'id="threshold"',
     'id="runtimes"',
     'id="boundary"',
     'id="surfaces"',
@@ -333,10 +332,7 @@ if (existsSync(distIndex)) {
     }
   }
 
-  const reforgedMedia = [
-    'coven-cave-explainer.mp4',
-    'coven-cave-explainer-poster.webp',
-  ];
+  const reforgedMedia = ['coven-cave-explainer.mp4'];
   for (const media of reforgedMedia) {
     if (!existsSync(path.join(publicDir, 'reforged', media))) {
       throw new Error(`Missing Reforged media asset: ${media}`);
@@ -346,25 +342,17 @@ if (existsSync(distIndex)) {
     }
   }
 
-  for (const marker of [
-    'data-threshold-theater-trigger',
-    'data-threshold-theater-video',
-    'href="/reforged/coven-cave-explainer.mp4"',
-  ]) {
-    if (!html.includes(marker)) {
-      throw new Error(`Homepage is missing threshold theater marker: ${marker}`);
-    }
+  if (!html.includes('href="/reforged/coven-cave-explainer.mp4"')) {
+    throw new Error('Homepage is missing the Coven Cave explainer link');
   }
-
-  const thresholdTheaterDialog = html.match(
-    /<dialog\b[^>]*\bdata-threshold-theater(?:[=\s>])[^>]*>/i,
-  )?.[0];
-  if (
-    !thresholdTheaterDialog
-    || !thresholdTheaterDialog.includes('id="threshold-video-theater"')
-    || !thresholdTheaterDialog.includes('aria-labelledby="threshold-theater-title"')
-  ) {
-    throw new Error('Homepage is missing threshold theater dialog contract');
+  for (const marker of [
+    'id="threshold"',
+    'data-threshold-theater',
+    'data-threshold-theater-trigger',
+  ]) {
+    if (html.includes(marker)) {
+      throw new Error(`Homepage retains removed Threshold markup: ${marker}`);
+    }
   }
 
   const runtimeChips = countMatches(html, /\bdata-runtime-chip=/g);
