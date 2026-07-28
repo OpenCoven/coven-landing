@@ -426,146 +426,9 @@ wireCopyControls();
 document.documentElement.classList.add('reforged-ready');
 
 const progressBar = document.querySelector('[data-scroll-progress]');
-const threshold = document.querySelector('[data-threshold]');
-const thresholdVideo = document.querySelector('[data-threshold-video]');
-const thresholdTheaterTrigger = document.querySelector(
-  '[data-threshold-theater-trigger]',
-);
-const thresholdTheater = document.querySelector('[data-threshold-theater]');
-const thresholdTheaterVideo = document.querySelector(
-  '[data-threshold-theater-video]',
-);
-const thresholdTheaterClose = document.querySelector(
-  '[data-threshold-theater-close]',
-);
-const apertureRings = [
-  ...document.querySelectorAll('[data-threshold-aperture] i'),
-];
-const thresholdWindow = document.querySelector('.threshold__window');
-const thresholdInvitation = document.querySelector('.threshold__invitation');
-const heroCard = document.querySelector('.hero-card');
-const heroCue = document.querySelector('.hero-cue');
 const surfacesSection = document.querySelector('[data-surfaces]');
 const invocationSection = document.querySelector('[data-invocation]');
 let framePending = false;
-let thresholdVideoInView = false;
-let thresholdTheaterOpen = false;
-let thresholdTheaterOpener = null;
-
-function syncThresholdVideoPlayback() {
-  if (!thresholdVideo) return;
-  if (
-    thresholdTheaterOpen ||
-    prefersReducedMotion() ||
-    document.visibilityState === 'hidden' ||
-    !thresholdVideoInView
-  ) {
-    thresholdVideo.pause();
-    return;
-  }
-  thresholdVideo.play().catch(() => {});
-}
-
-async function openThresholdTheater(event) {
-  if (
-    !thresholdTheaterTrigger ||
-    !thresholdTheater ||
-    !thresholdTheaterVideo ||
-    typeof thresholdTheater.showModal !== 'function'
-  ) {
-    return;
-  }
-
-  event.preventDefault();
-  thresholdTheaterOpener = thresholdTheaterTrigger;
-  thresholdTheaterOpen = true;
-  thresholdVideo?.pause();
-
-  try {
-    thresholdTheater.showModal();
-  } catch {
-    thresholdTheaterOpen = false;
-    thresholdTheaterOpener = null;
-    syncThresholdVideoPlayback();
-    window.location.href = thresholdTheaterTrigger.href;
-    return;
-  }
-
-  document.documentElement.classList.add('threshold-theater-open');
-  thresholdTheaterVideo.currentTime = 0;
-  thresholdTheaterVideo.muted = false;
-  thresholdTheaterVideo.focus({ preventScroll: true });
-  try {
-    await thresholdTheaterVideo.play();
-  } catch {}
-}
-
-function finishThresholdTheaterClose() {
-  if (!thresholdTheaterVideo) return;
-
-  thresholdTheaterVideo.pause();
-  thresholdTheaterVideo.currentTime = 0;
-  thresholdTheaterVideo.muted = true;
-  document.documentElement.classList.remove('threshold-theater-open');
-  thresholdTheaterOpen = false;
-
-  const opener = thresholdTheaterOpener;
-  thresholdTheaterOpener = null;
-  opener?.focus({ preventScroll: true });
-  syncThresholdVideoPlayback();
-}
-
-function closeThresholdTheater() {
-  if (thresholdTheater?.open) thresholdTheater.close();
-}
-
-function handleThresholdTheaterCancel(event) {
-  event.preventDefault();
-  closeThresholdTheater();
-}
-
-function handleVisibilityChange() {
-  if (document.visibilityState === 'hidden' && thresholdTheaterOpen) {
-    thresholdTheaterVideo?.pause();
-  }
-  syncThresholdVideoPlayback();
-}
-
-if (
-  thresholdTheaterTrigger &&
-  thresholdTheater &&
-  thresholdTheaterVideo &&
-  thresholdTheaterClose &&
-  typeof thresholdTheater.showModal === 'function'
-) {
-  thresholdTheaterTrigger.setAttribute('aria-haspopup', 'dialog');
-  thresholdTheaterTrigger.setAttribute(
-    'aria-controls',
-    'threshold-video-theater',
-  );
-  thresholdTheaterTrigger.addEventListener('click', openThresholdTheater);
-  thresholdTheaterClose.addEventListener('click', closeThresholdTheater);
-  thresholdTheater.addEventListener('cancel', handleThresholdTheaterCancel);
-  thresholdTheater.addEventListener('close', finishThresholdTheaterClose);
-}
-
-if (thresholdVideo) {
-  thresholdVideo.muted = true;
-  if ('IntersectionObserver' in window) {
-    const thresholdVideoObserver = new IntersectionObserver(
-      ([entry]) => {
-        thresholdVideoInView = Boolean(entry?.isIntersecting);
-        syncThresholdVideoPlayback();
-      },
-      { rootMargin: '120px 0px' },
-    );
-    thresholdVideoObserver.observe(thresholdVideo);
-  } else {
-    thresholdVideoInView = true;
-  }
-  document.addEventListener('visibilitychange', handleVisibilityChange);
-  syncThresholdVideoPlayback();
-}
 
 function pinnedProgress(section) {
   const rect = section.getBoundingClientRect();
@@ -597,70 +460,6 @@ function renderScrollState() {
   }
 
   const canScrub = !prefersReducedMotion() && usesPinnedLayout();
-
-  if (canScrub && threshold) {
-    const progress = pinnedProgress(threshold);
-    apertureRings.forEach((ring, index) => {
-      const scale = 1 + progress * (1.15 + index * 0.13);
-      ring.style.setProperty('--aperture-scale', scale.toFixed(3));
-      ring.style.setProperty(
-        '--aperture-opacity',
-        String(clamp(1 - progress * (0.72 + index * 0.04))),
-      );
-    });
-
-    if (thresholdWindow) {
-      const scale = 0.58 + progress * 0.42;
-      const radius = 44 - progress * 30;
-      thresholdWindow.style.setProperty(
-        '--threshold-scale',
-        scale.toFixed(3),
-      );
-      thresholdWindow.style.setProperty(
-        '--threshold-radius',
-        `${radius.toFixed(1)}px`,
-      );
-    }
-
-    if (thresholdInvitation) {
-      const invitationProgress = clamp((progress - 0.7) / 0.25);
-      thresholdInvitation.style.setProperty(
-        '--threshold-invitation-opacity',
-        String(invitationProgress),
-      );
-      thresholdInvitation.style.setProperty(
-        '--threshold-invitation-pointer-events',
-        invitationProgress > 0.85 ? 'auto' : 'none',
-      );
-    }
-
-    if (heroCard && heroCue) {
-      const heroFade = clamp(1 - window.scrollY / (window.innerHeight * 0.62));
-      heroCard.style.setProperty(
-        '--hero-opacity',
-        String(0.38 + heroFade * 0.62),
-      );
-      heroCue.style.setProperty(
-        '--hero-cue-opacity',
-        String(heroFade),
-      );
-    }
-  } else {
-    apertureRings.forEach((ring) => {
-      ring.style.removeProperty('--aperture-scale');
-      ring.style.removeProperty('--aperture-opacity');
-    });
-    thresholdWindow?.style.removeProperty('--threshold-scale');
-    thresholdWindow?.style.removeProperty('--threshold-radius');
-    thresholdInvitation?.style.removeProperty(
-      '--threshold-invitation-opacity',
-    );
-    thresholdInvitation?.style.removeProperty(
-      '--threshold-invitation-pointer-events',
-    );
-    heroCard?.style.removeProperty('--hero-opacity');
-    heroCue?.style.removeProperty('--hero-cue-opacity');
-  }
 
   if (canScrub) {
     if (
@@ -704,7 +503,6 @@ function requestScrollRender() {
 
 function handleMotionPreferenceChange() {
   requestScrollRender();
-  syncThresholdVideoPlayback();
 }
 
 window.addEventListener('scroll', requestScrollRender, { passive: true });

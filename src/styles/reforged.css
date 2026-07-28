@@ -444,255 +444,6 @@ a:focus-visible {
   font-style: normal;
 }
 
-.hero-cue {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  display: inline-flex;
-  min-width: min(520px, 72%);
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 6px 22px;
-  border: 1px solid rgba(154, 142, 205, 0.22);
-  border-radius: 13px;
-  background: rgba(11, 9, 16, 0.5);
-  color: var(--faint);
-  font: 600 0.625rem/1 var(--mono);
-  letter-spacing: 0.16em;
-  opacity: var(--hero-cue-opacity, 1);
-  text-transform: uppercase;
-  transform: translateX(-50%);
-  white-space: nowrap;
-}
-
-.hero-cue span {
-  display: grid;
-  width: 20px;
-  height: 20px;
-  place-items: center;
-  border: 1px solid rgba(196, 185, 240, 0.3);
-  border-radius: 50%;
-}
-
-/* Threshold */
-
-.threshold {
-  position: relative;
-  height: 300vh;
-  margin-bottom: clamp(44px, 6vh, 88px);
-}
-
-.threshold__stage {
-  position: sticky;
-  top: 0;
-  display: grid;
-  height: 100svh;
-  place-items: center;
-  overflow: hidden;
-  background: radial-gradient(ellipse 60% 50% at 50% 62%, rgba(109, 91, 175, 0.16), transparent 68%);
-}
-
-.threshold__aperture {
-  position: absolute;
-  z-index: 3;
-  inset: 0;
-  pointer-events: none;
-}
-
-.threshold__aperture i {
-  position: absolute;
-  display: block;
-  inset: 0;
-  background: radial-gradient(ellipse var(--rx) var(--ry) at 50% 52%, transparent 0 95%, rgba(196, 185, 240, var(--edge)) 96.5% 99%, var(--rock) 100%);
-  opacity: var(--aperture-opacity, 1);
-  transform: scale(var(--aperture-scale, 1));
-  will-change: transform, opacity;
-}
-
-.threshold__aperture i:nth-child(1) { --rx: 150px; --ry: 105px; --edge: 0.45; --rock: #181329; }
-.threshold__aperture i:nth-child(2) { --rx: 218px; --ry: 151px; --edge: 0.34; --rock: #120e20; }
-.threshold__aperture i:nth-child(3) { --rx: 307px; --ry: 212px; --edge: 0.26; --rock: #0c0918; }
-.threshold__aperture i:nth-child(4) { --rx: 424px; --ry: 293px; --edge: 0.19; --rock: #08060f; }
-.threshold__aperture i:nth-child(5) { --rx: 590px; --ry: 408px; --edge: 0.13; --rock: #05040a; }
-
-.threshold__window {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  left: 50%;
-  width: min(1180px, 94vw);
-  aspect-ratio: 16 / 9;
-  max-height: 76svh;
-  overflow: hidden;
-  border: 1px solid rgba(196, 185, 240, 0.24);
-  border-radius: var(--threshold-radius, 44px);
-  background: radial-gradient(130% 120% at 50% 92%, rgba(154, 142, 205, 0.3), rgba(9, 7, 16, 0.96) 62%);
-  box-shadow:
-    0 0 150px -22px rgba(154, 142, 205, 0.6),
-    inset 0 0 90px rgba(109, 91, 175, 0.25);
-  transform: translate(-50%, -50%) scale(var(--threshold-scale, 0.58));
-  will-change: transform, border-radius;
-}
-
-.threshold__video {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #05040a;
-  opacity: 0.92;
-}
-
-.threshold__invitation {
-  position: relative;
-  z-index: 10;
-  display: grid;
-  justify-items: center;
-  gap: 18px;
-  text-align: center;
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.reforged-ready .threshold__invitation {
-  opacity: var(--threshold-invitation-opacity, 0);
-  pointer-events: var(--threshold-invitation-pointer-events, none);
-}
-
-.threshold__invitation p {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: #9a8ecd;
-  font: 600 0.625rem/1 var(--mono);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
-.threshold__invitation p span {
-  width: 22px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #9a8ecd);
-}
-
-.threshold__invitation p span:last-child {
-  background: linear-gradient(90deg, #9a8ecd, transparent);
-}
-
-.threshold__invitation > a {
-  display: grid;
-  width: 96px;
-  height: 96px;
-  place-items: center;
-  border: 1px solid rgba(196, 185, 240, 0.5);
-  border-radius: 50%;
-  background: radial-gradient(120% 120% at 50% 20%, rgba(196, 185, 240, 0.34), rgba(11, 9, 16, 0.85) 70%);
-  box-shadow:
-    0 0 0 12px rgba(154, 142, 205, 0.08),
-    0 0 70px -10px rgba(196, 185, 240, 0.75);
-  color: #f7f3ff;
-  font-size: 1.625rem;
-}
-
-.threshold__invitation h2 {
-  color: var(--white);
-  font: 700 clamp(1.5rem, 3vw, 2.7rem)/1 var(--font-display);
-  letter-spacing: -0.04em;
-}
-
-.threshold__invitation > span {
-  color: var(--white);
-  font: 600 clamp(0.9375rem, 1.6vw, 1.1875rem)/1.3 var(--font-display);
-  letter-spacing: -0.02em;
-}
-
-html.threshold-theater-open,
-html.threshold-theater-open body {
-  overflow: hidden;
-}
-
-.threshold-theater {
-  position: fixed;
-  display: none;
-  width: 100dvw;
-  height: 100dvh;
-  max-width: none;
-  max-height: none;
-  inset: 0;
-  place-items: center;
-  margin: 0;
-  padding: 16px;
-  border: 0;
-  background: #000;
-  color: #fff;
-}
-
-.threshold-theater[open] {
-  display: grid;
-}
-
-.threshold-theater::backdrop {
-  background: #000;
-}
-
-.threshold-theater__title {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-.threshold-theater__video {
-  display: block;
-  width: min(
-    1280px,
-    calc(100dvw - 32px),
-    calc((100dvh - 112px) * 16 / 9)
-  );
-  max-width: 1280px;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  background: #000;
-  box-shadow: 0 0 28px rgba(154, 142, 205, 0.26);
-  object-fit: contain;
-}
-
-.threshold-theater__video:focus-visible {
-  outline: 2px solid var(--violet-hot);
-  outline-offset: 4px;
-}
-
-.threshold-theater__close {
-  position: fixed;
-  top: max(16px, env(safe-area-inset-top));
-  right: max(16px, env(safe-area-inset-right));
-  display: grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.48);
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.86);
-  color: #fff;
-  cursor: pointer;
-  font: 400 2rem/1 var(--font-ui);
-  transition: none;
-}
-
-.threshold-theater__close:hover {
-  border-color: var(--violet-hot);
-  background: rgba(154, 142, 205, 0.32);
-}
-
-.threshold-theater__close:focus-visible {
-  outline: 2px solid var(--violet-hot);
-  outline-offset: 3px;
-}
-
 /* Runtime marquee */
 
 .runtime-marquee {
@@ -2509,18 +2260,13 @@ html.threshold-theater-open body {
     height: 380px;
   }
 
-  .hero-cue {
-    min-width: min(520px, calc(100% - 40px));
-  }
 
-  .threshold,
   .chapter--boundary,
   .chapter--surfaces,
   .chapter--invocation {
     height: auto;
   }
 
-  .threshold__stage,
   .chapter__sticky {
     position: relative;
     top: auto;
@@ -2529,35 +2275,10 @@ html.threshold-theater-open body {
     overflow: visible;
   }
 
-  .threshold__stage {
-    overflow: hidden;
-  }
 
-  .threshold__window {
-    position: relative;
-    top: auto;
-    left: auto;
-    width: calc(100% - 32px);
-    max-height: none;
-    transform: none !important;
-  }
 
-  .threshold__aperture {
-    opacity: 0.34;
-  }
 
-  .threshold__aperture i {
-    transform: scale(2.4) !important;
-  }
 
-  .threshold__invitation {
-    position: absolute;
-    right: 0;
-    bottom: 28px;
-    left: 0;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
 
   .runtime-marquee__inner {
     padding-inline: 20px;
@@ -2683,10 +2404,12 @@ html.threshold-theater-open body {
     height: 250px;
   }
 
-  .hero-cue {
-    bottom: 8px;
-    min-width: 0;
-  }
+
+
+
+
+
+
 }
 
 @media (max-width: 700px) {
@@ -2716,30 +2439,10 @@ html.threshold-theater-open body {
     height: 330px;
   }
 
-  .hero-cue {
-    bottom: 10px;
-    width: calc(100% - 32px);
-    min-width: 0;
-    font-size: 0.5625rem;
-  }
 
-  .threshold__stage {
-    min-height: 660px;
-  }
 
-  .threshold__window {
-    aspect-ratio: 16 / 9;
-    min-height: 0;
-  }
 
-  .threshold__invitation {
-    bottom: 22px;
-  }
 
-  .threshold__invitation > a {
-    width: 66px;
-    height: 66px;
-  }
 
   .runtime-marquee__heading {
     align-items: flex-start;
@@ -2771,7 +2474,6 @@ html.threshold-theater-open body {
   .skip-link,
   .reforged-brand,
   .hero-links a,
-  .hero-cue,
   .boundary-panel > a,
   .surface-card__guide,
   .invocation-next a,
@@ -3003,14 +2705,12 @@ html.threshold-theater-open body {
     transition-duration: 0.001ms !important;
   }
 
-  .threshold,
   .chapter--boundary,
   .chapter--surfaces,
   .chapter--invocation {
     height: auto;
   }
 
-  .threshold__stage,
   .chapter__sticky {
     position: relative;
     height: auto;
@@ -3018,27 +2718,10 @@ html.threshold-theater-open body {
     overflow: visible;
   }
 
-  .threshold__stage {
-    overflow: hidden;
-  }
 
-  .threshold__aperture {
-    transform: none !important;
-  }
 
-  .threshold__aperture i {
-    opacity: 0.24 !important;
-    transform: scale(2.6) !important;
-  }
 
-  .threshold__window {
-    transform: translate(-50%, -50%) !important;
-  }
 
-  .threshold__invitation {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-  }
 
   .runtime-marquee__track {
     animation-name: none !important;
@@ -3046,7 +2729,4 @@ html.threshold-theater-open body {
 }
 
 @media (max-width: 900px) and (prefers-reduced-motion: reduce) {
-  .threshold__window {
-    transform: none !important;
-  }
 }
