@@ -1,0 +1,111 @@
+---
+import { surfaces } from '../../data/reforged';
+---
+
+<section
+  class="chapter chapter--surfaces"
+  id="surfaces"
+  aria-labelledby="surfaces-heading"
+  data-surfaces
+>
+  <div class="chapter__sticky">
+    <div class="chapter-panel">
+      <header class="chapter-heading">
+        <p>
+          <span>II</span>
+          the surfaces
+          <small>start where the work is</small>
+        </p>
+        <div>
+          <h2 id="surfaces-heading">One substrate. Three ways in.</h2>
+          <p>
+            Every surface writes to the same local record. Start wherever the
+            work is — each path leads to its own verifiable Quick Start.
+          </p>
+        </div>
+      </header>
+
+      <div class="surface-grid">
+        {surfaces.map((surface, index) => (
+          <article
+            class="surface-card"
+            data-surface-card={surface.id}
+            data-expanded={index === 0 ? 'true' : 'false'}
+          >
+            <button
+              type="button"
+              class="surface-card__trigger"
+              data-surface-trigger
+              aria-expanded={index === 0 ? 'true' : 'false'}
+              aria-controls={`surface-demo-${surface.id}`}
+            >
+              <span class="surface-sigil">{surface.sigil}</span>
+              <span>
+                <small>{surface.eyebrow}</small>
+                <strong>{surface.name}</strong>
+              </span>
+              <i aria-hidden="true">↗</i>
+            </button>
+            <p class="surface-card__summary">{surface.summary}</p>
+            <p class="surface-card__best">{surface.bestFor}</p>
+            <div class="surface-card__meta">
+              <span>{surface.status}</span>
+              <span>{surface.platforms}</span>
+            </div>
+
+            <div
+              class="surface-demo"
+              id={`surface-demo-${surface.id}`}
+              data-surface-demo
+            >
+              {surface.id === 'cave' && (
+                <div class="surface-demo__cave">
+                  <header><i></i><i></i><i></i><span>3 familiars · local</span><b>live</b></header>
+                  <div>
+                    <aside><b>FAMILIARS</b><span>PROJECTS</span><span>SESSIONS</span></aside>
+                    <div class="surface-demo__cave-main">
+                      <p><b>H</b><span>Hexi<small>feat/runtime-attach</small></span><em>● working</em></p>
+                      <p><b>S</b><span>Sage<small>runtime-notes</small></span><em>idle</em></p>
+                      <footer>iOS companion <strong>paired</strong></footer>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {surface.id === 'cli' && (
+                <div class="surface-demo__terminal">
+                  <p>❯ coven doctor</p>
+                  <span>✔ project&nbsp;&nbsp;&nbsp;./opencoven</span>
+                  <span>✔ harness&nbsp;&nbsp;&nbsp;codex</span>
+                  <strong>✔ daemon&nbsp;&nbsp;&nbsp;&nbsp;running</strong>
+                  <p>❯ coven run codex "explain this repo"</p>
+                  <span>session&nbsp;&nbsp;&nbsp;01JC7F · feat/runtime-attach</span>
+                </div>
+              )}
+              {surface.id === 'code' && (
+                <div class="surface-demo__code">
+                  <span>src/<br />tests/<br />README</span>
+                  <p><strong>+ adapter boundary</strong><em>- legacy shim</em><b>▍ awaiting review</b></p>
+                </div>
+              )}
+            </div>
+
+            <a class="surface-card__guide" href={surface.href}>
+              Open guide <span aria-hidden="true">→</span>
+            </a>
+          </article>
+        ))}
+      </div>
+
+      <div class="doctor-strip" data-copy-surface>
+        <p><small><span></span>still deciding</small><strong>Let the runtime pick the surface.</strong><span>Run one command in your project. Coven reads what is already there and names the next verified step.</span></p>
+        <code><i aria-hidden="true">❯</i>coven doctor</code>
+        <button
+          type="button"
+          data-copy-command="coven doctor"
+          aria-label="Copy coven doctor"
+        >copy →</button>
+        <p data-copy-guidance hidden></p>
+      </div>
+    </div>
+  </div>
+</section>

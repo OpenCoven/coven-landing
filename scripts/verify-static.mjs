@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -20,19 +21,98 @@ const root = process.cwd();
 const publicDir = path.join(root, 'public');
 const distDir = path.join(root, 'dist');
 
+function verifyCovenCaveExplainerStreams() {
+  const explainer = path.join(
+    publicDir,
+    'reforged',
+    'coven-cave-explainer.mp4',
+  );
+  let inspection;
+  try {
+    inspection = execFileSync(
+      'ffprobe',
+      [
+        '-v',
+        'error',
+        '-show_entries',
+        'stream=codec_type,codec_name,channels',
+        '-of',
+        'json',
+        explainer,
+      ],
+      { encoding: 'utf8' },
+    );
+  } catch (error) {
+    if (error?.code === 'ENOENT') {
+      throw new Error(
+        'ffprobe is required to verify public/reforged/coven-cave-explainer.mp4; install FFmpeg and retry.',
+      );
+    }
+    const details = error?.stderr?.toString().trim() || error?.message;
+    throw new Error(
+      `ffprobe could not inspect public/reforged/coven-cave-explainer.mp4: ${details}`,
+    );
+  }
+
+  let metadata;
+  try {
+    metadata = JSON.parse(inspection);
+  } catch (error) {
+    throw new Error(
+      `ffprobe returned invalid JSON for public/reforged/coven-cave-explainer.mp4: ${error.message}`,
+    );
+  }
+  if (
+    !metadata
+    || typeof metadata !== 'object'
+    || Array.isArray(metadata)
+    || !Array.isArray(metadata.streams)
+  ) {
+    throw new Error(
+      'ffprobe returned malformed stream metadata for public/reforged/coven-cave-explainer.mp4; expected a JSON object with a streams array.',
+    );
+  }
+  const { streams } = metadata;
+
+  const videoStreams = streams.filter((stream) => stream.codec_type === 'video');
+  if (videoStreams.length !== 1) {
+    throw new Error(
+      'public/reforged/coven-cave-explainer.mp4 must contain exactly one video stream.',
+    );
+  }
+  if (videoStreams[0].codec_name !== 'h264') {
+    throw new Error(
+      'public/reforged/coven-cave-explainer.mp4 video stream must use H.264.',
+    );
+  }
+
+  const audioStreams = streams.filter((stream) => stream.codec_type === 'audio');
+  if (audioStreams.length !== 1) {
+    throw new Error(
+      'public/reforged/coven-cave-explainer.mp4 must contain exactly one audio stream.',
+    );
+  }
+  if (audioStreams[0].codec_name !== 'aac') {
+    throw new Error(
+      'public/reforged/coven-cave-explainer.mp4 audio stream must use AAC.',
+    );
+  }
+  if (audioStreams[0].channels !== 2) {
+    throw new Error(
+      'public/reforged/coven-cave-explainer.mp4 must contain stereo AAC audio.',
+    );
+  }
+
+  console.log(
+    'Verified Coven Cave explainer MP4 streams: H.264 video and one stereo AAC audio stream.',
+  );
+}
+
 const escapeRegExp = (value) =>
   value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const countMatches = (content, pattern) =>
   [...content.matchAll(pattern)].length;
-
-const hasClassToken = (content, token) => {
-  const tags = content.match(/<[a-z][^>]*>/gi) ?? [];
-  return tags.some((tag) => {
-    const classValue = tag.match(/\bclass=(["'])(.*?)\1/i)?.[2];
-    return classValue?.split(/\s+/).includes(token) ?? false;
-  });
-};
 
 const toRenderedText = (content) =>
   content
@@ -132,6 +212,8 @@ if (missing.length > 0) {
   throw new Error(`Missing required public files: ${missing.join(', ')}`);
 }
 
+verifyCovenCaveExplainerStreams();
+
 const assertCanonicalLogoSvg = (content, label) => {
   if (content.includes('currentColor')) {
     throw new Error(
@@ -160,8 +242,6 @@ assertCanonicalLogoSvg(og, 'public/og.svg');
 
 const distIndex = path.join(distDir, 'index.html');
 if (existsSync(distIndex)) {
-  // The sitemap only exists post-build; guard the @astrojs/sitemap
-  // integration against accidental removal from astro.config.mjs.
   if (!existsSync(path.join(distDir, 'sitemap-index.xml'))) {
     throw new Error('dist/sitemap-index.xml is missing — is the @astrojs/sitemap integration still configured?');
   }
@@ -169,12 +249,11 @@ if (existsSync(distIndex)) {
   const renderedText = toRenderedText(html);
   const narrativeOrder = [
     'id="top"',
-    'class="trust-bar"',
-    'id="how-it-works"',
-    'id="runtime"',
-    'id="products"',
-    'id="quickstart"',
-    'class="closing-invitation"',
+    'id="runtimes"',
+    'id="boundary"',
+    'id="surfaces"',
+    'id="invocation"',
+    'id="summon"',
   ];
   let previousPosition = -1;
   for (const marker of narrativeOrder) {
@@ -187,14 +266,6 @@ if (existsSync(distIndex)) {
     previousPosition = position;
   }
 
-  if (/<[a-z][^>]*\bdata-reveal(?:[=\s>])/i.test(html)) {
-    throw new Error('Homepage must not retain blanket per-card scroll reveals');
-  }
-
-  if (hasClassToken(html, 'ambient')) {
-    throw new Error('Homepage must not render the cursor-tracked Ambient component');
-  }
-
   const javascriptBudget = await getInitialJavascriptBudget(html);
   const maximumInitialJavascript = 20 * 1024;
   if (javascriptBudget.bytes >= maximumInitialJavascript) {
@@ -205,323 +276,130 @@ if (existsSync(distIndex)) {
   console.log(
     `Verified homepage initial JavaScript: ${javascriptBudget.bytes} gzip bytes across ${javascriptBudget.modules.length} module files.`,
   );
-  const requiredCopy = [
+
+  const requiredReforgedCopy = [
     'Persistent AI Familiars',
-    'familiars',
+    'Summon once. Remember forever.',
+    'A familiar is an AI agent with a memory, bound to your project.',
+    'the runtimes it speaks',
+    'Three layers. Only one is yours to defend.',
+    'One substrate. Three ways in.',
+    'Three commands to first summon.',
+    'Your familiar. Your tools. Your machine.',
+    'Coven Cave',
     'Coven CLI',
-    'Quick Start',
-    'https://discord.gg/opencoven',
-  ];
-  const missingCopy = requiredCopy.filter((needle) => !html.includes(needle));
-  if (missingCopy.length > 0) {
-    throw new Error(`Missing expected copy in dist/index.html: ${missingCopy.join(', ')}`);
-  }
-
-  const requiredHeroCopy = [
-    'Summon agents that remember.',
-    'Start with OpenCoven',
-    'View on GitHub',
-    'example · local',
-    'Download Coven Cave for macOS',
-  ];
-  const missingHeroCopy = requiredHeroCopy.filter(
-    (needle) => !renderedText.includes(needle),
-  );
-  if (missingHeroCopy.length > 0) {
-    throw new Error(
-      `Missing Living Familiar hero copy in dist/index.html: ${missingHeroCopy.join(', ')}`,
-    );
-  }
-
-  const requiredStoryCopy = [
-    'Codex · Claude Code',
-    'Open source',
-    'Local-first',
-    'Provider-owned',
-    'Start inside one explicit project.',
-    'Keep the conventions worth carrying.',
-    'Change surfaces without starting over.',
-    'Resume with the relevant state intact.',
-  ];
-  const missingStoryCopy = requiredStoryCopy.filter(
-    (needle) => !renderedText.includes(needle),
-  );
-  if (missingStoryCopy.length > 0) {
-    throw new Error(
-      `Missing continuity story copy in dist/index.html: ${missingStoryCopy.join(', ')}`,
-    );
-  }
-
-  const requiredRuntimeCopy = [
-    'One runtime between the surface and your work.',
-    'Harness or product surface',
-    'Coven',
-    'Your project',
-    'Sessions, familiar memory, adapters, and controlled tool access',
-  ];
-  const missingRuntimeCopy = requiredRuntimeCopy.filter(
-    (needle) => !renderedText.includes(needle),
-  );
-  if (missingRuntimeCopy.length > 0) {
-    throw new Error(
-      `Missing condensed runtime proof in dist/index.html: ${missingRuntimeCopy.join(', ')}`,
-    );
-  }
-
-  const requiredBeginAndBelongCopy = [
-    'Run your first familiar in three commands.',
+    'Coven Code',
+    'OpenAI Codex',
+    'Claude Code',
+    'GitHub Copilot',
+    'OpenCode',
+    'Grok Build',
+    'Hermes Agent',
+    'OpenClaw',
     'npm install -g @opencoven/cli',
     'coven doctor',
     'coven run codex "explain this repo in 5 bullets"',
-    'Choose any product',
-    'Your familiar, your tools, your machine.',
+    'https://discord.gg/opencoven',
+    'https://testflight.apple.com/join/61Dqw8y4',
   ];
-  const missingBeginAndBelongCopy = requiredBeginAndBelongCopy.filter(
-    (needle) => !renderedText.includes(needle),
+  const missingCopy = requiredReforgedCopy.filter(
+    (needle) => !renderedText.includes(needle) && !html.includes(needle),
   );
-  if (missingBeginAndBelongCopy.length > 0) {
+  if (missingCopy.length > 0) {
     throw new Error(
-      `Missing Begin or Belong copy in dist/index.html: ${missingBeginAndBelongCopy.join(', ')}`,
+      `Missing Reforged copy in dist/index.html: ${missingCopy.join(', ')}`,
     );
   }
 
-  const primaryCtaCount = countMatches(
-    html,
-    /<a(?=[^>]*\bdata-primary-cta)(?=[^>]*\bhref="\/quickstart")[^>]*>/g,
+  const reforgedAssets = [
+    'claude-code-mascot.png',
+    'codex-3d.png',
+    'grok-3d.png',
+    'openclaw-mascot.png',
+    'opencode-3d.png',
+    'hermes-agent.png',
+    'github-copilot.png',
+  ];
+  const missingAssets = reforgedAssets.filter(
+    (file) => !existsSync(path.join(publicDir, 'reforged', file)),
   );
-  if (primaryCtaCount !== 3) {
-    throw new Error(
-      `Homepage must expose exactly three marked primary CTAs to /quickstart across header, hero, and close; found ${primaryCtaCount}`,
-    );
+  if (missingAssets.length > 0) {
+    throw new Error(`Missing Reforged public assets: ${missingAssets.join(', ')}`);
   }
-
-  const mobileDialog = html.match(
-    /<div(?=[^>]*\bid="mobile-nav")(?=[^>]*\brole="dialog")(?=[^>]*\baria-modal="true")(?=[^>]*\bhidden)[^>]*>/,
-  );
-  if (!mobileDialog) {
-    throw new Error(
-      'Mobile navigation must render as an initially hidden modal dialog',
-    );
-  }
-
-  if (!html.includes('class="mobile-nav-fallback"')) {
-    throw new Error('Mobile navigation must include a no-JavaScript fallback');
-  }
-
-  if (!html.includes('data-feedback-launcher')) {
-    throw new Error(
-      'Homepage must render the lightweight feedback fallback link',
-    );
-  }
-  if (
-    html.includes(
-      '<script src="https://feedback.opencoven.ai/api/widget/sdk.js"',
-    )
-  ) {
-    throw new Error('Homepage HTML must not load the feedback SDK eagerly');
-  }
-
-  if (
-    !/<ol(?=[^>]*\bclass="quickstart-preview-steps")(?=[^>]*\brole="list")[^>]*>/.test(
-      html,
-    )
-  ) {
-    throw new Error('Homepage Quick Start preview must be an ordered list');
-  }
-
-  const previewCopyValues = countMatches(
-    html,
-    /\bdata-copy="(?:npm install -g @opencoven\/cli|coven doctor|coven run codex (?:&quot;|&#34;)explain this repo in 5 bullets(?:&quot;|&#34;))"/g,
-  );
-  if (previewCopyValues !== 3) {
-    throw new Error(
-      `Homepage Quick Start must render three canonical copied commands; found ${previewCopyValues}`,
-    );
-  }
-
-  const closingInvitationHtml = html.match(
-    /<section(?=[^>]*\bclass="closing-invitation")[^>]*>([\s\S]*?)<\/section>/,
-  )?.[1] ?? '';
-  if (
-    !/<a(?=[^>]*\bdata-primary-cta)(?=[^>]*\bhref="\/quickstart")[^>]*>\s*Start with OpenCoven\s*<\/a>/.test(
-      closingInvitationHtml,
-    )
-  ) {
-    throw new Error('Closing invitation must repeat Start with OpenCoven → /quickstart');
-  }
-
-  if (
-    /<section(?=[^>]*\bclass="[^"]*\becosystem-section\b)[^>]*>/.test(html)
-  ) {
-    throw new Error('Homepage must not retain the old Discord-primary ecosystem section');
-  }
-  if (html.includes('href="/#ecosystem"')) {
-    throw new Error('Homepage must not retain a dead link to the removed ecosystem section');
-  }
-
-  const runtimeTabs = countMatches(html, /\bdata-runtime-tab=/g);
-  const runtimePanels = countMatches(html, /\bdata-runtime-panel=/g);
-  const runtimeDisclosures = countMatches(
-    html,
-    /<details(?=[^>]*\bclass="runtime-disclosure")/g,
-  );
-  if (runtimeTabs !== 3 || runtimePanels !== 3 || runtimeDisclosures !== 3) {
-    throw new Error(
-      `Runtime proof must render 3 tabs, 3 panels, and 3 mobile disclosures; found ${runtimeTabs}, ${runtimePanels}, and ${runtimeDisclosures}`,
-    );
-  }
-
-  const constellationListHtml = html.match(
-    /<ul(?=[^>]*\bdata-product-constellation(?:\s|=|>))[^>]*>([\s\S]*?)<\/ul>/,
-  )?.[1];
-  if (!constellationListHtml) {
-    throw new Error('Homepage product constellation list is missing');
-  }
-
-  const constellationItems =
-    constellationListHtml.match(/<li\b[^>]*>[\s\S]*?<\/li>/g) ?? [];
-  const constellationAnchors =
-    constellationListHtml.match(/<a\b[^>]*>[\s\S]*?<\/a>/g) ?? [];
-  if (constellationItems.length !== 5 || constellationAnchors.length !== 5) {
-    throw new Error(
-      `Homepage product constellation must render exactly five list items and five links; found ${constellationItems.length} items and ${constellationAnchors.length} links`,
-    );
-  }
-
-  for (const [index, contract] of productContracts.entries()) {
-    const product = quickstartProducts[index];
-    const itemHtml = constellationItems[index];
-    const itemAnchors = itemHtml.match(/<a\b[^>]*>[\s\S]*?<\/a>/g) ?? [];
-    const href = `/quickstart#${contract.id}`;
-    if (
-      itemAnchors.length !== 1
-      || !new RegExp(`\\bhref="${escapeRegExp(href)}"`).test(itemAnchors[0])
-    ) {
-      throw new Error(
-        `${contract.name} (${contract.id}) must render exactly one homepage product constellation link to ${href}; found ${itemAnchors.length}`,
-      );
-    }
-
-    const cardText = toRenderedText(itemAnchors[0]);
-    if (!cardText.includes(contract.name)) {
-      throw new Error(
-        `${contract.name} (${contract.id}) homepage card is missing its canonical product name`,
-      );
-    }
-    for (const field of [
-      'sigil',
-      'eyebrow',
-      'summary',
-      'bestFor',
-      'status',
-      'platforms',
-    ]) {
-      if (!cardText.includes(product[field])) {
-        throw new Error(
-          `${product.name} (${product.id}) homepage card is missing registry field ${field}: ${product[field]}`,
-        );
-      }
+  for (const asset of reforgedAssets) {
+    if (!html.includes(`/reforged/${asset}`)) {
+      throw new Error(`Homepage does not render /reforged/${asset}`);
     }
   }
 
-  const productCardCount = countMatches(
-    constellationListHtml,
-    /\bclass="product-card"/g,
-  );
-  if (productCardCount !== 5) {
-    throw new Error(
-      `Homepage product constellation must render exactly five class="product-card" links; found ${productCardCount}`,
-    );
+  const reforgedMedia = ['coven-cave-explainer.mp4'];
+  for (const media of reforgedMedia) {
+    if (!existsSync(path.join(publicDir, 'reforged', media))) {
+      throw new Error(`Missing Reforged media asset: ${media}`);
+    }
+    if (!html.includes(`/reforged/${media}`)) {
+      throw new Error(`Homepage does not render /reforged/${media}`);
+    }
   }
 
-  const constellationSectionTag = html.match(
-    /<section(?=[^>]*\bclass="product-constellation")[^>]*>/,
-  )?.[0];
-  if (
-    !constellationSectionTag?.includes(
-      'aria-describedby="products-foundation-description"',
-    )
-    || !/<p(?=[^>]*\bid="products-foundation-description")(?=[^>]*\bclass="sr-only")[^>]*>\s*Coven is the shared local-first runtime foundation behind all five surfaces\.\s*<\/p>/.test(
-      html,
-    )
-  ) {
-    throw new Error(
-      'Homepage product constellation must associate the five surfaces with the shared local-first Coven runtime foundation',
-    );
+  if (!html.includes('href="/reforged/coven-cave-explainer.mp4"')) {
+    throw new Error('Homepage is missing the Coven Cave explainer link');
   }
-
-  const howItWorksAnchors = countMatches(
-    html,
-    /\bid="how-it-works"/g,
-  );
-  if (howItWorksAnchors !== 1) {
-    throw new Error(
-      `Homepage must render exactly one id="how-it-works"; found ${howItWorksAnchors}`,
-    );
-  }
-
-  for (const obsoleteClass of [
-    'architecture-section',
-    'howitworks-section',
-    'compare-section',
-    'proof-section',
+  for (const marker of [
+    'id="threshold"',
+    'data-threshold-theater',
+    'data-threshold-theater-trigger',
   ]) {
-    if (html.includes(obsoleteClass)) {
-      throw new Error(`Homepage still renders obsolete ${obsoleteClass}`);
+    if (html.includes(marker)) {
+      throw new Error(`Homepage retains removed Threshold markup: ${marker}`);
     }
   }
 
-  if (!/<ol(?=[^>]*\bclass="continuity-stages")(?=[^>]*\brole="list")[^>]*>/.test(html)) {
-    throw new Error('Continuity story must render an ordered list with role="list"');
+  const runtimeChips = countMatches(html, /\bdata-runtime-chip=/g);
+  const boundaryTabs = countMatches(html, /\bdata-boundary-tab=/g);
+  const boundaryPanels = countMatches(html, /\bdata-boundary-panel=/g);
+  const surfaceCards = countMatches(html, /\bdata-surface-card=/g);
+  const invocationSteps = countMatches(html, /\bdata-invocation-step=/g);
+  if (runtimeChips !== 7) {
+    throw new Error(`Homepage must render seven runtime chips; found ${runtimeChips}`);
   }
-
-  for (const stageId of ['summoned', 'learned', 'moved', 'returned']) {
-    const stagePattern = new RegExp(
-      `<li(?=[^>]*\\bid="stage-${stageId}")(?=[^>]*\\bdata-story-stage="${stageId}")[^>]*>`,
-    );
-    if (!stagePattern.test(html)) {
-      throw new Error(`Continuity story is missing semantic stage ${stageId}`);
-    }
-  }
-
-  const heroHtml = html.match(
-    /<section(?=[^>]*\bclass="hero")(?=[^>]*\bid="top")[^>]*>([\s\S]*?)<\/section>/,
-  )?.[1];
-  if (!heroHtml) {
-    throw new Error('Homepage must render <section class="hero" id="top">');
-  }
-
-  if (
-    !/<a(?=[^>]*\bdata-primary-cta)(?=[^>]*\bhref="\/quickstart")[^>]*>\s*Start with OpenCoven\s*<\/a>/.test(
-      heroHtml,
-    )
-  ) {
-    throw new Error('Hero primary CTA must be Start with OpenCoven → /quickstart');
-  }
-
-  const familiarTabs = countMatches(heroHtml, /\bdata-familiar-tab=/g);
-  const familiarPanels = countMatches(heroHtml, /\bdata-familiar-panel=/g);
-  if (familiarTabs !== 3 || familiarPanels !== 3) {
+  if (boundaryTabs !== 3 || boundaryPanels !== 3) {
     throw new Error(
-      `Hero must render three manual familiar tabs and panels; found ${familiarTabs} tabs and ${familiarPanels} panels`,
+      `Homepage must render three boundary tabs and panels; found ${boundaryTabs} and ${boundaryPanels}`,
+    );
+  }
+  if (surfaceCards !== 3) {
+    throw new Error(`Homepage must render three surface cards; found ${surfaceCards}`);
+  }
+  if (invocationSteps !== 3) {
+    throw new Error(`Homepage must render three invocation steps; found ${invocationSteps}`);
+  }
+
+  const canonicalCopyValues = countMatches(
+    html,
+    /\bdata-copy-command="(?:npm install -g @opencoven\/cli|coven doctor|coven run codex (?:&quot;|&#34;)explain this repo in 5 bullets(?:&quot;|&#34;))"/g,
+  );
+  if (canonicalCopyValues < 3) {
+    throw new Error(
+      `Homepage must expose the three canonical copied commands; found ${canonicalCopyValues}`,
     );
   }
 
-  if (!html.includes('data-download-primary')) {
-    throw new Error('Hero must preserve one platform-aware Cave download shortcut');
-  }
-  if (html.includes('data-download-ios')) {
-    throw new Error('The quiet hero shortcut must not render a competing iOS download button');
-  }
-
-  const previewClarification =
-    "Follow doctor's exact Codex or Claude Code install/auth next step. This compact preview uses Codex; the full product guide includes the Claude run.";
-  if (!renderedText.includes(previewClarification)) {
-    throw new Error('Homepage compact quickstart must clarify that its Codex preview links to a full guide with the Claude run');
+  for (const forbidden of [
+    'video slot',
+    'Drop a file into the project',
+    'set Video source in Tweaks',
+    'support.js',
+    'OpenCoven Landing - Reforged.dc.html',
+    'fonts.googleapis.com',
+  ]) {
+    if (renderedText.includes(forbidden) || html.includes(forbidden)) {
+      throw new Error(`Homepage retains prototype-only content or dependency: ${forbidden}`);
+    }
   }
 
   console.log(
-    `Verified ${requiredPublicFiles.length} required public files, canonical favicon + OG logos, and ${requiredCopy.length} required copy strings in dist/index.html.`,
+    `Verified ${requiredPublicFiles.length} core assets, ${reforgedAssets.length} Reforged assets, and ${requiredReforgedCopy.length} Reforged copy contracts in dist/index.html.`,
   );
 } else {
   console.log(
