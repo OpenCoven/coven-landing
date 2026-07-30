@@ -248,12 +248,11 @@ if (existsSync(distIndex)) {
   const html = await readFile(distIndex, 'utf8');
   const renderedText = toRenderedText(html);
   const narrativeOrder = [
+    'data-nav=',
     'id="top"',
-    'id="runtimes"',
-    'id="boundary"',
-    'id="surfaces"',
-    'id="invocation"',
-    'id="summon"',
+    'id="board"',
+    'id="outcomes"',
+    'id="get"',
   ];
   let previousPosition = -1;
   for (const marker of narrativeOrder) {
@@ -266,8 +265,11 @@ if (existsSync(distIndex)) {
     previousPosition = position;
   }
 
+  // The redesign ships an interactive product board and a WebGL hero, so the
+  // budget is wider than the old landing's — but still a hard ceiling so a
+  // dependency cannot creep in unnoticed.
   const javascriptBudget = await getInitialJavascriptBudget(html);
-  const maximumInitialJavascript = 20 * 1024;
+  const maximumInitialJavascript = 120 * 1024;
   if (javascriptBudget.bytes >= maximumInitialJavascript) {
     throw new Error(
       `Homepage initial JavaScript is ${javascriptBudget.bytes} gzip bytes; budget is below ${maximumInitialJavascript}`,
@@ -277,121 +279,61 @@ if (existsSync(distIndex)) {
     `Verified homepage initial JavaScript: ${javascriptBudget.bytes} gzip bytes across ${javascriptBudget.modules.length} module files.`,
   );
 
-  const requiredReforgedCopy = [
-    'Persistent AI Familiars',
-    'Summon once. Remember forever.',
-    'A familiar is an AI agent with a memory, bound to your project.',
-    'the runtimes it speaks',
-    'Three layers. Only one is yours to defend.',
-    'One substrate. Three ways in.',
-    'Three commands to first summon.',
-    'Your familiar. Your tools. Your machine.',
-    'Coven Cave',
-    'Coven CLI',
-    'Coven Code',
-    'OpenAI Codex',
-    'Claude Code',
-    'GitHub Copilot',
-    'OpenCode',
-    'Grok Build',
-    'Hermes Agent',
-    'OpenClaw',
-    'npm install -g @opencoven/cli',
-    'coven doctor',
-    'coven run codex "explain this repo in 5 bullets"',
+  const requiredRedesignCopy = [
+    "Stop being your agents' control plane.",
+    'one loses the work',
+    'One shared record.',
+    'What changes on day one',
+    'Agents stop overwriting each other',
+    'Claims and memory outlive the session',
+    'You stay the authority',
+    'Install Cave, then open a repo.',
+    'Download Cave for macOS',
+    'npm i -g @opencoven/cli',
     'https://discord.gg/opencoven',
     'https://testflight.apple.com/join/61Dqw8y4',
+    '/warded-braid.js',
+    'data-art="win-x64"',
+    'data-art="mac-arm64"',
+    'data-art="linux-amd64"',
   ];
-  const missingCopy = requiredReforgedCopy.filter(
+  const missingCopy = requiredRedesignCopy.filter(
     (needle) => !renderedText.includes(needle) && !html.includes(needle),
   );
   if (missingCopy.length > 0) {
     throw new Error(
-      `Missing Reforged copy in dist/index.html: ${missingCopy.join(', ')}`,
+      `Missing redesign copy in dist/index.html: ${missingCopy.join(', ')}`,
     );
   }
 
-  const reforgedAssets = [
-    'claude-code-mascot.png',
-    'codex-3d.png',
-    'grok-3d.png',
-    'openclaw-mascot.png',
-    'opencode-3d.png',
-    'hermes-agent.png',
-    'github-copilot.png',
+  const redesignAssets = [
+    ['assets/opencoven-mark-line.svg', '/assets/opencoven-mark-line.svg'],
+    ['logos/anthropic.svg', '/logos/anthropic.svg'],
+    ['logos/openai.svg', '/logos/openai.svg'],
+    ['warded-braid.js', '/warded-braid.js'],
   ];
-  const missingAssets = reforgedAssets.filter(
-    (file) => !existsSync(path.join(publicDir, 'reforged', file)),
-  );
-  if (missingAssets.length > 0) {
-    throw new Error(`Missing Reforged public assets: ${missingAssets.join(', ')}`);
-  }
-  for (const asset of reforgedAssets) {
-    if (!html.includes(`/reforged/${asset}`)) {
-      throw new Error(`Homepage does not render /reforged/${asset}`);
+  for (const [file, ref] of redesignAssets) {
+    if (!existsSync(path.join(publicDir, file))) {
+      throw new Error(`Missing redesign public asset: ${file}`);
+    }
+    if (!html.includes(ref)) {
+      throw new Error(`Homepage does not reference ${ref}`);
     }
   }
 
-  const reforgedMedia = ['coven-cave-explainer.mp4'];
-  for (const media of reforgedMedia) {
-    if (!existsSync(path.join(publicDir, 'reforged', media))) {
-      throw new Error(`Missing Reforged media asset: ${media}`);
-    }
-    if (!html.includes(`/reforged/${media}`)) {
-      throw new Error(`Homepage does not render /reforged/${media}`);
-    }
-  }
-
-  if (!html.includes('href="/reforged/coven-cave-explainer.mp4"')) {
-    throw new Error('Homepage is missing the Coven Cave explainer link');
-  }
-  for (const marker of [
-    'id="threshold"',
-    'data-threshold-theater',
-    'data-threshold-theater-trigger',
-  ]) {
-    if (html.includes(marker)) {
-      throw new Error(`Homepage retains removed Threshold markup: ${marker}`);
-    }
-  }
-
-  const runtimeChips = countMatches(html, /\bdata-runtime-chip=/g);
-  const boundaryTabs = countMatches(html, /\bdata-boundary-tab=/g);
-  const boundaryPanels = countMatches(html, /\bdata-boundary-panel=/g);
-  const surfaceCards = countMatches(html, /\bdata-surface-card=/g);
-  const invocationSteps = countMatches(html, /\bdata-invocation-step=/g);
-  if (runtimeChips !== 7) {
-    throw new Error(`Homepage must render seven runtime chips; found ${runtimeChips}`);
-  }
-  if (boundaryTabs !== 3 || boundaryPanels !== 3) {
-    throw new Error(
-      `Homepage must render three boundary tabs and panels; found ${boundaryTabs} and ${boundaryPanels}`,
-    );
-  }
-  if (surfaceCards !== 3) {
-    throw new Error(`Homepage must render three surface cards; found ${surfaceCards}`);
-  }
-  if (invocationSteps !== 3) {
-    throw new Error(`Homepage must render three invocation steps; found ${invocationSteps}`);
-  }
-
-  const canonicalCopyValues = countMatches(
-    html,
-    /\bdata-copy-command="(?:npm install -g @opencoven\/cli|coven doctor|coven run codex (?:&quot;|&#34;)explain this repo in 5 bullets(?:&quot;|&#34;))"/g,
-  );
-  if (canonicalCopyValues < 3) {
-    throw new Error(
-      `Homepage must expose the three canonical copied commands; found ${canonicalCopyValues}`,
-    );
+  // the footer's Product links point at pages that do not exist yet — the
+  // column ships hidden until they do
+  const productColumn = html.indexOf('display: none; flex-direction: column');
+  if (productColumn === -1) {
+    throw new Error('Footer Product column is visible but its pages do not exist yet');
   }
 
   for (const forbidden of [
-    'video slot',
-    'Drop a file into the project',
-    'set Video source in Tweaks',
     'support.js',
-    'OpenCoven Landing - Reforged.dc.html',
     'fonts.googleapis.com',
+    'api.github.com',
+    'discord.com/api',
+    'unpkg.com/three@0.184.0/build/three.module.js"',
   ]) {
     if (renderedText.includes(forbidden) || html.includes(forbidden)) {
       throw new Error(`Homepage retains prototype-only content or dependency: ${forbidden}`);
@@ -399,12 +341,31 @@ if (existsSync(distIndex)) {
   }
 
   console.log(
-    `Verified ${requiredPublicFiles.length} core assets, ${reforgedAssets.length} Reforged assets, and ${requiredReforgedCopy.length} Reforged copy contracts in dist/index.html.`,
+    `Verified ${requiredPublicFiles.length} core assets and ${requiredRedesignCopy.length} redesign copy contracts in dist/index.html.`,
   );
 } else {
   console.log(
     `Verified ${requiredPublicFiles.length} required public files and canonical favicon + OG logos. (Skipped dist/index.html copy check — run \`npm run build\` first.)`,
   );
+}
+
+const distHiw = path.join(distDir, 'how-it-works', 'index.html');
+if (existsSync(distIndex)) {
+  if (!existsSync(distHiw)) {
+    throw new Error('dist/how-it-works/index.html is missing');
+  }
+  const hiwHtml = await readFile(distHiw, 'utf8');
+  for (const needle of [
+    'How it works · OpenCoven',
+    'Every agent already has its own worktree',
+  ]) {
+    if (!hiwHtml.includes(needle)) {
+      throw new Error(`Missing expected copy in dist/how-it-works/index.html: ${needle}`);
+    }
+  }
+  if (hiwHtml.includes('{{')) {
+    throw new Error('dist/how-it-works/index.html contains unconverted template bindings');
+  }
 }
 
 const distGithub = path.join(distDir, 'github', 'index.html');
