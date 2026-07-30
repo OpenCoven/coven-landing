@@ -1,0 +1,307 @@
+---
+import DownloadCta from './DownloadCta.astro';
+---
+<header id="top" style="position: relative; max-width: 1140px; margin: 0 auto; padding: 132px 32px 40px; display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 40px; align-items: center; text-align: left">
+  <div data-hero="" data-dl-scope="" style="position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 24px; top: -41px">
+    <h1 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 72px; line-height: 0.98; letter-spacing: -0.028em; margin: 0; max-width: 13ch; text-wrap: balance">Stop being your agents' control plane.</h1>
+    <p style="font-size: 18px; line-height: 1.6; color: var(--cv-text-secondary); max-width: 46ch; margin: 0; text-wrap: pretty">When two agents reach for the same files, one loses the work. Coven decides who waits, and keeps the record of why.</p>
+    <div data-r="ctarow" style="display: flex; align-items: center; gap: 18px; margin-top: 4px">
+      <DownloadCta />
+      <button type="button" data-copy="npm install -g @opencoven/cli" data-action="copy" data-r="copybtn" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px; color: var(--cv-text-secondary); background: var(--cv-bg-raised); border: 1px solid var(--cv-border-hairline); border-radius: 8px; padding: 12px 14px; cursor: pointer; white-space: nowrap; box-sizing: border-box; align-self: stretch; display: inline-flex; align-items: center; gap: 0; transition: background-color 160ms cubic-bezier(0.2,0,0,1), color 160ms cubic-bezier(0.2,0,0,1)" class="rh0">npm i -g @opencoven/cli<span data-copy-label="" style="letter-spacing: 0.06em; text-transform: uppercase; font-size: 9.5px">copy</span></button>
+    </div>
+    <p data-dl-status="" role="status" aria-live="polite" style="display: none; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-secondary); margin: 0; align-items: center; gap: 10px"></p>
+    <p data-r="mobilenote" style="display: none; font-size: 13px; line-height: 1.5; color: var(--cv-text-muted); margin: 0">Cave is a desktop app. Copy the install line and run it on the machine your agents work on.</p>
+
+    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)">
+      <!-- every figure here is fetched live; each item hides itself if its API call fails -->
+      <a data-proof="stars" data-proof-display="inline-flex" href="https://github.com/OpenCoven" style="position: relative; display: none; align-items: center; color: var(--cv-text-secondary)" class="rh1"><i class="ph ph-github-logo" aria-hidden="true" style="font-size: 14px; line-height: 1; margin-right: 5px"></i><span style="white-space: nowrap"><span data-stars-count="">0</span> stars</span><span data-stars-pop="" style="position: absolute; top: calc(100% + 9px); left: -9px; z-index: 50; width: 252px; box-sizing: border-box; display: flex; flex-direction: column; gap: 2px; padding: 10px 12px 11px; text-align: left; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); border-radius: 10px; box-shadow: 0 1px 2px oklch(0.1 0.02 291 / 14%), 0 18px 44px oklch(0.1 0.02 291 / 26%); color: var(--cv-text-secondary)"><span style="font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cv-text-muted); padding-bottom: 5px">Across the org</span><span data-stars-rows="" style="display: flex; flex-direction: column"></span></span></a>
+      <span data-proof-sep="stars" style="display: none">·</span>
+      <a data-proof="downloads" href="https://github.com/OpenCoven/coven-cave/releases" style="display: none; color: var(--cv-text-secondary)" class="rh1"><span data-dlcount="">0</span> downloads</a>
+      <span data-proof-sep="downloads" style="display: none">·</span>
+      <a data-proof="discord" data-proof-display="inline-flex" href="https://discord.gg/opencoven" style="display: none; align-items: center; color: var(--cv-text-secondary)" class="rh1"><i class="ph ph-discord-logo" aria-hidden="true" style="font-size: 14px; line-height: 1; margin-right: 5px"></i><span style="white-space: nowrap"><span data-discord-count="">0</span> <span data-discord-label="">members</span></span></a>
+    </div>
+  </div>
+
+  <div data-braid="" data-live="off" data-dcb="braidPower:data-live" style="position: absolute; left: -56px; right: -8px; top: 18px; bottom: -18px; z-index: 0; pointer-events: none">
+    <!-- the board itself: turned metal, concentric under the seat and dissolving well before
+         it reaches any copy -->
+    <div data-board-metal="" aria-hidden="true" style="position: absolute; left: var(--braid-cx, 74%); top: var(--braid-cy, 46%); width: calc(var(--braid-r, 150px) * 11); height: calc(var(--braid-r, 150px) * 11); transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; opacity: 0.55; background: repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.032) 0 1px, rgba(0,0,0,0.03) 1px 2px, transparent 2px 7px); mask-image: radial-gradient(circle closest-side, #000 0 18%, rgba(0,0,0,0.74) 38%, rgba(0,0,0,0.42) 55%, rgba(0,0,0,0.18) 71%, rgba(0,0,0,0.06) 85%, transparent 97%); -webkit-mask-image: radial-gradient(circle closest-side, #000 0 18%, rgba(0,0,0,0.74) 38%, rgba(0,0,0,0.42) 55%, rgba(0,0,0,0.18) 71%, rgba(0,0,0,0.06) 85%, transparent 97%)">
+      <div style="position: absolute; inset: 0; border-radius: 50%; mix-blend-mode: overlay; background: conic-gradient(from 205deg, rgba(255,255,255,0.06) 0 4%, transparent 15% 43%, rgba(255,255,255,0.04) 51% 57%, transparent 69% 95%, rgba(255,255,255,0.06) 100%)"></div>
+      <div data-ripple="" style="position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, transparent 0 54%, rgba(255,255,255,0.13) 65%, rgba(255,255,255,0.045) 71%, transparent 79%); mask-image: conic-gradient(from 8deg, #000 0 54deg, transparent 54deg 360deg); -webkit-mask-image: conic-gradient(from 8deg, #000 0 54deg, transparent 54deg 360deg); animation-duration: 7.4s; animation-delay: -0.6s"></div>
+      <div data-ripple="" style="position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, transparent 0 54%, rgba(255,255,255,0.13) 65%, rgba(255,255,255,0.045) 71%, transparent 79%); mask-image: conic-gradient(from 76deg, #000 0 42deg, transparent 42deg 360deg); -webkit-mask-image: conic-gradient(from 76deg, #000 0 42deg, transparent 42deg 360deg); animation-duration: 9.1s; animation-delay: -4.2s"></div>
+      <div data-ripple="" style="position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, transparent 0 54%, rgba(255,255,255,0.13) 65%, rgba(255,255,255,0.045) 71%, transparent 79%); mask-image: conic-gradient(from 136deg, #000 0 68deg, transparent 68deg 360deg); -webkit-mask-image: conic-gradient(from 136deg, #000 0 68deg, transparent 68deg 360deg); animation-duration: 6.3s; animation-delay: -2.1s"></div>
+      <div data-ripple="" style="position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, transparent 0 54%, rgba(255,255,255,0.13) 65%, rgba(255,255,255,0.045) 71%, transparent 79%); mask-image: conic-gradient(from 212deg, #000 0 40deg, transparent 40deg 360deg); -webkit-mask-image: conic-gradient(from 212deg, #000 0 40deg, transparent 40deg 360deg); animation-duration: 10.4s; animation-delay: -7.8s"></div>
+      <div data-ripple="" style="position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, transparent 0 54%, rgba(255,255,255,0.13) 65%, rgba(255,255,255,0.045) 71%, transparent 79%); mask-image: conic-gradient(from 258deg, #000 0 56deg, transparent 56deg 360deg); -webkit-mask-image: conic-gradient(from 258deg, #000 0 56deg, transparent 56deg 360deg); animation-duration: 8.2s; animation-delay: -5.5s"></div>
+      <div data-ripple="" style="position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, transparent 0 54%, rgba(255,255,255,0.13) 65%, rgba(255,255,255,0.045) 71%, transparent 79%); mask-image: conic-gradient(from 326deg, #000 0 38deg, transparent 38deg 360deg); -webkit-mask-image: conic-gradient(from 326deg, #000 0 38deg, transparent 38deg 360deg); animation-duration: 11.1s; animation-delay: -9.4s"></div>
+    </div>
+    <!-- the containment well: opaque out to just inside the bezel so the board stops at the
+         seat, with a soft shade that reads as depth rather than a disc -->
+    <div data-seat-plate="" style="position: absolute; left: var(--braid-cx, 74%); top: var(--braid-cy, 46%); width: calc(var(--braid-r, 150px) * 3.2); height: calc(var(--braid-r, 150px) * 3.2); transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; background: radial-gradient(circle, var(--cv-bg-base) 0 76%, color-mix(in oklch, var(--cv-bg-base) 62%, transparent) 88%, transparent 100%)">
+      <div style="position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, color-mix(in oklch, #000 40%, transparent) 0 46%, color-mix(in oklch, #000 18%, transparent) 62%, transparent 74%)"></div>
+    </div>
+    <warded-braid data-look="studio" data-cursor="on" style="position: absolute; inset: 0; width: 100%; height: 100%"></warded-braid>
+
+    <!-- the seat: machined bezel the object sits inside. The braid publishes its own screen
+         circle as --braid-cx/cy/r, since only it knows this camera and this frame height. -->
+    <div data-seat="" style="position: absolute; left: var(--braid-cx, 74%); top: var(--braid-cy, 46%); width: calc(var(--braid-r, 150px) * 2.34); height: calc(var(--braid-r, 150px) * 2.34); transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; background: radial-gradient(circle, transparent 57%, color-mix(in oklch, var(--cv-bg-panel) 34%, transparent) 63%, color-mix(in oklch, var(--cv-bg-panel) 22%, transparent) 71%, transparent 74%)">
+      <div style="position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--cv-border-hairline)"></div>
+      <div data-band="inner" style="position: absolute; inset: 11%; border-radius: 50%; border: 1px solid color-mix(in oklch, var(--cv-border-hairline) 52%, transparent); mask-image: conic-gradient(from 0deg, #000 0 8deg, transparent 8deg 26deg, #000 26deg 40deg, transparent 40deg 62deg, #000 62deg 84deg, transparent 84deg 104deg, #000 104deg 128deg, transparent 128deg 146deg, #000 146deg 172deg, transparent 172deg 196deg, #000 196deg 218deg, transparent 218deg 240deg, #000 240deg 262deg, transparent 262deg 286deg, #000 286deg 308deg, transparent 308deg 332deg, #000 332deg 360deg)"></div>
+      <div data-band="outer" style="position: absolute; inset: -1px; border-radius: 50%; background: conic-gradient(from 0deg, transparent 0 1.4deg, color-mix(in oklch, var(--cv-text-muted) 18%, transparent) 1.4deg 2.2deg, transparent 2.2deg 6deg); mask-image: radial-gradient(circle, transparent 84%, #000 87%, #000 96%, transparent 99%)"></div>
+      <div data-grill-fan="" aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: calc(var(--braid-r, 150px) * 2.78); height: calc(var(--braid-r, 150px) * 2.78); transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; background: repeating-conic-gradient(from 0deg, rgba(212,205,236,0) 0 4.6deg, rgba(212,205,236,0.20) 4.6deg 7.4deg, rgba(212,205,236,0) 7.4deg 12deg); mask-image: radial-gradient(circle, transparent 0 84.5%, #000 85.5% 99.5%); -webkit-mask-image: radial-gradient(circle, transparent 0 84.5%, #000 85.5% 99.5%)"></div>
+      <!-- the intake grill: stamped louvres in the gap between bezel edge and the first lead,
+           swept 9 degrees off radial so the ring reads as a fan shroud, not a dotted rule -->
+      <svg data-grill="" viewBox="-130 -130 260 260" aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: calc(var(--braid-r, 150px) * 3.04); height: calc(var(--braid-r, 150px) * 3.04); transform: translate(-50%, -50%); opacity: 0.82; pointer-events: none">
+        <defs>
+          <linearGradient id="cvGrillSteel" gradientUnits="userSpaceOnUse" x1="-104" y1="-112" x2="92" y2="116">
+            <stop offset="0" stop-color="#9b93a6"></stop>
+            <stop offset="0.28" stop-color="#6a6474"></stop>
+            <stop offset="0.62" stop-color="#38343f"></stop>
+            <stop offset="1" stop-color="#1d1b22"></stop>
+          </linearGradient>
+        </defs>
+        <circle cx="0" cy="0" r="109" fill="none" stroke="#0a090c" stroke-opacity="0.85" stroke-width="18"></circle>
+        <circle cx="0" cy="0" r="118.6" fill="none" stroke="var(--cv-border-hairline)" stroke-width="1.2"></circle>
+        <circle cx="0" cy="0" r="117.1" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.7"></circle>
+        <circle cx="0" cy="0" r="100.2" fill="none" stroke="color-mix(in oklch, var(--cv-border-hairline) 70%, transparent)" stroke-width="0.8"></circle>
+        <g fill="url(#cvGrillSteel)">
+          <path d="M-2.0 -101.0 L2.0 -101.0 L12.5 -116.3 L7.9 -116.7 Z"></path>
+          <path d="M4.6 -100.9 L8.6 -100.6 L20.1 -115.3 L15.5 -116.0 Z"></path>
+          <path d="M11.2 -100.4 L15.2 -99.9 L27.6 -113.7 L23.0 -114.7 Z"></path>
+          <path d="M17.7 -99.4 L21.7 -98.6 L35.0 -111.6 L30.5 -113.0 Z"></path>
+          <path d="M24.2 -98.1 L28.1 -97.0 L42.2 -109.1 L37.8 -110.7 Z"></path>
+          <path d="M30.5 -96.3 L34.4 -95.0 L49.3 -106.1 L45.0 -108.0 Z"></path>
+          <path d="M36.8 -94.1 L40.5 -92.5 L56.1 -102.7 L51.9 -104.8 Z"></path>
+          <path d="M42.8 -91.5 L46.5 -89.7 L62.7 -98.8 L58.7 -101.2 Z"></path>
+          <path d="M48.7 -88.5 L52.2 -86.4 L69.0 -94.5 L65.2 -97.2 Z"></path>
+          <path d="M54.4 -85.1 L57.8 -82.8 L75.0 -89.8 L71.4 -92.7 Z"></path>
+          <path d="M59.9 -81.3 L63.1 -78.9 L80.8 -84.7 L77.3 -87.8 Z"></path>
+          <path d="M65.1 -77.3 L68.1 -74.6 L86.1 -79.2 L82.9 -82.6 Z"></path>
+          <path d="M70.0 -72.8 L72.8 -70.0 L91.1 -73.4 L88.1 -77.0 Z"></path>
+          <path d="M74.6 -68.1 L77.3 -65.1 L95.7 -67.3 L92.9 -71.1 Z"></path>
+          <path d="M78.9 -63.1 L81.3 -59.9 L99.9 -60.9 L97.4 -64.8 Z"></path>
+          <path d="M82.8 -57.8 L85.1 -54.4 L103.7 -54.2 L101.4 -58.3 Z"></path>
+          <path d="M86.4 -52.2 L88.5 -48.7 L107.0 -47.3 L105.0 -51.6 Z"></path>
+          <path d="M89.7 -46.5 L91.5 -42.8 L109.9 -40.2 L108.2 -44.6 Z"></path>
+          <path d="M92.5 -40.5 L94.1 -36.8 L112.3 -32.9 L110.9 -37.4 Z"></path>
+          <path d="M95.0 -34.4 L96.3 -30.5 L114.2 -25.5 L113.1 -30.1 Z"></path>
+          <path d="M97.0 -28.1 L98.1 -24.2 L115.6 -18.0 L114.8 -22.6 Z"></path>
+          <path d="M98.6 -21.7 L99.4 -17.7 L116.5 -10.4 L116.0 -15.1 Z"></path>
+          <path d="M99.9 -15.2 L100.4 -11.2 L117.0 -2.8 L116.8 -7.4 Z"></path>
+          <path d="M100.6 -8.6 L100.9 -4.6 L116.9 4.9 L117.0 0.2 Z"></path>
+          <path d="M101.0 -2.0 L101.0 2.0 L116.3 12.5 L116.7 7.9 Z"></path>
+          <path d="M100.9 4.6 L100.6 8.6 L115.3 20.1 L116.0 15.5 Z"></path>
+          <path d="M100.4 11.2 L99.9 15.2 L113.7 27.6 L114.7 23.0 Z"></path>
+          <path d="M99.4 17.7 L98.6 21.7 L111.6 35.0 L113.0 30.5 Z"></path>
+          <path d="M98.1 24.2 L97.0 28.1 L109.1 42.2 L110.7 37.8 Z"></path>
+          <path d="M96.3 30.5 L95.0 34.4 L106.1 49.3 L108.0 45.0 Z"></path>
+          <path d="M94.1 36.8 L92.5 40.5 L102.7 56.1 L104.8 51.9 Z"></path>
+          <path d="M91.5 42.8 L89.7 46.5 L98.8 62.7 L101.2 58.7 Z"></path>
+          <path d="M88.5 48.7 L86.4 52.2 L94.5 69.0 L97.2 65.2 Z"></path>
+          <path d="M85.1 54.4 L82.8 57.8 L89.8 75.0 L92.7 71.4 Z"></path>
+          <path d="M81.3 59.9 L78.9 63.1 L84.7 80.8 L87.8 77.3 Z"></path>
+          <path d="M77.3 65.1 L74.6 68.1 L79.2 86.1 L82.6 82.9 Z"></path>
+          <path d="M72.8 70.0 L70.0 72.8 L73.4 91.1 L77.0 88.1 Z"></path>
+          <path d="M68.1 74.6 L65.1 77.3 L67.3 95.7 L71.1 92.9 Z"></path>
+          <path d="M63.1 78.9 L59.9 81.3 L60.9 99.9 L64.8 97.4 Z"></path>
+          <path d="M57.8 82.8 L54.4 85.1 L54.2 103.7 L58.3 101.4 Z"></path>
+          <path d="M52.2 86.4 L48.7 88.5 L47.3 107.0 L51.6 105.0 Z"></path>
+          <path d="M46.5 89.7 L42.8 91.5 L40.2 109.9 L44.6 108.2 Z"></path>
+          <path d="M40.5 92.5 L36.8 94.1 L32.9 112.3 L37.4 110.9 Z"></path>
+          <path d="M34.4 95.0 L30.5 96.3 L25.5 114.2 L30.1 113.1 Z"></path>
+          <path d="M28.1 97.0 L24.2 98.1 L18.0 115.6 L22.6 114.8 Z"></path>
+          <path d="M21.7 98.6 L17.7 99.4 L10.4 116.5 L15.1 116.0 Z"></path>
+          <path d="M15.2 99.9 L11.2 100.4 L2.8 117.0 L7.4 116.8 Z"></path>
+          <path d="M8.6 100.6 L4.6 100.9 L-4.9 116.9 L-0.2 117.0 Z"></path>
+          <path d="M2.0 101.0 L-2.0 101.0 L-12.5 116.3 L-7.9 116.7 Z"></path>
+          <path d="M-4.6 100.9 L-8.6 100.6 L-20.1 115.3 L-15.5 116.0 Z"></path>
+          <path d="M-11.2 100.4 L-15.2 99.9 L-27.6 113.7 L-23.0 114.7 Z"></path>
+          <path d="M-17.7 99.4 L-21.7 98.6 L-35.0 111.6 L-30.5 113.0 Z"></path>
+          <path d="M-24.2 98.1 L-28.1 97.0 L-42.2 109.1 L-37.8 110.7 Z"></path>
+          <path d="M-30.5 96.3 L-34.4 95.0 L-49.3 106.1 L-45.0 108.0 Z"></path>
+          <path d="M-36.8 94.1 L-40.5 92.5 L-56.1 102.7 L-51.9 104.8 Z"></path>
+          <path d="M-42.8 91.5 L-46.5 89.7 L-62.7 98.8 L-58.7 101.2 Z"></path>
+          <path d="M-48.7 88.5 L-52.2 86.4 L-69.0 94.5 L-65.2 97.2 Z"></path>
+          <path d="M-54.4 85.1 L-57.8 82.8 L-75.0 89.8 L-71.4 92.7 Z"></path>
+          <path d="M-59.9 81.3 L-63.1 78.9 L-80.8 84.7 L-77.3 87.8 Z"></path>
+          <path d="M-65.1 77.3 L-68.1 74.6 L-86.1 79.2 L-82.9 82.6 Z"></path>
+          <path d="M-70.0 72.8 L-72.8 70.0 L-91.1 73.4 L-88.1 77.0 Z"></path>
+          <path d="M-74.6 68.1 L-77.3 65.1 L-95.7 67.3 L-92.9 71.1 Z"></path>
+          <path d="M-78.9 63.1 L-81.3 59.9 L-99.9 60.9 L-97.4 64.8 Z"></path>
+          <path d="M-82.8 57.8 L-85.1 54.4 L-103.7 54.2 L-101.4 58.3 Z"></path>
+          <path d="M-86.4 52.2 L-88.5 48.7 L-107.0 47.3 L-105.0 51.6 Z"></path>
+          <path d="M-89.7 46.5 L-91.5 42.8 L-109.9 40.2 L-108.2 44.6 Z"></path>
+          <path d="M-92.5 40.5 L-94.1 36.8 L-112.3 32.9 L-110.9 37.4 Z"></path>
+          <path d="M-95.0 34.4 L-96.3 30.5 L-114.2 25.5 L-113.1 30.1 Z"></path>
+          <path d="M-97.0 28.1 L-98.1 24.2 L-115.6 18.0 L-114.8 22.6 Z"></path>
+          <path d="M-98.6 21.7 L-99.4 17.7 L-116.5 10.4 L-116.0 15.1 Z"></path>
+          <path d="M-99.9 15.2 L-100.4 11.2 L-117.0 2.8 L-116.8 7.4 Z"></path>
+          <path d="M-100.6 8.6 L-100.9 4.6 L-116.9 -4.9 L-117.0 -0.2 Z"></path>
+          <path d="M-101.0 2.0 L-101.0 -2.0 L-116.3 -12.5 L-116.7 -7.9 Z"></path>
+          <path d="M-100.9 -4.6 L-100.6 -8.6 L-115.3 -20.1 L-116.0 -15.5 Z"></path>
+          <path d="M-100.4 -11.2 L-99.9 -15.2 L-113.7 -27.6 L-114.7 -23.0 Z"></path>
+          <path d="M-99.4 -17.7 L-98.6 -21.7 L-111.6 -35.0 L-113.0 -30.5 Z"></path>
+          <path d="M-98.1 -24.2 L-97.0 -28.1 L-109.1 -42.2 L-110.7 -37.8 Z"></path>
+          <path d="M-96.3 -30.5 L-95.0 -34.4 L-106.1 -49.3 L-108.0 -45.0 Z"></path>
+          <path d="M-94.1 -36.8 L-92.5 -40.5 L-102.7 -56.1 L-104.8 -51.9 Z"></path>
+          <path d="M-91.5 -42.8 L-89.7 -46.5 L-98.8 -62.7 L-101.2 -58.7 Z"></path>
+          <path d="M-88.5 -48.7 L-86.4 -52.2 L-94.5 -69.0 L-97.2 -65.2 Z"></path>
+          <path d="M-85.1 -54.4 L-82.8 -57.8 L-89.8 -75.0 L-92.7 -71.4 Z"></path>
+          <path d="M-81.3 -59.9 L-78.9 -63.1 L-84.7 -80.8 L-87.8 -77.3 Z"></path>
+          <path d="M-77.3 -65.1 L-74.6 -68.1 L-79.2 -86.1 L-82.6 -82.9 Z"></path>
+          <path d="M-72.8 -70.0 L-70.0 -72.8 L-73.4 -91.1 L-77.0 -88.1 Z"></path>
+          <path d="M-68.1 -74.6 L-65.1 -77.3 L-67.3 -95.7 L-71.1 -92.9 Z"></path>
+          <path d="M-63.1 -78.9 L-59.9 -81.3 L-60.9 -99.9 L-64.8 -97.4 Z"></path>
+          <path d="M-57.8 -82.8 L-54.4 -85.1 L-54.2 -103.7 L-58.3 -101.4 Z"></path>
+          <path d="M-52.2 -86.4 L-48.7 -88.5 L-47.3 -107.0 L-51.6 -105.0 Z"></path>
+          <path d="M-46.5 -89.7 L-42.8 -91.5 L-40.2 -109.9 L-44.6 -108.2 Z"></path>
+          <path d="M-40.5 -92.5 L-36.8 -94.1 L-32.9 -112.3 L-37.4 -110.9 Z"></path>
+          <path d="M-34.4 -95.0 L-30.5 -96.3 L-25.5 -114.2 L-30.1 -113.1 Z"></path>
+          <path d="M-28.1 -97.0 L-24.2 -98.1 L-18.0 -115.6 L-22.6 -114.8 Z"></path>
+          <path d="M-21.7 -98.6 L-17.7 -99.4 L-10.4 -116.5 L-15.1 -116.0 Z"></path>
+          <path d="M-15.2 -99.9 L-11.2 -100.4 L-2.8 -117.0 L-7.4 -116.8 Z"></path>
+          <path d="M-8.6 -100.6 L-4.6 -100.9 L4.9 -116.9 L0.2 -117.0 Z"></path>
+        </g>
+      </svg>
+      <div data-grill-sheen="" aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: calc(var(--braid-r, 150px) * 2.78); height: calc(var(--braid-r, 150px) * 2.78); transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; mix-blend-mode: screen; background: conic-gradient(from 0deg, transparent 0 18%, color-mix(in oklch, var(--cv-accent) 26%, transparent) 26%, transparent 34% 68%, color-mix(in oklch, #cfc7ff 20%, transparent) 76%, transparent 84%); mask-image: radial-gradient(circle, transparent 0 85%, #000 85.4% 99.5%); -webkit-mask-image: radial-gradient(circle, transparent 0 85%, #000 85.4% 99.5%)"></div>
+      <!-- everything leaves the bezel radially, elbows at 45 degrees, and either lands on a pad
+           or runs off the right edge of the page. 100 units = one ring radius. -->
+      <svg data-fan="" viewBox="-400 -400 800 800" aria-hidden="true" style="position: absolute; left: 50%; top: 50%; width: calc(var(--braid-r, 150px) * 8); height: calc(var(--braid-r, 150px) * 8); transform: translate(-50%, -50%); overflow: visible; pointer-events: none">
+        <defs>
+          <radialGradient id="cvFanFade" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="330">
+            <stop offset="0.46" stop-color="#fff"></stop>
+            <stop offset="0.72" stop-color="#8c8c8c"></stop>
+            <stop offset="1" stop-color="#000"></stop>
+          </radialGradient>
+          <mask id="cvFanFadeMask" maskUnits="userSpaceOnUse" x="-360" y="-360" width="720" height="720">
+            <circle cx="0" cy="0" r="340" fill="url(#cvFanFade)"></circle>
+          </mask>
+        </defs>
+        <g fill="none" data-solder="" stroke="var(--cv-bg-base)" stroke-width="5" stroke-opacity="0.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M140.7 -45.8 L142.7 -46.4 L165.1 -24 H176"></path>
+          <path d="M148 0 H176"></path>
+          <path d="M140.7 45.8 L142.7 46.4 L165.1 24 H176"></path>
+          <path d="M116.6 -91.1 L132.4 -103.4 L156.4 -127.4 H206"></path>
+          <path d="M91.1 -116.6 L97.3 -124.5 L127.3 -154.5 H173.3"></path>
+          <path d="M60.2 -135.2 L64.3 -144.4 L96.3 -176.4 H142"></path>
+          <path d="M116.6 91.1 L132.4 103.4 L156.4 127.4 H206"></path>
+          <path d="M91.1 116.6 L97.3 124.5 L127.3 154.5 H173.3"></path>
+          <path d="M60.2 135.2 L64.3 144.4 L96.3 176.4 H142"></path>
+          <!-- the harness continues around the far side: the left leads elbow into vertical runs
+               rather than horizontal ones, so nothing reaches back under the hero copy -->
+        </g>
+        <g fill="none" stroke="var(--cv-border-hairline)" stroke-width="0.8" stroke-linecap="square">
+          <path d="M140.7 -45.8 L142.7 -46.4 L165.1 -24 H176"></path>
+          <path d="M148 0 H176"></path>
+          <path d="M140.7 45.8 L142.7 46.4 L165.1 24 H176"></path>
+          <path d="M116.6 -91.1 L132.4 -103.4 L156.4 -127.4 H206"></path>
+          <path d="M91.1 -116.6 L97.3 -124.5 L127.3 -154.5 H173.3"></path>
+          <path d="M60.2 -135.2 L64.3 -144.4 L96.3 -176.4 H142"></path>
+          <path d="M116.6 91.1 L132.4 103.4 L156.4 127.4 H206"></path>
+          <path d="M91.1 116.6 L97.3 124.5 L127.3 154.5 H173.3"></path>
+          <path d="M60.2 135.2 L64.3 144.4 L96.3 176.4 H142"></path>
+          <!-- the harness continues around the far side: the left leads elbow into vertical runs
+               rather than horizontal ones, so nothing reaches back under the hero copy -->
+        </g>
+        <g fill="none" data-solder="" stroke="var(--cv-bg-base)" stroke-width="5" stroke-opacity="0.8" stroke-linecap="round" stroke-linejoin="round" mask="url(#cvFanFadeMask)">
+          <path d="M-69.5 -130.6 L-75.1 -141.2 L-95.1 -161.2 V-300"></path>
+          <path d="M-106.5 -102.8 L-115.1 -111.1 L-137.1 -133.1 V-272"></path>
+          <path d="M-130.6 -69.5 L-141.2 -75.1 L-165.2 -99.1 V-250"></path>
+          <path d="M-69.5 130.6 L-75.1 141.2 L-95.1 161.2 V300"></path>
+          <path d="M-106.5 102.8 L-115.1 111.1 L-137.1 133.1 V272"></path>
+          <path d="M-130.6 69.5 L-141.2 75.1 L-165.2 99.1 V250"></path>
+          <path d="M-140.7 -45.8 L-142.7 -46.4 L-165.1 -24 H-312"></path>
+          <path d="M-148 0 H-312"></path>
+          <path d="M-140.7 45.8 L-142.7 46.4 L-165.1 24 H-312"></path>
+        </g>
+        <g fill="none" stroke="var(--cv-border-hairline)" stroke-width="0.8" stroke-linecap="square" mask="url(#cvFanFadeMask)">
+          <path d="M-69.5 -130.6 L-75.1 -141.2 L-95.1 -161.2 V-300"></path>
+          <path d="M-106.5 -102.8 L-115.1 -111.1 L-137.1 -133.1 V-272"></path>
+          <path d="M-130.6 -69.5 L-141.2 -75.1 L-165.2 -99.1 V-250"></path>
+          <path d="M-69.5 130.6 L-75.1 141.2 L-95.1 161.2 V300"></path>
+          <path d="M-106.5 102.8 L-115.1 111.1 L-137.1 133.1 V272"></path>
+          <path d="M-130.6 69.5 L-141.2 75.1 L-165.2 99.1 V250"></path>
+          <path d="M-140.7 -45.8 L-142.7 -46.4 L-165.1 -24 H-312"></path>
+          <path d="M-148 0 H-312"></path>
+          <path d="M-140.7 45.8 L-142.7 46.4 L-165.1 24 H-312"></path>
+        </g>
+        <g data-pulse="tail" fill="none" stroke="var(--cv-accent)" stroke-width="0.9" stroke-opacity="0.24" stroke-linecap="round" data-trace-live="">
+          <path data-trace-flow="" style="animation-duration: 8.2s; animation-delay: -5.1s" d="M60.2 -135.2 L64.3 -144.4 L96.3 -176.4 H142"></path>
+          <path data-trace-flow="" style="animation-duration: 10.6s; animation-delay: -2.4s" d="M116.6 91.1 L132.4 103.4 L156.4 127.4 H206"></path>
+        </g>
+        <g data-pulse="mid" fill="none" stroke="var(--cv-accent)" stroke-width="1.7" stroke-opacity="0.5" stroke-linecap="round" data-trace-live="">
+          <path data-trace-flow="" style="animation-duration: 8.2s; animation-delay: -5.1s" d="M60.2 -135.2 L64.3 -144.4 L96.3 -176.4 H142"></path>
+          <path data-trace-flow="" style="animation-duration: 10.6s; animation-delay: -2.4s" d="M116.6 91.1 L132.4 103.4 L156.4 127.4 H206"></path>
+        </g>
+        <g data-pulse="head" fill="none" stroke="var(--cv-accent)" stroke-width="2.7" stroke-opacity="1" stroke-linecap="round" data-trace-live="">
+          <path data-trace-flow="" style="animation-duration: 8.2s; animation-delay: -5.1s" d="M60.2 -135.2 L64.3 -144.4 L96.3 -176.4 H142"></path>
+          <path data-trace-flow="" style="animation-duration: 10.6s; animation-delay: -2.4s" d="M116.6 91.1 L132.4 103.4 L156.4 127.4 H206"></path>
+        </g>
+        <g data-pulse="tail" fill="none" stroke="var(--cv-accent)" stroke-width="0.9" stroke-opacity="0.24" stroke-linecap="round" data-trace-live="" mask="url(#cvFanFadeMask)">
+          <path data-trace-flow="" style="animation-duration: 7.4s; animation-delay: -6.3s" d="M-130.6 -69.5 L-141.2 -75.1 L-165.2 -99.1 V-250"></path>
+          <path data-trace-flow="" style="animation-duration: 12.1s; animation-delay: -9.2s" d="M-69.5 130.6 L-75.1 141.2 L-95.1 161.2 V300"></path>
+        </g>
+        <g data-pulse="mid" fill="none" stroke="var(--cv-accent)" stroke-width="1.7" stroke-opacity="0.5" stroke-linecap="round" data-trace-live="" mask="url(#cvFanFadeMask)">
+          <path data-trace-flow="" style="animation-duration: 7.4s; animation-delay: -6.3s" d="M-130.6 -69.5 L-141.2 -75.1 L-165.2 -99.1 V-250"></path>
+          <path data-trace-flow="" style="animation-duration: 12.1s; animation-delay: -9.2s" d="M-69.5 130.6 L-75.1 141.2 L-95.1 161.2 V300"></path>
+        </g>
+        <g data-pulse="head" fill="none" stroke="var(--cv-accent)" stroke-width="2.7" stroke-opacity="1" stroke-linecap="round" data-trace-live="" mask="url(#cvFanFadeMask)">
+          <path data-trace-flow="" style="animation-duration: 7.4s; animation-delay: -6.3s" d="M-130.6 -69.5 L-141.2 -75.1 L-165.2 -99.1 V-250"></path>
+          <path data-trace-flow="" style="animation-duration: 12.1s; animation-delay: -9.2s" d="M-69.5 130.6 L-75.1 141.2 L-95.1 161.2 V300"></path>
+        </g>
+        <g fill="var(--cv-bg-panel)" stroke="var(--cv-border-hairline)" stroke-width="0.8">
+          <rect x="176" y="-134.4" width="14" height="14" rx="1.5"></rect>
+        </g>
+        <g fill="var(--cv-bg-base)" stroke="var(--cv-border-hairline)" stroke-width="0.8">
+          <circle cx="206" cy="-127.4" r="4.6"></circle>
+          <circle cx="173.3" cy="-154.5" r="4.6"></circle>
+          <circle cx="142" cy="-176.4" r="4.6"></circle>
+          <circle cx="206" cy="127.4" r="4.6"></circle>
+          <circle cx="173.3" cy="154.5" r="4.6"></circle>
+          <circle cx="142" cy="176.4" r="4.6"></circle>
+        </g>
+        <g fill="var(--cv-accent)" data-trace-live="">
+          <circle data-via="" cx="165.1" cy="-24" r="2.4"></circle>
+          <circle data-via="" cx="165.1" cy="24" r="2.4"></circle>
+          <circle data-via="" cx="156.4" cy="127.4" r="2.4"></circle>
+          <circle data-via="" cx="-165.1" cy="-24" r="2.4"></circle>
+          <circle data-via="" cx="-165.1" cy="24" r="2.4"></circle>
+        </g>
+      </svg>
+      <!-- the mains leave the fan's coordinate space here: anchored in px and overshooting the
+           viewport, they reach the page edge at every width instead of stopping at 4 radii -->
+      <div data-run="" data-flow-in="" style="position: absolute; left: calc(50% + var(--braid-r, 150px) * 1.651); right: -50vw; top: calc(50% + var(--braid-r, 150px) * -0.24); height: 1px; background-color: var(--cv-border-hairline); animation-duration: 7.3s; animation-delay: -1.2s"></div>
+      <div data-run="" data-flow-in="" style="position: absolute; left: calc(50% + var(--braid-r, 150px) * 1.651); right: -50vw; top: 50%; height: 1px; background-color: var(--cv-border-hairline); animation-duration: 9.1s; animation-delay: -5.6s"></div>
+      <div data-run="" data-flow-in="" style="position: absolute; left: calc(50% + var(--braid-r, 150px) * 1.651); right: -50vw; top: calc(50% + var(--braid-r, 150px) * 0.24); height: 1px; background-color: var(--cv-border-hairline); animation-duration: 6.2s; animation-delay: -3.4s"></div>
+      <div data-seat-glow="" style="position: absolute; inset: -5%; border-radius: 50%; background: radial-gradient(circle, transparent 62%, color-mix(in oklch, var(--cv-accent) 16%, transparent) 72%, transparent 84%)"></div>
+    </div>
+
+    <div data-sigils="" data-live="off" data-dcb="sigilState:data-live" aria-hidden="true" style="position: absolute; left: var(--braid-cx, 74%); top: var(--braid-cy, 46%); width: 0; height: 0; pointer-events: none">
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(0deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-0deg); animation-duration: 2.2s, 1.7s, 5.1s; animation-delay: 0.00s, 3.1s, 4.8s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><circle cx="6" cy="4.2" r="2.4"></circle><path d="M6 6.6V11M6 9h2"></path></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(30deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-30deg); animation-duration: 2.2s, 1.7s, 3.4s; animation-delay: 0.06s, 5.9s, 7.6s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><path d="M6 1.6 10.4 9.6H1.6z"></path><circle cx="6" cy="7.2" r="0.9"></circle></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(60deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-60deg); animation-duration: 2.2s, 1.7s, 6.2s; animation-delay: 0.12s, 2.7s, 4.4s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><path d="M6 1.4 10 3.7v4.6L6 10.6 2 8.3V3.7z"></path></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(90deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-90deg); animation-duration: 2.2s, 1.7s, 4.1s; animation-delay: 0.18s, 7.4s, 9.1s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><path d="M3 3.2 6.2 6 3 8.8M6.8 3.2 10 6l-3.2 2.8"></path></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(120deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-120deg); animation-duration: 2.2s, 1.7s, 5.7s; animation-delay: 0.24s, 4.2s, 5.9s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><circle cx="6" cy="6" r="4.2"></circle><path d="M3.9 3.9l4.2 4.2M8.1 3.9l-4.2 4.2"></path></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(150deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-150deg); animation-duration: 2.2s, 1.7s, 3.1s; animation-delay: 0.30s, 6.6s, 8.3s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><circle cx="6" cy="2.6" r="0.95"></circle><circle cx="2.8" cy="8.6" r="0.95"></circle><circle cx="9.2" cy="8.6" r="0.95"></circle></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(180deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-180deg); animation-duration: 2.2s, 1.7s, 4.8s; animation-delay: 0.36s, 3.6s, 5.3s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><path d="M6 1.5 10.5 6 6 10.5 1.5 6z"></path><path d="M3.6 6h4.8"></path></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(210deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-210deg); animation-duration: 2.2s, 1.7s, 6.6s; animation-delay: 0.42s, 5.1s, 6.8s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><path d="M4.4 1.9a5.4 5.4 0 0 0 0 8.2M7.6 1.9a5.4 5.4 0 0 1 0 8.2"></path></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(240deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-240deg); animation-duration: 2.2s, 1.7s, 3.7s; animation-delay: 0.48s, 7.9s, 9.6s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><path d="M4.3 1.8 3.4 10.2M8.4 1.8 7.5 10.2M1.8 4.3h8.4M1.6 7.7H10"></path></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(270deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-270deg); animation-duration: 2.2s, 1.7s, 5.4s; animation-delay: 0.54s, 2.9s, 4.6s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><circle cx="6" cy="6" r="4.2"></circle><path d="M2.4 6h7.2"></path></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(300deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-300deg); animation-duration: 2.2s, 1.7s, 4.3s; animation-delay: 0.60s, 6.1s, 7.8s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><path d="M2 9.6 4.6 2.4 6 6.6 7.4 2.4 10 9.6"></path></svg></span>
+      <span style="position: absolute; transform: translate(-50%, -50%) rotate(330deg) translateY(calc(var(--braid-r, 150px) * -1.042)) rotate(-330deg); animation-duration: 2.2s, 1.7s, 6s; animation-delay: 0.66s, 4.7s, 6.4s"><svg viewBox="0 0 12 12" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="display: block"><path d="M6 1.6v8.8"></path><path d="M6 2.6c2.2 0 2.2 3 0 3s-2.2 3 0 3"></path></svg></span>
+    </div>
+
+    <div data-core-mark="" aria-hidden="true" style="position: absolute; left: var(--braid-cx, 74%); top: var(--braid-cy, 46%); width: calc(var(--braid-r, 150px) * 0.58); height: calc(var(--braid-r, 150px) * 0.58); pointer-events: none; mix-blend-mode: screen">
+      <div data-holo="core"></div>
+      <div data-holo="cy"></div>
+      <div data-holo="mg"></div>
+      <div data-holo="scan"></div>
+      <div data-holo="slice"></div>
+    </div></div>
+
+    <button type="button" data-spin="" data-action="togglePower" aria-pressed="false" data-dcb="braidPressed:aria-pressed" aria-label="Spin the coven up" data-dcb="spinAria:aria-label" style="position: absolute; left: var(--braid-cx, 74%); top: var(--braid-cy, 46%); width: calc(var(--braid-r, 150px) * 2.1); height: calc(var(--braid-r, 150px) * 2.1); transform: translate(-50%, -50%); border-radius: 50%; border: none; background: none; padding: 0; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent"></button>
+
+    <div data-spin-hint="" style="position: absolute; left: calc(var(--braid-cx, 74%) - 56px); top: calc(var(--braid-cy, 46%) + var(--braid-r, 150px) * 1.82); transform: translate(-50%, 0); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cv-text-muted); pointer-events: none; white-space: nowrap; transition: opacity 500ms cubic-bezier(0.2,0,0,1); opacity: 0.8" data-dcb="hintOpacity:style">click to power</div>
+  </header></div>
+
+
+<!-- The live board -->

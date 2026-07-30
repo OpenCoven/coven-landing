@@ -12,18 +12,7 @@
 // We cache the 302 at the Vercel CDN (s-maxage) so real traffic almost
 // never reaches GitHub, and honour GITHUB_TOKEN if one is configured.
 
-const REPO = 'OpenCoven/coven-cave';
-const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`;
-
-// platform → predicate that picks its installer asset from the release.
-// Order matters only within a platform; each predicate must be unique
-// enough to match exactly one asset. `.sig` sidecars are always excluded.
-const MATCHERS = {
-  mac:         (n) => n.endsWith('.dmg') && /aarch64|arm64/i.test(n),
-  'mac-intel': (n) => n.endsWith('.dmg') && /x86_64|x64|intel/i.test(n),
-  windows:     (n) => n.endsWith('.msi'),
-  linux:       (n) => n.endsWith('.AppImage'),
-};
+import { MATCHERS, RELEASES_PAGE, REPO } from './_shared.js';
 
 export default async function handler(req, res) {
   const platform = String(req.query.platform || '').toLowerCase();
