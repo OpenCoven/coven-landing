@@ -17,6 +17,18 @@ Swap in your keys, run two commands, deploy.
    - `projectId` — the number in the PostHog URL: `app.posthog.com/project/<id>`
    - `siteUrl` — the deployed origin (used to authorize the heatmap toolbar)
 
+## Enabling the snippet in production
+
+The tracking snippet is emitted at build time. Vercel git deploys never see
+the gitignored config, so for production set two project env vars instead:
+
+- `PUBLIC_POSTHOG_KEY` — the project API key (`phc_…`, public by design)
+- `PUBLIC_POSTHOG_REGION` — `us` or `eu`
+
+Env vars win over the config file when both exist. The config file remains
+the local path (and the only home of the secret personal key, which is used
+by the provisioner below and never by the site build).
+
 ## Run
 
 ```bash

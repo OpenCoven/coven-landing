@@ -2,13 +2,17 @@
 // PostHog analytics, emitted only when analytics/posthog.config.json carries
 // a project API key (the file is gitignored; copy the .example to enable).
 // Provisioning of actions/funnels/dashboards: see analytics/README.md.
+// Key resolution order: PUBLIC_POSTHOG_KEY env var (how CI / Vercel git
+// deploys enable analytics — the config file below is gitignored and never
+// reaches build machines), then analytics/posthog.config.json for local runs.
 import fs from 'node:fs';
 let cfg = { projectApiKey: '', region: 'us' };
 try {
   cfg = JSON.parse(fs.readFileSync(new URL('../../../analytics/posthog.config.json', import.meta.url), 'utf8'));
 } catch { /* not configured */ }
-const key = (cfg.projectApiKey || '').trim();
-const ingest = `https://${(cfg.region || 'us').trim().toLowerCase()}.i.posthog.com`;
+const key = (import.meta.env.PUBLIC_POSTHOG_KEY || cfg.projectApiKey || '').trim();
+const region = (import.meta.env.PUBLIC_POSTHOG_REGION || cfg.region || 'us').trim().toLowerCase();
+const ingest = `https://${region}.i.posthog.com`;
 ---
 {key && (
   <script is:inline define:vars={{ key, ingest }}>
