@@ -70,3 +70,18 @@ test('no unexpected console errors on the landing page', async ({ page }) => {
   await page.waitForTimeout(4000);
   expect(errors).toEqual([]);
 });
+
+test('clicking a session cell opens the familiar inspector window', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('[data-live-board]').scrollIntoViewIfNeeded();
+  // let the demo settle and the window wiring attach
+  await page.waitForTimeout(4000);
+  const firstRow = page.locator('[data-panel="sessions"] [data-row]').first();
+  // regression: the fam name must come from its own element, not from
+  // splitting textContent on a newline Astro's compiler collapses away
+  await expect(firstRow).toHaveAttribute('data-fam', 'Hexi');
+  await firstRow.locator(':scope > *').first().click();
+  const win = page.locator('[data-win="profile"]');
+  await expect(win).toBeVisible({ timeout: 5000 });
+  await expect(win).toContainText('familiar');
+});

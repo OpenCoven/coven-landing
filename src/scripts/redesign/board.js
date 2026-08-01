@@ -3108,9 +3108,14 @@ function initWindows() {
   const COLS = ['profile', 'surface', 'state', 'diff'];
   const rows = Array.from(document.querySelectorAll('[data-panel="sessions"] [data-row]'));
   rows.forEach((row) => {
-    // the row itself says who it belongs to, so added projects need no index bookkeeping
+    // the row itself says who it belongs to, so added projects need no index bookkeeping.
+    // Take the name from its own element rather than splitting textContent on a
+    // newline: the dc runtime rendered a line break between name and harness,
+    // but Astro's compiler collapses template whitespace, so that newline no
+    // longer exists in the built markup.
     const label = row.firstElementChild && row.firstElementChild.querySelector('div div');
-    const name = label ? label.textContent.trim().split('\n')[0].trim() : 'Hexi';
+    const nameEl = label && (label.firstElementChild || label);
+    const name = nameEl ? nameEl.textContent.trim() : 'Hexi';
     row.dataset.fam = name;
     Array.from(row.children).forEach((cell, ci) => {
       if (!COLS[ci]) return;
