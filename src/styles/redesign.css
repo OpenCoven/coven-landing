@@ -697,3 +697,103 @@ a:hover { color: var(--cv-accent); }
 .rh14:hover { background: var(--cv-bg-hover) !important; color: var(--cv-text-primary) !important; border-color: color-mix(in oklch, var(--cv-accent) 40%, transparent) !important }
 .rh15:hover { color: var(--cv-text-primary) !important; border-color: var(--cv-border-strong) !important }
 .rh16:hover { background: color-mix(in oklch, var(--cv-warning) 12%, transparent) !important }
+
+/* ══ legal pages (privacy, terms) ══ */
+
+/* These carry the redesign chrome but hold long-form prose, so they set a
+   reading measure inside the 1140 shell rather than using the full width.
+   Everything below keys off the same tokens as the landing page, so the
+   theme toggle in the nav moves these pages too. */
+
+.legal-shell { min-width: 1140px; background: var(--cv-bg-base); padding-top: 60px }
+.legal-main { max-width: 1140px; margin: 0 auto; padding: 76px 32px 96px }
+.legal-doc { max-width: 720px }
+
+.legal-kicker {
+  font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none;
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--cv-text-muted); margin: 0 0 18px;
+}
+.legal-doc h1 {
+  font-family: 'EB Garamond', serif; font-weight: 400; font-size: 56px;
+  line-height: 1.02; letter-spacing: -0.024em; margin: 0; color: var(--cv-text-primary);
+  text-wrap: balance;
+}
+.legal-meta {
+  font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none;
+  font-size: 11.5px; color: var(--cv-text-muted); margin: 16px 0 0;
+}
+.legal-intro {
+  font-size: 17px; line-height: 1.65; color: var(--cv-text-secondary);
+  margin: 34px 0 0; padding-bottom: 34px;
+  border-bottom: 1px solid var(--cv-border-hairline);
+}
+.legal-doc h2 {
+  font-family: 'EB Garamond', serif; font-weight: 400; font-size: 27px;
+  letter-spacing: -0.016em; color: var(--cv-text-primary);
+  margin: 46px 0 14px; scroll-margin-top: 84px;
+}
+.legal-doc p { font-size: 15.5px; line-height: 1.75; color: var(--cv-text-secondary); margin: 0 0 15px }
+.legal-doc ul { margin: 0 0 15px; padding-left: 20px }
+.legal-doc li {
+  font-size: 15.5px; line-height: 1.72; color: var(--cv-text-secondary);
+  margin-bottom: 8px; padding-left: 4px;
+}
+.legal-doc li::marker { color: var(--cv-text-muted) }
+.legal-doc strong { color: var(--cv-text-primary); font-weight: 600 }
+.legal-doc a {
+  color: var(--cv-accent); text-decoration: underline;
+  text-decoration-color: color-mix(in oklch, var(--cv-accent) 42%, transparent);
+  text-underline-offset: 3px;
+}
+.legal-doc a:hover { text-decoration-color: currentColor }
+.legal-doc code {
+  font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none;
+  font-size: 0.88em; background: var(--cv-code-bg); color: var(--cv-code-fg);
+  border: 1px solid var(--cv-border-hairline); border-radius: 5px; padding: 1px 5px;
+}
+
+.legal-callout {
+  background: var(--cv-accent-soft);
+  border: 1px solid color-mix(in oklch, var(--cv-accent) 26%, transparent);
+  border-left-width: 3px; border-radius: 10px;
+  padding: 18px 22px; margin: 32px 0;
+  font-size: 14.5px; line-height: 1.7; color: var(--cv-text-secondary);
+}
+.legal-callout strong { color: var(--cv-text-primary) }
+
+.legal-tablewrap { overflow-x: auto; margin: 20px 0 32px }
+.legal-table {
+  width: 100%; border-collapse: collapse; font-size: 13.5px;
+  border: 1px solid var(--cv-border-hairline); border-radius: 10px;
+  overflow: hidden; min-width: 520px;
+}
+.legal-table th {
+  text-align: left; font-weight: 600; font-size: 12px; letter-spacing: 0.02em;
+  color: var(--cv-text-primary); background: var(--cv-bg-panel);
+  padding: 11px 14px; border-bottom: 1px solid var(--cv-border-hairline);
+}
+.legal-table td {
+  padding: 12px 14px; color: var(--cv-text-secondary);
+  border-bottom: 1px solid var(--cv-border-hairline); vertical-align: top;
+  line-height: 1.6;
+}
+.legal-table tr:last-child td { border-bottom: none }
+
+@media (max-width: 719px) {
+  .legal-shell { min-width: 0 !important }
+  .legal-main { padding: 44px 20px 64px !important }
+  .legal-doc h1 { font-size: 36px !important }
+  .legal-doc h2 { font-size: 23px !important; margin-top: 38px !important }
+  .legal-intro { font-size: 16px !important }
+}
+
+/* Shared chrome: the nav carries an inline min-width: 1140px so it tracks the
+   landing shell's own min-width. The shell is released below 1140 (see
+   [data-r~="shell"] above) but the nav was not, so under 1140 the bar stayed
+   1140 wide and pushed the theme toggle and the mobile Download CTA off the
+   right edge — the CTA that the 719 block deliberately reveals. Release the
+   nav on the same breakpoint the shell uses. */
+@media (max-width: 1139px) {
+  [data-nav] { min-width: 0 !important }
+}
