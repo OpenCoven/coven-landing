@@ -1,4 +1,5 @@
 ---
+import { ogImage } from '../lib/og.js';
 // Ported onto the redesign design language: header band, then a banded body
 // with a sticky index rail beside panelled sections — the same shape as
 // how-it-works. The terms text itself is carried over unchanged.
@@ -46,14 +47,14 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
   <meta property="og:description" content="The terms governing your use of the OpenCoven platform, tools, and ecosystem." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://opencoven.ai/terms" />
-  <meta property="og:image" content="https://opencoven.ai/og.png" />
+  <meta property="og:image" content={ogImage} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@OpenCvn" />
   <meta name="twitter:title" content="Terms of Service — OpenCoven" />
   <meta name="twitter:description" content="The terms governing your use of the OpenCoven platform, tools, and ecosystem." />
-  <meta name="twitter:image" content="https://opencoven.ai/og.png" />
+  <meta name="twitter:image" content={ogImage} />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://opencoven.ai/terms" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
