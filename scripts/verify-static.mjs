@@ -229,7 +229,7 @@ const assertCanonicalLogoSvg = (content, label) => {
 };
 
 const favicon = await readFile(path.join(publicDir, 'favicon.svg'), 'utf8');
-if (!favicon.includes('viewBox="0 0 2272 2272"')) {
+if (!favicon.includes('viewBox="0 0 512 512"')) {
   throw new Error('public/favicon.svg is not the canonical OpenCoven logo viewBox');
 }
 assertCanonicalLogoSvg(favicon, 'public/favicon.svg');
