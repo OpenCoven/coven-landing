@@ -1,0 +1,723 @@
+<div style="position: relative; border: 1px solid var(--cv-border-hairline); border-radius: 14px; background: var(--cv-bg-raised); box-shadow: var(--cv-shadow); overflow: hidden">
+  <div style="display: flex; align-items: center; gap: 14px; min-height: 21px; padding: 12px 16px; background: var(--cv-bg-panel); border-bottom: 1px solid var(--cv-border-hairline)">
+    <span data-board-path="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)">~/dev/opencoven</span>
+    <div style="margin-left: auto; display: flex; align-items: center; gap: 8px">
+      <span data-board-count="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)">4 sessions</span>
+      <button type="button" data-attention="" data-action="openConflict" style="display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px 10px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-warning); background: color-mix(in oklch, var(--cv-warning) 14%, transparent); border: 1px solid color-mix(in oklch, var(--cv-warning) 38%, transparent); opacity: 0; display: none; pointer-events: none; cursor: pointer; transition: opacity 400ms cubic-bezier(0.2,0,0,1), background-color 180ms" class="rh10">
+        <span style="width: 5px; height: 5px; border-radius: 999px; background: var(--cv-warning); animation: cvWarn 2.2s ease-out infinite"></span>1 needs you
+      </button>
+    </div>
+  </div>
+
+
+
+  <div data-view="board" style="perspective: 1500px; perspective-origin: 0% 50%">
+    <div data-r="boardgrid" style="display: grid; grid-template-columns: 260px minmax(0, 1fr)">
+      <div data-r="rail" style="border-right: 1px solid var(--cv-border-hairline); background: var(--cv-bg-panel); display: flex; flex-direction: column">
+        <div data-r="railhead" style="height: 43px; box-sizing: border-box; display: flex; align-items: center; padding: 0 16px; background: var(--cv-bg-sunken); border-bottom: 1px solid var(--cv-border-hairline); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Projects</div>
+        <button type="button" data-board-proj="opencoven" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: 64px; text-align: left; padding: 0 16px; background: var(--cv-accent-soft); border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
+          <span data-board-bar="" style="width: 2px; align-self: stretch; margin: 12px 0; background: var(--cv-accent); border-radius: 2px; transition: background-color 240ms"></span>
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 13.5px; font-weight: 500; color: var(--cv-text-primary)">opencoven</span>
+            <span style="display: block; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)">~/dev/opencoven</span>
+          </span>
+          <span style="display: flex; gap: 4px"><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/openai.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span></span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted); width: 14px; text-align: right">4</span>
+        </button>
+        <button type="button" data-board-proj="coven-cave" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: 64px; text-align: left; padding: 0 16px; background: none; border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
+          <span data-board-bar="" style="width: 2px; align-self: stretch; margin: 12px 0; background: transparent; border-radius: 2px; transition: background-color 240ms"></span>
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 13.5px; font-weight: 500; color: var(--cv-text-primary)">coven-cave</span>
+            <span style="display: block; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)">~/dev/coven-cave</span>
+          </span>
+          <span style="display: flex; gap: 4px"><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/openai.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span></span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted); width: 14px; text-align: right">2</span>
+        </button>
+        <button type="button" data-board-proj="castcodes" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: 64px; text-align: left; padding: 0 16px; background: none; border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
+          <span data-board-bar="" style="width: 2px; align-self: stretch; margin: 12px 0; background: transparent; border-radius: 2px; transition: background-color 240ms"></span>
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 13.5px; font-weight: 500; color: var(--cv-text-primary)">castcodes</span>
+            <span style="display: block; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)">~/dev/castcodes</span>
+          </span>
+          <span style="display: flex; gap: 4px"><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span></span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted); width: 14px; text-align: right">1</span>
+        </button>
+        <button type="button" data-board-proj="grimoire" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: 64px; text-align: left; padding: 0 16px; background: none; border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
+          <span data-board-bar="" style="width: 2px; align-self: stretch; margin: 12px 0; background: transparent; border-radius: 2px; transition: background-color 240ms"></span>
+          <span style="flex: 1; min-width: 0">
+            <span style="display: block; font-size: 13.5px; font-weight: 500; color: var(--cv-text-primary)">grimoire</span>
+            <span style="display: block; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)">~/dev/grimoire</span>
+          </span>
+          <span style="display: flex; gap: 4px"><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/openai.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span></span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted); width: 14px; text-align: right">2</span>
+        </button>
+      </div>
+      <div data-hero-panel="" data-live-board="" style="min-width: 0; display: flex; flex-direction: column">
+      <div data-panel="sessions" style="position: relative; flex: 0 0 429px; display: flex; flex-direction: column; height: 429px; min-height: 429px; box-sizing: border-box; overflow: hidden">
+
+      <div data-r="thead" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 43px; align-items: center; padding: 0 20px; background: var(--cv-bg-sunken); border-bottom: 1px solid var(--cv-border-hairline); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">
+        <span>Familiar</span><span>Surface</span><span>Session</span><span>Diff</span>
+      </div>
+
+      <div data-row="" data-proj="opencoven" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
+            <img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)">
+          </span>
+          <div>
+            <div style="font-size: 14px; font-weight: 500">Hexi</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">claude code</div>
+          </div>
+        </div>
+        <span data-claim="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-text-secondary); border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 4px 11px; justify-self: start; transition: color 300ms, border-color 300ms, background-color 300ms">ui/composer</span>
+        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--cv-success)"><span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success); animation: cvLive 2.2s ease-out infinite"></span>working</span>
+          <span data-log="" data-lines="reading composer-shell.tsx|editing control pills|vitest · 12 passed|staged 4 files" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary); transition: opacity 220ms cubic-bezier(0.2,0,0,1)">reading composer-shell.tsx</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px"><span data-tick="86" style="color: var(--cv-success)">0</span> <span data-tick="41" data-prefix="-" style="color: var(--cv-danger)">0</span></span>
+      </div>
+
+      <div data-row="" data-proj="opencoven" data-row-overlap="" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
+            <img src="https://opencoven.ai/logos/openai.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)">
+          </span>
+          <div>
+            <div style="font-size: 14px; font-weight: 500">Sage</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">codex</div>
+          </div>
+        </div>
+        <span data-claim="" data-claim-overlap="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-text-secondary); border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 4px 11px; justify-self: start; transition: color 300ms, border-color 300ms, background-color 300ms">ui/composer</span>
+        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <span data-state-cell="" style="display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--cv-success); transition: color 300ms"><span data-state-dot="" style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success); animation: cvLive 2.2s ease-out infinite; transition: background-color 300ms"></span><span data-state-text="">working</span></span>
+          <span data-log="" data-sage-log="" data-lines="opening composer-shell.tsx|planning a restyle|claim overlaps hexi|holding · waiting on you" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary); transition: opacity 220ms cubic-bezier(0.2,0,0,1)">opening composer-shell.tsx</span>
+        </div>
+        <span data-sage-diff="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-muted); transition: color 300ms">no diff yet</span>
+      </div>
+
+      <div data-row="" data-proj="opencoven" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
+            <img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)">
+          </span>
+          <div>
+            <div style="font-size: 14px; font-weight: 500">Charm</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">claude code</div>
+          </div>
+        </div>
+        <span data-claim="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-text-secondary); border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 4px 11px; justify-self: start">api/auth</span>
+        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--cv-success)"><span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success); animation: cvLive 2.2s ease-out infinite"></span>working</span>
+          <span data-log="" data-lines="adding refresh rotation|migration · 1 file|vitest · 8 passed|opened PR #167" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary); transition: opacity 220ms cubic-bezier(0.2,0,0,1)">adding refresh rotation</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px"><span data-tick="142" style="color: var(--cv-success)">0</span> <span data-tick="38" data-prefix="-" style="color: var(--cv-danger)">0</span></span>
+      </div>
+
+      <div data-row="" data-proj="opencoven" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
+            <img src="https://opencoven.ai/logos/openai.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)">
+          </span>
+          <div>
+            <div style="font-size: 14px; font-weight: 500">Mote</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">codex</div>
+          </div>
+        </div>
+        <span data-claim="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-text-secondary); border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 4px 11px; justify-self: start">infra/</span>
+        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--cv-text-muted)"><span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-text-muted)"></span>bounded</span>
+          <span data-log="" data-lines="reading terraform plan|3 resources to replace|guard · needs your approval|paused" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary); transition: opacity 220ms cubic-bezier(0.2,0,0,1)">reading terraform plan</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-muted)">held</span>
+      </div>
+
+      <div data-row="" data-proj="coven-cave" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
+            <img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
+          </span>
+          <div>
+            <div style="font-size: 14px; font-weight: 500">Hexi</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">claude code</div>
+          </div>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-text-secondary); border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 4px 11px; justify-self: start">src/shell</span>
+        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--cv-success)"><span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success); animation: cvLive 2.2s ease-out infinite"></span>working</span>
+          <span data-log="" data-lines="reading window-chrome.tsx|wiring the session list|vitest · 7 passed|staged 2 files" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary); transition: opacity 220ms cubic-bezier(0.2,0,0,1)">reading window-chrome.tsx</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">+51 −9</span>
+      </div>
+      <div data-row="" data-proj="coven-cave" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
+            <img src="https://opencoven.ai/logos/openai.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
+          </span>
+          <div>
+            <div style="font-size: 14px; font-weight: 500">Mote</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">codex</div>
+          </div>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-text-secondary); border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 4px 11px; justify-self: start">src/pty</span>
+        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--cv-success)"><span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success); animation: cvLive 2.2s ease-out infinite"></span>working</span>
+          <span data-log="" data-lines="attaching to the pty|resize handler|holding output buffer|idle" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary); transition: opacity 220ms cubic-bezier(0.2,0,0,1)">attaching to the pty</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">+18 −4</span>
+      </div>
+      <div data-row="" data-proj="castcodes" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
+            <img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
+          </span>
+          <div>
+            <div style="font-size: 14px; font-weight: 500">Charm</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">claude code</div>
+          </div>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-text-secondary); border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 4px 11px; justify-self: start">api/auth</span>
+        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--cv-success)"><span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success); animation: cvLive 2.2s ease-out infinite"></span>working</span>
+          <span data-log="" data-lines="porting the login flow|reading session.ts|vitest · 4 passed|opened PR #12" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary); transition: opacity 220ms cubic-bezier(0.2,0,0,1)">porting the login flow</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">+96 −31</span>
+      </div>
+
+      <div data-row="" data-proj="grimoire" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
+            <img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
+          </span>
+          <div>
+            <div style="font-size: 14px; font-weight: 500">Hexi</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">claude code</div>
+          </div>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-text-secondary); border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 4px 11px; justify-self: start">docs/guides</span>
+        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--cv-success)"><span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success); animation: cvLive 2.2s ease-out infinite"></span>working</span>
+          <span data-log="" data-lines="rewriting the claims guide|reading claims.md|added two examples|staged 3 files" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary); transition: opacity 220ms cubic-bezier(0.2,0,0,1)">rewriting the claims guide</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">+74 −22</span>
+      </div>
+      <div data-row="" data-proj="grimoire" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
+            <img src="https://opencoven.ai/logos/openai.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
+          </span>
+          <div>
+            <div style="font-size: 14px; font-weight: 500">Sage</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">codex</div>
+          </div>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-text-secondary); border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 4px 11px; justify-self: start">docs/reference</span>
+        <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0">
+          <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--cv-success)"><span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success); animation: cvLive 2.2s ease-out infinite"></span>working</span>
+          <span data-log="" data-lines="generating the CLI reference|reading cli.ts|checked 22 flags|staged 1 file" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary); transition: opacity 220ms cubic-bezier(0.2,0,0,1)">generating the CLI reference</span>
+        </div>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">+118 −9</span>
+      </div>
+
+      <div style="flex: 1"></div>
+
+      <div data-overlap-banner="" style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; display: flex; align-items: center; gap: 14px; padding: 10px 20px; min-height: 0; border-top: 1px solid color-mix(in oklch, var(--cv-warning) 38%, transparent); background: color-mix(in oklch, var(--cv-warning) 10%, var(--cv-bg-raised)); opacity: 0; transform: translateY(8px); transition: opacity 500ms cubic-bezier(0.2,0,0,1), transform 500ms cubic-bezier(0.2,0,0,1)">
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-warning)">Overlap</span>
+        <span style="font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Hexi and Sage both hold <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 13px">ui/composer</span>. Neither has merged yet.</span>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 8px">
+          <button type="button" data-action="openConflict" style="font-family: inherit; font-size: 12.5px; padding: 6px 10px; border-radius: 7px; border: 1px solid transparent; background: transparent; color: var(--cv-warning); cursor: pointer; white-space: nowrap; transition: background-color 180ms, border-color 180ms" class="rh11">Look at it →</button>
+          <button type="button" data-resolve="split" data-action="resolveOverlap" style="font-family: inherit; font-size: 12.5px; font-weight: 500; padding: 6px 12px; border-radius: 7px; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-raised); color: var(--cv-text-primary); cursor: pointer; white-space: nowrap; transition: border-color 200ms, background-color 200ms" class="rh12">Split the surface</button>
+          <button type="button" data-resolve="hand" data-action="resolveOverlap" style="font-family: inherit; font-size: 12.5px; font-weight: 500; padding: 6px 12px; border-radius: 7px; border: 1px solid transparent; background: var(--cv-accent); color: var(--cv-accent-fg); cursor: pointer; white-space: nowrap; transition: background-color 200ms" class="rh13">Hand it to Hexi</button>
+        </div>
+      </div>
+      </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail views, shown in place of the board -->
+  <div data-win="profile" data-view="profile" style="display: none; min-width: 0">
+  <div data-win-head="" style="display: flex; align-items: center; gap: 12px; padding: 10px 15px; background: var(--cv-bg-sunken); border-bottom: 1px solid var(--cv-border-hairline)">
+    <button type="button" data-win-close="" aria-label="Back to the board" title="Back to the board" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 1px solid var(--cv-border-hairline); border-radius: 7px; background: var(--cv-bg-raised); color: var(--cv-text-secondary); cursor: pointer; flex: none; transition: background-color 160ms, color 160ms, border-color 160ms" class="rh14"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"></path></svg></button>
+    <span data-w="head" style="font-size: 12.5px; font-weight: 500">Hexi</span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)">familiar</span>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 22px; padding: 0 16px; border-bottom: 1px solid var(--cv-border-hairline); font-size: 13px">
+    <button type="button" data-wp-tab="profile" style="padding: 11px 0; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--cv-text-primary); cursor: pointer; border-bottom: 2px solid var(--cv-accent)">Profile</button>
+    <button type="button" data-wp-tab="memory" style="padding: 11px 0; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--cv-text-muted); cursor: pointer; border-bottom: 2px solid transparent">Memory</button>
+    <button type="button" data-wp-tab="vault" style="padding: 11px 0; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--cv-text-muted); cursor: pointer; border-bottom: 2px solid transparent">Vault</button>
+    <button type="button" data-wp-tab="research" style="display: none; padding: 11px 0; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--cv-text-muted); cursor: pointer; border-bottom: 2px solid transparent">Research</button>
+  </div>
+
+  <div style="padding: 15px; max-height: 68vh; overflow: auto">
+    <div data-wp-panel="profile">
+      <div style="display: grid; grid-template-columns: 1.5fr 0.85fr 1.35fr; gap: 12px">
+
+        <div style="position: relative; border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-elevated); padding: 14px; display: flex; flex-direction: column; gap: 13px">
+          <div style="display: flex; align-items: center; gap: 13px">
+            <div style="width: 72px; height: 72px; flex-shrink: 0; border-radius: 11px; overflow: hidden; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-sunken)">
+            <img src="/assets/holder-avatar.png" width="216" height="216" decoding="async" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block" />
+            </div>
+            <div style="min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <div data-w="name" style="font-size: 19px; font-weight: 550; letter-spacing: -0.01em">Hexi</div>
+              <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 5px 7px; min-width: 0; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)">
+                <img data-wp-logo="" src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
+                <span data-w="harness" style="white-space: nowrap">claude code</span><span>·</span><span data-w="model" style="white-space: nowrap">sonnet 4.6</span>
+              </div>
+            </div>
+          </div>
+          <div data-wp-tags="" style="display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding-top: 12px; border-top: 1px solid var(--cv-border-hairline)"></div>
+          <div data-wp-rolemenu="" style="display: none; position: absolute; left: 14px; right: 14px; top: calc(100% - 6px); z-index: 90; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); border-radius: 10px; box-shadow: 0 1px 2px oklch(0.1 0.02 291 / 14%), 0 18px 40px oklch(0.1 0.02 291 / 26%); padding: 8px">
+            <input type="text" data-wp-rolefilter="" placeholder="Find or name a role" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: 12.5px; color: var(--cv-text-primary); background: var(--cv-bg-raised); border: 1px solid var(--cv-border-hairline); border-radius: 7px; padding: 7px 9px; margin-bottom: 6px" />
+            <div data-wp-roleopts="" style="display: flex; flex-direction: column; gap: 2px; max-height: 154px; overflow: auto"></div>
+          </div>
+        </div>
+
+        <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-elevated); padding: 14px; display: flex; flex-direction: column; gap: 9px">
+          <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Churn to date</span>
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span data-w="churn" style="font-family: 'EB Garamond', serif; font-size: 32px; line-height: 1">218k</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">tokens</span>
+          </div>
+          <div style="display: flex; height: 6px; border-radius: 999px; overflow: hidden; background: var(--cv-bg-sunken)">
+            <span data-wp-bar-in="" style="width: 80%; background: var(--cv-accent)"></span>
+            <span data-wp-bar-out="" style="width: 20%; background: var(--cv-success)"></span>
+          </div>
+          <div style="display: flex; gap: 12px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">
+            <span data-w="tokin">186k in</span><span data-w="tokout">21k out</span>
+          </div>
+          <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid var(--cv-border-hairline); display: flex; align-items: baseline; gap: 10px">
+            <span data-w="cost" style="font-family: 'EB Garamond', serif; font-size: 21px; line-height: 1">$1.84</span>
+            <span data-w="time" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">42m of wall time</span>
+          </div>
+        </div>
+
+        <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-elevated); padding: 14px; overflow: hidden">
+          <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 11px">
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Commits</span>
+            <span data-wp-range="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted); margin-left: auto">drag to scrub</span>
+          </div>
+          <div data-wp-gridwrap="" style="overflow: hidden; cursor: grab; mask-image: linear-gradient(to right, transparent 0, #000 16%); -webkit-mask-image: linear-gradient(to right, transparent 0, #000 16%)">
+            <div data-wp-track="" style="width: max-content; will-change: transform">
+              <div data-wp-grid="" style="display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 10px); gap: 3px; width: max-content"></div>
+              <div data-wp-months="" style="display: flex; gap: 3px; margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; color: var(--cv-text-muted)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: baseline; gap: 10px; margin: 18px 0 10px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Where it works</span>
+        <span data-wp-projcount="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)"></span>
+      </div>
+      <div data-wp-projects="" style="position: relative; height: 268px; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 10px"></div>
+    </div>
+
+    <div data-wp-panel="memory" style="display: none">
+      <div data-wp-memrow="" style="display: flex; align-items: stretch">
+        <div data-wp-graph="" style="flex: 1 1 auto; min-width: 0; display: flex; align-items: center"></div>
+        <!-- the selected note: no width until something is selected, so the graph has the whole row -->
+        <div data-wp-detail="" style="flex: 0 0 0px; min-width: 0; margin-left: 0; opacity: 0; overflow: hidden; transition: flex-basis 420ms cubic-bezier(0.2,0,0,1), margin-left 420ms cubic-bezier(0.2,0,0,1), opacity 240ms cubic-bezier(0.2,0,0,1)">
+          <div style="width: 296px; box-sizing: border-box; height: 100%; display: flex; flex-direction: column; gap: 12px; padding: 2px 0 2px 22px; border-left: 1px solid var(--cv-border-hairline)">
+            <div style="display: flex; align-items: flex-start; gap: 10px">
+              <span data-wp-dtitle="" style="flex: 1; min-width: 0; font-size: 14px; line-height: 1.4"></span>
+              <button type="button" data-wp-dclose="" aria-label="Close the note" style="flex: none; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid var(--cv-border-hairline); background: transparent; color: var(--cv-text-muted); font-family: inherit; font-size: 12px; line-height: 1; cursor: pointer; transition: color 160ms, border-color 160ms" class="rh15">✕</button>
+            </div>
+            <span data-wp-dwhere="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; line-height: 1.55; color: var(--cv-text-secondary)"></span>
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-top: auto">
+              <div style="display: flex; align-items: baseline; gap: 8px">
+                <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Strength</span>
+                <span data-wp-dstate="" style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-secondary)"></span>
+              </div>
+              <div data-wp-dmeter="" style="display: flex; gap: 3px"></div>
+              <span data-wp-dmeta="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; line-height: 1.5; color: var(--cv-text-muted)"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div data-wp-panel="vault" style="display: none">
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Secrets it can reach</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)">values stay in the daemon, never in a prompt</span>
+      </div>
+      <div data-wp-vault="" style="display: flex; flex-direction: column; gap: 8px"></div>
+    </div>
+
+    <div data-wp-panel="research" style="display: none">
+      <div data-wp-research="" style="display: flex; flex-direction: column; gap: 10px"></div>
+    </div>
+  </div>
+</div>
+  <div data-win="surface" data-view="surface" style="display: none; min-width: 0">
+  <div data-win-head="" style="display: flex; align-items: center; gap: 12px; padding: 10px 15px; background: var(--cv-bg-sunken); border-bottom: 1px solid var(--cv-border-hairline)">
+    <button type="button" data-win-close="" aria-label="Back to the board" title="Back to the board" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 1px solid var(--cv-border-hairline); border-radius: 7px; background: var(--cv-bg-raised); color: var(--cv-text-secondary); cursor: pointer; flex: none; transition: background-color 160ms, color 160ms, border-color 160ms" class="rh14"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"></path></svg></button>
+    <span data-w="head" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px; font-weight: 500">ui/composer</span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)">surface</span>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 22px; padding: 0 16px; border-bottom: 1px solid var(--cv-border-hairline); font-size: 13px">
+    <button type="button" data-wp-tab="claim" style="padding: 11px 0; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--cv-text-primary); cursor: pointer; border-bottom: 2px solid var(--cv-accent)">Claim</button>
+    <button type="button" data-wp-tab="files" style="padding: 11px 0; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--cv-text-muted); cursor: pointer; border-bottom: 2px solid transparent">Files</button>
+    <button type="button" data-wp-tab="guards" style="padding: 11px 0; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--cv-text-muted); cursor: pointer; border-bottom: 2px solid transparent">Guards</button>
+    <button type="button" data-wp-tab="history" style="padding: 11px 0; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--cv-text-muted); cursor: pointer; border-bottom: 2px solid transparent">History</button>
+  </div>
+
+  <div style="padding: 15px; max-height: 68vh; overflow: auto">
+    <div data-wp-panel="claim">
+      <div style="display: grid; grid-template-columns: 1.25fr 0.8fr; gap: 12px">
+        <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-elevated); padding: 15px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; gap: 11px">
+            <span style="width: 36px; height: 36px; flex-shrink: 0; border-radius: 9px; overflow: hidden; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-sunken)"><img src="/assets/holder-avatar.png" width="216" height="216" decoding="async" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block" /></span>
+            <div style="min-width: 0">
+              <div style="font-size: 14.5px; font-weight: 550">held by <span data-w="holder">Hexi</span></div>
+              <div data-w="kind" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">directory · 6 files</div>
+            </div>
+            <span data-ws-live="" style="margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--cv-success)"><span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success); animation: cvLive 2.2s ease-out infinite"></span>holding</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 78px minmax(0,1fr); gap: 8px 12px; font-size: 13px; padding-top: 12px; border-top: 1px solid var(--cv-border-hairline)">
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)">since</span><span data-w="since">14:02</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)">intent</span><span data-w="intent">restyle the control pills</span>
+          </div>
+        </div>
+        <div data-ws-stats="" style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-elevated); padding: 15px; display: flex; flex-direction: column; gap: 13px"></div>
+      </div>
+
+      <div style="margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">The queue</div>
+      <div data-ws-queue="" style="margin-top: 9px; display: flex; flex-direction: column; gap: 8px"></div>
+    </div>
+
+    <div data-wp-panel="files" style="display: none">
+      <div data-ws-files="" style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; overflow: hidden"></div>
+    </div>
+
+    <div data-wp-panel="guards" style="display: none">
+      <div data-ws-guards="" style="display: flex; flex-direction: column; gap: 9px"></div>
+    </div>
+
+    <div data-wp-panel="history" style="display: none">
+      <div data-ws-history="" style="display: flex; flex-direction: column"></div>
+    </div>
+  </div>
+</div>
+  <div data-win="diff" data-view="diff" style="display: none; min-width: 0">
+  <div data-win-head="" style="display: flex; align-items: center; gap: 12px; padding: 10px 15px; background: var(--cv-bg-sunken); border-bottom: 1px solid var(--cv-border-hairline)">
+    <button type="button" data-win-close="" aria-label="Back to the board" title="Back to the board" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 1px solid var(--cv-border-hairline); border-radius: 7px; background: var(--cv-bg-raised); color: var(--cv-text-secondary); cursor: pointer; flex: none; transition: background-color 160ms, color 160ms, border-color 160ms" class="rh14"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"></path></svg></button>
+    <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex: none"><img data-wd-logo="" src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" /></span>
+    <span data-w="head" style="font-size: 12.5px; font-weight: 500">Hexi</span>
+    <span data-wd-tree="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">working tree · opencoven</span>
+    <span data-wd-total="" style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; display: inline-flex; gap: 8px"></span>
+  </div>
+  <div style="padding: 18px; display: flex; flex-direction: column; gap: 14px">
+
+    <div style="flex: none; display: grid; grid-template-columns: 292px minmax(0,1fr); gap: 12px; align-items: stretch">
+      <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-elevated); overflow: hidden; display: flex; flex-direction: column">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--cv-border-hairline)">
+          <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Files</span>
+          <span data-wd-count="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted); margin-left: auto"></span>
+        </div>
+        <div data-wd-files="" style="flex: 1; padding: 6px"></div>
+      </div>
+
+      <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-code-bg); overflow: hidden; display: flex; flex-direction: column; min-width: 0">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--cv-border-hairline); background: var(--cv-bg-elevated)">
+          <span data-wd-hunk="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap"></span>
+          <span data-wd-chip="" style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--cv-border-hairline); color: var(--cv-text-muted); white-space: nowrap"></span>
+        </div>
+        <div data-wd-lines="" style="flex: 1; min-width: 0; overflow: hidden"></div>
+        <div data-wd-status="" style="display: flex; align-items: center; gap: 9px; padding: 10px 14px; border-top: 1px solid var(--cv-border-hairline); background: var(--cv-bg-elevated); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)"></div>
+      </div>
+    </div>
+
+    <div style="flex: none; display: flex; flex-direction: column; gap: 9px">
+      <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Steer it</span>
+      <div data-w-thread="" style="display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; gap: 10px; font-size: 13px; color: var(--cv-text-secondary); background: var(--cv-bg-raised); border: 1px solid var(--cv-border-hairline); border-radius: 9px; padding: 10px 12px"><span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted); flex-shrink: 0">you</span><span data-w="note">Keep the radius at 999px on the small pills.</span></div>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <input type="text" data-w-input="" placeholder="Leave a note on this diff" style="flex: 1; min-width: 0; font-family: inherit; font-size: 13px; color: var(--cv-text-primary); background: var(--cv-bg-raised); border: 1px solid var(--cv-border-hairline); border-radius: 8px; padding: 9px 11px" />
+        <button type="button" data-w-send="" style="font-family: inherit; font-size: 13px; font-weight: 500; padding: 9px 14px; border: none; border-radius: 8px; background: var(--cv-accent); color: var(--cv-accent-fg); cursor: pointer; white-space: nowrap">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div data-win="state" data-view="state" style="display: none; min-width: 0">
+  <div data-win-head="" style="display: flex; align-items: center; gap: 12px; padding: 10px 15px; background: var(--cv-bg-sunken); border-bottom: 1px solid var(--cv-border-hairline)">
+    <button type="button" data-win-close="" aria-label="Back to the board" title="Back to the board" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 1px solid var(--cv-border-hairline); border-radius: 7px; background: var(--cv-bg-raised); color: var(--cv-text-secondary); cursor: pointer; flex: none; transition: background-color 160ms, color 160ms, border-color 160ms" class="rh14"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"></path></svg></button>
+    <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex: none"><img data-ws-face="" src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" /></span>
+    <span data-w="head" style="font-size: 12.5px; font-weight: 500">Hexi</span>
+    <span data-w="hmodel" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)"></span>
+    <span data-wst-pill="" style="margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid color-mix(in oklch, var(--cv-success) 38%, transparent); color: var(--cv-success)"><span data-wst-dot="" style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success)"></span><span data-wst-txt="">working</span></span>
+  </div>
+  <div style="padding: 18px; display: flex; flex-direction: column; gap: 14px">
+
+    <div style="flex: none; display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap">
+      <div style="min-width: 0; display: flex; flex-direction: column; gap: 5px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Working on</div>
+        <div data-w="intent" style="font-family: 'EB Garamond', serif; font-size: 24px; line-height: 1.2; letter-spacing: -0.01em"></div>
+      </div>
+      <div data-w="surf" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-text-secondary); margin-left: auto; padding: 5px 10px; border-radius: 7px; background: var(--cv-bg-sunken); white-space: nowrap"></div>
+    </div>
+
+    <div style="flex: none; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px">
+      <div style="border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 13px 14px; background: var(--cv-bg-raised); display: flex; flex-direction: column; gap: 4px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Spend</div>
+        <div data-w="cost" style="font-family: 'EB Garamond', serif; font-size: 27px; line-height: 1.05; letter-spacing: -0.01em"></div>
+        <div data-w="costsub" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)">this session</div>
+      </div>
+      <div style="border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 13px 14px; background: var(--cv-bg-raised); display: flex; flex-direction: column; gap: 4px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Wall time</div>
+        <div data-w="time" style="font-family: 'EB Garamond', serif; font-size: 27px; line-height: 1.05; letter-spacing: -0.01em"></div>
+        <div data-w="timesub" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)">since it claimed</div>
+      </div>
+      <div style="border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 13px 14px; background: var(--cv-bg-raised); display: flex; flex-direction: column; gap: 7px">
+        <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Token churn</div>
+        <div data-w="tokens" style="font-family: 'EB Garamond', serif; font-size: 27px; line-height: 1.05; letter-spacing: -0.01em"></div>
+        <div style="display: flex; height: 4px; border-radius: 999px; overflow: hidden; background: var(--cv-bg-sunken)">
+          <div data-wst-in="" style="height: 100%; width: 0%; background: var(--cv-accent); transition: width 620ms cubic-bezier(0.2,0,0,1)"></div>
+          <div data-wst-out="" style="height: 100%; width: 0%; background: color-mix(in oklch, var(--cv-accent) 32%, transparent); transition: width 620ms cubic-bezier(0.2,0,0,1) 80ms"></div>
+        </div>
+        <div style="display: flex; gap: 10px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)"><span>in</span><span data-wst-split="" style="margin-left: auto"></span><span>out</span></div>
+      </div>
+    </div>
+
+    <div style="flex: none; display: grid; grid-template-columns: minmax(0,1.02fr) minmax(0,1fr); gap: 12px; align-items: stretch">
+    <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-elevated); overflow: hidden; display: flex; flex-direction: column">
+      <div style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--cv-border-hairline)">
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Where the tokens went</span>
+        <span data-wst-ftotal="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted); margin-left: auto"></span>
+      </div>
+      <div data-wst-files="" style="padding: 6px 14px 12px"></div>
+    </div>
+
+    <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-sunken); overflow: hidden; display: flex; flex-direction: column">
+      <div style="display: flex; align-items: center; gap: 9px; padding: 10px 14px; border-bottom: 1px solid var(--cv-border-hairline); background: var(--cv-bg-elevated)">
+        <span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success); animation: cvLive 2.2s ease-out infinite"></span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Tool calls, as they land</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted); margin-left: auto">tail −4</span>
+      </div>
+      <div data-w-feed="" style="flex: 1; padding: 10px 14px 12px; display: flex; flex-direction: column; justify-content: center; gap: 5px">
+        <div data-w="feed1" style="display: flex; align-items: baseline; gap: 10px"></div>
+        <div data-w="feed2" style="display: flex; align-items: baseline; gap: 10px"></div>
+        <div data-w="feed3" style="display: flex; align-items: baseline; gap: 10px"></div>
+        <div data-w="feed4" style="display: flex; align-items: baseline; gap: 10px"></div>
+      </div>
+    </div>
+    </div>
+
+    <div data-wst-foot="" style="flex: none; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-raised)">
+      <span data-wst-footdot="" style="width: 7px; height: 7px; border-radius: 999px; background: var(--cv-success); flex: none"></span>
+      <span data-wst-foottxt="" style="font-size: 13px; line-height: 1.5; color: var(--cv-text-secondary)"></span>
+      <button type="button" data-wst-dive="" data-action="openConflict" style="margin-left: auto; flex: none; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; padding: 6px 11px; border-radius: 7px; border: 1px solid color-mix(in oklch, var(--cv-warning) 34%, transparent); background: transparent; color: var(--cv-warning); font-family: inherit; cursor: pointer; white-space: nowrap; transition: background-color 180ms" class="rh16">Look at the overlap →</button>
+    </div>
+  </div>
+</div>
+
+  <div data-win="conflict" data-view="conflict" style="display: none; min-width: 0">
+  <div data-win-head="" style="display: flex; align-items: center; gap: 12px; padding: 10px 15px; background: var(--cv-bg-sunken); border-bottom: 1px solid var(--cv-border-hairline)">
+    <button type="button" data-win-close="" aria-label="Back to the board" title="Back to the board" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 1px solid var(--cv-border-hairline); border-radius: 7px; background: var(--cv-bg-raised); color: var(--cv-text-secondary); cursor: pointer; flex: none; transition: background-color 160ms, color 160ms, border-color 160ms" class="rh14"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"></path></svg></button>
+    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-warning)">Overlap</span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">ui/composer</span>
+    <span style="margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; border: 1px solid color-mix(in oklch, var(--cv-warning) 38%, transparent); color: var(--cv-warning)"><span style="width: 5px; height: 5px; border-radius: 999px; background: var(--cv-warning); animation: cvWarn 2.2s ease-out infinite"></span>waiting on you</span>
+  </div>
+  <div style="padding: 18px; display: flex; flex-direction: column; gap: 14px">
+
+    <div style="display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap">
+      <div style="display: flex; flex-direction: column; gap: 5px; max-width: 62ch">
+        <h3 style="margin: 0; font-family: 'EB Garamond', serif; font-size: 26px; line-height: 1.15; letter-spacing: -0.01em; font-weight: 400">Two claims on one surface.</h3>
+        <p style="margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--cv-text-secondary); text-wrap: pretty">Hexi has been writing in <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px">ui/composer</span> since 14:02. Sage reached for the same shell at 14:19 and the runtime held it there.</p>
+      </div>
+      <div style="margin-left: auto; display: flex; gap: 4px; padding: 4px; border-radius: 10px; background: var(--cv-bg-sunken); border: 1px solid var(--cv-border-hairline)">
+      <button type="button" data-cf-tab="claims" data-action="pickConflictTab" style="font-family: inherit; font-size: 12.5px; padding: 7px 13px; border-radius: 8px; border: 1px solid color-mix(in oklch, var(--cv-accent) 40%, transparent); background: var(--cv-bg-raised); color: var(--cv-text-primary); cursor: pointer; transition: color 160ms, background-color 160ms, border-color 160ms" class="rh1">The two claims</button>
+      <button type="button" data-cf-tab="overlap" data-action="pickConflictTab" style="font-family: inherit; font-size: 12.5px; padding: 7px 13px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: var(--cv-text-muted); cursor: pointer; transition: color 160ms, background-color 160ms, border-color 160ms" class="rh1">The contested file</button>
+      <button type="button" data-cf-tab="timeline" data-action="pickConflictTab" style="font-family: inherit; font-size: 12.5px; padding: 7px 13px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: var(--cv-text-muted); cursor: pointer; transition: color 160ms, background-color 160ms, border-color 160ms" class="rh1">How it got here</button>
+      </div>
+    </div>
+
+    <div data-cf-panel="claims" style="display: block">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; align-items: stretch">
+        <div style="border: 1px solid color-mix(in oklch, var(--cv-success) 30%, transparent); border-radius: 11px; background: var(--cv-bg-raised); padding: 15px 16px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span style="width: 26px; height: 26px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex: none"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="14" height="14" style="width: 14px; height: 14px; display: block; filter: var(--cv-logo-filter)" /></span>
+            <div style="min-width: 0">
+              <div style="font-size: 14px; font-weight: 500">Hexi</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">claude code</div>
+            </div>
+            <span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; border: 1px solid color-mix(in oklch, var(--cv-success) 38%, transparent); color: var(--cv-success)">holds it</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 3px">
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Claimed</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">14:02 · 38 minutes ago</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 3px">
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Intent</span>
+            <span style="font-size: 13.5px; line-height: 1.5; color: var(--cv-text-secondary)">Restyle the composer control pills.</span>
+          </div>
+        </div>
+        <div style="border: 1px solid color-mix(in oklch, var(--cv-warning) 34%, transparent); border-radius: 11px; background: var(--cv-bg-raised); padding: 15px 16px; display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span style="width: 26px; height: 26px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex: none"><img src="https://opencoven.ai/logos/openai.svg" alt="" width="14" height="14" style="width: 14px; height: 14px; display: block; filter: var(--cv-logo-filter)" /></span>
+            <div style="min-width: 0">
+              <div style="font-size: 14px; font-weight: 500">Sage</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">codex</div>
+            </div>
+            <span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; border: 1px solid color-mix(in oklch, var(--cv-warning) 38%, transparent); color: var(--cv-warning)">held back</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 3px">
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Claimed</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">14:19 · held on arrival</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 3px">
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Intent</span>
+            <span style="font-size: 13.5px; line-height: 1.5; color: var(--cv-text-secondary)">Restyle the same shell from the token scale.</span>
+          </div>
+        </div>
+    </div>
+    </div>
+
+    <div data-cf-panel="overlap" style="display: none">
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; align-items: stretch">
+        <div style="border: 1px solid var(--cv-border-hairline); border-radius: 10px; background: var(--cv-code-bg); overflow: hidden; display: flex; flex-direction: column">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--cv-border-hairline); background: var(--cv-bg-elevated)">
+            <span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-success)"></span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-secondary)">Hexi wrote it</span>
+            <span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)">lines 142–145 · written</span>
+          </div>
+          <div style="padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; line-height: 1.85; overflow: hidden">
+            <div style="white-space: pre; color: var(--cv-code-dim)">const pills = usePillState(session)</div>
+            <div style="white-space: pre; color: var(--cv-danger)">−  radius: tokens.radius.sm,</div>
+            <div style="white-space: pre; color: var(--cv-success)">+  radius: tokens.radius.full,</div>
+            <div style="white-space: pre; color: var(--cv-success)">+  border: '1px solid ' + tokens.border.hairline,</div>
+          </div>
+        </div>
+        <div style="border: 1px solid var(--cv-border-hairline); border-radius: 10px; background: var(--cv-code-bg); overflow: hidden; display: flex; flex-direction: column">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--cv-border-hairline); background: var(--cv-bg-elevated)">
+            <span style="width: 6px; height: 6px; border-radius: 999px; background: var(--cv-warning)"></span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-secondary)">Sage planned it</span>
+            <span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)">lines 142–145 · never ran</span>
+          </div>
+          <div style="padding: 10px 12px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; line-height: 1.85; overflow: hidden">
+            <div style="white-space: pre; color: var(--cv-code-dim)">const pills = usePillState(session)</div>
+            <div style="white-space: pre; color: var(--cv-danger)">−  radius: tokens.radius.sm,</div>
+            <div style="white-space: pre; color: var(--cv-success)">+  radius: scale.radius.pill,</div>
+            <div style="white-space: pre; color: var(--cv-success)">+  boxShadow: none,</div>
+          </div>
+        </div>
+      </div>
+      <p style="margin: 11px 0 0; font-size: 13px; line-height: 1.55; color: var(--cv-text-muted); text-wrap: pretty">Both rewrite the same four lines of <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px">composer-shell.tsx</span>, and they disagree about where the radius comes from. Whichever landed second would have quietly undone the first.</p>
+    </div>
+
+    <div data-cf-panel="timeline" style="display: none">
+      <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-elevated); padding: 15px 16px">
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px">
+          <div style="display: flex; flex-direction: column; gap: 7px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 0">
+              <span style="width: 9px; height: 9px; border-radius: 999px; flex: none; background: var(--cv-success)"></span>
+              <span style="flex: 1; height: 1px; background: var(--cv-border-hairline)"></span>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">14:02</div>
+            <div style="font-size: 12.5px; line-height: 1.45; color: var(--cv-text-secondary)">Hexi claims ui/composer. No one else is on it.</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 7px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 0">
+              <span style="width: 9px; height: 9px; border-radius: 999px; flex: none; background: var(--cv-success)"></span>
+              <span style="flex: 1; height: 1px; background: var(--cv-border-hairline)"></span>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">14:11</div>
+            <div style="font-size: 12.5px; line-height: 1.45; color: var(--cv-text-secondary)">Hexi writes the pill radius and stages three files.</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 7px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 0">
+              <span style="width: 9px; height: 9px; border-radius: 999px; flex: none; background: var(--cv-warning)"></span>
+              <span style="flex: 1; height: 1px; background: var(--cv-border-hairline)"></span>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">14:19</div>
+            <div style="font-size: 12.5px; line-height: 1.45; color: var(--cv-text-secondary)">Sage asks for the same shell. The runtime holds it.</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 7px; min-width: 0">
+            <div style="display: flex; align-items: center; gap: 0">
+              <span style="width: 9px; height: 9px; border-radius: 999px; flex: none; background: var(--cv-text-muted)"></span>
+              <span style="flex: 1; height: 1px; background: var(--cv-border-hairline)"></span>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">now</div>
+            <div style="font-size: 12.5px; line-height: 1.45; color: var(--cv-text-secondary)">Neither has merged. The second write is still waiting.</div>
+          </div>
+      </div>
+    </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 9px">
+      <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Ways out</div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; align-items: stretch">
+        <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-raised); padding: 14px 15px; display: flex; flex-direction: column; gap: 9px">
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span style="font-size: 13.5px; font-weight: 500">Split the surface</span>
+            <span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; color: var(--cv-text-muted); white-space: nowrap">Sage suggests</span>
+          </div>
+          <p style="margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--cv-text-secondary); text-wrap: pretty; flex: 1">Sage only needs the token scale. Narrow its claim and both can work at once.</p>
+          <button type="button" data-resolve="split" data-action="resolveFromDive" style="align-self: stretch; font-family: inherit; font-size: 12.5px; font-weight: 500; padding: 8px 14px; border-radius: 7px; cursor: pointer; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-elevated); color: var(--cv-text-primary); transition: background-color 200ms, border-color 200ms" class="rh12">Split the surface</button>
+        </div>
+        <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-raised); padding: 14px 15px; display: flex; flex-direction: column; gap: 9px">
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span style="font-size: 13.5px; font-weight: 500">Hand it to Hexi</span>
+            <span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; color: var(--cv-text-muted); white-space: nowrap">Hexi suggests</span>
+          </div>
+          <p style="margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--cv-text-secondary); text-wrap: pretty; flex: 1">38 minutes and 86 lines in, tests already green. Sage picks it up after the merge.</p>
+          <button type="button" data-resolve="hand" data-action="resolveFromDive" style="align-self: stretch; font-family: inherit; font-size: 12.5px; font-weight: 500; padding: 8px 14px; border-radius: 7px; cursor: pointer; border: 1px solid transparent; background: var(--cv-accent); color: var(--cv-accent-fg); transition: background-color 200ms, border-color 200ms" class="rh13">Hand it to Hexi</button>
+        </div>
+        <div style="border: 1px solid color-mix(in oklch, var(--cv-accent) 26%, transparent); border-radius: 11px; background: var(--cv-bg-raised); padding: 14px 15px; display: flex; flex-direction: column; gap: 9px">
+          <div style="display: flex; align-items: baseline; gap: 8px">
+            <span style="font-size: 13.5px; font-weight: 500">Say it yourself</span>
+            <span style="margin-left: auto; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; color: var(--cv-text-muted); white-space: nowrap">your call</span>
+          </div>
+          <p style="margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--cv-text-secondary); flex: 1">Neither suggestion fits? Write the instruction and both familiars get it.</p>
+          <div style="display: flex; gap: 7px">
+            <input type="text" data-cf-note="" placeholder="Sage takes the tests only" style="flex: 1; min-width: 0; font-family: inherit; font-size: 12.5px; color: var(--cv-text-primary); background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); border-radius: 7px; padding: 8px 10px" />
+            <button type="button" data-action="resolveWithNote" style="font-family: inherit; font-size: 12.5px; font-weight: 500; padding: 8px 13px; border-radius: 7px; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-elevated); color: var(--cv-text-primary); cursor: pointer; white-space: nowrap; transition: border-color 200ms, background-color 200ms" class="rh12">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div data-win="report" data-view="report" style="display: none; min-width: 0">
+  <div data-win-head="" style="display: flex; align-items: center; gap: 12px; padding: 10px 15px; background: var(--cv-bg-sunken); border-bottom: 1px solid var(--cv-border-hairline)">
+    <button type="button" data-win-close="" aria-label="Back to the board" title="Back to the board" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 1px solid var(--cv-border-hairline); border-radius: 7px; background: var(--cv-bg-raised); color: var(--cv-text-secondary); cursor: pointer; flex: none; transition: background-color 160ms, color 160ms, border-color 160ms" class="rh14"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"></path></svg></button>
+    <span data-wr-who="" style="font-size: 12.5px; font-weight: 500">Sage</span>
+    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)">research</span>
+  </div>
+
+  <div style="max-height: 76vh; overflow: auto">
+    <div style="padding: 26px 30px 22px; border-bottom: 1px solid var(--cv-border-hairline); background: var(--cv-bg-elevated)">
+      <div data-wr-meta="" style="display: flex; flex-wrap: wrap; gap: 14px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted); margin-bottom: 12px"></div>
+      <h2 data-wr-title="" style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 38px; line-height: 1.05; letter-spacing: -0.018em; margin: 0 0 12px; text-wrap: balance">Pill radius across the ecosystem</h2>
+      <p data-wr-thesis="" style="font-size: 17px; line-height: 1.6; color: var(--cv-text-secondary); margin: 0; max-width: 58ch; text-wrap: pretty"></p>
+    </div>
+
+    <div data-wr-stats="" style="display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-bottom: 1px solid var(--cv-border-hairline)"></div>
+
+    <div style="padding: 24px 30px; border-bottom: 1px solid var(--cv-border-hairline)">
+      <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted); margin-bottom: 14px">What the data looks like</div>
+      <div data-wr-chart=""></div>
+      <div data-wr-chartnote="" style="margin-top: 12px; font-size: 12.5px; color: var(--cv-text-muted)"></div>
+    </div>
+
+    <div style="padding: 24px 30px; border-bottom: 1px solid var(--cv-border-hairline)">
+      <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted); margin-bottom: 12px">Evidence</div>
+      <div data-wr-evidence="" style="border: 1px solid var(--cv-border-hairline); border-radius: 10px; overflow: hidden"></div>
+    </div>
+
+    <div style="padding: 24px 30px 28px">
+      <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted); margin-bottom: 12px">What we should do with it</div>
+      <div data-wr-takeaways="" style="display: flex; flex-direction: column; gap: 10px"></div>
+      <p data-wr-method="" style="margin: 20px 0 0; padding-top: 14px; border-top: 1px solid var(--cv-border-hairline); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; line-height: 1.6; color: var(--cv-text-muted)"></p>
+    </div>
+  </div>
+</div>
+
+
+</div>

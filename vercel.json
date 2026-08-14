@@ -15,6 +15,10 @@
     {
       "source": "/download/:platform",
       "destination": "/api/download?platform=:platform"
+    },
+    {
+      "source": "/stream/:platform",
+      "destination": "/api/stream?platform=:platform"
     }
   ]
 }

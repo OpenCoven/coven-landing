@@ -1,4 +1,5 @@
 ---
+import { ogImage } from '../lib/og.js';
 import '@fontsource-variable/inter/wght.css';
 import '@fontsource-variable/jetbrains-mono/wght.css';
 import '@fontsource-variable/geist/wght.css';
@@ -89,9 +90,10 @@ const collectionJsonLd = {
   <meta name="description" content="Choose an OpenCoven product and follow a verified path to your first successful Coven CLI, Coven Code, Cave, CastCodes, or GitHub run." />
   <meta property="og:title" content="OpenCoven Quickstart" />
   <meta property="og:description" content="Choose a product, prepare it, run the first loop, and verify a checkable first success." />
+  <meta property="og:site_name" content="OpenCoven" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://opencoven.ai/quickstart" />
-  <meta property="og:image" content="https://opencoven.ai/og.png" />
+  <meta property="og:image" content={ogImage} />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="OpenCoven — Persistent AI Familiars" />
@@ -99,7 +101,7 @@ const collectionJsonLd = {
   <meta name="twitter:site" content="@OpenCvn" />
   <meta name="twitter:title" content="OpenCoven Quickstart" />
   <meta name="twitter:description" content="Choose a product, prepare it, run the first loop, and verify a checkable first success." />
-  <meta name="twitter:image" content="https://opencoven.ai/og.png" />
+  <meta name="twitter:image" content={ogImage} />
   <meta name="twitter:image:alt" content="OpenCoven — Persistent AI Familiars" />
   <meta name="theme-color" content="#050409" />
   <meta name="robots" content="index, follow" />

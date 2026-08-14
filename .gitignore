@@ -9,3 +9,6 @@ coverage/
 /.copilot/
 /playwright-report/
 /test-results/
+
+# analytics keys stay local (copy posthog.config.example.json)
+analytics/posthog.config.json

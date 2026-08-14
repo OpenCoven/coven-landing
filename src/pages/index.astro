@@ -1,17 +1,24 @@
 ---
-import '@fontsource-variable/inter/wght.css';
-import '@fontsource-variable/jetbrains-mono/wght.css';
-import '@fontsource-variable/geist/wght.css';
-import '../styles/reforged.css';
+import { ogImage } from '../lib/og.js';
+import '@fontsource/eb-garamond/400.css';
+import '@fontsource/eb-garamond/400-italic.css';
+import '@fontsource/eb-garamond/500.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '@phosphor-icons/web/regular';
+import '../styles/redesign.css';
 
-import ReforgedHeader from '../components/reforged/ReforgedHeader.astro';
-import ReforgedHero from '../components/reforged/ReforgedHero.astro';
-import RuntimeMarquee from '../components/reforged/RuntimeMarquee.astro';
-import Boundary from '../components/reforged/Boundary.astro';
-import Surfaces from '../components/reforged/Surfaces.astro';
-import Invocation from '../components/reforged/Invocation.astro';
-import Summoning from '../components/reforged/Summoning.astro';
-import ReforgedFooter from '../components/reforged/ReforgedFooter.astro';
+import ThemeInit from '../components/ThemeInit.astro';
+import PosthogSnippet from '../components/redesign/PosthogSnippet.astro';
+import RedesignNav from '../components/redesign/RedesignNav.astro';
+import RedesignHero from '../components/redesign/RedesignHero.astro';
+import BoardSection from '../components/redesign/BoardSection.astro';
+import Outcomes from '../components/redesign/Outcomes.astro';
+import FinalCta from '../components/redesign/FinalCta.astro';
+import RedesignFooter from '../components/redesign/RedesignFooter.astro';
 ---
 
 <!doctype html>
@@ -19,79 +26,61 @@ import ReforgedFooter from '../components/reforged/ReforgedFooter.astro';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>OpenCoven — Persistent AI Familiars</title>
+    <title>OpenCoven · Stop being your agents' control plane</title>
     <meta
       name="description"
-      content="Summon a persistent AI familiar with project-scoped memory, a local-first runtime, and a boundary you control."
+      content="Coven is a local daemon that coordinates coding agents working in the same repo: claims on surfaces, one shared record, and guards that wait for your yes."
     />
-    <meta property="og:title" content="OpenCoven — Persistent AI Familiars" />
+    <meta property="og:title" content="OpenCoven · Stop being your agents' control plane" />
     <meta
       property="og:description"
-      content="A familiar is an AI agent with a memory, bound to your project."
+      content="A local daemon coordinating coding agents in one repo: claims on surfaces, one shared record, guards that wait for your yes."
     />
+    <meta property="og:site_name" content="OpenCoven" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://opencoven.ai/" />
-    <meta property="og:image" content="https://opencoven.ai/og.png" />
+    <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="OpenCoven — Persistent AI Familiars" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@OpenCvn" />
-    <meta name="twitter:title" content="OpenCoven — Persistent AI Familiars" />
-    <meta
-      name="twitter:description"
-      content="A familiar is an AI agent with a memory, bound to your project."
-    />
-    <meta name="twitter:image" content="https://opencoven.ai/og.png" />
-    <meta name="theme-color" content="#050409" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://opencoven.ai/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'SoftwareApplication',
-        name: 'OpenCoven',
-        alternateName: 'Coven',
-        description:
-          'An open-source, local-first runtime for persistent AI familiars with project-scoped memory.',
-        applicationCategory: 'DeveloperApplication',
-        operatingSystem: 'macOS, Linux, Windows, iOS',
-        url: 'https://opencoven.ai/',
-        downloadUrl:
-          'https://github.com/opencoven/coven-cave/releases/latest',
-        softwareHelp: {
-          '@type': 'CreativeWork',
-          url: 'https://docs.opencoven.ai/',
-        },
-        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-        sameAs: [
-          'https://github.com/OpenCoven',
-          'https://discord.gg/opencoven',
-        ],
-      })}
-    />
-
+    <ThemeInit />
+    <PosthogSnippet />
+    <script type="importmap" is:inline>
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.184.0/build/three.module.min.js",
+        "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+        "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+        "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+      },
+      "integrity": {
+        "https://unpkg.com/three@0.184.0/build/three.module.min.js": "sha384-35WaVqXNGvw49+RCXk67Ci9ebo55/5+CfirDbAVSG21KV8/7gO4xwIkhA5ZRcUHc",
+        "https://unpkg.com/three@0.184.0/build/three.core.min.js": "sha384-/2vXInuUL2LKgd3n86c5RIzG+YC7vk3zYPTknaEkF2H2sauHtaOrS8swZ+MURxU6",
+        "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+        "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+        "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+      }
+    }
+    </script>
+    <script type="module" src="/warded-braid.js?v=7" is:inline></script>
   </head>
-  <body class="reforged-page">
-    <div class="reforged-atmosphere" aria-hidden="true"></div>
-    <ReforgedHeader />
-    <main id="content" tabindex="-1">
-      <ReforgedHero />
-      <RuntimeMarquee />
-      <Boundary />
-      <Surfaces />
-      <Invocation />
-      <Summoning />
+  <body>
+    <RedesignNav />
+    <main>
+      <div data-screen-label="Landing v10 product surfaces" data-r="shell" style="min-width: 1140px; background: var(--cv-bg-base); padding-top: 116px">
+        <RedesignHero />
+        <BoardSection />
+        <Outcomes />
+        <FinalCta />
+      </div>
     </main>
-    <ReforgedFooter />
-    <p class="copy-live" data-copy-live aria-live="polite"></p>
+    <RedesignFooter />
 
     <script>
-      import '../scripts/reforged.js';
+      import '../scripts/redesign/landing.js';
     </script>
   </body>
 </html>
