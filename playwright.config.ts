@@ -4,6 +4,11 @@ export default defineConfig({
   testDir: './tests',
   outputDir: 'test-results',
   fullyParallel: false,
+  // One worker, always. `fullyParallel: false` only serializes tests *within* a
+  // file, so a second spec file — or any --repeat-each run — would fan out to
+  // CPU/2 browsers against the single `pnpm preview` server. That saturates it
+  // and times out tests that pass fine on their own.
+  workers: 1,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI
