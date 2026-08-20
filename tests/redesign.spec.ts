@@ -56,9 +56,22 @@ test('how-it-works renders with its own head and no template bindings', async ({
 
 test('no unexpected console errors on the landing page', async ({ page }) => {
   const errors: string[] = [];
-  page.on('pageerror', (e) => errors.push(String(e)));
+  page.on('pageerror', (e) => errors.push(`pageerror: ${e}`));
+  // The name promised console errors but only uncaught exceptions were
+  // watched, so console.error calls and failed subresources went unseen.
+  // Watch both, minus the /api routes the preview server genuinely does not
+  // serve — those 404s are an artifact of this environment, not the page.
+  page.on('console', (msg) => {
+    if (msg.type() !== 'error') return;
+    if (msg.location().url.includes('/api/')) return;
+    errors.push(`console: ${msg.text()}`);
+  });
   await page.goto('/');
-  await page.waitForTimeout(4000);
+  // Replaces a fixed 4s sleep. The braid boots on idle and its canvas appears
+  // around 5.5s, so that sleep returned before the slowest subsystem had even
+  // started — errors thrown during braid boot fell outside the window.
+  // Waiting on the canvas is deterministic and covers strictly more.
+  await expect(page.locator('warded-braid canvas')).toBeAttached({ timeout: 20_000 });
   expect(errors).toEqual([]);
 });
 
@@ -80,11 +93,13 @@ test.describe('interactions with the demo held still', () => {
     await page.locator('[data-action="toggleDownloads"]').first().click();
     const menu = page.locator('[data-dl-menu]').first();
     await expect(menu).toBeVisible();
-    const winTab = menu.locator('[data-dl-plat="win"], [data-dl-plat="windows"], [data-dl-plat="win-x64"]').first();
-    if (await winTab.count()) {
-      await winTab.click();
-      await expect(winTab).toHaveAttribute('aria-selected', 'true');
-    }
+    const winTab = menu.locator('[data-dl-plat="windows"]');
+    // Unconditional on purpose. This was guarded by `if (await winTab.count())`
+    // against two attribute spellings the markup never emits, so a renamed
+    // attribute would have made the test pass while asserting nothing. Every
+    // platform tab is authored statically in DownloadCta.astro.
+    await winTab.click();
+    await expect(winTab).toHaveAttribute('aria-selected', 'true');
     await page.keyboard.press('Escape');
     await expect(menu).toBeHidden();
   });
