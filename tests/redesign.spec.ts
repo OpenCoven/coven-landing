@@ -6,12 +6,17 @@ import { test, expect } from '@playwright/test';
 // functions themselves.
 
 test('landing renders the hero and adapts the download button', async ({ page }) => {
+  // Platform retargeting reads navigator.platform first, because Chrome's UA
+  // reduction freezes the UA string to Windows on every desktop OS. Emulate the
+  // platform so the machine running the suite cannot decide the expectation.
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'platform', { get: () => 'Linux x86_64', configurable: true });
+  });
+
   await page.goto('/');
   await expect(page).toHaveTitle(/OpenCoven/);
   await expect(page.locator('h1')).toContainText("Stop being your agents' control plane");
 
-  // platform retargeting: chromium reports Linux via navigator.platform even
-  // when UA reduction freezes the UA string to Windows
   const btn = page.locator('[data-dl-btn]').first();
   await expect(btn).toBeVisible();
   await expect(btn.locator('[data-dl-label]')).toHaveText('Download Cave for Linux');
