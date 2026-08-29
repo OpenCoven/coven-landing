@@ -489,14 +489,33 @@ function wireDownloadCards() {
     if (liveNode) liveNode.textContent = message;
   };
 
+  const isActiveState = (state) =>
+    state === 'preparing' || state === 'downloading';
+
+  // While a download is in flight the card doubles as its cancel
+  // control: hovering or focusing it swaps the label to say so.
+  let cancelHintOn = false;
+  const syncActiveLabel = () => {
+    const state = primary.dataset.state;
+    if (!isActiveState(state)) {
+      primary.removeAttribute('aria-label');
+      return;
+    }
+    primary.setAttribute('aria-label', 'Cancel download');
+    if (!labelNode) return;
+    labelNode.textContent = cancelHintOn
+      ? 'Cancel download'
+      : state === 'preparing'
+        ? 'Preparing…'
+        : 'Downloading…';
+  };
+
   const setState = (state, { label, sub } = {}) => {
     primary.dataset.state = state;
-    primary.setAttribute(
-      'aria-busy',
-      String(state === 'preparing' || state === 'downloading'),
-    );
+    primary.setAttribute('aria-busy', String(isActiveState(state)));
     if (label !== undefined && labelNode) labelNode.textContent = label;
     if (sub !== undefined && subNode) subNode.textContent = sub;
+    syncActiveLabel();
   };
 
   const setProgress = (ratio) => {
@@ -554,8 +573,12 @@ function wireDownloadCards() {
   };
 
   // → 'done' | 'error' (mid-stream drop, worth a retry) |
+  //   'cancelled' (the visitor aborted — reset quietly) |
   //   'native' (no fetch/CORS/stream — hand back to the browser).
+  let controller = null;
   const runDownload = async (href) => {
+    controller = new AbortController();
+    const { signal } = controller;
     setState('preparing', { sub: 'Preparing your download…' });
     setProgress(0);
     announce('Download started.');
@@ -564,8 +587,9 @@ function wireDownloadCards() {
     for (const candidate of streamCandidatesFor(href)) {
       let attempt;
       try {
-        attempt = await fetch(candidate);
+        attempt = await fetch(candidate, { signal });
       } catch {
+        if (signal.aborted) return 'cancelled';
         continue;
       }
       if (!attempt.ok || !attempt.body) continue;
@@ -579,7 +603,12 @@ function wireDownloadCards() {
     }
     if (!response) return 'native';
 
-    const total = Number(response.headers.get('Content-Length')) || 0;
+    // Vercel's edge strips Content-Length from streamed responses; the
+    // stream endpoints carry the real size in X-File-Size instead.
+    const total =
+      Number(response.headers.get('Content-Length')) ||
+      Number(response.headers.get('X-File-Size')) ||
+      0;
     const reader = response.body.getReader();
     const chunks = [];
     let received = 0;
@@ -604,9 +633,10 @@ function wireDownloadCards() {
         }
       }
     } catch {
-      return 'error';
+      return signal.aborted ? 'cancelled' : 'error';
     }
 
+    if (signal.aborted) return 'cancelled';
     setProgress(1);
     saveBlob(new Blob(chunks), filenameFor(response, response.url || href));
     return 'done';
@@ -622,11 +652,27 @@ function wireDownloadCards() {
     typeof window.fetch !== 'function' ||
     typeof window.ReadableStream !== 'function';
 
+  const setCancelHint = (on) => {
+    cancelHintOn = on;
+    syncActiveLabel();
+  };
+  primary.addEventListener('mouseenter', () => setCancelHint(true));
+  primary.addEventListener('mouseleave', () => setCancelHint(false));
+  primary.addEventListener('focus', () => setCancelHint(true));
+  primary.addEventListener('blur', () => setCancelHint(false));
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (isActiveState(primary.dataset.state)) controller?.abort();
+  });
+
   primary.addEventListener('click', (event) => {
     if (nativeOnly) return;
     const state = primary.dataset.state;
-    if (state === 'preparing' || state === 'downloading') {
+    if (isActiveState(state)) {
+      // Second click while in flight cancels rather than restarts.
       event.preventDefault();
+      controller?.abort();
       return;
     }
 
@@ -641,6 +687,11 @@ function wireDownloadCards() {
         nativeOnly = true;
         resetToIdle();
         window.location.assign(href);
+        return;
+      }
+      if (outcome === 'cancelled') {
+        resetToIdle();
+        announce('Download cancelled.');
         return;
       }
       if (outcome === 'error') {

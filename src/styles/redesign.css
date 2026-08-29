@@ -496,6 +496,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cv-accent); out
 
 /* scoped to the footer so a host page's own link styling is untouched */
 [data-r="footcols"] a, [data-r="footrow"] a { text-decoration: none }
+[data-theme="dark"] [data-daytona-logo="light"] { display: none !important }
+[data-theme="dark"] [data-daytona-logo="dark"] { display: block !important }
 @media (max-width: 1079px) {
   [data-r="footcols"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 44px 32px !important; padding-top: 64px !important }
   [data-r="footmark"] { height: 150px !important }

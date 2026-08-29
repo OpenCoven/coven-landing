@@ -68,7 +68,8 @@ export function corsFor(origin, allowedOrigins) {
   }
   return {
     'Access-Control-Allow-Origin': origin,
-    'Access-Control-Expose-Headers': 'Content-Length, Content-Disposition',
+    'Access-Control-Expose-Headers':
+      'Content-Length, Content-Disposition, X-File-Size',
     Vary: 'Origin',
   };
 }
@@ -148,6 +149,9 @@ export default {
       headers.set('Cache-Control', 'public, max-age=600');
       const length = upstream.headers.get('Content-Length');
       if (length) headers.set('Content-Length', length);
+      // Belt-and-braces size signal for progress UIs behind proxies that
+      // re-chunk the stream and drop Content-Length (Vercel's edge does).
+      if (asset.size) headers.set('X-File-Size', String(asset.size));
 
       return new Response(request.method === 'HEAD' ? null : upstream.body, {
         status: 200,

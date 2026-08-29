@@ -11,7 +11,7 @@ import worker, {
 const RELEASE_ASSETS = [
   { name: 'CovenCave-v0.1.6-aarch64.app.tar.gz', browser_download_url: 'https://gh/aarch64.app.tar.gz' },
   { name: 'CovenCave-v0.1.6-aarch64.dmg.sig', browser_download_url: 'https://gh/aarch64.dmg.sig' },
-  { name: 'CovenCave-v0.1.6-aarch64.dmg', browser_download_url: 'https://gh/aarch64.dmg' },
+  { name: 'CovenCave-v0.1.6-aarch64.dmg', browser_download_url: 'https://gh/aarch64.dmg', size: 76901698 },
   { name: 'CovenCave-v0.1.6-x86_64.dmg', browser_download_url: 'https://gh/x86_64.dmg' },
   { name: 'CovenCave_0.1.6_x64.msi', browser_download_url: 'https://gh/x64.msi' },
   { name: 'CovenCave_0.1.6_amd64.AppImage', browser_download_url: 'https://gh/amd64.AppImage' },
@@ -90,7 +90,7 @@ describe('origin allowlist', () => {
   it('exposes the headers the progress UI needs', () => {
     assert.equal(
       corsFor('https://opencoven.ai', allowed)['Access-Control-Expose-Headers'],
-      'Content-Length, Content-Disposition',
+      'Content-Length, Content-Disposition, X-File-Size',
     );
   });
 
@@ -122,6 +122,7 @@ describe('fetch handler', () => {
       'https://opencoven.ai',
     );
     assert.equal(response.headers.get('Content-Length'), '64');
+    assert.equal(response.headers.get('X-File-Size'), '76901698');
     assert.equal(
       response.headers.get('Content-Disposition'),
       'attachment; filename="CovenCave-v0.1.6-aarch64.dmg"',
