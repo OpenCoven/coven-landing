@@ -1,369 +1,385 @@
-// The download suite: platform-aware primary button, streaming with progress
-// via the same-origin /stream proxy, tabbed platform menu with real release
-// artifacts from /api/site-stats, copy-to-clipboard, and graceful fallbacks
-// (proxy down or rate-limited → browser-native download of the pinned asset).
+// Browser-native Cave downloads plus a progressively enhanced artifact chooser.
+//
+// The page never fetches installer bytes. The primary link points at the
+// same-origin /download/:platform resolver, which redirects the browser's own
+// download manager to the allowlisted current release asset. JavaScript only
+// adapts the platform label, manages the disclosure/tabs, copies verification
+// commands, and decorates the static fallback with small JSON release metadata.
 
 import { register } from './actions.js';
 
-let dlBusy = false;
-let dlReader = null;
-let dlCancelled = false;
-let dlAway = null;
-let dlEsc = null;
-let copyT = null;
-const timers = [];
+let activeMenu = null;
+let activeToggle = null;
+let copyTimer = null;
 
-const later = (fn, ms) => { const id = setTimeout(fn, ms); timers.push(id); return id; };
+const PLATFORM = {
+  mac: {
+    label: 'Download Cave for macOS',
+    route: '/download/mac',
+  },
+  windows: {
+    label: 'Download Cave for Windows',
+    route: '/download/windows',
+  },
+  linux: {
+    label: 'Download Cave for Linux',
+    route: '/download/linux',
+  },
+};
 
-export function fmtMB(bytes) {
-  return (bytes / 1048576).toFixed(bytes < 10485760 ? 1 : 0) + ' MB';
-}
+const SLOTS = [
+  {
+    slot: 'mac-arm64',
+    match: /-aarch64\.dmg$/,
+    command: (file) => `shasum -a 256 ~/Downloads/${file}`,
+  },
+  {
+    slot: 'mac-x64',
+    match: /-x86_64\.dmg$/,
+    command: (file) => `shasum -a 256 ~/Downloads/${file}`,
+  },
+  {
+    slot: 'win-x64',
+    match: /_x64_.*\.msi$/,
+    command: (file) => `certutil -hashfile ${file} SHA256`,
+  },
+  {
+    slot: 'linux-amd64',
+    match: /_amd64\.AppImage$/,
+    command: (file) => `sha256sum ${file}`,
+  },
+];
 
-function setDl(btn, state, info) {
-  const q = (s) => btn.querySelector(s);
-  const fill = q('[data-dl-fill]');
-  const label = q('[data-dl-label]');
-  const spin = q('[data-dl-spin]');
-  const check = q('[data-dl-check]');
-  const scope = btn.closest('[data-dl-scope]') || document;
-  const status = scope.querySelector('[data-dl-status]');
-  const caption = scope.querySelector('[data-dl-caption]');
-  btn.dataset.dlState = state;
-
-  if (spin) spin.style.display = state === 'connecting' ? 'block' : 'none';
-  if (check) check.style.display = state === 'done' ? 'block' : 'none';
-  if (caption) caption.style.display = state === 'idle' ? 'flex' : 'none';
-  if (status) status.style.display = state === 'idle' ? 'none' : 'flex';
-  const busy = state === 'connecting' || state === 'progress';
-  btn.style.cursor = 'pointer';
-  if (busy) btn.setAttribute('aria-busy', 'true');
-  else btn.removeAttribute('aria-busy');
-
-  if (state === 'connecting') {
-    if (fill) fill.style.width = '0%';
-    if (label) label.textContent = 'Preparing your download';
-    if (status) { status.textContent = 'Contacting the release host'; status.style.color = 'var(--cv-text-muted)'; }
-    return;
-  }
-  if (state === 'progress') {
-    const pct = info.total ? Math.min(100, (info.got / info.total) * 100) : 0;
-    if (fill) fill.style.width = pct.toFixed(1) + '%';
-    if (label) label.textContent = info.total ? Math.round(pct) + '% · downloading' : 'downloading';
-    if (status) {
-      const secs = (Date.now() - info.t0) / 1000;
-      const rate = secs > 0.35 ? info.got / secs : 0;
-      const left = rate && info.total ? Math.max(0, (info.total - info.got) / rate) : 0;
-      status.textContent = (info.total
-          ? fmtMB(info.got) + ' / ' + fmtMB(info.total)
-            + (left > 0.6 ? ' · ' + Math.ceil(left) + 's left' : ' · almost there')
-          : fmtMB(info.got) + ' downloaded') + ' · click to cancel';
-      status.style.color = 'var(--cv-text-secondary)';
-    }
-    return;
-  }
-  if (state === 'done') {
-    if (fill) fill.style.width = '100%';
-    if (label) label.textContent = 'Saved to your Downloads';
-    if (status) {
-      const named = btn.dataset.dlName || 'the disk image';
-      status.textContent = 'Open ' + named + ' → drag Cave to Applications → run coven init in your repo';
-      status.style.color = 'var(--cv-success)';
-    }
-    later(() => { dlBusy = false; setDl(btn, 'idle'); }, 11000);
-    return;
-  }
-  if (state === 'error') {
-    if (fill) fill.style.width = '0%';
-    if (label) label.textContent = 'Retry download';
-    if (status) { status.textContent = 'The connection dropped before the file finished'; status.style.color = 'var(--cv-danger)'; }
-    dlBusy = false;
-    return;
-  }
-  if (fill) fill.style.width = '0%';
-  if (label) label.textContent = btn.dataset.dlLabel || 'Download Cave for macOS';
-}
-
-async function streamDownload(btn) {
-  const t0 = Date.now();
-  let started = false;
+function capture(name, properties) {
   try {
-    const res = await fetch(btn.dataset.dlUrl);
-    if (!res.ok || !res.body) throw new Error('no stream');
-    // needs Access-Control-Expose-Headers: Content-Length on the release origin
-    const total = Number(res.headers.get('Content-Length')) || Number(res.headers.get('X-File-Size')) || 0;
-    const reader = res.body.getReader();
-    dlReader = reader;
-    const chunks = [];
-    let got = 0;
-    started = true;
-    for (;;) {
-      const step = await reader.read();
-      if (step.done) break;
-      chunks.push(step.value);
-      got += step.value.length;
-      setDl(btn, 'progress', { got, total, t0 });
-    }
-    dlReader = null;
-    if (dlCancelled) {
-      dlCancelled = false;
-      dlBusy = false;
-      setDl(btn, 'idle');
-      return;
-    }
-    const href = URL.createObjectURL(new Blob(chunks, { type: 'application/octet-stream' }));
-    const a = document.createElement('a');
-    a.href = href;
-    a.download = btn.dataset.dlName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(href);
-    setDl(btn, 'done');
-  } catch (err) {
-    dlReader = null;
-    if (dlCancelled) {
-      dlCancelled = false;
-      dlBusy = false;
-      setDl(btn, 'idle');
-      return;
-    }
-    if (started) { setDl(btn, 'error'); return; }
-    // Streaming unavailable (CORS, proxy down, rate limit): hand the click to
-    // the browser so the visitor still gets the real installer.
-    dlBusy = false;
-    setDl(btn, 'idle');
-    location.assign(btn.dataset.dlHref || btn.dataset.dlUrl || '/download/mac');
+    window.opencovenAnalytics?.capture(name, properties);
+  } catch {
+    // Analytics is optional and can never block a download or disclosure.
   }
 }
 
-function startDownload(e) {
-  const btn = e.currentTarget;
-  if (dlBusy) {
-    // second click cancels the in-flight stream
-    if (dlReader) {
-      dlCancelled = true;
-      dlReader.cancel().catch(() => {});
-    }
-    return;
+export function detectOs() {
+  // navigator.platform first: Chromium's reduced UA can report Windows on a
+  // non-Windows host, while platform remains useful for this coarse label.
+  const platform =
+    navigator.platform
+    || (navigator.userAgentData && navigator.userAgentData.platform)
+    || navigator.userAgent
+    || '';
+  if (/Win/i.test(platform)) return 'windows';
+  if (/Linux|X11/i.test(platform) && !/Android/i.test(navigator.userAgent || '')) {
+    return 'linux';
   }
-  dlBusy = true;
-  setDl(btn, 'connecting');
-  streamDownload(btn);
+  return 'mac';
 }
 
-function pickPlatform(e) {
-  // the tab lives inside the menu, so the outside-click closer must not see this
-  e.stopPropagation();
-  const tab = e.currentTarget;
-  const menu = tab.closest('[data-dl-menu]');
-  const plat = tab.getAttribute('data-dl-plat');
-  if (!menu) return;
-  const paint = () => {
-    menu.querySelectorAll('[data-dl-pane]').forEach((p) => {
-      p.style.setProperty('display', p.getAttribute('data-dl-pane') === plat ? 'flex' : 'none', 'important');
-    });
-    menu.querySelectorAll('[data-dl-plat]').forEach((t) => {
-      const on = t.getAttribute('data-dl-plat') === plat;
-      t.setAttribute('aria-selected', on ? 'true' : 'false');
-      t.style.setProperty('background', on ? 'var(--cv-bg-hover)' : 'transparent', 'important');
-      t.style.setProperty('border-color', on ? 'color-mix(in oklch, var(--cv-accent) 45%, transparent)' : 'var(--cv-border-hairline)', 'important');
-      t.style.setProperty('color', on ? 'var(--cv-text-primary)' : 'var(--cv-text-secondary)', 'important');
-    });
-  };
-  paint();
-  requestAnimationFrame(paint);
+function platformConfig(os) {
+  return PLATFORM[os] || PLATFORM.mac;
 }
 
-function setDownloads(open, only) {
-  const menus = Array.from(document.querySelectorAll('[data-dl-menu]'));
-  menus.filter((m) => m !== only).forEach((m) => {
-    m.style.visibility = 'hidden';
-    m.style.opacity = '0';
-    m.style.transform = 'translateY(-6px)';
+export function adaptPlatform() {
+  const os = detectOs();
+  const config = platformConfig(os);
+  document.querySelectorAll('[data-dl-btn]').forEach((link) => {
+    link.setAttribute('href', config.route);
+    link.setAttribute('data-dl-platform', os);
+    link.setAttribute('data-dl-label', config.label);
+    const label = link.querySelector('[data-dl-label]');
+    if (label) label.textContent = config.label;
   });
-  const menu = only || menus[0];
-  if (!menu) return;
+}
+
+function paintMenu(menu, open) {
+  menu.hidden = !open;
   menu.style.visibility = open ? 'visible' : 'hidden';
   menu.style.opacity = open ? '1' : '0';
   menu.style.transform = open ? 'none' : 'translateY(-6px)';
-  if (open && !dlAway) {
-    dlAway = (ev) => { if (!menu.contains(ev.target)) setDownloads(false); };
-    dlEsc = (ev) => { if (ev.key === 'Escape') setDownloads(false); };
-    document.addEventListener('click', dlAway);
-    document.addEventListener('keydown', dlEsc);
-  } else if (!open && dlAway) {
-    document.removeEventListener('click', dlAway);
-    document.removeEventListener('keydown', dlEsc);
-    dlAway = null;
-    dlEsc = null;
-  }
 }
 
-function toggleDownloads(e) {
-  e.stopPropagation();
-  const wrap = e.currentTarget.parentElement;
-  const menu = wrap ? wrap.querySelector('[data-dl-menu]') : null;
+function closeDownloads({ restoreFocus = false } = {}) {
+  if (!activeMenu) return;
+  const menu = activeMenu;
+  const toggle = activeToggle;
+  activeMenu = null;
+  activeToggle = null;
+  paintMenu(menu, false);
+  if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  if (restoreFocus && toggle && document.contains(toggle)) toggle.focus();
+}
+
+function openDownloads(menu, toggle) {
+  if (activeMenu && activeMenu !== menu) closeDownloads();
+  activeMenu = menu;
+  activeToggle = toggle;
+  paintMenu(menu, true);
+  toggle.setAttribute('aria-expanded', 'true');
+  capture('download_menu_opened');
+}
+
+function toggleDownloads(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  const toggle = event.currentTarget;
+  const wrap = toggle.closest('[data-r~="dlwrap"]') || toggle.parentElement;
+  const menu = wrap && wrap.querySelector('[data-dl-menu]');
   if (!menu) return;
-  const open = menu.style.visibility === 'visible';
-  setDownloads(!open, menu);
+  if (activeMenu === menu && !menu.hidden) closeDownloads({ restoreFocus: true });
+  else openDownloads(menu, toggle);
 }
 
-function copy(e) {
-  const btn = e.currentTarget;
-  const text = btn.dataset.copy || '';
-  const flash = () => {
-    const label = btn.querySelector('[data-copy-label]');
-    if (!label) return;
-    if (!label.dataset.idle) label.dataset.idle = label.textContent;
-    label.textContent = 'copied';
-    label.style.opacity = '1';
-    label.style.color = 'var(--cv-accent)';
-    clearTimeout(copyT);
-    copyT = setTimeout(() => {
-      label.textContent = label.dataset.idle || 'copy';
-      label.style.opacity = '';
-      label.style.color = '';
-    }, 1500);
-  };
-  const fallback = () => {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.top = '-1000px';
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); } catch (err) { /* clipboard unavailable */ }
-    document.body.removeChild(ta);
-    flash();
-  };
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(flash, fallback);
-  } else {
-    fallback();
+function selectPlatform(menu, platform, { focus = false, report = true } = {}) {
+  const tabs = Array.from(menu.querySelectorAll('[data-dl-plat]'));
+  const panels = Array.from(menu.querySelectorAll('[data-dl-pane]'));
+  const selectedTab = tabs.find((tab) => tab.dataset.dlPlat === platform);
+  if (!selectedTab) return;
+
+  tabs.forEach((tab) => {
+    const selected = tab === selectedTab;
+    tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+    tab.tabIndex = selected ? 0 : -1;
+    tab.style.background = selected ? 'var(--cv-bg-hover)' : 'transparent';
+    tab.style.borderColor = selected
+      ? 'color-mix(in oklch, var(--cv-accent) 45%, transparent)'
+      : 'var(--cv-border-hairline)';
+    tab.style.color = selected
+      ? 'var(--cv-text-primary)'
+      : 'var(--cv-text-secondary)';
+  });
+
+  panels.forEach((panel) => {
+    const selected = panel.dataset.dlPane === platform;
+    panel.hidden = !selected;
+    panel.style.display = selected ? 'flex' : 'none';
+  });
+
+  if (focus) selectedTab.focus();
+  if (report) capture('download_platform_selected', { platform });
+}
+
+function pickPlatform(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  const tab = event.currentTarget;
+  const menu = tab.closest('[data-dl-menu]');
+  if (!menu) return;
+  selectPlatform(menu, tab.dataset.dlPlat);
+}
+
+function onTabKeydown(event) {
+  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+  const tab = event.currentTarget;
+  const menu = tab.closest('[data-dl-menu]');
+  if (!menu) return;
+  const tabs = Array.from(menu.querySelectorAll('[data-dl-plat]'));
+  const current = tabs.indexOf(tab);
+  if (current < 0) return;
+
+  event.preventDefault();
+  let next = current;
+  if (event.key === 'ArrowLeft') next = (current - 1 + tabs.length) % tabs.length;
+  if (event.key === 'ArrowRight') next = (current + 1) % tabs.length;
+  if (event.key === 'Home') next = 0;
+  if (event.key === 'End') next = tabs.length - 1;
+  selectPlatform(menu, tabs[next].dataset.dlPlat, { focus: true });
+}
+
+function copiedFeedback(button) {
+  const label = button.querySelector('[data-copy-label]');
+  if (!label) return;
+  if (!label.dataset.idle) label.dataset.idle = label.textContent || 'copy';
+  label.textContent = 'copied';
+  label.style.opacity = '1';
+  label.style.color = 'var(--cv-accent)';
+  clearTimeout(copyTimer);
+  copyTimer = setTimeout(() => {
+    label.textContent = label.dataset.idle || 'copy';
+    label.style.opacity = '';
+    label.style.color = '';
+  }, 1500);
+}
+
+function legacyCopy(text, button) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.inset = '-1000px auto auto -1000px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+  } finally {
+    textarea.remove();
   }
-  // the how-it-works quickstart advances its step cards on copy
-  const card = btn.closest ? btn.closest('[data-step-card]') : null;
-  if (card) document.dispatchEvent(new CustomEvent('redesign:copystep', { detail: Number(card.dataset.stepCard) }));
+  copiedFeedback(button);
 }
 
-// the pane region holds its tallest pane, measured rather than guessed — panes
-// change height when assets resolve or the provenance block appears, and the
-// tab row must not move
-export function fitMenus() {
-  document.querySelectorAll('[data-dl-panes]').forEach((wrap) => {
-    let tallest = 0;
-    wrap.querySelectorAll('[data-dl-pane]').forEach((pane) => {
-      const prev = pane.getAttribute('style') || '';
-      const hidden = getComputedStyle(pane).display === 'none';
-      if (hidden) pane.style.setProperty('display', 'flex', 'important');
-      tallest = Math.max(tallest, pane.offsetHeight);
-      if (hidden) pane.setAttribute('style', prev);
+function copy(event) {
+  const button = event.currentTarget;
+  const text = button.dataset.copy || '';
+  if (!text) return;
+  const done = () => copiedFeedback(button);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, () => legacyCopy(text, button));
+  } else {
+    legacyCopy(text, button);
+  }
+  capture('quickstart_command_copied', {
+    command_id: button.dataset.commandId || button.dataset.artVerify || 'install',
+  });
+
+  const card = button.closest('[data-step-card]');
+  if (card) {
+    document.dispatchEvent(
+      new CustomEvent('redesign:copystep', {
+        detail: Number(card.dataset.stepCard),
+      }),
+    );
+  }
+}
+
+function formatSize(bytes) {
+  const value = Number(bytes);
+  if (!Number.isFinite(value) || value <= 0) return '';
+  return `${(value / 1048576).toFixed(1).replace(/\.0$/, '')} MB`;
+}
+
+function setVisible(element, visible, display = '') {
+  if (!element) return;
+  element.hidden = !visible;
+  element.style.display = visible ? display : 'none';
+}
+
+function decorateSlot(spec, assets) {
+  const asset = assets.find(
+    (candidate) =>
+      candidate
+      && typeof candidate.name === 'string'
+      && !candidate.name.endsWith('.sig')
+      && spec.match.test(candidate.name),
+  );
+  const signature = asset
+    && assets.find((candidate) => candidate.name === `${asset.name}.sig`);
+  const digest = asset && typeof asset.digest === 'string' ? asset.digest : '';
+
+  document.querySelectorAll(`[data-art="${spec.slot}"]`).forEach((row) => {
+    if (!asset || !asset.browser_download_url) {
+      // The static row remains a truthful link to the latest releases page.
+      return;
+    }
+    row.setAttribute('href', asset.browser_download_url);
+    const filename = row.querySelector('[data-art-file]');
+    if (filename) filename.textContent = asset.name;
+    const size = row.querySelector('[data-art-size]');
+    if (size) size.textContent = formatSize(asset.size) || 'current release';
+  });
+
+  document
+    .querySelectorAll(`[data-art-verify="${spec.slot}"]`)
+    .forEach((button) => {
+      if (!asset || !digest) {
+        setVisible(button, false);
+        return;
+      }
+      button.dataset.copy = spec.command(asset.name);
+      button.dataset.commandId = `verify-${spec.slot}`;
+      const hash = button.querySelector('[data-art-hash]');
+      if (hash) {
+        const normalized = digest.startsWith('sha256:') ? digest : `sha256:${digest}`;
+        hash.textContent = `${normalized.slice(0, 24)}…`;
+      }
+      setVisible(button, true, 'flex');
     });
-    if (tallest) wrap.style.minHeight = tallest + 'px';
+
+  document.querySelectorAll(`[data-art-sig="${spec.slot}"]`).forEach((link) => {
+    if (!signature || !signature.browser_download_url) {
+      setVisible(link, false);
+      return;
+    }
+    link.setAttribute('href', signature.browser_download_url);
+    setVisible(link, true, 'inline-flex');
   });
 }
 
-function detectOs() {
-  // navigator.platform first: Chrome's UA reduction freezes the UA string
-  // (and can freeze userAgentData) to Windows on every desktop OS
-  const plat = navigator.platform || (navigator.userAgentData && navigator.userAgentData.platform) || navigator.userAgent || '';
-  return /Win/i.test(plat) ? 'windows'
-    : (/Linux|X11/i.test(plat) && !/Android/i.test(navigator.userAgent || '')) ? 'linux'
-    : 'mac';
-}
-
-// asset names carry the version, so a fixed /latest/download/ path cannot stay
-// current — the panel names a version in the markup and then rewrites itself
-// from the newest release via the CDN-cached stats endpoint
 export function loadArtifacts() {
-  const SLOTS = [
-    { slot: 'mac-arm64', match: /-aarch64\.dmg$/, cmd: (f) => 'shasum -a 256 ~/Downloads/' + f },
-    { slot: 'mac-x64', match: /-x86_64\.dmg$/, cmd: (f) => 'shasum -a 256 ~/Downloads/' + f },
-    { slot: 'win-x64', match: /_x64_.*\.msi$/, cmd: (f) => 'certutil -hashfile ' + f + ' SHA256' },
-    { slot: 'linux-amd64', match: /_amd64\.AppImage$/, cmd: (f) => 'sha256sum ' + f },
-  ];
   fetch('/api/site-stats')
-    .then((r) => (r.ok ? r.json() : null))
-    .then((d) => {
-      const rel = d && d.release;
-      const assets = (rel && rel.assets) || [];
-      if (!assets.length) return;
-      const tag = rel.tag_name || '';
-      if (tag) document.querySelectorAll('[data-art-ver]').forEach((el) => { el.textContent = tag; });
-      // the primary button hands out the visitor's platform build (Apple silicon by default)
-      const os = detectOs();
-      const primaryMatch = os === 'windows' ? /_x64_.*\.msi$/ : os === 'linux' ? /_amd64\.AppImage$/ : /-aarch64\.dmg$/;
-      const primaryLabel = os === 'windows' ? 'Download Cave for Windows' : os === 'linux' ? 'Download Cave for Linux' : 'Download Cave for macOS';
-      const primary = assets.find((a) => primaryMatch.test(a.name) && !/\.sig$/.test(a.name)) || assets.find((a) => /-aarch64\.dmg$/.test(a.name));
-      if (primary) {
-        document.querySelectorAll('[data-dl-btn]').forEach((btn) => {
-          // stream same-origin so progress works (direct GitHub fetch dies on
-          // CORS); keep the direct URL as the browser-navigation fallback
-          btn.dataset.dlUrl = '/stream/' + os;
-          btn.dataset.dlHref = primary.browser_download_url;
-          btn.dataset.dlName = primary.name;
-          btn.dataset.dlSize = String(primary.size);
-          btn.dataset.dlLabel = primaryLabel;
-          const l = btn.querySelector('[data-dl-label]');
-          if (l && !btn.dataset.dlState) l.textContent = primaryLabel;
+    .then((response) => (response.ok ? response.json() : null))
+    .then((data) => {
+      const release = data && data.release;
+      const assets = (release && release.assets) || [];
+      if (!Array.isArray(assets) || !assets.length) return;
+      if (release.tag_name) {
+        document.querySelectorAll('[data-art-ver]').forEach((element) => {
+          element.textContent = release.tag_name;
         });
       }
-      // provenance answered server-side (cached attestation lookup)
-      if (d && d.hasAttestation) {
-        document.querySelectorAll('[data-art-prov-block]').forEach((el) => { el.style.display = 'flex'; });
-        fitMenus();
+      SLOTS.forEach((spec) => decorateSlot(spec, assets));
+      if (data.hasAttestation) {
+        document.querySelectorAll('[data-art-prov-block]').forEach((block) => {
+          setVisible(block, true, 'block');
+        });
       }
-      SLOTS.forEach((spec) => {
-        const asset = assets.find((a) => spec.match.test(a.name) && !/\.sig$/.test(a.name));
-        const sig = asset && assets.find((a) => a.name === asset.name + '.sig');
-        const digest = asset && typeof asset.digest === 'string' ? asset.digest : '';
-        document.querySelectorAll('[data-art="' + spec.slot + '"]').forEach((row) => {
-          if (!asset) { row.style.display = 'none'; return; }
-          row.setAttribute('href', asset.browser_download_url);
-          const f = row.querySelector('[data-art-file]');
-          if (f) f.textContent = asset.name;
-          const sz = row.querySelector('[data-art-size]');
-          if (sz) sz.textContent = (asset.size / 1048576).toFixed(1).replace(/\.0$/, '') + ' MB';
-        });
-        document.querySelectorAll('[data-art-verify="' + spec.slot + '"]').forEach((btn) => {
-          if (!asset) return;
-          btn.setAttribute('data-copy', spec.cmd(asset.name));
-          const h = btn.querySelector('[data-art-hash]');
-          if (h && digest) h.textContent = digest.slice(0, digest.startsWith('sha256:') ? 24 : 17) + '…';
-        });
-        document.querySelectorAll('[data-art-sig="' + spec.slot + '"]').forEach((link) => {
-          if (sig) link.setAttribute('href', sig.browser_download_url);
-          else link.style.display = 'none';
-        });
-      });
     })
-    .then(() => fitMenus())
-    .catch(() => {});
+    .catch(() => {
+      // Static latest-release links remain usable when metadata is unavailable.
+    });
 }
 
-// the primary button is authored for macOS; retarget it for the visitor's OS
-// before the release data lands (and permanently if the stats API is down)
-export function adaptPlatform() {
-  const os = detectOs();
-  if (os === 'mac') return;
-  const label = os === 'windows' ? 'Download Cave for Windows' : 'Download Cave for Linux';
-  const name = os === 'windows' ? 'Coven-Cave.msi' : 'Coven-Cave.AppImage';
-  document.querySelectorAll('[data-dl-btn]').forEach((btn) => {
-    if (btn.dataset.dlHref) return; // loadArtifacts already landed real data
-    btn.setAttribute('data-dl-url', '/stream/' + os);
-    btn.setAttribute('data-dl-name', name);
-    if (!btn.dataset.dlLabel) btn.dataset.dlLabel = label;
-    const l = btn.querySelector('[data-dl-label]');
-    if (l && !btn.dataset.dlState) l.textContent = label;
+function initializeDownloadControls() {
+  document.querySelectorAll('[data-r~="dlwrap"]').forEach((wrap, index) => {
+    const menu = wrap.querySelector('[data-dl-menu]');
+    const toggle = wrap.querySelector('[data-action="toggleDownloads"]');
+    if (!menu || !toggle) return;
+
+    const menuId = menu.id || `cave-download-options-${index + 1}`;
+    menu.id = menuId;
+    toggle.setAttribute('aria-controls', menuId);
+    toggle.setAttribute('aria-expanded', 'false');
+    paintMenu(menu, false);
+
+    menu.querySelectorAll('[data-dl-plat]').forEach((tab) => {
+      const platform = tab.dataset.dlPlat;
+      const panel = menu.querySelector(`[data-dl-pane="${platform}"]`);
+      const tabId = `${menuId}-${platform}-tab`;
+      const panelId = `${menuId}-${platform}-panel`;
+      tab.id = tabId;
+      tab.setAttribute('aria-controls', panelId);
+      tab.addEventListener('keydown', onTabKeydown);
+      if (panel) {
+        panel.id = panelId;
+        panel.setAttribute('aria-labelledby', tabId);
+      }
+    });
+
+    selectPlatform(menu, 'mac', { report: false });
+  });
+
+  document.querySelectorAll('[data-dl-btn]').forEach((link) => {
+    link.addEventListener('click', () => {
+      capture('download_started', {
+        platform: link.dataset.dlPlatform || 'mac',
+      });
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!activeMenu) return;
+    if (activeMenu.contains(event.target) || activeToggle?.contains(event.target)) return;
+    closeDownloads();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && activeMenu) {
+      event.preventDefault();
+      closeDownloads({ restoreFocus: true });
+    }
   });
 }
 
 export function initDownloads() {
-  register('startDownload', startDownload);
   register('toggleDownloads', toggleDownloads);
   register('pickPlatform', pickPlatform);
   register('copy', copy);
   adaptPlatform();
+  initializeDownloadControls();
   loadArtifacts();
-  setTimeout(fitMenus, 60);
 }
