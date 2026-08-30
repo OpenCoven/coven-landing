@@ -54,6 +54,18 @@ test('how-it-works renders with its own head and no template bindings', async ({
   await expect(page.locator('h2', { hasText: 'own worktree' })).toBeAttached();
 });
 
+test('privacy table remains keyboard accessible on narrow screens', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/privacy/');
+
+  const table = page.getByRole('region', { name: 'Data collection details' });
+  await expect(table).toHaveAttribute('tabindex', '0');
+  await expect.poll(() => table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+
+  await table.focus();
+  await expect(table).toBeFocused();
+});
+
 test('no unexpected console errors on the landing page', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(`pageerror: ${e}`));
