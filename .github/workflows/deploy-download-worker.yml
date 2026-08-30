@@ -24,6 +24,8 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
@@ -38,6 +40,8 @@ jobs:
     needs: test
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     # Deploying is opt-in: without the Cloudflare secrets configured the
     # steps below skip (green, not failed) and the site keeps using the
     # same-origin /stream fallback. See README "Download pipeline".

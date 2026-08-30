@@ -56,6 +56,9 @@ export function parseAllowedOrigins(raw) {
         new RegExp(
           `^${pattern
             .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+            // Port wildcard (e.g. "localhost:*") — digits only.
+            // Subdomain wildcard (e.g. "*.vercel.app") — hostname labels.
+            .replace(/:\*/g, ':\\d+')
             .replace(/\*/g, '[a-z0-9.-]+')}$`,
           'i',
         ),
