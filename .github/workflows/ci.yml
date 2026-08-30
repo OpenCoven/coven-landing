@@ -34,6 +34,11 @@ jobs:
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
+      # node:test suites for the optional installer-stream Worker and its
+      # browser-native handoff (no browser needed)
+      - name: Unit tests
+        run: pnpm test:unit
+
       # CI=true keeps Astro non-interactive; verify-static.mjs asserts
       # required public assets, canonical logo treatment, and load-bearing
       # copy in the built HTML (see scripts/verify-static.mjs).

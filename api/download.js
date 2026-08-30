@@ -1,10 +1,11 @@
-// Direct-download resolver — 302s to the latest CovenCave installer.
+// Browser-native download resolver — 302s to the optional Worker when it is
+// configured, otherwise to the latest CovenCave installer.
 //
 // Why a function: GitHub release asset filenames carry version suffixes
 // (CovenCave-v0.1.0-aarch64.dmg), so a static redirect breaks on every
-// release. This resolves the *latest* release at request time and points
-// the visitor straight at the correct installer file — a real download,
-// never the GitHub Releases listing page.
+// release. Without the Worker, this resolves the *latest* release at request
+// time and points the visitor straight at the correct installer file — a real
+// download, never the GitHub Releases listing page.
 //
 // Routed via vercel.json rewrites: /download/:platform → /api/download?platform=:platform
 //
@@ -13,6 +14,29 @@
 // never reaches GitHub, and honour GITHUB_TOKEN if one is configured.
 
 import { MATCHERS, RELEASES_PAGE, REPO } from './_shared.js';
+
+// When configured, the browser-native endpoint hands the request to the
+// optional Cloudflare Worker. This keeps the Worker behind the same download
+// contract: the page remains a normal link and never reads installer bytes.
+// The PUBLIC_ alias keeps existing Worker rollout notes usable; new Vercel
+// deployments should prefer the private runtime variable.
+export function workerDownloadUrl(
+  platform,
+  origin = process.env.DOWNLOAD_STREAM_ORIGIN || process.env.PUBLIC_DOWNLOAD_STREAM_ORIGIN,
+) {
+  if (!origin) return null;
+  try {
+    const url = new URL(origin);
+    if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) return null;
+    if (url.pathname.replace(/\/+$/, '')) return null;
+    url.search = '';
+    url.hash = '';
+    url.pathname = `/${encodeURIComponent(platform)}`;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
 
 export default async function handler(req, res) {
   const platform = String(req.query.platform || '').toLowerCase();
@@ -23,6 +47,15 @@ export default async function handler(req, res) {
   if (!match) {
     res.setHeader('Cache-Control', 'no-store');
     res.writeHead(302, { Location: RELEASES_PAGE });
+    return res.end();
+  }
+
+  const workerUrl = workerDownloadUrl(platform);
+  if (workerUrl) {
+    // Do not cache the handoff: an operator can disable the optional Worker
+    // and have the direct resolver take effect on the next request.
+    res.setHeader('Cache-Control', 'no-store');
+    res.writeHead(302, { Location: workerUrl });
     return res.end();
   }
 
@@ -50,7 +83,7 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=86400');
     res.writeHead(302, { Location: asset.browser_download_url });
     return res.end();
-  } catch (err) {
+  } catch {
     // Any failure (rate limit, network, missing asset) degrades to the
     // releases page so the button always does something useful.
     res.setHeader('Cache-Control', 'no-store');

@@ -72,6 +72,7 @@ api/            Vercel functions
                 download.js — browser-native latest-installer resolver
                 stream.js — compatibility streaming endpoint, not the page CTA
                 site-stats.js — CDN-cached release/community metadata
+workers/        Optional Cloudflare Worker installer stream
 src/
   pages/        Astro routes
   components/
@@ -92,3 +93,41 @@ modules. The warded-braid hero remains a framework-free custom element in
 
 Vercel auto-detects Astro and serves `dist/`. `vercel.json` also owns the
 `/party` and `/weekly` Discord redirects.
+
+## Optional Cloudflare Worker download tier
+
+The browser-native Cave link always starts at `/download/:platform`. When the
+Vercel runtime variable `DOWNLOAD_STREAM_ORIGIN` is set, `api/download.js`
+redirects that link to the matching route on the optional Worker first. The
+Worker streams `upstream.body` directly, so installer bytes never enter page
+JavaScript or an installer-sized `Blob`. The primary path is a normal browser
+navigation and does not require CORS.
+
+If the Worker cannot resolve or stream an asset, its `FALLBACK_ORIGIN` sends the
+browser to the site's `/stream/:platform` compatibility endpoint; that
+endpoint falls back to the GitHub Releases page. With the Worker variable
+unset, the existing Vercel resolver selects the current allowlisted asset and
+redirects directly to GitHub. No production enablement is required for the
+site to work.
+
+### Setup
+
+1. Deploy `workers/installer-stream/` with `npx wrangler deploy`.
+2. Set `FALLBACK_ORIGIN` to the site origin and keep `ALLOWED_ORIGINS` as an
+   exact-match list. The optional `GITHUB_TOKEN` Worker secret raises the
+   GitHub API rate limit.
+3. Set the Vercel runtime variable `DOWNLOAD_STREAM_ORIGIN` to the Worker's
+   HTTPS origin, then redeploy the site. (The older
+   `PUBLIC_DOWNLOAD_STREAM_ORIGIN` name is accepted as a compatibility alias.)
+4. Verify the browser-native link with JavaScript disabled and exercise both
+   the Worker and fallback routes before enabling it for all traffic.
+
+Cloudflare deployment credentials are operator-owned: use
+`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repository/deployment
+secrets. The Worker may also be deployed manually with Wrangler.
+
+### Rollback
+
+Unset `DOWNLOAD_STREAM_ORIGIN` (and the compatibility alias, if used) in Vercel
+and redeploy. The page immediately returns to the existing Vercel resolver;
+the Worker can remain deployed or be deleted independently.
