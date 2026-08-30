@@ -3,6 +3,11 @@ import path from 'node:path';
 
 const dist = path.join(process.cwd(), 'dist');
 const attributes = ['data-stars-count', 'data-dlcount', 'data-discord-count'];
+const destinationReplacements = new Map([
+  ['https://opencoven.ai/cave', 'https://github.com/OpenCoven/coven-cave/releases/latest'],
+  ['https://opencoven.ai/cli', 'https://www.npmjs.com/package/@opencoven/cli'],
+  ['https://opencoven.ai/code', 'https://github.com/OpenCoven/coven-code'],
+]);
 
 async function htmlFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -15,7 +20,8 @@ async function htmlFiles(directory) {
   return files;
 }
 
-let replacements = 0;
+let proofReplacements = 0;
+let destinationReplacementCount = 0;
 for (const file of await htmlFiles(dist)) {
   let html = await readFile(file, 'utf8');
   const before = html;
@@ -25,8 +31,15 @@ for (const file of await htmlFiles(dist)) {
       'g',
     );
     html = html.replace(pattern, (_match, open, close) => {
-      replacements += 1;
+      proofReplacements += 1;
       return `${open}${close}`;
+    });
+  }
+  for (const [from, to] of destinationReplacements) {
+    const pattern = new RegExp(`href="${from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`, 'g');
+    html = html.replace(pattern, () => {
+      destinationReplacementCount += 1;
+      return `href="${to}"`;
     });
   }
   if (html !== before) await writeFile(file, html, 'utf8');
@@ -42,6 +55,17 @@ for (const attribute of attributes) {
   }
 }
 
+for (const from of destinationReplacements.keys()) {
+  for (const file of await htmlFiles(dist)) {
+    const html = await readFile(file, 'utf8');
+    if (html.includes(`href="${from}"`)) {
+      throw new Error(
+        `Built public page still exposes nonexistent destination ${from}: ${path.relative(process.cwd(), file)}`,
+      );
+    }
+  }
+}
+
 console.log(
-  `Sanitized ${replacements} zero-valued public proof fallback${replacements === 1 ? '' : 's'} from built HTML.`,
+  `Sanitized ${proofReplacements} zero-valued public proof fallback${proofReplacements === 1 ? '' : 's'} and remapped ${destinationReplacementCount} known dead destination${destinationReplacementCount === 1 ? '' : 's'} in built HTML.`,
 );
