@@ -64,7 +64,7 @@ for (const requirement of [
   }
 }
 
-if (roadmap.includes('privacy`, `/terms`) still') {
+if (roadmap.includes("privacy`, `/terms`) still")) {
   throw new Error('ROADMAP still describes already-migrated legal routes as pre-redesign');
 }
 
