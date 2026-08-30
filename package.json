@@ -9,7 +9,8 @@
     "build": "astro build",
     "preview": "astro preview --host 127.0.0.1 --port 4173",
     "astro": "astro",
-    "check": "node scripts/verify-static.mjs",
+    "check": "node scripts/verify-static.mjs && node scripts/verify-analytics.mjs && python3 analytics/test-provision.py",
+    "check:analytics": "node scripts/verify-analytics.mjs && python3 analytics/test-provision.py",
     "check:browser": "playwright test"
   },
   "dependencies": {
