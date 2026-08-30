@@ -9,6 +9,8 @@ coverage/
 /.copilot/
 /playwright-report/
 /test-results/
+.vercel
+.env*
 
 # analytics keys stay local (copy posthog.config.example.json)
 analytics/posthog.config.json
