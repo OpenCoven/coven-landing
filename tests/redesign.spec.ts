@@ -1,26 +1,30 @@
 import { test, expect } from '@playwright/test';
 
-// Browser checks for the redesign. The preview server has no /api functions,
-// so behaviors fed by /api/site-stats or /stream are asserted in their
-// graceful fallback states; production behavior is covered by the api/
-// functions themselves.
+// Browser checks for the redesign. The static preview server does not run the
+// Vercel functions, so API-fed release metadata is asserted through its
+// graceful static fallback. Primary downloads remain real browser-native links.
 
-test('landing renders the hero and adapts the download button', async ({ page }) => {
+test('landing renders the hero and adapts the browser-native download link', async ({ page }) => {
   // Platform retargeting reads navigator.platform first, because Chrome's UA
-  // reduction freezes the UA string to Windows on every desktop OS. Emulate the
-  // platform so the machine running the suite cannot decide the expectation.
+  // reduction can freeze the UA string to Windows on every desktop OS. Emulate
+  // the platform so the host running the suite cannot decide the expectation.
   await page.addInitScript(() => {
-    Object.defineProperty(navigator, 'platform', { get: () => 'Linux x86_64', configurable: true });
+    Object.defineProperty(navigator, 'platform', {
+      get: () => 'Linux x86_64',
+      configurable: true,
+    });
   });
 
   await page.goto('/');
   await expect(page).toHaveTitle(/OpenCoven/);
   await expect(page.locator('h1')).toContainText("Stop being your agents' control plane");
 
-  const btn = page.locator('[data-dl-btn]').first();
-  await expect(btn).toBeVisible();
-  await expect(btn.locator('[data-dl-label]')).toHaveText('Download Cave for Linux');
-  await expect(btn).toHaveAttribute('data-dl-url', '/stream/linux');
+  const link = page.locator('[data-dl-btn]').first();
+  await expect(link).toBeVisible();
+  await expect(link).toHaveAttribute('href', '/download/linux');
+  await expect(link).toHaveAttribute('data-dl-platform', 'linux');
+  await expect(link).not.toHaveAttribute('data-action', 'startDownload');
+  await expect(link.locator('[data-dl-label]')).toHaveText('Download Cave for Linux');
 });
 
 test('the braid assembles after idle boot', async ({ page }) => {
@@ -68,62 +72,63 @@ test('privacy table remains keyboard accessible on narrow screens', async ({ pag
 
 test('no unexpected console errors on the landing page', async ({ page }) => {
   const errors: string[] = [];
-  page.on('pageerror', (e) => errors.push(`pageerror: ${e}`));
-  // The name promised console errors but only uncaught exceptions were
-  // watched, so console.error calls and failed subresources went unseen.
-  // Watch both, minus the /api routes the preview server genuinely does not
-  // serve — those 404s are an artifact of this environment, not the page.
-  page.on('console', (msg) => {
-    if (msg.type() !== 'error') return;
-    if (msg.location().url.includes('/api/')) return;
-    errors.push(`console: ${msg.text()}`);
+  page.on('pageerror', (error) => errors.push(`pageerror: ${error}`));
+  page.on('console', (message) => {
+    if (message.type() !== 'error') return;
+    if (message.location().url.includes('/api/')) return;
+    errors.push(`console: ${message.text()}`);
   });
   await page.goto('/');
-  // Replaces a fixed 4s sleep. The braid boots on idle and its canvas appears
-  // around 5.5s, so that sleep returned before the slowest subsystem had even
-  // started — errors thrown during braid boot fell outside the window.
-  // Waiting on the canvas is deterministic and covers strictly more.
   await expect(page.locator('warded-braid canvas')).toBeAttached({ timeout: 20_000 });
   expect(errors).toEqual([]);
 });
 
-// The landing page never stops moving: motion.js reveals sections on scroll,
-// runBoard swaps the session log lines for ~6s, and runTicks counts the diff
-// numbers up. Playwright's actionability check makes a click wait for its
-// target to hold still across two animation frames, so a click aimed into that
-// demo can spin for tens of seconds and exhaust the whole test budget — a
-// traced failure of the session-cell test burned 20.6s inside one click().
-// These two tests assert behavior rather than motion, so they drive the page
-// in its reduced-motion mode. The redesign scripts already branch on that
-// preference, so the assertions still cover shipped code, but the layout
-// settles at once and each click lands on the frame it is issued.
+// The current board demo continues to animate. These tests assert behavior,
+// not animation, so reduced motion keeps actionability deterministic.
 test.describe('interactions with the demo held still', () => {
   test.use({ reducedMotion: 'reduce' });
 
-  test('download menu opens, switches platform tabs, and closes on Escape', async ({ page }) => {
+  test('download chooser exposes state, switches tabs, and restores focus on Escape', async ({ page }) => {
+    await page.goto('/');
+    const toggle = page.locator('[data-action="toggleDownloads"]').first();
+    const menu = page.locator('[data-dl-menu]').first();
+
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(toggle).toHaveAttribute('aria-controls', /cave-download-options-/);
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(menu).toBeVisible();
+
+    const winTab = menu.locator('[data-dl-plat="windows"]');
+    const winPanel = menu.locator('[data-dl-pane="windows"]');
+    await winTab.click();
+    await expect(winTab).toHaveAttribute('aria-selected', 'true');
+    await expect(winTab).toHaveAttribute('tabindex', '0');
+    await expect(winPanel).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(menu).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(toggle).toBeFocused();
+  });
+
+  test('download platform tabs support arrow-key navigation', async ({ page }) => {
     await page.goto('/');
     await page.locator('[data-action="toggleDownloads"]').first().click();
     const menu = page.locator('[data-dl-menu]').first();
-    await expect(menu).toBeVisible();
-    const winTab = menu.locator('[data-dl-plat="windows"]');
-    // Unconditional on purpose. This was guarded by `if (await winTab.count())`
-    // against two attribute spellings the markup never emits, so a renamed
-    // attribute would have made the test pass while asserting nothing. Every
-    // platform tab is authored statically in DownloadCta.astro.
-    await winTab.click();
-    await expect(winTab).toHaveAttribute('aria-selected', 'true');
-    await page.keyboard.press('Escape');
-    await expect(menu).toBeHidden();
+    const macTab = menu.locator('[data-dl-plat="mac"]');
+    const windowsTab = menu.locator('[data-dl-plat="windows"]');
+
+    await macTab.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(windowsTab).toBeFocused();
+    await expect(windowsTab).toHaveAttribute('aria-selected', 'true');
   });
 
   test('clicking a session cell opens the familiar inspector window', async ({ page }) => {
     await page.goto('/');
     await page.locator('[data-live-board]').scrollIntoViewIfNeeded();
     const firstRow = page.locator('[data-panel="sessions"] [data-row]').first();
-    // initWindows() stamps data-fam while the module boots, so waiting on the
-    // attribute waits for the click wiring itself rather than sleeping past it.
-    // regression: the fam name must come from its own element, not from
-    // splitting textContent on a newline Astro's compiler collapses away
     await expect(firstRow).toHaveAttribute('data-fam', 'Hexi');
     await firstRow.locator(':scope > *').first().click();
     const win = page.locator('[data-win="profile"]');
