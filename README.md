@@ -1,6 +1,7 @@
 # coven-landing
 
-Landing page for OpenCoven / Coven, built with [Astro](https://astro.build).
+Public website and product landing experience for OpenCoven, built with
+[Astro](https://astro.build).
 
 ## Develop
 
@@ -11,52 +12,83 @@ pnpm dev
 
 Then open <http://localhost:4321>.
 
-## Build + preview
+## Build and preview
 
 ```sh
-pnpm build      # outputs static site to dist/
-pnpm preview    # serves dist/ on http://localhost:4173
+pnpm build      # outputs static pages to dist/
+pnpm preview    # serves dist/ on http://127.0.0.1:4173
 ```
 
-In non-interactive shells (CI, agents), run `CI=true pnpm build`. Keep the
-`allowBuilds` entries for `esbuild`/`sharp` in `pnpm-workspace.yaml` — without
-them pnpm blocks those packages' install scripts and the build fails.
+In non-interactive shells and CI, run `CI=true pnpm build`. Keep the
+`allowBuilds` entries for `esbuild` and `sharp` in `pnpm-workspace.yaml`;
+without them pnpm blocks those packages' install scripts and the build fails.
 
 ## Verify
 
 ```sh
-pnpm check      # verify-static sanity checks (run after `pnpm build`)
+pnpm check
+pnpm check:browser
 ```
 
-`verify-static.mjs` confirms required public assets exist, the canonical OpenCoven logo treatment is used in `favicon.svg` and `og.svg`, and that built HTML still contains load-bearing copy.
+`pnpm check` verifies required public assets, canonical logo treatment, built
+HTML contracts, current public copy, and other deterministic source/build
+invariants. Playwright drives the shipped interaction and fallback paths.
+
+## Browser-native Cave downloads
+
+The primary Cave CTA is a normal link:
+
+```text
+/download/mac
+/download/mac-intel
+/download/windows
+/download/linux
+```
+
+`vercel.json` rewrites that route to `api/download.js`. The function resolves
+an allowlisted installer from the latest `OpenCoven/coven-cave` release and
+returns a cached redirect to the asset. The browser download manager owns the
+binary transfer, retry behavior, and disk write.
+
+The landing page deliberately does **not** fetch the installer into JavaScript,
+accumulate chunks, construct an installer-sized `Blob`, or simulate
+stream-to-disk progress. Downloads therefore remain usable with JavaScript
+disabled and do not consume 100–200 MB of page memory.
+
+The adjacent disclosure is progressive enhancement only. It fetches the small
+`/api/site-stats` JSON response to decorate static latest-release links with
+current version, filename, size, digest, signature, and attestation metadata.
+When that API is unavailable, the static GitHub Releases links remain usable.
+
+`/stream/:platform` remains a compatibility API while downstream references are
+audited. It is not used by the current primary landing CTA and can be retired
+separately after the release/redirect safety gate.
 
 ## Layout
 
-```
-public/         Static assets served at /        (favicon, og image, logos, warded-braid.js —
-                                                  the WebGL hero, a vanilla custom element)
-api/            Vercel serverless functions      (download.js — latest-installer 302;
-                                                  stream.js — same-origin streaming proxy;
-                                                  site-stats.js — CDN-cached GitHub/Discord stats)
+```text
+public/         Static assets served from /
+api/            Vercel functions
+                download.js — browser-native latest-installer resolver
+                stream.js — compatibility streaming endpoint, not the page CTA
+                site-stats.js — CDN-cached release/community metadata
 src/
-  pages/        Astro routes                     (index + how-it-works are the redesign;
-                                                  github, quickstart, privacy, terms predate it)
+  pages/        Astro routes
   components/
-    redesign/   Redesign sections                (Hero, Board, DownloadCta, Outcomes, Footer, …)
-    …           Pre-redesign components          (used by the secondary pages)
+    redesign/   Current landing, footer, download, and proof components
+    …           Earlier secondary-page components pending consolidation
   scripts/
-    redesign/   Redesign behavior modules        (theme, nav, downloads, stats, motion, hero, board)
-  styles/       Stylesheets                      (redesign.css — tokens + page/component CSS)
-scripts/        Build-time sanity checks         (verify-static.mjs)
-analytics/      PostHog provisioning kit         (never deployed; see analytics/README.md)
-tests/          Playwright suite                 (redesign.spec.ts)
+    redesign/   Theme, navigation, metadata decoration, motion, hero, and board
+  styles/       Current and historical page styles pending vNext consolidation
+scripts/        Build-time verification contracts
+analytics/      Optional analytics provisioning kit; never contains secrets
+                 in deployed source
+tests/          Playwright interaction, fallback, and no-JavaScript coverage
 ```
 
-The redesign pages were ported from Claude Design exports into ordinary Astro
-components and plain script modules; design iteration now happens in this
-repo. The hero braid stays a framework-free custom element in `public/`.
+The current redesign pages are ordinary Astro components and plain JavaScript
+modules. The warded-braid hero remains a framework-free custom element in
+`public/warded-braid.js` pending its progressive-enhancement refactor.
 
-Vercel auto-detects Astro (pnpm via `pnpm-lock.yaml`) and serves `dist/`.
-`vercel.json` adds the `/party` and `/weekly` Discord redirects and rewrites
-`/download/:platform` to `api/download.js`, which 302s to the latest installer
-asset on GitHub Releases.
+Vercel auto-detects Astro and serves `dist/`. `vercel.json` also owns the
+`/party` and `/weekly` Discord redirects.
