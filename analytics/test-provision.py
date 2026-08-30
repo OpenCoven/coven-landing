@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""End-to-end test for provision.py against a faithful mock of the PostHog API.
+"""End-to-end test for the privacy-safe PostHog provisioner.
 
-Proves, without real credentials:
-  run 1  every object is CREATED (posted bodies pass schema assertions)
-  run 2  every object is looked up by name and PATCHED, nothing duplicated
-  run 3  a forced 500 on one insight reports FAIL + exit 1, everything else
-         still provisions (failure isolation)
+Proves without real credentials:
+  run 1  every object is created and payloads match the explicit-event profile
+  run 2  every object is updated by name with no duplicates
+  run 3  one forced insight failure is isolated and returns exit 1
 
 Usage: python3 analytics/test-provision.py
 """
@@ -15,8 +14,8 @@ import re
 import shutil
 import subprocess
 import sys
-import threading
 import tempfile
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -24,48 +23,117 @@ HERE = Path(__file__).parent
 STORE = {'actions': [], 'dashboards': [], 'insights': []}
 PROJECT = {'id': 1, 'app_urls': ['https://existing.example']}
 SCHEMA_ERRORS = []
-FAIL_INSIGHT = {'name': None}  # set to an insight name to 500 its creation
+FAIL_INSIGHT = {'name': None}
+
+APPROVED_EVENTS = {
+    'page_viewed',
+    'hero_primary_clicked',
+    'hero_secondary_clicked',
+    'principle_opened',
+    'guided_demo_started',
+    'guided_demo_completed',
+    'product_selected',
+    'quickstart_command_copied',
+    'download_menu_opened',
+    'download_platform_selected',
+    'download_started',
+    'download_fallback_used',
+    'docs_clicked',
+    'github_clicked',
+    'discord_clicked',
+}
 
 
-def check(cond, msg):
-    if not cond:
-        SCHEMA_ERRORS.append(msg)
+def check(condition, message):
+    if not condition:
+        SCHEMA_ERRORS.append(message)
 
 
 def validate(kind, body):
     if kind == 'actions':
         check(body.get('name'), 'action missing name')
-        for s in body.get('steps', []):
-            check(s.get('event') in ('$autocapture', '$pageview'), f'action step event {s.get("event")!r}')
-            check(any(k in s for k in ('selector', 'text', 'url')), 'action step has no matcher')
+        steps = body.get('steps', [])
+        check(len(steps) == 1, 'action must contain exactly one explicit event step')
+        for action_step in steps:
+            event = action_step.get('event')
+            check(event in APPROVED_EVENTS, f'unapproved action event {event!r}')
+            for forbidden in ('selector', 'text', 'url'):
+                check(
+                    forbidden not in action_step,
+                    f'action event {event!r} retained {forbidden} autocapture matcher',
+                )
+
     if kind == 'insights':
-        q = body.get('query') or {}
-        check(q.get('kind') == 'InsightVizNode', f'insight query.kind {q.get("kind")!r}')
-        src = q.get('source') or {}
-        check(src.get('kind') in ('TrendsQuery', 'FunnelsQuery'), f'source.kind {src.get("kind")!r}')
-        for s in src.get('series', []):
-            check(s.get('kind') in ('EventsNode', 'ActionsNode'), f'series kind {s.get("kind")!r}')
-            if s.get('kind') == 'ActionsNode':
-                check(isinstance(s.get('id'), int), 'ActionsNode.id not an int')
-        if src.get('kind') == 'FunnelsQuery':
-            ff = src.get('funnelsFilter') or {}
-            check('funnelWindowInterval' in ff and 'funnelWindowIntervalUnit' in ff, 'funnelsFilter fields')
+        query = body.get('query') or {}
+        check(
+            query.get('kind') == 'InsightVizNode',
+            f'insight query.kind {query.get("kind")!r}',
+        )
+        source = query.get('source') or {}
+        check(
+            source.get('kind') in ('TrendsQuery', 'FunnelsQuery'),
+            f'source.kind {source.get("kind")!r}',
+        )
+        for series in source.get('series', []):
+            check(
+                series.get('kind') in ('EventsNode', 'ActionsNode'),
+                f'series kind {series.get("kind")!r}',
+            )
+            if series.get('kind') == 'EventsNode':
+                check(
+                    series.get('event') in APPROVED_EVENTS,
+                    f'unapproved insight event {series.get("event")!r}',
+                )
+            if series.get('kind') == 'ActionsNode':
+                check(isinstance(series.get('id'), int), 'ActionsNode.id not an int')
+        if source.get('kind') == 'FunnelsQuery':
+            filters = source.get('funnelsFilter') or {}
+            check(
+                'funnelWindowInterval' in filters
+                and 'funnelWindowIntervalUnit' in filters,
+                'funnelsFilter fields',
+            )
         if body.get('dashboards') is not None:
-            check(all(isinstance(d, int) for d in body['dashboards']), 'dashboards not ids')
+            check(
+                all(isinstance(dashboard, int) for dashboard in body['dashboards']),
+                'dashboards not ids',
+            )
+
     if kind == 'project':
-        for f in ('session_recording_opt_in', 'heatmaps_opt_in', 'autocapture_web_vitals_opt_in', 'app_urls'):
-            check(f in body, f'project PATCH missing {f}')
-        check('https://opencoven-redesign-preview.vercel.app' in body.get('app_urls', []), 'siteUrl not in app_urls')
-        check('https://existing.example' in body.get('app_urls', []), 'existing app_urls clobbered')
+        for field in (
+            'session_recording_opt_in',
+            'heatmaps_opt_in',
+            'autocapture_web_vitals_opt_in',
+            'app_urls',
+        ):
+            check(field in body, f'project PATCH missing {field}')
+        check(
+            body.get('session_recording_opt_in') is False,
+            'session recording must remain disabled',
+        )
+        check(body.get('heatmaps_opt_in') is False, 'heatmaps must remain disabled')
+        check(
+            body.get('autocapture_web_vitals_opt_in') is False,
+            'autocaptured web vitals must remain disabled',
+        )
+        check(
+            'https://opencoven-redesign-preview.vercel.app'
+            in body.get('app_urls', []),
+            'siteUrl not in app_urls',
+        )
+        check(
+            'https://existing.example' in body.get('app_urls', []),
+            'existing app_urls clobbered',
+        )
 
 
 class Mock(BaseHTTPRequestHandler):
-    def log_message(self, *a):
+    def log_message(self, *args):
         pass
 
     def _read(self):
-        n = int(self.headers.get('Content-Length') or 0)
-        return json.loads(self.rfile.read(n)) if n else None
+        length = int(self.headers.get('Content-Length') or 0)
+        return json.loads(self.rfile.read(length)) if length else None
 
     def _send(self, obj, code=200):
         data = json.dumps(obj).encode()
@@ -75,96 +143,156 @@ class Mock(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_GET(self):
-        check(self.headers.get('Authorization', '').startswith('Bearer '), 'missing bearer token')
+        check(
+            self.headers.get('Authorization', '').startswith('Bearer '),
+            'missing bearer token',
+        )
         path = self.path.split('?')[0]
-        m = re.fullmatch(r'/api/projects/1/(actions|dashboards|insights)/', path)
-        if m:
-            kind = m.group(1)
-            # actions paginate in two pages to exercise paged()
+        match = re.fullmatch(
+            r'/api/projects/1/(actions|dashboards|insights)/',
+            path,
+        )
+        if match:
+            kind = match.group(1)
             if kind == 'actions' and STORE['actions'] and 'page=2' not in self.path:
                 half = len(STORE['actions']) // 2 or 1
-                return self._send({'results': STORE['actions'][:half],
-                                   'next': f'http://{self.headers["Host"]}/api/projects/1/actions/?page=2'})
+                return self._send(
+                    {
+                        'results': STORE['actions'][:half],
+                        'next': (
+                            f'http://{self.headers["Host"]}'
+                            '/api/projects/1/actions/?page=2'
+                        ),
+                    }
+                )
             if kind == 'actions' and 'page=2' in self.path:
                 half = len(STORE['actions']) // 2 or 1
-                return self._send({'results': STORE['actions'][half:], 'next': None})
+                return self._send(
+                    {'results': STORE['actions'][half:], 'next': None}
+                )
             return self._send({'results': STORE[kind], 'next': None})
         if path == '/api/projects/1/':
             return self._send(PROJECT)
-        self._send({'detail': 'not found'}, 404)
+        return self._send({'detail': 'not found'}, 404)
 
     def do_POST(self):
         body = self._read()
-        kind = re.fullmatch(r'/api/projects/1/(actions|dashboards|insights)/', self.path).group(1)
+        match = re.fullmatch(
+            r'/api/projects/1/(actions|dashboards|insights)/',
+            self.path,
+        )
+        if not match:
+            return self._send({'detail': 'not found'}, 404)
+        kind = match.group(1)
         if kind == 'insights' and body.get('name') == FAIL_INSIGHT['name']:
             return self._send({'detail': 'forced failure'}, 500)
         validate(kind, body)
         body['id'] = len(STORE[kind]) + 101
         STORE[kind].append(body)
-        self._send(body, 201)
+        return self._send(body, 201)
 
     def do_PATCH(self):
         body = self._read()
-        m = re.fullmatch(r'/api/projects/1/(actions|dashboards|insights)/(\d+)/', self.path)
-        if m:
-            kind, oid = m.group(1), int(m.group(2))
+        match = re.fullmatch(
+            r'/api/projects/1/(actions|dashboards|insights)/(\d+)/',
+            self.path,
+        )
+        if match:
+            kind, object_id = match.group(1), int(match.group(2))
             validate(kind, body)
-            obj = next(o for o in STORE[kind] if o['id'] == oid)
+            obj = next(item for item in STORE[kind] if item['id'] == object_id)
             obj.update(body)
             return self._send(obj)
         if self.path == '/api/projects/1/':
             validate('project', body)
             PROJECT.update(body)
             return self._send(PROJECT)
-        self._send({'detail': 'not found'}, 404)
+        return self._send({'detail': 'not found'}, 404)
 
 
 def run_provision(workdir):
-    return subprocess.run([sys.executable, str(workdir / 'provision.py')],
-                          capture_output=True, text=True)
+    return subprocess.run(
+        [sys.executable, str(workdir / 'provision.py')],
+        capture_output=True,
+        text=True,
+    )
 
 
 def main():
-    srv = ThreadingHTTPServer(('127.0.0.1', 0), Mock)
-    threading.Thread(target=srv.serve_forever, daemon=True).start()
-    port = srv.server_address[1]
+    server = ThreadingHTTPServer(('127.0.0.1', 0), Mock)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    port = server.server_address[1]
 
     tmp = Path(tempfile.mkdtemp(prefix='ph-test-'))
     shutil.copy(HERE / 'provision.py', tmp / 'provision.py')
-    (tmp / 'posthog.config.json').write_text(json.dumps({
-        'region': 'us', 'apiHost': f'http://127.0.0.1:{port}',
-        'projectApiKey': 'phc_test', 'personalApiKey': 'phx_test', 'projectId': '1',
-        'siteUrl': 'https://opencoven-redesign-preview.vercel.app'}))
+    (tmp / 'posthog.config.json').write_text(
+        json.dumps(
+            {
+                'mode': 'events',
+                'region': 'us',
+                'apiHost': f'http://127.0.0.1:{port}',
+                'projectApiKey': 'phc_test',
+                'personalApiKey': 'phx_test',
+                'projectId': '1',
+                'siteUrl': 'https://opencoven-redesign-preview.vercel.app',
+            }
+        )
+    )
 
     failures = []
 
-    r1 = run_provision(tmp)
-    new = r1.stdout.count('new  ')
-    if r1.returncode != 0: failures.append(f'run1 exit {r1.returncode}: {r1.stdout}{r1.stderr}')
-    if new < 15: failures.append(f'run1 created only {new} objects:\n{r1.stdout}')
+    first = run_provision(tmp)
+    created = first.stdout.count('new  ')
+    if first.returncode != 0:
+        failures.append(
+            f'run1 exit {first.returncode}: {first.stdout}{first.stderr}'
+        )
+    if created < 20:
+        failures.append(f'run1 created only {created} objects:\n{first.stdout}')
 
-    r2 = run_provision(tmp)
-    if r2.returncode != 0: failures.append(f'run2 exit {r2.returncode}')
-    if 'new  ' in r2.stdout: failures.append(f'run2 not idempotent — created duplicates:\n{r2.stdout}')
-    counts = {k: len(v) for k, v in STORE.items()}
-    if counts != {k: len({o["name"] for o in v}) for k, v in STORE.items()}:
+    second = run_provision(tmp)
+    if second.returncode != 0:
+        failures.append(f'run2 exit {second.returncode}')
+    if 'new  ' in second.stdout:
+        failures.append(
+            f'run2 not idempotent — created duplicates:\n{second.stdout}'
+        )
+    counts = {kind: len(values) for kind, values in STORE.items()}
+    unique_counts = {
+        kind: len({item['name'] for item in values})
+        for kind, values in STORE.items()
+    }
+    if counts != unique_counts:
         failures.append(f'duplicate names in store: {counts}')
 
-    FAIL_INSIGHT['name'] = 'Top referrers'
-    for k in STORE: STORE[k] = [o for o in STORE[k] if o.get('name') != 'Top referrers']
-    r3 = run_provision(tmp)
-    if r3.returncode != 1: failures.append(f'run3 expected exit 1, got {r3.returncode}')
-    if 'FAIL  insight: Top referrers' not in r3.stdout: failures.append(f'run3 missing FAIL line:\n{r3.stdout}')
-    if r3.stdout.count('FAIL') != 1: failures.append(f'run3 failure not isolated:\n{r3.stdout}')
+    FAIL_INSIGHT['name'] = 'Top routes'
+    for kind in STORE:
+        STORE[kind] = [
+            item for item in STORE[kind]
+            if item.get('name') != 'Top routes'
+        ]
+    third = run_provision(tmp)
+    if third.returncode != 1:
+        failures.append(f'run3 expected exit 1, got {third.returncode}')
+    if 'FAIL  insight: Top routes' not in third.stdout:
+        failures.append(f'run3 missing FAIL line:\n{third.stdout}')
+    if third.stdout.count('FAIL') != 1:
+        failures.append(f'run3 failure not isolated:\n{third.stdout}')
 
-    failures += [f'schema: {e}' for e in SCHEMA_ERRORS]
+    failures += [f'schema: {error}' for error in SCHEMA_ERRORS]
 
-    print(r1.stdout)
-    print(f'store after runs: {[f"{k}:{len(v)}" for k, v in STORE.items()]}')
+    print(first.stdout)
+    print(
+        'store after runs: '
+        + str([f'{kind}:{len(values)}' for kind, values in STORE.items()])
+    )
     if failures:
         print('\nTEST FAILURES:', *failures, sep='\n  ')
         sys.exit(1)
-    print('\nALL TESTS PASSED — create, idempotent update, pagination, schema shapes, failure isolation')
+    print(
+        '\nALL TESTS PASSED — explicit event allowlist, replay/heatmap disablement, '
+        'create/update idempotence, pagination, schema shapes, and failure isolation'
+    )
 
 
 main()
