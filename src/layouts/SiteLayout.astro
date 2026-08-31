@@ -30,10 +30,11 @@ const {
 const canonicalUrl = new URL(canonicalPath, 'https://opencoven.ai').toString();
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
 const primaryNavigation = [
-  { label: 'How it works', href: '/#how-it-works' },
+  { label: 'How it works', href: '/how-it-works' },
+  { label: 'Protocol', href: '/protocol' },
   { label: 'Products', href: '/#products' },
   { label: 'Quickstart', href: '/quickstart' },
-  { label: 'GitHub', href: '/github' },
+  { label: 'Status', href: '/status' },
   { label: 'Docs', href: 'https://docs.opencoven.ai' },
 ] as const;
 
@@ -157,7 +158,11 @@ const structuredData = [
       <div class="site-shell site-footer__inner">
         <span>OpenCoven · identity-preserving familiar infrastructure</span>
         <nav aria-label="Footer">
-          <a href="https://github.com/OpenCoven">GitHub</a>
+          <a href="/github">GitHub delivery</a>
+          <a href="/protocol">Protocol</a>
+          <a href="/security">Security</a>
+          <a href="/status">Status</a>
+          <a href="https://github.com/OpenCoven">Source</a>
           <a href="https://docs.opencoven.ai">Docs</a>
           <a href="https://discord.gg/opencoven">Discord</a>
           <a href="https://x.com/OpenCvn">X</a>
