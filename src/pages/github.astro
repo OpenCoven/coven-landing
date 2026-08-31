@@ -4,6 +4,7 @@ import { publicProducts } from '../data/products.ts';
 
 const product = publicProducts.find((item) => item.id === 'github');
 if (!product) throw new Error('Missing GitHub product registry record');
+if (!product.docsUrl) throw new Error('GitHub product registry record missing docsUrl');
 
 const title = 'OpenCoven for GitHub · Familiar delivery under human oversight';
 const description = product.summary;
