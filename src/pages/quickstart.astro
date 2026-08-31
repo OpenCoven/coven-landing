@@ -1,360 +1,244 @@
 ---
-import { ogImage } from '../lib/og.js';
-import '@fontsource-variable/inter/wght.css';
-import '@fontsource-variable/jetbrains-mono/wght.css';
-import '@fontsource-variable/geist/wght.css';
-import '../styles/global.css';
-
-import ThemeInit from '../components/ThemeInit.astro';
-import Ambient from '../components/Ambient.astro';
-import Header from '../components/Header.astro';
-import MobileNav from '../components/MobileNav.astro';
-import Footer from '../components/Footer.astro';
-import QuickstartProduct from '../components/QuickstartProduct.astro';
+import SiteLayout from '../layouts/SiteLayout.astro';
 import {
-  activeQuickstartGuides,
-  archivedQuickstartGuides,
-  allQuickstartGuides,
+  activeProducts,
+  archivedProducts,
   canonicalFoundationCommands,
-} from '../data/products';
+} from '../data/products.ts';
 
-const routeStages = [
-  {
-    mark: '01',
-    label: 'Choose',
-    title: 'Choose a current product',
-    body: 'Match the chooser below to how you already work today: the shared terminal runtime, an interactive coding TUI, visual Cave oversight, or GitHub delivery.',
-  },
-  {
-    mark: '02',
-    label: 'Prepare',
-    title: 'Prepare prerequisites',
-    body: 'Complete the prerequisites named by your guide — provider, account, runtime, or repository access — before you run anything.',
-  },
-  {
-    mark: '03',
-    label: 'Run',
-    title: 'Run the first loop',
-    body: "Follow the guide's exact steps for one small, bounded task — the same loop you can repeat after this.",
-  },
-  {
-    mark: '04',
-    label: 'Verify',
-    title: 'Verify the result',
-    body: "Confirm the stated arrival state. That checkable proof, not a tutorial's last screen, is what success means here.",
-    isArrival: true,
-  },
-];
+const title = 'OpenCoven Quickstart · Start locally';
+const description =
+  'Install the shared OpenCoven runtime, verify your project, then choose the current product surface that matches the job.';
 
-const foundationItems = [
-  {
-    label: 'Bring a project',
-    body: 'Local product paths start inside a Git-tracked project you already control. Hosted or self-hosted GitHub automation begins with repository and access setup.',
-  },
-  {
-    label: 'Authenticate your provider',
-    body: 'For local provider-backed paths, connect Anthropic or OpenAI directly; those credentials remain provider-owned. Self-hosted GitHub workers require their own provider setup, while hosted beta users follow the access path they receive.',
-  },
-  {
-    label: 'Prepare the shared runtime',
-    body: 'Coven CLI is the current shared foundation. Coven Code and Cave reuse that local runtime and session state rather than asking you to begin from an archived product.',
-  },
-  {
-    label: 'Install one surface at a time',
-    body: 'Add local surfaces one at a time without repeating their shared setup. GitHub automation has separate hosted-access or self-hosted operator setup.',
-  },
-];
-
-// These exact sentences were load-bearing strings in the pre-registry static
-// verifier. They remain visible only inside an explicit migration receipt until
-// #82 removes historical string pinning. They are quoted as retired wording,
-// not asserted as current product truth.
-const retiredCompatibilityCopy = [
-  'Coven CLI, Coven Code, Cave, and CastCodes share a local runtime and session history, so switching among those surfaces does not restart what you already built.',
-  'Coven CLI, Coven Code, Cave, and CastCodes share the runtime and session history you already set up. GitHub automation has its own hosted or self-hosted access path.',
-  'Coven CLI, Coven Code, Cave, and CastCodes reuse the local runtime, provider connection, and session history. GitHub automation connects separately through the hosted beta or a self-hosted deployment.',
-];
+const productState = (maturity: string) => {
+  if (maturity === 'available') return 'success';
+  if (maturity === 'gated-beta') return 'unavailable';
+  return 'selected';
+};
 
 const collectionJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: 'OpenCoven Quickstart',
-  description:
-    'Choose a current OpenCoven product, follow one verified first-run path, and consult archived lineage only when migrating an existing installation.',
+  description,
   url: 'https://opencoven.ai/quickstart',
   mainEntity: {
     '@type': 'ItemList',
-    // Transitional compatibility: the historical archive remains listed in
-    // its prior stable position until #82 replaces the legacy exact-shape
-    // JSON-LD assertion. Recommended UI below is active-only.
-    itemListElement: allQuickstartGuides.map((product, index) => ({
+    itemListElement: activeProducts.map((product, index) => ({
       '@type': 'ListItem',
       position: index + 1,
       name: product.name,
-      url: `https://opencoven.ai/quickstart#${product.id}`,
+      url: product.canonicalUrl.startsWith('/')
+        ? `https://opencoven.ai${product.canonicalUrl}`
+        : product.canonicalUrl,
     })),
   },
 };
 ---
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <ThemeInit />
-  <title>OpenCoven Quickstart — Choose Your First Product</title>
-  <meta name="description" content="Start with the shared OpenCoven runtime, Coven Code, Cave, or GitHub delivery. Archived predecessors are separated from current onboarding." />
-  <meta property="og:title" content="OpenCoven Quickstart" />
-  <meta property="og:description" content="Choose a current product, prepare it, run one bounded loop, and verify a checkable first success." />
-  <meta property="og:site_name" content="OpenCoven" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://opencoven.ai/quickstart" />
-  <meta property="og:image" content={ogImage} />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="OpenCoven — Persistent AI Familiars" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@OpenCvn" />
-  <meta name="twitter:title" content="OpenCoven Quickstart" />
-  <meta name="twitter:description" content="Choose a current product, prepare it, run one bounded loop, and verify a checkable first success." />
-  <meta name="twitter:image" content={ogImage} />
-  <meta name="twitter:image:alt" content="OpenCoven — Persistent AI Familiars" />
-  <meta name="theme-color" content="#050409" />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://opencoven.ai/quickstart" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
+<SiteLayout title={title} description={description} canonicalPath="/quickstart">
   <script type="application/ld+json" set:html={JSON.stringify(collectionJsonLd)} />
 
-  <script is:inline>
-    (function () {
-      var html = document.documentElement;
-      html.classList.add('js-on');
-      if (!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        html.classList.add('motion-on');
-      }
-    })();
-  </script>
-</head>
-<body class="quickstart-page">
-  <Ambient />
-  <Header />
-  <MobileNav />
-
-  <main id="content" tabindex="-1">
-    <section class="onboard-hero" id="top" aria-label="OpenCoven quickstart hero">
-      <div class="onboard-hero-copy">
-        <p class="section-kicker">Quickstart</p>
-        <h1>Choose your way into OpenCoven.</h1>
-        <p class="onboard-hero-lede">
-          Start with the current surface that matches how you work: the shared runtime, an
-          interactive coding cockpit, visual Cave oversight, or GitHub delivery. Every path ends
-          with concrete, checkable proof that it worked.
-        </p>
-        <p class="onboard-hero-foundation">
-          <strong>Three commands, one local foundation.</strong> Install the CLI, check the project,
-          then open it in Coven. Code and Cave build on that foundation; GitHub delivery has its
-          own hosted-gated or self-hosted access path.
-        </p>
-        <div class="onboard-hero-actions">
-          <a class="btn-primary" href="#onboard-chooser">Choose a current product</a>
-          <a class="btn-secondary" href="#onboard-foundation-heading">Start with the foundation</a>
-        </div>
+  <section class="site-shell hero" id="top">
+    <div class="hero__copy">
+      <p class="eyebrow">Quickstart</p>
+      <h1>Start with one local foundation.</h1>
+      <p class="hero__lede">
+        Install the shared Coven CLI/runtime, check the current project, and open Coven.
+        Then choose Code, Cave, or GitHub delivery only when the job calls for that surface.
+      </p>
+      <div class="button-row">
+        <a
+          class="action action--primary"
+          data-oc-primitive="action"
+          data-oc-part="label"
+          data-oc-state="idle"
+          href="#foundation"
+        >Run the three commands</a>
+        <a
+          class="action"
+          data-oc-primitive="action"
+          data-oc-part="label"
+          data-oc-state="idle"
+          href="#surfaces"
+        >Choose a surface</a>
       </div>
+    </div>
+    <aside class="evidence-card" aria-labelledby="arrival-heading">
+      <span
+        class="status status--available"
+        data-oc-primitive="status-indicator"
+        data-oc-part="label"
+        data-oc-state="success"
+      >Current start path</span>
+      <h2 class="card-heading" id="arrival-heading">What success looks like</h2>
+      <p class="muted">
+        <code>coven doctor</code> reports a usable project and provider boundary, then
+        <code>coven</code> opens the current project without an extra init ceremony.
+      </p>
+    </aside>
+  </section>
 
-      <div class="onboard-route panel" aria-labelledby="onboard-route-heading">
-        <p class="section-kicker">Mission trace</p>
-        <h2 id="onboard-route-heading">The sequence that actually runs.</h2>
-        <ol class="onboard-route-list" role="list">
-          {routeStages.map((stage, stageIndex) => (
-            <li class:list={['onboard-route-step', { 'is-arrival': stage.isArrival }]}>
-              <span class="sr-only">Step {stageIndex + 1} of {routeStages.length}: </span>
-              <span class="onboard-route-marker" aria-hidden="true">{stage.mark}</span>
-              <div class="onboard-route-body">
-                <p class="onboard-route-label">{stage.label}</p>
-                <h3 class="onboard-route-title">{stage.title}</h3>
-                <p class="onboard-route-desc">{stage.body}</p>
-                {stage.isArrival && (
-                  <p class="onboard-route-arrival-tag">
-                    <span aria-hidden="true">✓</span> Arrival state — the proof it worked
-                  </p>
-                )}
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </section>
-
-    <section class="onboard-chooser content-section" id="onboard-chooser" aria-labelledby="onboard-chooser-heading">
-      <div class="section-header" data-reveal>
-        <p class="section-kicker">Pick one current path</p>
-        <h2 id="onboard-chooser-heading">Four active products. One successful first loop.</h2>
+  <section class="band" id="foundation" aria-labelledby="foundation-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="foundation-heading">Three commands. One canonical source.</h2>
         <p>
-          These are alternatives, not a sequence. Install only the current product that fits your
-          job. The archived predecessor is separated below and never participates in this
-          recommended set.
+          These commands come directly from the checked-in product registry. Their text
+          remains visible and selectable when JavaScript or clipboard permission is unavailable.
         </p>
       </div>
-      <nav class="onboard-chooser-nav" aria-label="Choose a current product guide or archived migration record">
-        <ul class="onboard-chooser-grid" data-active-product-grid role="list">
-          {activeQuickstartGuides.map((product) => (
-            <li>
-              <a
-                class="onboard-chooser-card panel-inset is-card"
-                href={`#${product.id}`}
-                data-product-lifecycle="active"
-              >
-                <span class="onboard-chooser-sigil" aria-hidden="true">{product.sigil}</span>
-                <span class="onboard-chooser-name">{product.name}</span>
-                <span class="onboard-chooser-best">{product.bestFor}</span>
-                <span class="onboard-chooser-meta">
-                  <span class="onboard-chooser-status">{product.status}</span>
-                  <span class="onboard-chooser-platforms">{product.platforms}</span>
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
 
-        {archivedQuickstartGuides.map((product) => (
-          <div class="panel-inset" style="margin-top: 16px; padding: 16px 18px">
-            <p class="section-kicker">Archived predecessor · not a recommended start</p>
-            <a
-              class="onboard-chooser-card"
-              href={`#${product.id}`}
-              data-product-lifecycle="archived"
-              style="margin-top: 8px"
-            >
-              <span class="onboard-chooser-sigil" aria-hidden="true">{product.sigil}</span>
-              <span class="onboard-chooser-name">{product.name}</span>
-              <span class="onboard-chooser-best">{product.bestFor}</span>
-              <span class="onboard-chooser-meta">
-                <span class="onboard-chooser-status">{product.status}</span>
-                <span class="onboard-chooser-platforms">{product.platforms}</span>
-              </span>
-            </a>
-          </div>
-        ))}
-      </nav>
-    </section>
-
-    <section class="onboard-foundation content-section" aria-labelledby="onboard-foundation-heading">
-      <div class="onboard-foundation-panel panel">
-        <div class="section-header" data-reveal>
-          <p class="section-kicker">Shared foundation</p>
-          <h2 id="onboard-foundation-heading">Prepare once. Add current surfaces when you need them.</h2>
-          <p>Use these exact current commands before branching into a product-specific guide.</p>
-        </div>
-        <div class="onboard-command-list" style="display: grid; gap: 10px; margin: 22px 0 28px">
-          {canonicalFoundationCommands.map((item) => (
-            <div class="onboard-command" data-copy-surface>
-              <code>{item.command}</code>
-              <button
-                class="qs-copy"
-                type="button"
-                aria-label={`Copy: ${item.label}`}
-                data-copy={item.command}
-                data-command-id={item.id}
-              >
-                <span aria-hidden="true">Copy</span>
-              </button>
-              <span class="copy-guidance" data-copy-guidance hidden></span>
+      <ol class="command-block command-block--wide" aria-label="Canonical local foundation commands">
+        {canonicalFoundationCommands.map((item) => (
+          <li
+            class="copy-control"
+            data-copy-surface
+            data-oc-primitive="copy-control"
+            data-oc-state="idle"
+          >
+            <div class="copy-control__main">
+              <span class="copy-control__label">{item.label}</span>
+              <code data-oc-part="source">{item.command}</code>
             </div>
-          ))}
-        </div>
-        <ul class="onboard-foundation-grid" role="list">
-          {foundationItems.map((item) => (
-            <li class="onboard-foundation-item panel-inset">
-              <p class="onboard-foundation-label">{item.label}</p>
-              <p class="onboard-foundation-body">{item.body}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+            <div class="copy-control__actions">
+              <button
+                class="copy-button action"
+                type="button"
+                data-oc-part="trigger"
+                data-copy={item.command}
+                aria-label={`Copy command: ${item.label}`}
+              >Copy</button>
+              <span
+                class="copy-status"
+                data-oc-part="status"
+                aria-live="polite"
+                aria-atomic="true"
+              ></span>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <noscript>
+        <p class="muted">Clipboard enhancement is off. Select and copy the visible commands normally.</p>
+      </noscript>
+    </div>
+  </section>
 
-    <section class="onboard-guides content-section" id="onboard-guides" aria-labelledby="onboard-guides-heading">
-      <div class="section-header" data-reveal>
-        <p class="section-kicker">Current guides</p>
-        <h2 id="onboard-guides-heading">From install to proof.</h2>
+  <section class="band" id="surfaces" aria-labelledby="surfaces-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="surfaces-heading">Then branch by job, not by branding.</h2>
         <p>
-          Each current guide is self-contained: install, connect, run one bounded task, and verify
-          the exact arrival signal.
+          Each current product has one registry-backed status, owner, platform boundary,
+          canonical destination, and primary action.
         </p>
       </div>
-      <div class="onboard-guide-list" data-active-product-guides>
-        {activeQuickstartGuides.map((product, index) => (
-          <QuickstartProduct product={product} index={index} />
+      <div class="product-grid" data-active-product-grid>
+        {activeProducts.map((product) => (
+          <article
+            class="product-card"
+            id={`product-${product.id}`}
+            data-product-lifecycle="active"
+          >
+            <span
+              class:list={["status", `status--${product.maturity}`]}
+              data-oc-primitive="status-indicator"
+              data-oc-part="label"
+              data-oc-state={productState(product.maturity)}
+            >{product.statusLabel}</span>
+            <p class="eyebrow">{product.category}</p>
+            <h3>{product.name}</h3>
+            <p>{product.summary}</p>
+            <p><strong>Best for:</strong> {product.bestFor}</p>
+            <p class="muted">{product.platforms}</p>
+            <p class="route-meta mono">Owner: {product.ownerRepository}</p>
+            <div class="button-row">
+              <a
+                class="action"
+                data-oc-primitive="action"
+                data-oc-part="label"
+                data-oc-state="idle"
+                href={product.primaryAction.href}
+              >{product.primaryAction.label}</a>
+              {product.docsUrl && <a href={product.docsUrl}>Docs</a>}
+            </div>
+          </article>
         ))}
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="onboard-guides content-section" id="onboard-archive" aria-labelledby="onboard-archive-heading">
-      <div class="section-header" data-reveal>
-        <p class="section-kicker">Archived lineage</p>
-        <h2 id="onboard-archive-heading">CastCodes is preserved for migration, not new onboarding.</h2>
+  <section class="band" id="archive" aria-labelledby="archive-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="archive-heading">Historical lineage stays visible, not recommended.</h2>
         <p>
-          Coven Code is the current successor. The archived guide remains available for existing
-          release verification and provenance while compatibility references are retired safely.
+          Archived products remain available for migration and release history only. They
+          do not participate in the current start sequence or active product JSON-LD.
         </p>
       </div>
-
-      <details class="panel-inset" style="margin-bottom: 20px; padding: 14px 16px">
-        <summary>Static-contract migration receipt</summary>
-        <p style="margin-top: 12px">
-          The previous verifier pinned the following sentences as exact current copy. They are
-          quoted here only as retired language until #82 removes historical string pinning:
-        </p>
-        {retiredCompatibilityCopy.map((line) => <blockquote>{line}</blockquote>)}
-      </details>
-
-      <div class="onboard-guide-list" data-archived-product-guides>
-        {archivedQuickstartGuides.map((product, archivedIndex) => (
-          <QuickstartProduct
-            product={product}
-            index={activeQuickstartGuides.length + archivedIndex}
-          />
+      <div class="archive-stack" data-archived-product-grid>
+        {archivedProducts.map((product) => (
+          <article class="evidence-card" data-product-lifecycle="archived">
+            <span
+              class="status"
+              data-oc-primitive="status-indicator"
+              data-oc-part="label"
+              data-oc-state="unavailable"
+            >{product.statusLabel}</span>
+            <h3 class="card-heading">{product.name}</h3>
+            <p>{product.summary}</p>
+            <p class="muted">{product.bestFor}</p>
+            <a href={product.primaryAction.href}>{product.primaryAction.label}</a>
+          </article>
         ))}
       </div>
-    </section>
-
-    <section class="onboard-support content-section" aria-labelledby="onboard-support-heading">
-      <div class="onboard-support-panel panel">
-        <div class="onboard-support-copy">
-          <p class="section-kicker">Keep going</p>
-          <h2 id="onboard-support-heading">Current local surfaces reuse the foundation.</h2>
-          <p>
-            Coven CLI, Coven Code, and Cave reuse the local runtime, provider connection, and
-            session history. GitHub automation connects separately through its hosted-gated or
-            self-hosted deployment path. Archived CastCodes users should move toward Coven Code.
-          </p>
-        </div>
-        <nav class="onboard-support-links" aria-label="OpenCoven community and documentation">
-          <a class="onboard-support-link is-primary" href="https://docs.opencoven.ai" target="_blank" rel="noopener noreferrer">
-            Read the docs
-            <span class="sr-only"> (opens in new tab)</span>
-          </a>
-          <a class="onboard-support-link" href="https://github.com/OpenCoven" target="_blank" rel="noopener noreferrer">
-            Browse the GitHub org
-            <span class="sr-only"> (opens in new tab)</span>
-          </a>
-          <a class="onboard-support-link" href="https://discord.gg/opencoven" target="_blank" rel="noopener noreferrer">
-            Ask in Discord
-            <span class="sr-only"> (opens in new tab)</span>
-          </a>
-        </nav>
-      </div>
-    </section>
-
-    <div class="sr-only" role="status" aria-live="polite" data-copy-live></div>
-  </main>
-
-  <Footer />
+    </div>
+  </section>
 
   <script>
-    import '../scripts/main.js';
+    const resetTimers = new WeakMap();
+
+    function selectCommand(element) {
+      const selection = window.getSelection();
+      if (!selection) return;
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    document.querySelectorAll('[data-copy-surface]').forEach((surface) => {
+      const button = surface.querySelector('[data-copy]');
+      const source = surface.querySelector('[data-oc-part="source"]');
+      const status = surface.querySelector('[data-oc-part="status"]');
+      if (!(button instanceof HTMLButtonElement) || !source || !status) return;
+
+      surface.setAttribute('data-copy-ready', '');
+      button.addEventListener('click', async () => {
+        const text = button.getAttribute('data-copy') ?? '';
+        surface.setAttribute('data-oc-state', 'copying');
+        button.disabled = true;
+
+        try {
+          if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+          await navigator.clipboard.writeText(text);
+          surface.setAttribute('data-oc-state', 'success');
+          status.textContent = `Copied: ${text}`;
+        } catch {
+          selectCommand(source);
+          surface.setAttribute('data-oc-state', 'error');
+          status.textContent = 'Copy unavailable. Command selected; copy it manually.';
+        }
+
+        clearTimeout(resetTimers.get(surface));
+        resetTimers.set(surface, window.setTimeout(() => {
+          button.disabled = false;
+          status.textContent = '';
+          surface.setAttribute('data-oc-state', 'idle');
+        }, 3000));
+      });
+    });
   </script>
-</body>
-</html>
+</SiteLayout>
