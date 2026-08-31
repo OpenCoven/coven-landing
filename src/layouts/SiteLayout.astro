@@ -134,7 +134,7 @@ const structuredData = [
           data-oc-primitive="mobile-navigation"
           data-oc-state="collapsed"
         >
-          <summary data-oc-part="trigger" aria-label="Open navigation">Menu</summary>
+          <summary data-oc-part="trigger">Menu</summary>
           <div class="mobile-nav__panel" data-oc-part="panel">
             <nav aria-label="Mobile primary" data-oc-part="links">
               {primaryNavigation.map((item) => (
@@ -174,15 +174,7 @@ const structuredData = [
         );
 
         function sync(disclosure) {
-          var expanded = disclosure.open;
-          disclosure.dataset.ocState = expanded ? 'expanded' : 'collapsed';
-          var summary = disclosure.querySelector('summary');
-          if (summary) {
-            summary.setAttribute(
-              'aria-label',
-              expanded ? 'Close navigation' : 'Open navigation',
-            );
-          }
+          disclosure.dataset.ocState = disclosure.open ? 'expanded' : 'collapsed';
         }
 
         disclosures.forEach(function (disclosure) {
