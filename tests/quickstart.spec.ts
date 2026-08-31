@@ -1,9 +1,9 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 const INSTALL_COMMAND = 'npm install -g @opencoven/cli';
 
-const installSurface = (page) =>
+const installSurface = (page: Page) =>
   page.locator('[data-copy-surface]', {
     has: page.locator(`[data-copy="${INSTALL_COMMAND}"]`),
   });
