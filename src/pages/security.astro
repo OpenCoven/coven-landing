@@ -1,0 +1,23 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+const title = 'Security · OpenCoven';
+const description = 'How to report OpenCoven vulnerabilities, what security properties are in scope, and where to verify release artifacts.';
+---
+
+<SiteLayout title={title} description={description} canonicalPath="/security">
+  <section class="site-shell hero" id="top">
+    <div class="hero__copy">
+      <p class="eyebrow">Security and reporting</p>
+      <h1>Report vulnerabilities privately. Verify what you run.</h1>
+      <p class="hero__lede">OpenCoven handles local agent execution and personal context, so security reports should go through private channels—not public issues.</p>
+      <div class="button-row">
+        <a class="action action--primary" data-oc-primitive="action" data-oc-state="idle" href="https://github.com/OpenCoven/coven/security/advisories/new">Open a private security advisory</a>
+        <a class="action" data-oc-primitive="action" data-oc-state="idle" href="https://discord.gg/OpenCoven">OpenCoven Discord</a>
+      </div>
+    </div>
+    <aside class="evidence-card"><span class="status" data-oc-primitive="status-indicator" data-oc-state="idle">Repository policy governs</span><h2 class="card-heading">No certification overclaim</h2><p class="muted">Local-first architecture and guarded actions are useful properties, not blanket guarantees or claims of independent certification.</p></aside>
+  </section>
+  <section class="band" aria-labelledby="scope-heading"><div class="site-shell"><div class="band__intro"><h2 id="scope-heading">What belongs in a security report.</h2><p>Reports affecting session isolation, identity integrity, authentication, execution boundaries, or cross-user/context isolation belong in the private security channel.</p></div><div class="concept-grid"><article class="concept-card"><h3>Session isolation</h3><p>One user or agent must not gain another context without explicit permission.</p></article><article class="concept-card"><h3>Identity integrity</h3><p>A familiar identity must not be forgeable merely by another caller possessing context.</p></article><article class="concept-card"><h3>Execution boundaries</h3><p>Tool and runtime actions must remain within their intended scope and authority boundary.</p></article></div></div></section>
+  <section class="band" aria-labelledby="verify-heading"><div class="site-shell"><div class="band__intro"><h2 id="verify-heading">Use first-party release evidence.</h2><p>Verification should start from the producing repository’s releases, checksums, signatures, attestations, and SECURITY.md when available.</p></div><div class="button-row button-row--spaced"><a class="action" data-oc-primitive="action" data-oc-state="idle" href="https://github.com/OpenCoven/coven-cave/releases/latest">Cave releases</a><a class="action" data-oc-primitive="action" data-oc-state="idle" href="https://github.com/OpenCoven">OpenCoven repositories</a></div></div></section>
+</SiteLayout>
