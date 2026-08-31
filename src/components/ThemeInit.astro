@@ -8,7 +8,7 @@
     var html = document.documentElement;
     function resolve(pref) {
       if (pref === 'light' || pref === 'dark') return pref;
-      return window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches
         ? 'light'
         : 'dark';
     }
