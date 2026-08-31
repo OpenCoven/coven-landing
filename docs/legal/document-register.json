@@ -1,15 +1,15 @@
 {
   "schemaVersion": "opencoven.legal-document-register/v1",
-  "reviewedAt": "2026-08-30",
+  "reviewedAt": "2026-08-31",
   "documents": [
     {
       "route": "/privacy",
       "title": "Privacy Policy",
       "effectiveDate": "2026-05-27",
-      "lastUpdated": "2026-05-27",
-      "contentChangeInThisMigration": false,
+      "lastUpdated": "2026-08-31",
+      "contentChangeInThisMigration": true,
       "owner": "OpenCoven maintainers / scoped legal-compliance process",
-      "status": "published-text-preserved-pending-claim-reconciliation"
+      "status": "reconciled-to-default-off-analytics-contract"
     },
     {
       "route": "/terms",
@@ -18,12 +18,26 @@
       "lastUpdated": "2026-05-27",
       "contentChangeInThisMigration": false,
       "owner": "OpenCoven maintainers / scoped legal-compliance process",
-      "status": "published-text-preserved-pending-claim-reconciliation"
+      "status": "published-text-preserved"
     }
   ],
+  "privacyReconciliation": {
+    "sourceContracts": [
+      "docs/public-truth-register.md",
+      "analytics/README.md",
+      "scripts/verify-analytics.mjs",
+      "src/components/redesign/PosthogSnippet.astro"
+    ],
+    "changes": [
+      "Analytics is now described as disabled by default and available only through the explicit bounded events mode.",
+      "Unsupported landing claims about newsletter/waitlist collection and GitHub OAuth were removed because no checked-in collection path was found.",
+      "Session replay, heatmaps, broad autocapture, raw prompt/command/file/path/error collection, and automatic page-view/page-leave capture are explicitly excluded by the shipped analytics contract.",
+      "Provider, region, sampling, and retention must be documented before an explicitly enabled analytics deployment is treated as production-approved."
+    ]
+  },
   "knownReconciliationItems": [
-    "The current public truth register says analytics are off by default with explicit event mode only; Privacy policy analytics/cookie language must be reviewed against the deployed configuration before any legal-content revision.",
-    "Privacy policy references Vercel, optional GitHub OAuth, waitlist/newsletter email collection, and optional cloud services; each must be verified against current production or changed through the scoped legal/compliance issue.",
-    "No shell migration may silently alter effective dates, rights language, governing law, liability language, or data-practice commitments."
+    "If events analytics is enabled in production, record the exact PostHog host/provider, region, sampling policy, and retention period in deployment evidence before launch.",
+    "Re-run legal/deployment reconciliation whenever hosting, analytics, authentication, account, waitlist, newsletter, or cloud-service data flows change.",
+    "Do not alter governing law, liability, warranty, or other Terms commitments through ordinary shell/UI migrations."
   ]
 }
