@@ -1,508 +1,68 @@
 ---
-import { ogImage } from '../lib/og.js';
-import '@fontsource/eb-garamond/400.css';
-import '@fontsource/eb-garamond/400-italic.css';
-import '@fontsource/eb-garamond/500.css';
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/500.css';
-import '@fontsource/inter/600.css';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/500.css';
-import '@phosphor-icons/web/regular';
-import '../styles/redesign.css';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { canonicalFoundationCommands } from '../data/products.ts';
 
-import ThemeInit from '../components/ThemeInit.astro';
-import PosthogSnippet from '../components/redesign/PosthogSnippet.astro';
-import Board from '../components/redesign/Board.astro';
-import DownloadCta from '../components/redesign/DownloadCta.astro';
-import RedesignFooter from '../components/redesign/RedesignFooter.astro';
+const title = 'How Coven works · OpenCoven';
+const description = 'How the current Coven runtime coordinates local agent work through durable sessions, shared claims, evidence, and human-approved protected actions.';
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>How it works · OpenCoven</title>
-    <meta
-      name="description"
-      content="How Coven coordinates coding agents: the daemon, claims, the shared record, familiars, and guards, from install onward."
-    />
-    <meta property="og:title" content="How it works · OpenCoven" />
-    <meta
-      property="og:description"
-      content="How Coven coordinates coding agents: the daemon, claims, the shared record, familiars, and guards, from install onward."
-    />
-    <meta property="og:site_name" content="OpenCoven" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://opencoven.ai/how-it-works" />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@OpenCvn" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <ThemeInit />
-    <PosthogSnippet />
-  </head>
-  <body>
-    <nav data-nav="" style="position: sticky; top: 0; z-index: 60; background: transparent; border-bottom: 1px solid transparent; will-change: transform; transition: transform 300ms cubic-bezier(0.2,0,0,1), background-color 220ms cubic-bezier(0.2,0,0,1), border-color 220ms cubic-bezier(0.2,0,0,1)">
-      <div style="max-width: 1140px; margin: 0 auto; padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between">
-        <a href="/" style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17.5px; letter-spacing: -0.015em">
-          <img data-logo="" src="/assets/opencoven-black.svg" alt="OpenCoven" width="30" height="30" style="width: 30px; height: 30px; display: block">
-          OpenCoven
-        </a>
-        <div data-r="navlinks" style="display: flex; align-items: center; gap: 26px; font-size: 14px; color: var(--cv-text-secondary)">
-          <a href="/" style="color: var(--cv-text-secondary)">Overview</a>
-          <a href="https://docs.opencoven.ai" style="color: var(--cv-text-secondary)">Docs</a>
-          <a href="https://github.com/OpenCoven/coven" style="color: var(--cv-text-secondary)">GitHub</a>
-          <a href="https://discord.gg/opencoven" style="color: var(--cv-text-secondary)">Discord</a>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px">
-          <button type="button" data-action="toggleTheme" aria-label="Switch to light mode" data-dcb="themeAria:aria-label" style="width: 34px; height: 34px; border-radius: 999px; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-raised); color: var(--cv-text-secondary); font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-family: inherit" class="rh0"><i class="ph ph-moon-stars" data-dcb="themeIcon:class" aria-hidden="true" style="font-size: 15px; line-height: 1"></i></button>
-              </div>
+<SiteLayout title={title} description={description} canonicalPath="/how-it-works">
+  <section class="site-shell hero" id="top">
+    <div class="hero__copy">
+      <p class="eyebrow">Current runtime behavior</p>
+      <h1>The local layer your agent sessions share.</h1>
+      <p class="hero__lede">
+        Coven sits at the local project boundary. Your coding harness still reasons and
+        edits; Coven owns the durable session state, claims, execution records, and guard
+        decisions those sessions need to coordinate safely.
+      </p>
+      <div class="button-row">
+        <a class="action action--primary" data-oc-primitive="action" data-oc-state="idle" href="/quickstart">Start locally</a>
+        <a class="action" data-oc-primitive="action" data-oc-state="idle" href="/protocol">See the protocol direction</a>
       </div>
-    </nav>
-    <main>
-      <div data-screen-label="How it works v3" data-r="shell" style="min-width: 1140px; background: var(--cv-bg-base)">
+    </div>
+    <aside class="evidence-card">
+      <span class="status status--available" data-oc-primitive="status-indicator" data-oc-state="success">Available today</span>
+      <h2 style="font-size: var(--oc-type-2); margin-top: var(--oc-space-4)">Scope of this page</h2>
+      <p class="muted">This route describes current Coven runtime behavior. Familiar identity, continuity profiles, and broader cross-surface authority semantics live on the protocol route and carry their own maturity labels.</p>
+    </aside>
+  </section>
 
-        <header style="max-width: 1140px; margin: 0 auto; padding: 80px 32px 64px">
-          <div data-hero="" style="max-width: 68ch">
-            <a href="/" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cv-text-muted)">← Back to home</a>
-            <h1 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 76px; line-height: 1.05; letter-spacing: -0.02em; margin: 22px 0 20px; white-space: nowrap">The layer your agents <em style="font-style: italic; position: relative; display: inline-block">share<span data-hero-underline="" style="position: absolute; left: 0; right: 0; bottom: 0.1em; height: 3px; border-radius: 2px; background: var(--cv-accent); transform: scaleX(0); transform-origin: left center; transition: transform 1s cubic-bezier(0.2,0,0,1)"></span></em>.</h1>
-            <p style="font-size: 19px; line-height: 1.6; color: var(--cv-text-secondary); margin: 0; max-width: 68ch">Coven sits between the agent CLIs you already run and the project they are working in. Your harness keeps reasoning and writing code. Coven holds the state those sessions have to share: intent, ownership, authority, and evidence.</p>
-          </div>
-        </header>
-
-        <!-- Architecture -->
-        <section id="architecture" style="border-top: 1px solid var(--cv-border-hairline); background: var(--cv-bg-panel)">
-          <div style="max-width: 1140px; margin: 0 auto; padding: 76px 32px">
-            <div data-anim="" style="display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin-bottom: 40px">
-              <h2 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 46px; letter-spacing: -0.018em; margin: 0">Three layers, one boundary</h2>
-              <p style="font-size: 15px; line-height: 1.6; color: var(--cv-text-secondary); max-width: 62ch; margin: 0">Commands go down. Output and memory come back up.&nbsp;<br>Coven attributes every crossing to a session.</p>
-            </div>
-
-            <div data-arch="" style="display: flex; flex-direction: column">
-              <div data-arch-card="0" style="border: 1px solid var(--cv-border-hairline); border-radius: 12px; background: var(--cv-bg-elevated); padding: 22px 24px; display: flex; align-items: center; gap: 24px; transition: border-color 400ms cubic-bezier(0.2,0,0,1), background-color 400ms cubic-bezier(0.2,0,0,1)">
-                <span data-arch-label="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted); flex-shrink: 0; transition: color 400ms">Harness layer</span>
-                <span style="display: flex; gap: 8px; flex-wrap: wrap"><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-terminal-window" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Claude Code</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-terminal-window" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Codex</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-terminal-window" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Hermes</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-terminal-window" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>OpenCode</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-terminal-window" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>OpenClaw</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px dashed var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-muted)"><i class="ph ph-plus" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>whatever ships next</span></span>
-              </div>
-              <div style="display: grid; grid-template-columns: 128px 1fr; gap: 24px; padding: 0 24px">
-                <span></span>
-                <span style="display: flex; align-items: center; gap: 16px; height: 56px">
-                  <span style="position: relative; width: 1px; height: 56px; background: var(--cv-border-hairline); overflow: hidden">
-                    <span data-flow="down" style="position: absolute; inset: 0; background: var(--cv-accent); transform: scaleY(0); transform-origin: top center"></span>
-                  </span>
-                  <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">commands down</span>
-                </span>
-              </div>
-              <div data-arch-card="1" style="border: 1px solid color-mix(in oklch, var(--cv-accent) 40%, transparent); border-radius: 12px; background: var(--cv-accent-soft); padding: 22px 24px; display: flex; align-items: center; gap: 24px; transition: border-color 400ms cubic-bezier(0.2,0,0,1), background-color 400ms cubic-bezier(0.2,0,0,1)">
-                <span data-arch-label="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-accent); flex-shrink: 0; transition: color 400ms">Coven runtime</span>
-                <span style="display: flex; gap: 8px; flex-wrap: wrap"><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-stack" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Sessions</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-file-text" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Memory</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-plug" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Adapter</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-shield-check" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Tool gateway</span></span>
-              </div>
-              <div style="display: grid; grid-template-columns: 128px 1fr; gap: 24px; padding: 0 24px">
-                <span></span>
-                <span style="display: flex; align-items: center; gap: 16px; height: 56px">
-                  <span style="position: relative; width: 1px; height: 56px; background: var(--cv-border-hairline); overflow: hidden">
-                    <span data-flow="up" style="position: absolute; inset: 0; background: var(--cv-accent); transform: scaleY(0); transform-origin: bottom center"></span>
-                  </span>
-                  <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted)">output and memory up</span>
-                </span>
-              </div>
-              <div data-arch-card="2" style="border: 1px solid var(--cv-border-hairline); border-radius: 12px; background: var(--cv-bg-elevated); padding: 22px 24px; display: flex; align-items: center; gap: 24px; transition: border-color 400ms cubic-bezier(0.2,0,0,1), background-color 400ms cubic-bezier(0.2,0,0,1)">
-                <span data-arch-label="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted); flex-shrink: 0; transition: color 400ms">Your project</span>
-                <span style="display: flex; gap: 8px; flex-wrap: wrap"><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-folder" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Filesystem</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-git-branch" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Git</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-terminal-window" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Terminals</span><span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--cv-border-hairline); border-radius: 999px; padding: 6px 13px; font-size: 13px; color: var(--cv-text-secondary)"><i class="ph ph-file-text" aria-hidden="true" style="font-size: 16px; line-height: 1; color: inherit"></i>Docs</span></span>
-              </div>
-              <div style="display: grid; grid-template-columns: 128px 1fr; gap: 24px; padding: 20px 24px 0; margin-top: 4px">
-                <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Boundary</span>
-                <span style="font-size: 13.5px; color: var(--cv-text-secondary)">Every session works inside one project root. Anything out of tree needs a written grant.</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="layers" style="border-top: 1px solid var(--cv-border-hairline)">
-          <div style="max-width: 1140px; margin: 0 auto; padding: 76px 32px; display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 72px; align-items: start">
-            <div style="position: sticky; top: 108px">
-              <h2 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 44px; letter-spacing: -0.018em; line-height: 1.05; margin: 0 0 16px">What Coven keeps</h2>
-              <p style="font-size: 15px; line-height: 1.65; color: var(--cv-text-secondary); margin: 0 0 26px">Memory, sessions, harnesses, and actions. These four decide what a session can do.</p>
-              <div style="display: flex; flex-direction: column; gap: 2px">
-                <a href="#layer-memory" data-toc="layer-memory" style="display: flex; align-items: center; gap: 12px; padding: 9px 0; font-size: 14px; color: var(--cv-text-muted); border-top: 1px solid var(--cv-border-hairline)"><span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px">01</span>Memory</a>
-                <a href="#layer-sessions" data-toc="layer-sessions" style="display: flex; align-items: center; gap: 12px; padding: 9px 0; font-size: 14px; color: var(--cv-text-muted); border-top: 1px solid var(--cv-border-hairline)"><span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px">02</span>Sessions</a>
-                <a href="#layer-harnesses" data-toc="layer-harnesses" style="display: flex; align-items: center; gap: 12px; padding: 9px 0; font-size: 14px; color: var(--cv-text-muted); border-top: 1px solid var(--cv-border-hairline)"><span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px">03</span>Harnesses</a>
-                <a href="#layer-tools" data-toc="layer-tools" style="display: flex; align-items: center; gap: 12px; padding: 9px 0; font-size: 14px; color: var(--cv-text-muted); border-top: 1px solid var(--cv-border-hairline); border-bottom: 1px solid var(--cv-border-hairline)"><span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px">04</span>Actions</a>
-              </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 20px">
-              <div id="layer-memory" data-layer-panel="" style="scroll-margin-top: 100px; border: 1px solid var(--cv-border-hairline); border-radius: 12px; background: var(--cv-bg-raised); padding: 32px">
-                <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-accent)">01 · Memory</span>
-                <h3 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 30px; letter-spacing: -0.012em; margin: 12px 0 10px">Memory that carries between sessions</h3>
-                <p style="font-size: 15px; line-height: 1.65; color: var(--cv-text-secondary); margin: 0 0 22px; max-width: 58ch; font-size: 16px">A file on your disk. The next session reads it first.</p>
-                <div data-mem-cap="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; color: var(--cv-code-dim); margin-bottom: 10px">~/.coven/familiars/hexi/memory.md</div>
-                <div data-mem-grid="" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
-                  <div style="border: 1px solid var(--cv-border-hairline); border-radius: 10px; background: var(--cv-bg-elevated); padding: 14px 16px; display: flex; flex-direction: column; gap: 9px; min-width: 0">
-                    <span style="display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)"><i class="ph ph-folder-simple" aria-hidden="true" style="font-size: 15px; line-height: 1; color: var(--cv-accent)"></i>Project</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px; line-height: 1.5; color: var(--cv-code-fg); text-wrap: pretty">opencoven, Astro, no build step</span>
-                  </div>
-                  <div style="border: 1px solid var(--cv-border-hairline); border-radius: 10px; background: var(--cv-bg-elevated); padding: 14px 16px; display: flex; flex-direction: column; gap: 9px; min-width: 0">
-                    <span style="display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)"><i class="ph ph-repeat" aria-hidden="true" style="font-size: 15px; line-height: 1; color: var(--cv-accent)"></i>Habit</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px; line-height: 1.5; color: var(--cv-code-fg); text-wrap: pretty">keep PR summaries short</span>
-                  </div>
-                  <div style="border: 1px solid var(--cv-border-hairline); border-radius: 10px; background: var(--cv-bg-elevated); padding: 14px 16px; display: flex; flex-direction: column; gap: 9px; min-width: 0">
-                    <span style="display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)"><i class="ph ph-bookmark-simple" aria-hidden="true" style="font-size: 15px; line-height: 1; color: var(--cv-accent)"></i>Left off</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px; line-height: 1.5; color: var(--cv-code-fg); text-wrap: pretty">feat/runtime-attach, 4 files staged</span>
-                  </div>
-                  <div style="border: 1px solid var(--cv-border-hairline); border-radius: 10px; background: var(--cv-bg-elevated); padding: 14px 16px; display: flex; flex-direction: column; gap: 9px; min-width: 0">
-                    <span style="display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)"><i class="ph ph-shield-check" aria-hidden="true" style="font-size: 15px; line-height: 1; color: var(--cv-accent)"></i>Rule</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px; line-height: 1.5; color: var(--cv-code-fg); text-wrap: pretty">ask before touching infra/</span>
-                  </div>
-                </div>
-              </div>
-
-              <div id="layer-sessions" data-layer-panel="" style="scroll-margin-top: 100px; border: 1px solid var(--cv-border-hairline); border-radius: 12px; background: var(--cv-bg-raised); padding: 32px">
-                <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">02 · Sessions</span>
-                <h3 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 30px; letter-spacing: -0.012em; margin: 12px 0 10px">A session outlives its terminal</h3>
-                <p style="font-size: 15px; line-height: 1.65; color: var(--cv-text-secondary); margin: 0 0 22px; max-width: 58ch">Reboot mid-task and the record comes back. The process does not.</p>
-                <div data-session-demo="" style="position: relative; border: 1px solid var(--cv-border-hairline); border-radius: 10px; overflow: hidden; transition: border-color 320ms cubic-bezier(0.2,0,0,1)">
-                  <div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--cv-bg-panel); border-bottom: 1px solid var(--cv-border-hairline)">
-                    <span style="font-size: 12.5px; font-weight: 500">hexi · claude code</span>
-                    <span data-sess-phase="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--cv-text-muted); margin-left: auto; transition: color 300ms">live</span>
-                  </div>
-                  <div data-sess-sweep="" style="position: absolute; left: 0; right: 0; top: 41px; height: 1px; background: var(--cv-accent); opacity: 0; transform: scaleX(0); transform-origin: left center; transition: transform 900ms cubic-bezier(0.2,0,0,1), opacity 300ms"></div>
-                  <div data-proc-body="" style="display: grid; grid-template-columns: minmax(0,1fr) 132px; gap: 20px; padding: 20px 18px 18px">
-                    <div style="min-width: 0">
-                      <div style="display: flex; align-items: center; padding-bottom: 22px">
-                      <div data-proc-node="harness" style="position: relative; flex: 0 0 auto; width: 38px; height: 38px; border: 1px solid var(--cv-border-hairline); border-radius: 9px; background: var(--cv-bg-panel); display: grid; place-items: center; transition: border-color 320ms cubic-bezier(0.2,0,0,1), background-color 320ms cubic-bezier(0.2,0,0,1)">
-                        <i class="ph ph-terminal-window" aria-hidden="true" style="font-size: 17px; line-height: 1; color: var(--cv-text-secondary); transition: color 320ms, opacity 320ms"></i>
-                        <span style="position: absolute; top: 44px; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--cv-text-muted); white-space: nowrap">harness</span>
-                      </div>
-                        <div data-proc-link="in" style="flex: 1 1 auto; height: 1px; margin: 0 6px; background-color: var(--cv-border-hairline); background-image: repeating-linear-gradient(90deg, var(--cv-success) 0 5px, transparent 5px 18px); background-size: 18px 1px; animation: cvProcFlow 900ms linear infinite; transition: background-color 320ms, opacity 320ms"></div>
-                      <div data-proc-node="process" style="position: relative; flex: 0 0 auto; width: 38px; height: 38px; border: 1px solid var(--cv-border-hairline); border-radius: 9px; background: var(--cv-bg-panel); display: grid; place-items: center; transition: border-color 320ms cubic-bezier(0.2,0,0,1), background-color 320ms cubic-bezier(0.2,0,0,1)">
-                        <i class="ph ph-cpu" aria-hidden="true" style="font-size: 17px; line-height: 1; color: var(--cv-text-secondary); transition: color 320ms, opacity 320ms"></i>
-                        <span style="position: absolute; top: 44px; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--cv-text-muted); white-space: nowrap">process</span>
-                      </div>
-                        <div data-proc-link="out" style="flex: 1 1 auto; height: 1px; margin: 0 6px; background-color: var(--cv-border-hairline); background-image: repeating-linear-gradient(90deg, var(--cv-success) 0 5px, transparent 5px 18px); background-size: 18px 1px; animation: cvProcFlow 900ms linear infinite; transition: background-color 320ms, opacity 320ms"></div>
-                      <div data-proc-node="record" style="position: relative; flex: 0 0 auto; width: 38px; height: 38px; border: 1px solid var(--cv-border-hairline); border-radius: 9px; background: var(--cv-bg-panel); display: grid; place-items: center; transition: border-color 320ms cubic-bezier(0.2,0,0,1), background-color 320ms cubic-bezier(0.2,0,0,1)">
-                        <i class="ph ph-database" aria-hidden="true" style="font-size: 17px; line-height: 1; color: var(--cv-text-secondary); transition: color 320ms, opacity 320ms"></i>
-                        <span style="position: absolute; top: 44px; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--cv-text-muted); white-space: nowrap">record</span>
-                      </div>
-                      </div>
-                      <div data-proc-wave="" style="display: flex; align-items: center; justify-content: space-between; gap: 2px; height: 20px; color: var(--cv-success); transition: color 320ms cubic-bezier(0.2,0,0,1)"><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out 0ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -62ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -124ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -186ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -248ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -310ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -372ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -434ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -496ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -558ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -620ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -682ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -744ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -806ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -868ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -930ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -992ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -1054ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -1116ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -1178ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -1240ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -1302ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -1364ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -1426ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -1488ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span><span data-proc-bar="" style="flex: 0 0 3px; height: 100%; border-radius: 1px; background: currentColor; opacity: 0.85; transform: scaleY(0.18); transform-origin: center; animation: cvProcBar 780ms ease-in-out -1550ms infinite; transition: transform 260ms cubic-bezier(0.2,0,0,1)"></span></div>
-                    </div>
-                    <div style="border-left: 1px solid var(--cv-border-hairline); padding-left: 16px; display: flex; flex-direction: column; gap: 7px; justify-content: center">
-                    <div data-proc-state="running" style="display: flex; align-items: center; gap: 8px; opacity: 0.3; transition: opacity 300ms cubic-bezier(0.2,0,0,1)">
-                      <span data-proc-state-dot="" style="flex: 0 0 auto; width: 5px; height: 5px; border-radius: 999px; background: var(--cv-text-muted); transition: background-color 300ms, box-shadow 300ms"></span>
-                      <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cv-text-secondary); white-space: nowrap; transition: color 300ms">running</span>
-                    </div>
-                    <div data-proc-state="lost" style="display: flex; align-items: center; gap: 8px; opacity: 0.3; transition: opacity 300ms cubic-bezier(0.2,0,0,1)">
-                      <span data-proc-state-dot="" style="flex: 0 0 auto; width: 5px; height: 5px; border-radius: 999px; background: var(--cv-text-muted); transition: background-color 300ms, box-shadow 300ms"></span>
-                      <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cv-text-secondary); white-space: nowrap; transition: color 300ms">connection lost</span>
-                    </div>
-                    <div data-proc-state="terminated" style="display: flex; align-items: center; gap: 8px; opacity: 0.3; transition: opacity 300ms cubic-bezier(0.2,0,0,1)">
-                      <span data-proc-state-dot="" style="flex: 0 0 auto; width: 5px; height: 5px; border-radius: 999px; background: var(--cv-text-muted); transition: background-color 300ms, box-shadow 300ms"></span>
-                      <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cv-text-secondary); white-space: nowrap; transition: color 300ms">terminated</span>
-                    </div>
-                    <div data-proc-state="rebooting" style="display: flex; align-items: center; gap: 8px; opacity: 0.3; transition: opacity 300ms cubic-bezier(0.2,0,0,1)">
-                      <span data-proc-state-dot="" style="flex: 0 0 auto; width: 5px; height: 5px; border-radius: 999px; background: var(--cv-text-muted); transition: background-color 300ms, box-shadow 300ms"></span>
-                      <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cv-text-secondary); white-space: nowrap; transition: color 300ms">rebooting</span>
-                    </div>
-                    <div data-proc-state="resuming" style="display: flex; align-items: center; gap: 8px; opacity: 0.3; transition: opacity 300ms cubic-bezier(0.2,0,0,1)">
-                      <span data-proc-state-dot="" style="flex: 0 0 auto; width: 5px; height: 5px; border-radius: 999px; background: var(--cv-text-muted); transition: background-color 300ms, box-shadow 300ms"></span>
-                      <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--cv-text-secondary); white-space: nowrap; transition: color 300ms">resuming</span>
-                    </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div id="layer-harnesses" data-layer-panel="" style="scroll-margin-top: 100px; border: 1px solid var(--cv-border-hairline); border-radius: 12px; background: var(--cv-bg-raised); padding: 32px">
-                <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">03 · Harnesses</span>
-                <h3 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 30px; letter-spacing: -0.012em; margin: 12px 0 10px">One adapter contract</h3>
-                <p style="font-size: 15px; line-height: 1.65; color: var(--cv-text-secondary); margin: 0 0 22px; max-width: 62ch">One harness can write files and another can use tools.<br>Coven interacts with both through one interface.</p>
-                <div data-marq="" style="position: relative; overflow: hidden; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; mask-image: linear-gradient(to right, transparent 0, #000 5%, #000 95%, transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0, #000 5%, #000 95%, transparent 100%)">
-                  <div data-marq-track="" style="display: flex; width: max-content; animation: cvMarquee 44s linear infinite; will-change: transform">
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <img src="https://opencoven.ai/logos/anthropic.svg" alt="" aria-hidden="true" style="position: absolute; right: -14px; bottom: -22px; width: 96px; height: 96px; opacity: 0.08; transform: rotate(-14deg); filter: var(--cv-logo-filter); pointer-events: none">
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px">Claude Code</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">Anthropic · 12 sessions</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <img src="https://opencoven.ai/logos/openai.svg" alt="" aria-hidden="true" style="position: absolute; right: -14px; bottom: -22px; width: 96px; height: 96px; opacity: 0.08; transform: rotate(-14deg); filter: var(--cv-logo-filter); pointer-events: none">
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px">Codex</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">OpenAI · last used 2h ago</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <img src="/logos/hermes.svg" alt="" aria-hidden="true" style="position: absolute; right: -14px; bottom: -22px; width: 96px; height: 96px; object-fit: contain; opacity: 0.12; transform: rotate(-14deg); filter: var(--cv-logo-filter); pointer-events: none">
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px">Hermes Agent</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">Nous Research · next release</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <img src="/logos/openclaw.svg" alt="" aria-hidden="true" style="position: absolute; right: -14px; bottom: -22px; width: 96px; height: 96px; object-fit: contain; opacity: 0.1; transform: rotate(-14deg); filter: grayscale(1) var(--cv-logo-filter); pointer-events: none">
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px">OpenClaw</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">Community · next release</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <img src="/logos/xai.png" alt="" aria-hidden="true" style="position: absolute; right: -14px; bottom: -22px; width: 96px; height: 96px; object-fit: contain; opacity: 0.12; transform: rotate(-14deg); filter: var(--cv-logo-filter); pointer-events: none">
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px">Grok Build</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">xAI · next release</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px dashed var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <i class="ph ph-plus" aria-hidden="true" style="position: absolute; right: -10px; bottom: -20px; font-size: 92px; line-height: 1; color: var(--cv-text-muted); opacity: 0.1; transform: rotate(-14deg); pointer-events: none"></i>
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px; color: var(--cv-text-muted)">Yours</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">Open spec, one file</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <img src="https://opencoven.ai/logos/anthropic.svg" alt="" aria-hidden="true" style="position: absolute; right: -14px; bottom: -22px; width: 96px; height: 96px; opacity: 0.08; transform: rotate(-14deg); filter: var(--cv-logo-filter); pointer-events: none">
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px">Claude Code</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">Anthropic · 12 sessions</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <img src="https://opencoven.ai/logos/openai.svg" alt="" aria-hidden="true" style="position: absolute; right: -14px; bottom: -22px; width: 96px; height: 96px; opacity: 0.08; transform: rotate(-14deg); filter: var(--cv-logo-filter); pointer-events: none">
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px">Codex</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">OpenAI · last used 2h ago</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <img src="/logos/hermes.svg" alt="" aria-hidden="true" style="position: absolute; right: -14px; bottom: -22px; width: 96px; height: 96px; object-fit: contain; opacity: 0.12; transform: rotate(-14deg); filter: var(--cv-logo-filter); pointer-events: none">
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px">Hermes Agent</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">Nous Research · next release</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <img src="/logos/openclaw.svg" alt="" aria-hidden="true" style="position: absolute; right: -14px; bottom: -22px; width: 96px; height: 96px; object-fit: contain; opacity: 0.1; transform: rotate(-14deg); filter: grayscale(1) var(--cv-logo-filter); pointer-events: none">
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px">OpenClaw</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">Community · next release</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <img src="/logos/xai.png" alt="" aria-hidden="true" style="position: absolute; right: -14px; bottom: -22px; width: 96px; height: 96px; object-fit: contain; opacity: 0.12; transform: rotate(-14deg); filter: var(--cv-logo-filter); pointer-events: none">
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px">Grok Build</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">xAI · next release</div>
-                    </div>
-                    <div style="position: relative; overflow: hidden; flex: 0 0 236px; margin-right: 12px; border: 1px dashed var(--cv-border-hairline); border-radius: 10px; padding: 16px 18px; background: var(--cv-bg-raised)">
-                      <i class="ph ph-plus" aria-hidden="true" style="position: absolute; right: -10px; bottom: -20px; font-size: 92px; line-height: 1; color: var(--cv-text-muted); opacity: 0.1; transform: rotate(-14deg); pointer-events: none"></i>
-                      <div style="position: relative; font-size: 14.5px; font-weight: 600; margin-bottom: 4px; color: var(--cv-text-muted)">Yours</div>
-                      <div style="position: relative; font-size: 12.5px; color: var(--cv-text-muted)">Open spec, one file</div>
-                    </div>
-                  </div>
-                </div>
-              </div><div id="layer-tools" data-layer-panel="" style="scroll-margin-top: 100px; border: 1px solid var(--cv-border-hairline); border-radius: 12px; background: var(--cv-bg-raised); padding: 32px">
-                <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">04 · Actions</span>
-                <h3 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 30px; letter-spacing: -0.012em; margin: 12px 0 10px">Every agent asks first</h3>
-                <p style="font-size: 15px; line-height: 1.65; color: var(--cv-text-secondary); margin: 0 0 20px; max-width: 62ch">Before an agent changes a file, runs a command, or pushes code, it asks Coven.&nbsp;<br>Coven looks at who is working where and what you allowed, then gives one of three answers.</p>
-                <div data-verdict-stage="" style="position: relative; min-height: 106px; border: 1px solid var(--cv-border-hairline); border-radius: 10px; overflow: hidden; background: var(--cv-bg-raised)">
-                  <div data-verdict-card="0" style="position: absolute; inset: 0; display: flex; align-items: center; gap: 18px; padding: 20px 22px; opacity: 0; will-change: transform, opacity">
-                    <div style="min-width: 0; flex: 1 1 auto">
-                      <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px; overflow-wrap: anywhere">edit composer-shell.tsx</div>
-                      <div style="font-size: 13px; color: var(--cv-text-muted); margin-top: 6px; text-wrap: pretty">Hexi owns this file right now.</div>
-                    </div>
-                    <span data-verdict-stamp="" style="flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1.5px solid color-mix(in oklch, var(--cv-success) 70%, transparent); border-radius: 8px; background: color-mix(in oklch, var(--cv-success) 10%, transparent); color: var(--cv-success); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0; transform: rotate(-8deg) scale(1.75); will-change: transform, opacity"><i class="ph ph-check-fat" aria-hidden="true" style="font-size: 15px; line-height: 1"></i>Yes</span>
-                  </div>
-                  <div data-verdict-card="1" style="position: absolute; inset: 0; display: flex; align-items: center; gap: 18px; padding: 20px 22px; opacity: 0; will-change: transform, opacity">
-                    <div style="min-width: 0; flex: 1 1 auto">
-                      <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px; overflow-wrap: anywhere">git push --force origin main</div>
-                      <div style="font-size: 13px; color: var(--cv-text-muted); margin-top: 6px; text-wrap: pretty">You said main is off limits.</div>
-                    </div>
-                    <span data-verdict-stamp="" style="flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1.5px solid color-mix(in oklch, var(--cv-danger) 70%, transparent); border-radius: 8px; background: color-mix(in oklch, var(--cv-danger) 10%, transparent); color: var(--cv-danger); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0; transform: rotate(-8deg) scale(1.75); will-change: transform, opacity"><i class="ph ph-x-circle" aria-hidden="true" style="font-size: 15px; line-height: 1"></i>No</span>
-                  </div>
-                  <div data-verdict-card="2" style="position: absolute; inset: 0; display: flex; align-items: center; gap: 18px; padding: 20px 22px; opacity: 0; will-change: transform, opacity">
-                    <div style="min-width: 0; flex: 1 1 auto">
-                      <div style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px; overflow-wrap: anywhere">terraform apply infra/</div>
-                      <div style="font-size: 13px; color: var(--cv-text-muted); margin-top: 6px; text-wrap: pretty">This one deletes things, so you decide.</div>
-                    </div>
-                    <span data-verdict-stamp="" style="flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1.5px solid color-mix(in oklch, var(--cv-warning) 70%, transparent); border-radius: 8px; background: color-mix(in oklch, var(--cv-warning) 10%, transparent); color: var(--cv-warning); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0; transform: rotate(-8deg) scale(1.75); will-change: transform, opacity"><i class="ph ph-question" aria-hidden="true" style="font-size: 15px; line-height: 1"></i>Asks you</span>
-                  </div>
-                  <div style="position: absolute; left: 22px; bottom: 10px; display: flex; gap: 5px">
-                    <span data-verdict-dot="0" style="width: 4px; height: 4px; border-radius: 999px; background: var(--cv-text-muted); opacity: 0.28; transition: opacity 300ms"></span>
-                    <span data-verdict-dot="1" style="width: 4px; height: 4px; border-radius: 999px; background: var(--cv-text-muted); opacity: 0.28; transition: opacity 300ms"></span>
-                    <span data-verdict-dot="2" style="width: 4px; height: 4px; border-radius: 999px; background: var(--cv-text-muted); opacity: 0.28; transition: opacity 300ms"></span>
-                  </div>
-                </div>
-        
-              </div>
-
-      
-            </div>
-          </div>
-        </section>
-
-        <!-- Memory timeline -->
-        <section id="memory" style="border-top: 1px solid var(--cv-border-hairline); background: var(--cv-bg-panel)">
-          <div style="max-width: 1140px; margin: 0 auto; padding: 76px 32px; display: grid; grid-template-columns: 380px minmax(0,1fr); gap: 72px; align-items: start">
-            <div style="position: sticky; top: 108px">
-      
-              <h2 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 44px; letter-spacing: -0.018em; line-height: 1.05; margin: 12px 0 16px; text-wrap: balance">How a familiar learns a repo</h2>
-              <p style="font-size: 15px; line-height: 1.65; color: var(--cv-text-secondary); margin: 0">Each familiar writes it's own notes and reads them back at the start of the next section.</p>
-            </div>
-            <div style="position: relative; padding-left: 28px">
-              <div style="position: absolute; left: 0; top: 8px; bottom: 8px; width: 1px; background: var(--cv-border-hairline)"></div>
-              <div data-rail="" style="position: absolute; left: 0; top: 8px; bottom: 8px; width: 1px; background: var(--cv-accent); transform-origin: top center"></div>
-              <div data-day-entry="0" data-anim="" style="position: relative; margin-left: -28px; padding: 22px 0 22px 28px; transition: opacity 520ms cubic-bezier(0.2,0,0,1)"><span data-day-dot="" style="position: absolute; left: -3px; top: 29px; width: 7px; height: 7px; box-sizing: border-box; border-radius: 999px; background: var(--cv-bg-panel); border: 1px solid var(--cv-border-hairline); transition: background-color 240ms cubic-bezier(0.2,0,0,1), border-color 240ms cubic-bezier(0.2,0,0,1)"></span>
-                <div data-day-row="" style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 5px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)">
-                  <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-muted)">day 001</span>
-                  <p style="font-size: 16.5px; margin: 0; transform-origin: left center; transition: transform 520ms cubic-bezier(0.2,0,0,1)">Summoned Hexi. It read the repo and wrote nine notes.</p>
-                </div>
-                <p data-day-row="" style="font-size: 13.5px; color: var(--cv-text-muted); margin: 0 0 0 78px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)">Stack, entry points, the test command that works.</p>
-                <div data-day-row="" style="display: flex; align-items: center; gap: 9px; margin: 10px 0 0 78px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)"><span style="width: 20px; height: 20px; border-radius: 5px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; object-fit: contain; filter: var(--cv-logo-filter)"></span><span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted); white-space: nowrap; flex: none">claude code · session 1 · notes created</span></div>
-              </div>
-              <div data-day-entry="1" data-anim="" style="position: relative; margin-left: -28px; padding: 18px 0 18px 28px; border-top: 1px solid var(--cv-border-hairline); transition: opacity 520ms cubic-bezier(0.2,0,0,1), padding 520ms cubic-bezier(0.2,0,0,1)"><span data-day-dot="" style="position: absolute; left: -3px; top: 29px; width: 7px; height: 7px; box-sizing: border-box; border-radius: 999px; background: var(--cv-bg-panel); border: 1px solid var(--cv-border-hairline); transition: background-color 240ms cubic-bezier(0.2,0,0,1), border-color 240ms cubic-bezier(0.2,0,0,1)"></span>
-                <div data-day-row="" style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 5px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)">
-                  <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-muted)">day 009</span>
-                  <p style="font-size: 16.5px; margin: 0; transform-origin: left center; transition: transform 520ms cubic-bezier(0.2,0,0,1)">Picked up how you review.</p>
-                </div>
-                <p data-day-row="" style="font-size: 13.5px; color: var(--cv-text-muted); margin: 0 0 0 78px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)">Terse PR summaries, no trailing recap. It stopped writing them.</p>
-                <div data-day-row="" style="display: flex; align-items: center; gap: 9px; margin: 10px 0 0 78px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)"><span style="width: 20px; height: 20px; border-radius: 5px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; object-fit: contain; filter: var(--cv-logo-filter)"></span><span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted); white-space: nowrap; flex: none">claude code · sessions 2 to 6</span></div>
-              </div>
-              <div data-day-entry="2" data-anim="" style="position: relative; margin-left: -28px; padding: 18px 0 18px 28px; border-top: 1px solid var(--cv-border-hairline); transition: opacity 520ms cubic-bezier(0.2,0,0,1), padding 520ms cubic-bezier(0.2,0,0,1)"><span data-day-dot="" style="position: absolute; left: -3px; top: 29px; width: 7px; height: 7px; box-sizing: border-box; border-radius: 999px; background: var(--cv-bg-panel); border: 1px solid var(--cv-border-hairline); transition: background-color 240ms cubic-bezier(0.2,0,0,1), border-color 240ms cubic-bezier(0.2,0,0,1)"></span>
-                <div data-day-row="" style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 5px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)">
-                  <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-muted)">day 023</span>
-                  <p style="font-size: 16.5px; margin: 0; transform-origin: left center; transition: transform 520ms cubic-bezier(0.2,0,0,1)">Shipped feat/runtime-attach across three sessions.</p>
-                </div>
-                <p data-day-row="" style="font-size: 13.5px; color: var(--cv-text-muted); margin: 0 0 0 78px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)">Two of them started after a reboot.</p>
-                <div data-day-row="" style="display: flex; align-items: center; gap: 9px; margin: 10px 0 0 78px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)"><span data-harness-rail="" style="display: inline-flex; align-items: center; cursor: default">
-                  <span data-harness-item="" title="codex" style="display: inline-flex; align-items: center; gap: 0; margin-left: 0; transition: margin-left 320ms cubic-bezier(0.2,0,0,1); position: relative; z-index: 10"><span style="width: 20px; height: 20px; border-radius: 5px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0"><img src="https://opencoven.ai/logos/openai.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; object-fit: contain; filter: var(--cv-logo-filter)"></span><span data-harness-label="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted); white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0; transition: max-width 320ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1), margin-left 320ms cubic-bezier(0.2,0,0,1)">codex</span></span>
-                  <span data-harness-item="" title="claude code" style="display: inline-flex; align-items: center; gap: 0; margin-left: -7px; transition: margin-left 320ms cubic-bezier(0.2,0,0,1); position: relative; z-index: 9"><span style="width: 20px; height: 20px; border-radius: 5px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; object-fit: contain; filter: var(--cv-logo-filter)"></span><span data-harness-label="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted); white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0; transition: max-width 320ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1), margin-left 320ms cubic-bezier(0.2,0,0,1)">claude code</span></span>
-                </span><span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-accent); white-space: nowrap; flex: none">switched to codex mid-branch · same notes file</span></div>
-              </div>
-              <div data-day-entry="3" data-anim="" style="position: relative; margin-left: -28px; padding: 18px 0 18px 28px; border-top: 1px solid var(--cv-border-hairline); transition: opacity 520ms cubic-bezier(0.2,0,0,1), padding 520ms cubic-bezier(0.2,0,0,1)"><span data-day-dot="" style="position: absolute; left: -3px; top: 29px; width: 7px; height: 7px; box-sizing: border-box; border-radius: 999px; background: var(--cv-bg-panel); border: 1px solid var(--cv-border-hairline); transition: background-color 240ms cubic-bezier(0.2,0,0,1), border-color 240ms cubic-bezier(0.2,0,0,1)"></span>
-                <div data-day-row="" style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 5px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)">
-                  <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-accent)">day 047</span>
-                  <p style="font-size: 16.5px; margin: 0; transform-origin: left center; transition: transform 520ms cubic-bezier(0.2,0,0,1)">Still remembers all of it.</p>
-                </div>
-                <p data-day-row="" style="font-size: 13.5px; color: var(--cv-text-muted); margin: 0 0 0 78px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)"><span data-count="128">128</span> notes. You have read maybe six.</p>
-                <div data-day-row="" style="display: flex; align-items: center; gap: 9px; margin: 10px 0 0 78px; transition: opacity 420ms cubic-bezier(0.2,0,0,1), transform 520ms cubic-bezier(0.16,0.84,0.24,1)"><span data-harness-rail="" style="display: inline-flex; align-items: center; cursor: default">
-                  <span data-harness-item="" title="claude code" style="display: inline-flex; align-items: center; gap: 0; margin-left: 0; transition: margin-left 320ms cubic-bezier(0.2,0,0,1); position: relative; z-index: 10"><span style="width: 20px; height: 20px; border-radius: 5px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; object-fit: contain; filter: var(--cv-logo-filter)"></span><span data-harness-label="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted); white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0; transition: max-width 320ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1), margin-left 320ms cubic-bezier(0.2,0,0,1)">claude code</span></span>
-                  <span data-harness-item="" title="codex" style="display: inline-flex; align-items: center; gap: 0; margin-left: -7px; transition: margin-left 320ms cubic-bezier(0.2,0,0,1); position: relative; z-index: 9"><span style="width: 20px; height: 20px; border-radius: 5px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0"><img src="https://opencoven.ai/logos/openai.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; object-fit: contain; filter: var(--cv-logo-filter)"></span><span data-harness-label="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted); white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0; transition: max-width 320ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1), margin-left 320ms cubic-bezier(0.2,0,0,1)">codex</span></span>
-                  <span data-harness-item="" title="hermes" style="display: inline-flex; align-items: center; gap: 0; margin-left: -7px; transition: margin-left 320ms cubic-bezier(0.2,0,0,1); position: relative; z-index: 8"><span style="width: 20px; height: 20px; border-radius: 5px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0"><img src="/logos/hermes.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; object-fit: contain; filter: var(--cv-logo-filter)"></span><span data-harness-label="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted); white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0; transition: max-width 320ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1), margin-left 320ms cubic-bezier(0.2,0,0,1)">hermes</span></span>
-                  <span data-harness-item="" title="openclaw" style="display: inline-flex; align-items: center; gap: 0; margin-left: -7px; transition: margin-left 320ms cubic-bezier(0.2,0,0,1); position: relative; z-index: 7"><span style="width: 20px; height: 20px; border-radius: 5px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0"><img src="/logos/openclaw.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; object-fit: contain; filter: var(--cv-logo-filter)"></span><span data-harness-label="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted); white-space: nowrap; overflow: hidden; max-width: 0; opacity: 0; transition: max-width 320ms cubic-bezier(0.2,0,0,1), opacity 220ms cubic-bezier(0.2,0,0,1), margin-left 320ms cubic-bezier(0.2,0,0,1)">openclaw</span></span>
-                </span><span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted); white-space: nowrap; flex: none"><span data-count="41">41</span> sessions · 4 harnesses · 1 project record</span></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- The incident -->
-        <!-- the incident and the "do you need this" objection are one argument, so they are one
-             section: the same hour on two tapes, then the answer -->
-        <section id="incident" data-screen-label="Incident and need" style="border-top: 1px solid var(--cv-border-hairline)">
-          <div style="max-width: 1140px; margin: 0 auto; padding: 76px 32px 92px; display: flex; flex-direction: column; gap: 34px">
-
-
-              <h2 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: clamp(30px, 5.6vw, 44px); line-height: 1.06; letter-spacing: -0.02em; margin: 0; max-width: 22ch; text-wrap: pretty"><span data-nowrap-wide="" style="white-space: nowrap">Every agent already has its own worktree.</span><br>It did not help.</h2>
-              <p style="font-size: 15.5px; line-height: 1.7; color: var(--cv-text-secondary); margin: 0; max-width: 76ch">Two sessions, isolated checkouts, both right about their own context. Each diff was clean on its own, so git raised nothing and CI passed a tree that had already lost work.</p>
-
-              <div style="display: flex; flex-direction: column; gap: 14px; padding: 26px 28px; border-radius: 12px; background: var(--cv-bg-sunken); border: 1px solid var(--cv-border-hairline)">
-              <div style="display: flex; align-items: center; gap: 10px">
-                <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cv-text-muted)">WORKTREE ONLY</span>
-              </div>
-              <div data-tape="" style="position: relative">
-                  <svg viewBox="0 0 1040 148" style="width: 100%; height: 148px; display: block; position: relative" aria-hidden="true">
-                    <defs>
-                      <clipPath id="cvTape1" clipPathUnits="userSpaceOnUse">
-                        <rect data-sweep="" x="0" y="0" width="1040" height="148" style="transform-origin: 0 0; transform: scaleX(0); --sweep-dur: 3.4s; --sweep-ease: cubic-bezier(0.02, 0.72, 0.34, 1)"></rect>
-                      </clipPath>
-                    </defs>
-                    <g clip-path="url(#cvTape1)">
-                <line x1="20" y1="74" x2="1020" y2="74" stroke="var(--cv-border-hairline)" stroke-width="1"></line>
-                <path d="M170 74 C 230 74, 240 30, 310 30 L 690 30 C 760 30, 770 74, 830 74" fill="none" stroke="var(--cv-accent)" stroke-width="1.6" opacity="0.85"></path>
-                <path d="M170 74 C 230 74, 240 118, 310 118 L 690 118 C 760 118, 770 74, 830 74" fill="none" stroke="var(--cv-warning)" stroke-width="1.6" opacity="0.85"></path>
-                <circle cx="170" cy="74" r="4.5" fill="var(--cv-bg-sunken)" stroke="var(--cv-text-muted)" stroke-width="1.6"></circle>
-                <circle cx="400" cy="30" r="5" fill="var(--cv-accent)"></circle>
-                <circle cx="400" cy="118" r="5" fill="var(--cv-warning)"></circle>
-                <circle cx="830" cy="74" r="7.5" fill="color-mix(in oklch, var(--cv-danger) 26%, transparent)" stroke="var(--cv-danger)" stroke-width="1.6"></circle>
-              </g>
-                  </svg>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; white-space: nowrap; position: absolute; transform: translateY(-50%); left: 16.3%; top: 43%; font-size: 9.5px; color: var(--cv-text-muted); transform: translate(-50%, -50%); opacity: 0; --lbl-delay: 694ms">00m</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; white-space: nowrap; position: absolute; transform: translateY(-50%); left: 40.4%; top: 16%; font-size: 10.5px; color: var(--cv-accent); opacity: 0; --lbl-delay: 1366ms">Hexi rewrites the session hook · 12m</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; white-space: nowrap; position: absolute; transform: translateY(-50%); left: 40.4%; top: 90%; max-width: 44%; overflow: hidden; text-overflow: ellipsis; font-size: clamp(8px, 1.05vw, 10.5px); color: var(--cv-warning); opacity: 0; --lbl-delay: 1366ms">Sage rewrites the same hook · 18m</span>
-            
-                  </div>
-              </div>
-
-              <div style="display: flex; flex-direction: column; gap: 14px; padding: 26px 28px; border-radius: 12px; background: var(--cv-bg-raised); border: 1px solid color-mix(in oklch, var(--cv-accent) 34%, transparent)">
-              <div style="display: flex; align-items: center; gap: 10px">
-                <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cv-accent)">COVEN</span>
-              </div>
-              <div data-tape="" style="position: relative">
-                  <svg viewBox="0 0 1040 148" style="width: 100%; height: 148px; display: block" aria-hidden="true">
-                    <defs>
-                      <clipPath id="cvTape2" clipPathUnits="userSpaceOnUse">
-                        <rect data-sweep="" x="0" y="0" width="1040" height="148" style="transform-origin: 0 0; transform: scaleX(0); --sweep-dur: 2.2s; --sweep-ease: cubic-bezier(0.55, 0.02, 0.25, 1)"></rect>
-                      </clipPath>
-                    </defs>
-                    <g clip-path="url(#cvTape2)">
-                <line x1="20" y1="74" x2="1020" y2="74" stroke="var(--cv-border-hairline)" stroke-width="1"></line>
-                <path d="M170 74 C 230 74, 240 30, 310 30 L 750 30 C 800 30, 805 74, 850 74" fill="none" stroke="var(--cv-accent)" stroke-width="1.6"></path>
-                <path d="M170 74 C 230 74, 240 118, 290 118 L 450 118" fill="none" stroke="var(--cv-text-muted)" stroke-width="1.6" stroke-dasharray="4 4" opacity="0.7"></path>
-                <path d="M450 118 L 690 118 C 770 118, 790 74, 870 74 L 980 74" fill="none" stroke="var(--cv-success)" stroke-width="1.6" opacity="0.85"></path>
-                <circle cx="170" cy="74" r="4.5" fill="var(--cv-bg-raised)" stroke="var(--cv-text-muted)" stroke-width="1.6"></circle>
-                <circle cx="400" cy="30" r="5" fill="var(--cv-accent)"></circle>
-                <circle cx="450" cy="118" r="7.5" fill="color-mix(in oklch, var(--cv-accent) 26%, transparent)" stroke="var(--cv-accent)" stroke-width="1.6"></circle>
-                <circle cx="850" cy="74" r="5" fill="var(--cv-success)"></circle>
-              </g>
-                  </svg>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; white-space: nowrap; position: absolute; transform: translateY(-50%); left: 16.3%; top: 43%; font-size: 9.5px; color: var(--cv-text-muted); transform: translate(-50%, -50%); opacity: 0; --lbl-delay: 534ms">00m</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; white-space: nowrap; position: absolute; transform: translateY(-50%); left: 40.4%; top: 16%; font-size: 10.5px; color: var(--cv-accent); opacity: 0; --lbl-delay: 969ms">Hexi claims the hook, edits it</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; white-space: nowrap; position: absolute; transform: translateY(-50%); left: 27.9%; top: 90%; font-size: clamp(8px, 1.05vw, 10.5px); color: var(--cv-text-muted); opacity: 0; --lbl-delay: 743ms">Sage holds</span>
-                    <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; white-space: nowrap; position: absolute; transform: translateY(-50%); left: 46.2%; top: 90%; max-width: 52%; overflow: hidden; text-overflow: ellipsis; font-size: clamp(8px, 1.05vw, 10.5px); color: var(--cv-success); opacity: 0; --lbl-delay: 1073ms">reads Hexi's record, edits after · both land</span>
-                  </div>
-              </div>
-
-
-          </div>
-        </section>
-
-        <section id="reach" style="border-top: 1px solid var(--cv-border-hairline)">
-          <div style="max-width: 1140px; margin: 0 auto; padding: 76px 32px">
-            <div data-anim="" style="display: flex; flex-direction: column; align-items: flex-start; gap: 14px; margin-bottom: 36px">
-              <h2 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 46px; letter-spacing: -0.018em; margin: 0">One runtime. Every project. Any harness.</h2>
-              <p style="font-size: 15px; line-height: 1.6; color: var(--cv-text-secondary); max-width: 62ch; margin: 0">The Coven daemon is per machine. Claims, guards, and events are per project. Pick a project to see who is in it, and open any column for the detail behind it.</p>
-            </div>
-
-            <div data-anim="">
-              <Board />
-            </div>
-          </div>
-        </section>
-
-        <!-- Ecosystem -->
-        <section style="border-top: 1px solid var(--cv-border-hairline)">
-          <div style="max-width: 1140px; margin: 0 auto; padding: 76px 32px 96px; display: grid; grid-template-columns: 380px minmax(0,1fr); gap: 72px; align-items: start">
-            <div data-anim="" style="max-width: 46ch">
-              <h2 style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 46px; letter-spacing: -0.018em; line-height: 1.05; margin: 0 0 16px"><em style="font-style: italic; display: block">The circle is open.</em>Step in.</h2>
-              <p style="font-size: 15px; color: var(--cv-text-secondary); margin: 0 0 22px; line-height: 1.65">The runtime, the workspace, and the people building both. All of it public, all of it MIT.</p>
-              <div data-dl-scope="" data-r="ctarow" style="display: flex; flex-direction: column; align-items: flex-start; gap: 14px">
-              <DownloadCta />
-              <p data-dl-caption="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted); margin: 0">MIT · runs locally · signed .dmg</p>
-              <p data-dl-status="" role="status" aria-live="polite" style="display: none; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-secondary); margin: 0; align-items: center; gap: 10px"></p>
-              </div>
-            </div>
-            <div data-anim-group="" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
-              <a href="https://github.com/OpenCoven/coven" style="border-radius: 12px; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-raised); padding: 22px 24px; display: block" class="rh0">
-                <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px">Coven CLI ↗</div>
-                <div style="font-size: 13.5px; line-height: 1.55; color: var(--cv-text-secondary)">The runtime itself. Read the source, file an issue, send a PR.</div>
-              </a>
-              <a href="https://docs.opencoven.ai" style="border-radius: 12px; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-raised); padding: 22px 24px; display: block" class="rh0">
-                <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px">Docs ↗</div>
-                <div style="font-size: 13.5px; line-height: 1.55; color: var(--cv-text-secondary)">Architecture, the socket API, familiars, and the security model.</div>
-              </a>
-              <a href="https://opencoven.ai/code" style="border-radius: 12px; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-raised); padding: 22px 24px; display: block" class="rh0">
-                <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px">Coven Code ↗</div>
-                <div style="font-size: 13.5px; line-height: 1.55; color: var(--cv-text-secondary)">A terminal that ships no telemetry, built to host sessions.</div>
-              </a>
-              <a href="https://discord.gg/opencoven" style="border-radius: 12px; border: 1px solid var(--cv-border-hairline); background: var(--cv-bg-raised); padding: 22px 24px; display: block" class="rh0">
-                <div style="font-size: 15px; font-weight: 600; margin-bottom: 6px">Discord ↗</div>
-                <div style="font-size: 13.5px; line-height: 1.55; color: var(--cv-text-secondary)">Ask questions and meet other people's familiars.</div>
-              </a>
-            </div>
-          </div>
-        </section>
-
+  <section class="band" aria-labelledby="flow-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="flow-heading">One project, shared local evidence.</h2>
+        <p>The runtime does not make every session one agent. It gives independent sessions a common place to state intent, preserve records, and encounter explicit authority boundaries.</p>
       </div>
-    </main>
-    <RedesignFooter />
+      <div class="proof-sequence">
+        <article class="proof-step"><div class="proof-step__body"><h3>A session enters a project.</h3><p>Coven binds work to the current local project and restores durable session context rather than treating every terminal process as the whole system.</p></div></article>
+        <article class="proof-step"><div class="proof-step__body"><h3>Intent becomes inspectable.</h3><p>Claims and records make overlapping work visible, so two sessions do not need to coordinate through prompt folklore or silent last-writer-wins behavior.</p></div></article>
+        <article class="proof-step"><div class="proof-step__body"><h3>Protected work can wait.</h3><p>Guarded local operations can pause for human approval instead of inferring authority merely because an agent has context or filesystem access.</p></div></article>
+        <article class="proof-step"><div class="proof-step__body"><h3>The record survives the terminal.</h3><p>Durable runtime state makes claims, sessions, and evidence inspectable after an individual shell or harness process exits.</p></div></article>
+      </div>
+    </div>
+  </section>
 
-    <script>
-      import '../scripts/redesign/hiw.js';
-    </script>
-  </body>
-</html>
+  <section class="band" aria-labelledby="boundary-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="boundary-heading">What Coven owns—and what it does not.</h2>
+        <p>Keeping these boundaries explicit prevents the runtime from quietly becoming a second identity protocol, orchestration plane, or product UI authority.</p>
+      </div>
+      <div class="concept-grid">
+        <article class="concept-card"><h3>Runtime authority</h3><p>Durable session state, claims, local execution, persistence, and enforcement at the project boundary.</p></article>
+        <article class="concept-card"><h3>Not identity definition</h3><p>The Familiar Contract defines the governed familiar self; Coven consumes authorized identity rather than redefining it.</p></article>
+        <article class="concept-card"><h3>Not orchestration policy</h3><p>Psyche owns task, lane, lease, approval, receipt, and recovery protocol semantics across orchestrated work.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="start-heading">
+    <div class="site-shell">
+      <div class="band__intro"><h2 id="start-heading">Verify it from one project.</h2><p>The canonical foundation remains deliberately small.</p></div>
+      <div class="command-block">
+        {canonicalFoundationCommands.map((item, index) => <div class="command-row"><span>{index + 1}</span><code>{item.command}</code></div>)}
+      </div>
+    </div>
+  </section>
+</SiteLayout>
