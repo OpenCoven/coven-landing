@@ -12,6 +12,17 @@ const PUBLIC_ROUTES = [
   '/terms/',
 ] as const;
 
+function durationMilliseconds(value: string) {
+  return Math.max(
+    ...value.split(',').map((part) => {
+      const trimmed = part.trim();
+      const amount = Number.parseFloat(trimmed);
+      if (!Number.isFinite(amount)) return Number.POSITIVE_INFINITY;
+      return trimmed.endsWith('ms') ? amount : amount * 1000;
+    }),
+  );
+}
+
 async function visibleControlMetrics(page: Page) {
   return page
     .locator('button:visible, summary:visible, select:visible, a.action:visible')
@@ -42,8 +53,8 @@ test('skip link is the first focus stop and transfers focus to main', async ({ p
   await expect(skip).toBeVisible();
   const box = await skip.boundingBox();
   expect(box).not.toBeNull();
-  expect(box!.top).toBeGreaterThanOrEqual(0);
-  expect(box!.bottom).toBeLessThanOrEqual(720);
+  expect(box!.y).toBeGreaterThanOrEqual(0);
+  expect(box!.y + box!.height).toBeLessThanOrEqual(720);
 
   await page.keyboard.press('Enter');
   await expect(page.locator('main#content')).toBeFocused();
@@ -92,8 +103,8 @@ test('mobile disclosure focus stays visible and Escape restores the trigger', as
   const linkBox = await firstLink.boundingBox();
   expect(headerBox).not.toBeNull();
   expect(linkBox).not.toBeNull();
-  expect(linkBox!.top).toBeGreaterThanOrEqual(headerBox!.bottom - 1);
-  expect(linkBox!.bottom).toBeLessThanOrEqual(844);
+  expect(linkBox!.y).toBeGreaterThanOrEqual(headerBox!.y + headerBox!.height - 1);
+  expect(linkBox!.y + linkBox!.height).toBeLessThanOrEqual(844);
 
   await page.keyboard.press('Escape');
   await expect(disclosure).not.toHaveAttribute('open', '');
@@ -115,8 +126,6 @@ test('forced-colors mode preserves borders, text, and visible focus', async ({ p
     elements.map((element) => {
       const style = getComputedStyle(element);
       return {
-        label: element.textContent?.replace(/\s+/g, ' ').trim().slice(0, 80),
-        borderStyle: style.borderTopStyle,
         forcedColorAdjust: style.forcedColorAdjust,
         color: style.color,
       };
@@ -154,8 +163,8 @@ test('reduced-motion preference completes feedback without sustained motion', as
       scrollBehavior: getComputedStyle(document.documentElement).scrollBehavior,
     };
   });
-  expect(['0s', '0.00001s']).toContain(motion.transitionDuration);
-  expect(['0s', '0.00001s']).toContain(motion.animationDuration);
+  expect(durationMilliseconds(motion.transitionDuration)).toBeLessThanOrEqual(0.02);
+  expect(durationMilliseconds(motion.animationDuration)).toBeLessThanOrEqual(0.02);
   expect(motion.scrollBehavior).toBe('auto');
 });
 
