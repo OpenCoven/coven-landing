@@ -12,7 +12,8 @@
     "check": "node scripts/verify-static.mjs && node scripts/verify-analytics.mjs && node scripts/verify-public-truth.mjs && python3 analytics/test-provision.py",
     "check:analytics": "node scripts/verify-analytics.mjs && python3 analytics/test-provision.py",
     "check:truth": "node scripts/verify-public-truth.mjs",
-    "check:browser": "playwright test"
+    "check:browser": "playwright test",
+    "test:unit": "node --test 'api/**/*.test.js' 'workers/**/*.test.js'"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

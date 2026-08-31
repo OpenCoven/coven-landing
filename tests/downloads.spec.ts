@@ -17,6 +17,10 @@ const resolverSource = readFileSync(
   new URL('../api/download.js', import.meta.url),
   'utf8',
 );
+const workerSource = readFileSync(
+  new URL('../workers/installer-stream/src/index.js', import.meta.url),
+  'utf8',
+);
 
 test('landing source never owns the installer binary', () => {
   for (const forbidden of [
@@ -47,6 +51,8 @@ test('the browser-native resolver remains wired to an allowlisted release select
   expect(resolverSource).toContain("import { MATCHERS, RELEASES_PAGE, REPO } from './_shared.js'");
   expect(resolverSource).toContain('const match = MATCHERS[platform]');
   expect(resolverSource).toContain('res.writeHead(302, { Location: asset.browser_download_url })');
+  expect(resolverSource).toContain('workerDownloadUrl(platform)');
+  expect(workerSource).toContain('new Response(upstream.body, { status: 200, headers })');
 });
 
 test.describe('without JavaScript', () => {
