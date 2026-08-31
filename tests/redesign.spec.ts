@@ -109,19 +109,22 @@ test('mobile navigation exposes state, closes on Escape, and restores focus', as
   const trigger = disclosure.locator('summary');
   await expect(disclosure).toHaveAttribute('data-oc-state', 'collapsed');
   await expect(trigger).toHaveText('Menu');
-  await expect(trigger).toHaveAccessibleName('Menu');
+  await expect(trigger).toHaveAccessibleName('Open navigation');
 
   await trigger.click();
   await expect(disclosure).toHaveAttribute('data-oc-state', 'expanded');
+  await expect(trigger).toHaveAccessibleName('Close navigation');
   await expect(disclosure.getByRole('link', { name: 'Quickstart' })).toBeVisible();
 
   await page.keyboard.press('Escape');
   await expect(disclosure).toHaveAttribute('data-oc-state', 'collapsed');
+  await expect(trigger).toHaveAccessibleName('Open navigation');
   await expect(trigger).toBeFocused();
 
   await trigger.click();
   await page.locator('main').click({ position: { x: 8, y: 120 } });
   await expect(disclosure).toHaveAttribute('data-oc-state', 'collapsed');
+  await expect(trigger).toHaveAccessibleName('Open navigation');
 });
 
 test('skip link moves keyboard focus to the main content target', async ({ page }) => {
