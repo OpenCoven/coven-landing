@@ -1,0 +1,87 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import '../styles/routes.css';
+
+const title = 'Security · OpenCoven';
+const description =
+  'How to report OpenCoven vulnerabilities, what security properties are in scope, and where to verify release artifacts.';
+---
+
+<SiteLayout title={title} description={description} canonicalPath="/security">
+  <section class="site-shell hero" id="top">
+    <div class="hero__copy">
+      <p class="eyebrow">Security and reporting</p>
+      <h1>Report vulnerabilities privately. Verify what you run.</h1>
+      <p class="hero__lede">
+        OpenCoven handles local agent execution and personal context, so security reports
+        should go through private channels—not public issues. Open a repository Security
+        Advisory, or join the OpenCoven Discord and privately DM <strong>@BunsDev</strong>.
+        Do not post vulnerability details in a public Discord channel.
+      </p>
+      <div class="button-row">
+        <a class="action action--primary" data-oc-primitive="action" data-oc-state="idle" href="https://github.com/OpenCoven/coven/security/advisories/new">Open a private security advisory</a>
+        <a class="action" data-oc-primitive="action" data-oc-state="idle" href="https://discord.gg/OpenCoven">Join Discord, then DM @BunsDev</a>
+      </div>
+    </div>
+    <aside class="evidence-card" aria-labelledby="security-target-heading">
+      <span class="status" data-oc-primitive="status-indicator" data-oc-state="idle">Policy last updated 2026-07-04</span>
+      <h2 class="card-heading" id="security-target-heading">Response targets</h2>
+      <p class="muted">
+        The repository policy states an acknowledgement target of 48 hours and an aim to
+        address confirmed vulnerabilities within 14 days. These are project targets, not a
+        contractual service-level agreement.
+      </p>
+    </aside>
+  </section>
+
+  <section class="band" aria-labelledby="scope-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="scope-heading">What belongs in a security report.</h2>
+        <p>The current repository policy welcomes reports affecting core routing, memory and session boundaries, authentication and identity handling, execution boundaries, or cross-user and cross-context isolation.</p>
+      </div>
+      <div class="concept-grid">
+        <article class="concept-card"><h3>Session isolation</h3><p>One user or agent must not gain another context without explicit permission.</p></article>
+        <article class="concept-card"><h3>Identity integrity</h3><p>A familiar identity must not be forgeable merely by another agent or external caller possessing context.</p></article>
+        <article class="concept-card"><h3>Execution boundaries</h3><p>Tool and runtime actions must remain within their intended scope and explicit authority boundary.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="verify-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="verify-heading">Use first-party release evidence.</h2>
+        <p>OpenCoven does not claim certifications or independent audits that have not been obtained. Verification should start from repository releases, checksums, signatures, and attestations where the producing repository publishes them.</p>
+      </div>
+      <div class="product-grid">
+        <article class="product-card">
+          <h3>Coven Cave releases</h3>
+          <p>Inspect the release page and GitHub provenance or attestation evidence associated with the exact artifact you install.</p>
+          <a class="action" data-oc-primitive="action" data-oc-state="idle" href="https://github.com/OpenCoven/coven-cave/releases/latest">Open latest Cave release</a>
+        </article>
+        <article class="product-card">
+          <h3>Repository security policies</h3>
+          <p>Implementation-specific scope and reporting details remain canonical in each repository's SECURITY.md rather than this public explanation surface.</p>
+          <a class="action" data-oc-primitive="action" data-oc-state="idle" href="https://github.com/OpenCoven">Browse OpenCoven repositories</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="nonclaims-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="nonclaims-heading">Security language stays bounded.</h2>
+        <p>Local-first architecture and guarded actions are useful properties, not blanket guarantees.</p>
+      </div>
+      <div class="architecture">
+        <ol>
+          <li>No public claim of SOC 2, ISO 27001, third-party audit, formal certification, or complete conformance is made here.</li>
+          <li>Third-party dependency and model-provider vulnerabilities should be reported to the relevant upstream provider unless they expose an OpenCoven integration flaw.</li>
+          <li>Protocol-level identity and authority guarantees remain maturity-scoped; implemented runtime proof must not be generalized into future cross-device or cloud guarantees.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</SiteLayout>
