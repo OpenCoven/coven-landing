@@ -6,202 +6,39 @@ import '../styles/tokens.css';
 import '../styles/vnext.css';
 import ThemeInit from '../components/ThemeInit.astro';
 import ThemeControl from '../components/ThemeControl.astro';
-import PosthogSnippet from '../components/redesign/PosthogSnippet.astro';
+import PosthogSnippet from '../components/PosthogSnippet.astro';
 import { ogImage } from '../lib/og.js';
 
-interface Props {
-  title: string;
-  description: string;
-  canonicalPath?: string;
-  robots?: string;
-  imageAlt?: string;
-  themeColor?: string;
-}
-
-const {
-  title,
-  description,
-  canonicalPath = Astro.url.pathname,
-  robots = 'index, follow',
-  imageAlt = 'OpenCoven — identity-preserving familiar infrastructure',
-  themeColor = '#050409',
-} = Astro.props;
-
+interface Props { title: string; description: string; canonicalPath?: string; robots?: string; imageAlt?: string; themeColor?: string; }
+const { title, description, canonicalPath = Astro.url.pathname, robots = 'index, follow', imageAlt = 'OpenCoven — identity-preserving familiar infrastructure', themeColor = '#050409' } = Astro.props;
 const canonicalUrl = new URL(canonicalPath, 'https://opencoven.ai').toString();
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
 const primaryNavigation = [
-  { label: 'How it works', href: '/#how-it-works' },
-  { label: 'Products', href: '/#products' },
+  { label: 'How it works', href: '/how-it-works' },
+  { label: 'Protocol', href: '/protocol' },
   { label: 'Quickstart', href: '/quickstart' },
-  { label: 'GitHub', href: '/github' },
+  { label: 'Status', href: '/status' },
   { label: 'Docs', href: 'https://docs.opencoven.ai' },
 ] as const;
-
-const currentFor = (href: string) => {
-  if (!href.startsWith('/') || href.includes('#')) return undefined;
-  return pathname === href ? 'page' : undefined;
-};
-
+const currentFor = (href: string) => href.startsWith('/') && !href.includes('#') && pathname === href ? 'page' : undefined;
 const structuredData = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    '@id': 'https://opencoven.ai/#organization',
-    name: 'OpenCoven',
-    url: 'https://opencoven.ai/',
-    logo: 'https://opencoven.ai/og.png',
-    sameAs: [
-      'https://github.com/OpenCoven',
-      'https://x.com/OpenCvn',
-      'https://discord.gg/opencoven',
-    ],
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    '@id': 'https://opencoven.ai/#website',
-    name: 'OpenCoven',
-    url: 'https://opencoven.ai/',
-    publisher: { '@id': 'https://opencoven.ai/#organization' },
-  },
+  { '@context': 'https://schema.org', '@type': 'Organization', '@id': 'https://opencoven.ai/#organization', name: 'OpenCoven', url: 'https://opencoven.ai/', logo: 'https://opencoven.ai/og.png', sameAs: ['https://github.com/OpenCoven','https://x.com/OpenCvn','https://discord.gg/opencoven'] },
+  { '@context': 'https://schema.org', '@type': 'WebSite', '@id': 'https://opencoven.ai/#website', name: 'OpenCoven', url: 'https://opencoven.ai/', publisher: { '@id': 'https://opencoven.ai/#organization' } },
 ];
 ---
-
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <meta name="robots" content={robots} />
-    <meta name="theme-color" content={themeColor} />
-    <link rel="canonical" href={canonicalUrl} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:site_name" content="OpenCoven" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={imageAlt} />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@OpenCvn" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
-    <meta name="twitter:image:alt" content={imageAlt} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
-    <ThemeInit />
-    <PosthogSnippet />
-  </head>
-  <body>
-    <a class="skip-link" href="#content">Skip to content</a>
-    <header
-      class="site-header"
-      data-oc-primitive="global-navigation"
-      data-oc-state="idle"
-    >
-      <div class="site-shell site-header__inner">
-        <a
-          class="brand-link"
-          href="/"
-          data-oc-part="brand-link"
-          aria-label="OpenCoven home"
-        >
-          <span class="brand-mark brand-mark--header" aria-hidden="true"></span>
-          <span>OpenCoven</span>
-        </a>
-        <nav class="desktop-nav" aria-label="Primary" data-oc-part="primary-links">
-          {primaryNavigation.map((item) => (
-            <a href={item.href} aria-current={currentFor(item.href)}>{item.label}</a>
-          ))}
-        </nav>
-        <ThemeControl />
-        <a
-          class="header-action action action--primary"
-          href="/quickstart"
-          data-oc-primitive="action"
-          data-oc-part="primary-action"
-          data-oc-state="idle"
-        >Start locally</a>
-        <details
-          class="mobile-nav"
-          data-mobile-navigation
-          data-oc-primitive="mobile-navigation"
-          data-oc-state="collapsed"
-        >
-          <summary data-oc-part="trigger">Menu</summary>
-          <div class="mobile-nav__panel" data-oc-part="panel">
-            <nav aria-label="Mobile primary" data-oc-part="links">
-              {primaryNavigation.map((item) => (
-                <a href={item.href} aria-current={currentFor(item.href)}>{item.label}</a>
-              ))}
-              <a
-                class="action action--primary"
-                href="/quickstart"
-                data-oc-primitive="action"
-                data-oc-part="primary-action"
-                data-oc-state="idle"
-              >Start locally</a>
-            </nav>
-          </div>
-        </details>
-      </div>
-    </header>
-    <main id="content" tabindex="-1"><slot /></main>
-    <footer class="site-footer">
-      <div class="site-shell site-footer__inner">
-        <span>OpenCoven · identity-preserving familiar infrastructure</span>
-        <nav aria-label="Footer">
-          <a href="https://github.com/OpenCoven">GitHub</a>
-          <a href="https://docs.opencoven.ai">Docs</a>
-          <a href="https://discord.gg/opencoven">Discord</a>
-          <a href="https://x.com/OpenCvn">X</a>
-          <a href="/privacy">Privacy</a>
-          <a href="/terms">Terms</a>
-        </nav>
-      </div>
-    </footer>
-
-    <script is:inline>
-      (function () {
-        var disclosures = Array.from(
-          document.querySelectorAll('[data-mobile-navigation]'),
-        );
-
-        function sync(disclosure) {
-          disclosure.dataset.ocState = disclosure.open ? 'expanded' : 'collapsed';
-        }
-
-        disclosures.forEach(function (disclosure) {
-          sync(disclosure);
-          disclosure.addEventListener('toggle', function () {
-            sync(disclosure);
-          });
-        });
-
-        document.addEventListener('keydown', function (event) {
-          if (event.key !== 'Escape') return;
-          disclosures.forEach(function (disclosure) {
-            if (!disclosure.open) return;
-            disclosure.open = false;
-            var summary = disclosure.querySelector('summary');
-            if (summary) summary.focus();
-          });
-        });
-
-        document.addEventListener('click', function (event) {
-          disclosures.forEach(function (disclosure) {
-            if (disclosure.open && !disclosure.contains(event.target)) {
-              disclosure.open = false;
-            }
-          });
-        });
-      })();
-    </script>
-  </body>
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>{title}</title><meta name="description" content={description} /><meta name="robots" content={robots} /><meta name="theme-color" content={themeColor} /><link rel="canonical" href={canonicalUrl} />
+<meta property="og:title" content={title} /><meta property="og:description" content={description} /><meta property="og:site_name" content="OpenCoven" /><meta property="og:type" content="website" /><meta property="og:url" content={canonicalUrl} /><meta property="og:image" content={ogImage} /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta property="og:image:alt" content={imageAlt} />
+<meta name="twitter:card" content="summary_large_image" /><meta name="twitter:site" content="@OpenCvn" /><meta name="twitter:title" content={title} /><meta name="twitter:description" content={description} /><meta name="twitter:image" content={ogImage} /><meta name="twitter:image:alt" content={imageAlt} />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" /><link rel="apple-touch-icon" href="/apple-touch-icon.png" /><script type="application/ld+json" set:html={JSON.stringify(structuredData)} /><ThemeInit /><PosthogSnippet />
+</head>
+<body>
+<a class="skip-link" href="#content">Skip to content</a>
+<header class="site-header" data-oc-primitive="global-navigation" data-oc-state="idle"><div class="site-shell site-header__inner"><a class="brand-link" href="/" data-oc-part="brand-link" aria-label="OpenCoven home"><span class="brand-mark brand-mark--header" aria-hidden="true"></span><span>OpenCoven</span></a><nav class="desktop-nav" aria-label="Primary" data-oc-part="primary-links">{primaryNavigation.map((item) => (<a href={item.href} aria-current={currentFor(item.href)}>{item.label}</a>))}</nav><ThemeControl /><a class="header-action action action--primary" href="/quickstart" data-oc-primitive="action" data-oc-part="primary-action" data-oc-state="idle">Start locally</a><details class="mobile-nav" data-mobile-navigation data-oc-primitive="mobile-navigation" data-oc-state="collapsed"><summary data-oc-part="trigger">Menu</summary><div class="mobile-nav__panel" data-oc-part="panel"><nav aria-label="Mobile primary" data-oc-part="links">{primaryNavigation.map((item) => (<a href={item.href} aria-current={currentFor(item.href)}>{item.label}</a>))}<a class="action action--primary" href="/quickstart" data-oc-primitive="action" data-oc-part="primary-action" data-oc-state="idle">Start locally</a></nav></div></details></div></header>
+<main id="content" tabindex="-1"><slot /></main>
+<footer class="site-footer"><div class="site-shell site-footer__inner"><span>OpenCoven · identity-preserving familiar infrastructure</span><nav aria-label="Footer"><a href="/protocol">Protocol</a><a href="/security">Security</a><a href="/status">Status</a><a href="https://github.com/OpenCoven">GitHub</a><a href="https://docs.opencoven.ai">Docs</a><a href="https://discord.gg/opencoven">Discord</a><a href="https://x.com/OpenCvn">X</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav></div></footer>
+<script is:inline>(function(){var disclosures=Array.from(document.querySelectorAll('[data-mobile-navigation]'));function sync(disclosure){disclosure.dataset.ocState=disclosure.open?'expanded':'collapsed';}disclosures.forEach(function(disclosure){sync(disclosure);disclosure.addEventListener('toggle',function(){sync(disclosure);});});document.addEventListener('keydown',function(event){if(event.key!=='Escape')return;disclosures.forEach(function(disclosure){if(!disclosure.open)return;disclosure.open=false;var summary=disclosure.querySelector('summary');if(summary)summary.focus();});});document.addEventListener('click',function(event){disclosures.forEach(function(disclosure){if(disclosure.open&&!disclosure.contains(event.target))disclosure.open=false;});});})();</script>
+</body>
 </html>
