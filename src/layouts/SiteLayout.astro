@@ -33,12 +33,14 @@ const primaryNavigation = [
   { label: 'How it works', href: '/how-it-works' },
   { label: 'Protocol', href: '/protocol' },
   { label: 'Quickstart', href: '/quickstart' },
-  { label: 'Status', href: '/status' },
+  { label: 'GitHub', href: '/github' },
   { label: 'Docs', href: 'https://docs.opencoven.ai' },
 ] as const;
 
-const currentFor = (href: string) =>
-  href.startsWith('/') && !href.includes('#') && pathname === href ? 'page' : undefined;
+const currentFor = (href: string) => {
+  if (!href.startsWith('/') || href.includes('#')) return undefined;
+  return pathname === href ? 'page' : undefined;
+};
 
 const structuredData = [
   {
@@ -64,6 +66,7 @@ const structuredData = [
   },
 ];
 ---
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -97,9 +100,18 @@ const structuredData = [
   </head>
   <body>
     <a class="skip-link" href="#content">Skip to content</a>
-    <header class="site-header" data-oc-primitive="global-navigation" data-oc-state="idle">
+    <header
+      class="site-header"
+      data-oc-primitive="global-navigation"
+      data-oc-state="idle"
+    >
       <div class="site-shell site-header__inner">
-        <a class="brand-link" href="/" data-oc-part="brand-link" aria-label="OpenCoven home">
+        <a
+          class="brand-link"
+          href="/"
+          data-oc-part="brand-link"
+          aria-label="OpenCoven home"
+        >
           <span class="brand-mark brand-mark--header" aria-hidden="true"></span>
           <span>OpenCoven</span>
         </a>
@@ -109,15 +121,32 @@ const structuredData = [
           ))}
         </nav>
         <ThemeControl />
-        <a class="header-action action action--primary" href="/quickstart" data-oc-primitive="action" data-oc-part="primary-action" data-oc-state="idle">Start locally</a>
-        <details class="mobile-nav" data-mobile-navigation data-oc-primitive="mobile-navigation" data-oc-state="collapsed">
+        <a
+          class="header-action action action--primary"
+          href="/quickstart"
+          data-oc-primitive="action"
+          data-oc-part="primary-action"
+          data-oc-state="idle"
+        >Start locally</a>
+        <details
+          class="mobile-nav"
+          data-mobile-navigation
+          data-oc-primitive="mobile-navigation"
+          data-oc-state="collapsed"
+        >
           <summary data-oc-part="trigger">Menu</summary>
           <div class="mobile-nav__panel" data-oc-part="panel">
             <nav aria-label="Mobile primary" data-oc-part="links">
               {primaryNavigation.map((item) => (
                 <a href={item.href} aria-current={currentFor(item.href)}>{item.label}</a>
               ))}
-              <a class="action action--primary" href="/quickstart" data-oc-primitive="action" data-oc-part="primary-action" data-oc-state="idle">Start locally</a>
+              <a
+                class="action action--primary"
+                href="/quickstart"
+                data-oc-primitive="action"
+                data-oc-part="primary-action"
+                data-oc-state="idle"
+              >Start locally</a>
             </nav>
           </div>
         </details>
@@ -140,16 +169,24 @@ const structuredData = [
         </nav>
       </div>
     </footer>
+
     <script is:inline>
       (function () {
-        var disclosures = Array.from(document.querySelectorAll('[data-mobile-navigation]'));
+        var disclosures = Array.from(
+          document.querySelectorAll('[data-mobile-navigation]'),
+        );
+
         function sync(disclosure) {
           disclosure.dataset.ocState = disclosure.open ? 'expanded' : 'collapsed';
         }
+
         disclosures.forEach(function (disclosure) {
           sync(disclosure);
-          disclosure.addEventListener('toggle', function () { sync(disclosure); });
+          disclosure.addEventListener('toggle', function () {
+            sync(disclosure);
+          });
         });
+
         document.addEventListener('keydown', function (event) {
           if (event.key !== 'Escape') return;
           disclosures.forEach(function (disclosure) {
@@ -159,9 +196,12 @@ const structuredData = [
             if (summary) summary.focus();
           });
         });
+
         document.addEventListener('click', function (event) {
           disclosures.forEach(function (disclosure) {
-            if (disclosure.open && !disclosure.contains(event.target)) disclosure.open = false;
+            if (disclosure.open && !disclosure.contains(event.target)) {
+              disclosure.open = false;
+            }
           });
         });
       })();
