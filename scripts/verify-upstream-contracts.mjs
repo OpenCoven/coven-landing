@@ -30,6 +30,8 @@ require(layout.includes('data-oc-primitive="global-navigation"'), 'global naviga
 require(layout.includes('data-oc-primitive="mobile-navigation"'), 'mobile navigation contract hook missing');
 require(layout.includes('<details class="mobile-nav"'), 'mobile navigation must remain native/static-first');
 require(home.includes('data-oc-primitive="guided-proof"'), 'guided proof contract hook missing');
+require(home.includes('data-oc-state="idle"'), 'vNext controls must expose explicit shared state semantics');
+require(home.includes('Give your agents continuity. Keep authority local.'), 'ratified vNext homepage headline drifted');
 require(home.includes('activeProducts'), 'homepage products must come from canonical registry');
 require(home.includes('canonicalFoundationCommands'), 'homepage commands must come from canonical registry');
 require(!home.includes('https://unpkg.com/three'), 'homepage must not have render-critical remote Three.js');
