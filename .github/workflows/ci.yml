@@ -28,9 +28,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install --yes ffmpeg
-
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
@@ -39,9 +36,6 @@ jobs:
       - name: Unit tests
         run: pnpm test:unit
 
-      # CI=true keeps Astro non-interactive; verify-static.mjs asserts
-      # required public assets, canonical logo treatment, and load-bearing
-      # copy in the built HTML (see scripts/verify-static.mjs).
       - name: Build
         run: CI=true pnpm build
 
