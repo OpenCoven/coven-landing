@@ -8,7 +8,7 @@ const description = 'Identity-preserving familiar infrastructure with local-firs
 const trustFacts = [
   ['Local-first', 'Current Coven proof runs at the local project boundary.'],
   ['Open source', 'Public repositories, schemas, releases, and implementation evidence.'],
-  ['Model-agnostic', 'Provider-backed sessions sit behind the shared runtime boundary.'],
+  ['Provider-backed', 'Supported harness sessions sit behind the shared runtime boundary.'],
   ['Human-approved guards', 'Protected local actions can wait for explicit principal approval.'],
   ['Verifiable artifacts', 'Cave release evidence links to GitHub attestations.'],
 ];
@@ -36,6 +36,12 @@ const concepts = [
     body: 'Continuity is evidence that a later embodiment or revision is the same familiar, a successor, a fork, a restored state, or a different root—not merely the same prompt or display name.',
   },
 ];
+
+const productUiState = (maturity: string) => {
+  if (maturity === 'available') return 'success';
+  if (maturity === 'gated-beta') return 'unavailable';
+  return 'selected';
+};
 ---
 
 <SiteLayout title={title} description={description} canonicalPath="/">
@@ -55,7 +61,7 @@ const concepts = [
       </div>
     </div>
     <div class="hero__mark" aria-hidden="true">
-      <img src="/favicon.svg" alt="" width="320" height="320" />
+      <span class="brand-mark"></span>
     </div>
   </section>
 
@@ -92,7 +98,12 @@ const concepts = [
       <div class="concept-grid">
         {concepts.map((concept) => (
           <article class="concept-card">
-            <span class:list={["status", concept.className]} data-oc-primitive="status-indicator" data-oc-state={concept.state}>{concept.status}</span>
+            <span
+              class:list={["status", concept.className]}
+              data-oc-primitive="status-indicator"
+              data-oc-part="label"
+              data-oc-state={concept.state}
+            >{concept.status}</span>
             <h3>{concept.name}</h3>
             <p>{concept.body}</p>
           </article>
@@ -110,7 +121,7 @@ const concepts = [
     </div>
   </section>
 
-  <section class="band" aria-labelledby="proof-heading" data-oc-primitive="guided-proof" data-oc-state="idle">
+  <section class="band" aria-labelledby="proof-heading" data-oc-primitive="guided-proof" data-oc-state="selected">
     <div class="site-shell">
       <div class="band__intro">
         <h2 id="proof-heading">A concrete local proof.</h2>
@@ -123,7 +134,7 @@ const concepts = [
       <div class="proof-sequence" data-oc-part="evidence-region">
         <article class="proof-step" id="proof-claim">
           <div class="proof-step__body">
-            <span class="status status--available" data-oc-state="success">Available today</span>
+            <span class="status status--available" data-oc-primitive="status-indicator" data-oc-part="label" data-oc-state="success">Available today</span>
             <h3>Two sessions claim the same surface.</h3>
             <p>The shared local record makes competing intent visible instead of letting one session silently overwrite another.</p>
             <code>session-a → claim src/auth.ts · session-b → competing claim</code>
@@ -131,7 +142,7 @@ const concepts = [
         </article>
         <article class="proof-step" id="proof-hold">
           <div class="proof-step__body">
-            <span class="status status--available" data-oc-state="success">Available today</span>
+            <span class="status status--available" data-oc-primitive="status-indicator" data-oc-part="label" data-oc-state="success">Available today</span>
             <h3>Coven holds the second protected write.</h3>
             <p>The runtime records why the operation is waiting, preserving an inspectable boundary instead of guessing on behalf of the principal.</p>
             <code>guard → held · reason: overlapping protected surface</code>
@@ -139,7 +150,7 @@ const concepts = [
         </article>
         <article class="proof-step" id="proof-decision">
           <div class="proof-step__body">
-            <span class="status status--available" data-oc-state="success">Available today</span>
+            <span class="status status--available" data-oc-primitive="status-indicator" data-oc-part="label" data-oc-state="success">Available today</span>
             <h3>The principal decides.</h3>
             <p>Approval, redirection, or rejection remains a human decision; the evidence stays attached to the local workflow for inspection in Cave.</p>
             <code>principal decision → approve | redirect | reject</code>
@@ -162,13 +173,18 @@ const concepts = [
       <div class="product-grid">
         {activeProducts.map((product) => (
           <article class="product-card">
-            <span class:list={["status", `status--${product.maturity}`]} data-oc-primitive="status-indicator" data-oc-state={product.maturity === 'available' ? 'success' : 'unavailable'}>{product.statusLabel}</span>
+            <span
+              class:list={["status", `status--${product.maturity}`]}
+              data-oc-primitive="status-indicator"
+              data-oc-part="label"
+              data-oc-state={productUiState(product.maturity)}
+            >{product.statusLabel}</span>
             <p class="eyebrow">{product.eyebrow}</p>
             <h3>{product.name}</h3>
             <p>{product.summary}</p>
             <p><strong>Best for:</strong> {product.bestFor}</p>
             <p class="muted">{product.platforms}</p>
-            <a class="action" data-oc-primitive="action" data-oc-state="idle" href={product.primaryAction.href}>{product.primaryAction.label}</a>
+            <a class="action" data-oc-primitive="action" data-oc-part="label" data-oc-state="idle" href={product.primaryAction.href}>{product.primaryAction.label}</a>
           </article>
         ))}
       </div>
@@ -192,9 +208,9 @@ const concepts = [
           </div>
         ))}
       </div>
-      <div class="button-row" style="margin-top: var(--oc-space-6)">
-        <a class="action action--primary" data-oc-primitive="action" data-oc-state="idle" href="/quickstart">Start locally</a>
-        <a class="action" data-oc-primitive="action" data-oc-state="idle" href="https://docs.opencoven.ai">Read the docs</a>
+      <div class="button-row button-row--spaced">
+        <a class="action action--primary" data-oc-primitive="action" data-oc-part="label" data-oc-state="idle" href="/quickstart">Start locally</a>
+        <a class="action" data-oc-primitive="action" data-oc-part="label" data-oc-state="idle" href="https://docs.opencoven.ai">Read the docs</a>
       </div>
     </div>
   </section>
