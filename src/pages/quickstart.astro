@@ -139,7 +139,7 @@ const collectionJsonLd = {
         {activeProducts.map((product) => (
           <article
             class="product-card"
-            id={`product-${product.id}`}
+            id={product.id}
             data-product-lifecycle="active"
           >
             <span
@@ -181,7 +181,11 @@ const collectionJsonLd = {
       </div>
       <div class="archive-stack" data-archived-product-grid>
         {archivedProducts.map((product) => (
-          <article class="evidence-card" data-product-lifecycle="archived">
+          <article
+            class="evidence-card"
+            id={product.id}
+            data-product-lifecycle="archived"
+          >
             <span
               class="status"
               data-oc-primitive="status-indicator"
