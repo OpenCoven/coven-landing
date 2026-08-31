@@ -117,9 +117,7 @@
   .concept-card p, .product-card p, .proof-step p { color: var(--oc-text-muted); }
   .status { display: inline-flex; align-items: center; min-height: 1.8rem; padding: .1rem .55rem; border-radius: 999px; background: var(--oc-evidence-bg); color: var(--oc-evidence-text); font-size: var(--oc-type--1); font-weight: 760; }
   .status--available { background: var(--oc-success-bg); color: var(--oc-success-text); }
-  .status--beta { background: var(--oc-pending-bg); color: var(--oc-pending-text); }
-  .status--direction { background: var(--oc-pending-bg); color: var(--oc-pending-text); }
-  .status--gated-beta { background: var(--oc-pending-bg); color: var(--oc-pending-text); }
+  .status--beta, .status--direction, .status--gated-beta { background: var(--oc-pending-bg); color: var(--oc-pending-text); }
 
   .proof-sequence { display: grid; gap: var(--oc-space-4); margin-top: var(--oc-space-8); counter-reset: proof; }
   .proof-step { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--oc-space-4); }

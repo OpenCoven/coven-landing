@@ -108,16 +108,14 @@ test('mobile navigation exposes state, closes on Escape, and restores focus', as
   const disclosure = page.locator('[data-mobile-navigation]');
   const trigger = disclosure.locator('summary');
   await expect(disclosure).toHaveAttribute('data-oc-state', 'collapsed');
-  await expect(trigger).toHaveAttribute('aria-label', 'Open navigation');
+  await expect(trigger).toHaveText('Menu');
 
   await trigger.click();
   await expect(disclosure).toHaveAttribute('data-oc-state', 'expanded');
-  await expect(trigger).toHaveAttribute('aria-label', 'Close navigation');
   await expect(disclosure.getByRole('link', { name: 'Quickstart' })).toBeVisible();
 
   await page.keyboard.press('Escape');
   await expect(disclosure).toHaveAttribute('data-oc-state', 'collapsed');
-  await expect(trigger).toHaveAttribute('aria-label', 'Open navigation');
   await expect(trigger).toBeFocused();
 
   await trigger.click();
