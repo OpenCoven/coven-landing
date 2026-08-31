@@ -14,7 +14,10 @@
     "check:truth": "node scripts/verify-public-truth.mjs && node scripts/verify-product-registry.mjs",
     "check:registry": "node scripts/verify-product-registry.mjs",
     "check:browser": "playwright test",
-    "test:unit": "node --test 'api/**/*.test.js' 'workers/**/*.test.js'"
+    "test:unit": "node --test 'api/**/*.test.js' 'workers/**/*.test.js'",
+    "baseline:static": "node scripts/baseline/static.mjs",
+    "baseline:browser": "node scripts/baseline/browser.mjs",
+    "baseline:lighthouse": "node scripts/baseline/lighthouse.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

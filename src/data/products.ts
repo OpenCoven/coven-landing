@@ -75,7 +75,7 @@ export const publicProducts: readonly PublicProduct[] = [
     maturity: 'available',
     statusLabel: 'Recommended foundation',
     recommended: true,
-    platforms: 'macOS Apple Silicon and Intel x64 · glibc Linux x64 · Windows x64',
+    platforms: 'macOS Apple Silicon · glibc Linux x64 · Windows x64 · also available for macOS Intel x64',
     canonicalUrl: 'https://www.npmjs.com/package/@opencoven/cli',
     docsUrl: COVEN_ONBOARDING_URL,
     repositoryUrl: 'https://github.com/OpenCoven/coven',
