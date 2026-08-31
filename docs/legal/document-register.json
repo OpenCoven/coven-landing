@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "opencoven.legal-document-register/v1",
+  "reviewedAt": "2026-08-30",
+  "documents": [
+    {
+      "route": "/privacy",
+      "title": "Privacy Policy",
+      "effectiveDate": "2026-05-27",
+      "lastUpdated": "2026-05-27",
+      "contentChangeInThisMigration": false,
+      "owner": "OpenCoven maintainers / scoped legal-compliance process",
+      "status": "published-text-preserved-pending-claim-reconciliation"
+    },
+    {
+      "route": "/terms",
+      "title": "Terms of Service",
+      "effectiveDate": "2026-05-27",
+      "lastUpdated": "2026-05-27",
+      "contentChangeInThisMigration": false,
+      "owner": "OpenCoven maintainers / scoped legal-compliance process",
+      "status": "published-text-preserved-pending-claim-reconciliation"
+    }
+  ],
+  "knownReconciliationItems": [
+    "The current public truth register says analytics are off by default with explicit event mode only; Privacy policy analytics/cookie language must be reviewed against the deployed configuration before any legal-content revision.",
+    "Privacy policy references Vercel, optional GitHub OAuth, waitlist/newsletter email collection, and optional cloud services; each must be verified against current production or changed through the scoped legal/compliance issue.",
+    "No shell migration may silently alter effective dates, rights language, governing law, liability language, or data-practice commitments."
+  ]
+}
