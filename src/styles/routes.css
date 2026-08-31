@@ -1,0 +1,109 @@
+@layer components {
+  .card-heading {
+    margin-top: var(--oc-space-4);
+    font-size: var(--oc-type-2);
+  }
+
+  .route-meta {
+    color: var(--oc-text-subtle);
+    font-size: var(--oc-type--1);
+    overflow-wrap: anywhere;
+  }
+
+  .archive-stack {
+    display: grid;
+    gap: var(--oc-space-4);
+    margin-top: var(--oc-space-8);
+  }
+
+  .command-block--wide {
+    max-width: 60rem;
+    list-style: none;
+  }
+
+  .copy-control {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--oc-space-4);
+    align-items: center;
+    padding-block: var(--oc-space-4);
+    border-bottom: 1px solid var(--oc-border);
+  }
+
+  .copy-control:last-child {
+    border-bottom: 0;
+  }
+
+  .copy-control__main {
+    min-width: 0;
+  }
+
+  .copy-control__label {
+    display: block;
+    margin-bottom: var(--oc-space-2);
+    color: var(--oc-text-muted);
+    font-size: var(--oc-type--1);
+    font-weight: 700;
+  }
+
+  .copy-control code {
+    display: block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    color: var(--oc-evidence-text);
+  }
+
+  .copy-control__actions {
+    min-width: 10rem;
+    display: grid;
+    justify-items: end;
+    gap: var(--oc-space-2);
+  }
+
+  .copy-button {
+    display: none;
+    cursor: pointer;
+    background: var(--oc-surface-2);
+    color: var(--oc-text);
+  }
+
+  [data-copy-ready] .copy-button {
+    display: inline-flex;
+  }
+
+  .copy-button:disabled {
+    cursor: wait;
+    opacity: .7;
+  }
+
+  .copy-status {
+    min-height: 1.4em;
+    max-width: 22rem;
+    color: var(--oc-text-muted);
+    font-size: var(--oc-type--1);
+    text-align: right;
+  }
+
+  [data-oc-state="success"] .copy-status {
+    color: var(--oc-success-text);
+  }
+
+  [data-oc-state="error"] .copy-status {
+    color: var(--oc-danger-text, var(--oc-text));
+  }
+}
+
+@media (max-width: 40rem) {
+  .copy-control {
+    grid-template-columns: 1fr;
+  }
+
+  .copy-control__actions {
+    min-width: 0;
+    justify-items: start;
+  }
+
+  .copy-status {
+    text-align: left;
+  }
+}
