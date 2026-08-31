@@ -9,9 +9,10 @@
     "build": "astro build && node scripts/sanitize-public-fallbacks.mjs",
     "preview": "astro preview --host 127.0.0.1 --port 4173",
     "astro": "astro",
-    "check": "node scripts/verify-static.mjs && node scripts/verify-analytics.mjs && node scripts/verify-public-truth.mjs && python3 analytics/test-provision.py",
+    "check": "node scripts/verify-static.mjs && node scripts/verify-analytics.mjs && node scripts/verify-public-truth.mjs && node scripts/verify-product-registry.mjs && python3 analytics/test-provision.py",
     "check:analytics": "node scripts/verify-analytics.mjs && python3 analytics/test-provision.py",
-    "check:truth": "node scripts/verify-public-truth.mjs",
+    "check:truth": "node scripts/verify-public-truth.mjs && node scripts/verify-product-registry.mjs",
+    "check:registry": "node scripts/verify-product-registry.mjs",
     "check:browser": "playwright test",
     "test:unit": "node --test 'api/**/*.test.js' 'workers/**/*.test.js'"
   },
