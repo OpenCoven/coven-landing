@@ -8,7 +8,8 @@ const [
   packageSource,
   fastConfig,
   releaseConfig,
-  workflow,
+  fastWorkflow,
+  releaseWorkflow,
   accessibilityCss,
   accessibilityTests,
   releaseTests,
@@ -17,6 +18,7 @@ const [
   read('package.json'),
   read('playwright.config.ts'),
   read('playwright.release.config.ts'),
+  read('.github/workflows/ci.yml'),
   read('.github/workflows/release-gates.yml'),
   read('src/styles/accessibility.css'),
   read('tests/accessibility-contracts.spec.ts'),
@@ -45,6 +47,16 @@ for (const forbidden of ['release-firefox', 'release-webkit', 'release-mobile-we
     throw new Error(`The fast PR config must not absorb release project ${forbidden}`);
   }
 }
+for (const requirement of [
+  'actions/upload-artifact@v4',
+  'if: failure()',
+  'playwright-report',
+  'test-results',
+]) {
+  if (!fastWorkflow.includes(requirement)) {
+    throw new Error(`Fast CI workflow is missing diagnostic requirement: ${requirement}`);
+  }
+}
 
 for (const project of [
   'release-chromium',
@@ -56,12 +68,12 @@ for (const project of [
   if (!releaseConfig.includes(`name: '${project}'`)) {
     throw new Error(`Release Playwright config is missing ${project}`);
   }
-  if (!workflow.includes(`project: ${project}`)) {
+  if (!releaseWorkflow.includes(`project: ${project}`)) {
     throw new Error(`Release workflow matrix is missing ${project}`);
   }
 }
 for (const browser of ['chromium', 'firefox', 'webkit']) {
-  if (!workflow.includes(`browser: ${browser}`)) {
+  if (!releaseWorkflow.includes(`browser: ${browser}`)) {
     throw new Error(`Release workflow matrix is missing browser installer ${browser}`);
   }
 }
@@ -73,7 +85,7 @@ for (const requirement of [
   'playwright-report-release',
   'test-results/release',
 ]) {
-  if (!workflow.includes(requirement)) {
+  if (!releaseWorkflow.includes(requirement)) {
     throw new Error(`Release workflow is missing requirement: ${requirement}`);
   }
 }
