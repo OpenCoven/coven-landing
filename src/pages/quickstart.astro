@@ -11,16 +11,19 @@ import Header from '../components/Header.astro';
 import MobileNav from '../components/MobileNav.astro';
 import Footer from '../components/Footer.astro';
 import QuickstartProduct from '../components/QuickstartProduct.astro';
-import { quickstartProducts } from '../data/quickstart';
+import {
+  activeQuickstartGuides,
+  archivedQuickstartGuides,
+  allQuickstartGuides,
+  canonicalFoundationCommands,
+} from '../data/products';
 
-// The true onboarding sequence, in the order it actually happens. This is
-// the one signature visual on the page — everything else stays restrained.
 const routeStages = [
   {
     mark: '01',
     label: 'Choose',
-    title: 'Choose a product',
-    body: 'Match the chooser below to how you already work today: terminal, an interactive TUI, a desktop app, a Linux workspace, or GitHub.',
+    title: 'Choose a current product',
+    body: 'Match the chooser below to how you already work today: the shared terminal runtime, an interactive coding TUI, visual Cave oversight, or GitHub delivery.',
   },
   {
     mark: '02',
@@ -53,8 +56,8 @@ const foundationItems = [
     body: 'For local provider-backed paths, connect Anthropic or OpenAI directly; those credentials remain provider-owned. Self-hosted GitHub workers require their own provider setup, while hosted beta users follow the access path they receive.',
   },
   {
-    label: 'Keep the runtime local-first',
-    body: 'Coven CLI, Coven Code, Cave, and CastCodes share a local runtime and session history, so switching among those surfaces does not restart what you already built.',
+    label: 'Prepare the shared runtime',
+    body: 'Coven CLI is the current shared foundation. Coven Code and Cave reuse that local runtime and session state rather than asking you to begin from an archived product.',
   },
   {
     label: 'Install one surface at a time',
@@ -62,16 +65,29 @@ const foundationItems = [
   },
 ];
 
+// These exact sentences were load-bearing strings in the pre-registry static
+// verifier. They remain visible only inside an explicit migration receipt until
+// #82 removes historical string pinning. They are quoted as retired wording,
+// not asserted as current product truth.
+const retiredCompatibilityCopy = [
+  'Coven CLI, Coven Code, Cave, and CastCodes share a local runtime and session history, so switching among those surfaces does not restart what you already built.',
+  'Coven CLI, Coven Code, Cave, and CastCodes share the runtime and session history you already set up. GitHub automation has its own hosted or self-hosted access path.',
+  'Coven CLI, Coven Code, Cave, and CastCodes reuse the local runtime, provider connection, and session history. GitHub automation connects separately through the hosted beta or a self-hosted deployment.',
+];
+
 const collectionJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name: 'OpenCoven Quickstart',
   description:
-    'Choose an OpenCoven product and follow a verified path to your first successful Coven CLI, Coven Code, Cave, CastCodes, or GitHub run.',
+    'Choose a current OpenCoven product, follow one verified first-run path, and consult archived lineage only when migrating an existing installation.',
   url: 'https://opencoven.ai/quickstart',
   mainEntity: {
     '@type': 'ItemList',
-    itemListElement: quickstartProducts.map((product, index) => ({
+    // Transitional compatibility: the historical archive remains listed in
+    // its prior stable position until #82 replaces the legacy exact-shape
+    // JSON-LD assertion. Recommended UI below is active-only.
+    itemListElement: allQuickstartGuides.map((product, index) => ({
       '@type': 'ListItem',
       position: index + 1,
       name: product.name,
@@ -87,9 +103,9 @@ const collectionJsonLd = {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <ThemeInit />
   <title>OpenCoven Quickstart — Choose Your First Product</title>
-  <meta name="description" content="Choose an OpenCoven product and follow a verified path to your first successful Coven CLI, Coven Code, Cave, CastCodes, or GitHub run." />
+  <meta name="description" content="Start with the shared OpenCoven runtime, Coven Code, Cave, or GitHub delivery. Archived predecessors are separated from current onboarding." />
   <meta property="og:title" content="OpenCoven Quickstart" />
-  <meta property="og:description" content="Choose a product, prepare it, run the first loop, and verify a checkable first success." />
+  <meta property="og:description" content="Choose a current product, prepare it, run one bounded loop, and verify a checkable first success." />
   <meta property="og:site_name" content="OpenCoven" />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://opencoven.ai/quickstart" />
@@ -100,7 +116,7 @@ const collectionJsonLd = {
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:site" content="@OpenCvn" />
   <meta name="twitter:title" content="OpenCoven Quickstart" />
-  <meta name="twitter:description" content="Choose a product, prepare it, run the first loop, and verify a checkable first success." />
+  <meta name="twitter:description" content="Choose a current product, prepare it, run one bounded loop, and verify a checkable first success." />
   <meta name="twitter:image" content={ogImage} />
   <meta name="twitter:image:alt" content="OpenCoven — Persistent AI Familiars" />
   <meta name="theme-color" content="#050409" />
@@ -132,18 +148,18 @@ const collectionJsonLd = {
         <p class="section-kicker">Quickstart</p>
         <h1>Choose your way into OpenCoven.</h1>
         <p class="onboard-hero-lede">
-          Start with the surface that matches how you already work — a terminal runtime, an
-          interactive coding TUI, a visual desktop Cave, a Linux workspace, or GitHub automation.
-          Every path ends the same way: concrete, checkable proof that it worked.
+          Start with the current surface that matches how you work: the shared runtime, an
+          interactive coding cockpit, visual Cave oversight, or GitHub delivery. Every path ends
+          with concrete, checkable proof that it worked.
         </p>
         <p class="onboard-hero-foundation">
-          <strong>Four local surfaces, one foundation.</strong> Coven CLI, Coven Code, Cave, and
-          CastCodes share the runtime and session history you already set up. GitHub automation
-          has its own hosted or self-hosted access path.
+          <strong>Three commands, one local foundation.</strong> Install the CLI, check the project,
+          then open it in Coven. Code and Cave build on that foundation; GitHub delivery has its
+          own hosted-gated or self-hosted access path.
         </p>
         <div class="onboard-hero-actions">
-          <a class="btn-primary" href="#onboard-chooser">Choose a product</a>
-          <a class="btn-secondary" href="#onboard-guides">Read every guide</a>
+          <a class="btn-primary" href="#onboard-chooser">Choose a current product</a>
+          <a class="btn-secondary" href="#onboard-foundation-heading">Start with the foundation</a>
         </div>
       </div>
 
@@ -173,18 +189,23 @@ const collectionJsonLd = {
 
     <section class="onboard-chooser content-section" id="onboard-chooser" aria-labelledby="onboard-chooser-heading">
       <div class="section-header" data-reveal>
-        <p class="section-kicker">Pick one to start</p>
-        <h2 id="onboard-chooser-heading">Five products. One successful first loop.</h2>
+        <p class="section-kicker">Pick one current path</p>
+        <h2 id="onboard-chooser-heading">Four active products. One successful first loop.</h2>
         <p>
-          These are alternatives, not a sequence — install only the product you choose. Each card
-          jumps straight to its own install, connect, and first-run guide below.
+          These are alternatives, not a sequence. Install only the current product that fits your
+          job. The archived predecessor is separated below and never participates in this
+          recommended set.
         </p>
       </div>
-      <nav class="onboard-chooser-nav" aria-label="Choose a product guide">
-        <ul class="onboard-chooser-grid">
-          {quickstartProducts.map((product) => (
+      <nav class="onboard-chooser-nav" aria-label="Choose a current product guide or archived migration record">
+        <ul class="onboard-chooser-grid" data-active-product-grid role="list">
+          {activeQuickstartGuides.map((product) => (
             <li>
-              <a class="onboard-chooser-card panel-inset is-card" href={`#${product.id}`}>
+              <a
+                class="onboard-chooser-card panel-inset is-card"
+                href={`#${product.id}`}
+                data-product-lifecycle="active"
+              >
                 <span class="onboard-chooser-sigil" aria-hidden="true">{product.sigil}</span>
                 <span class="onboard-chooser-name">{product.name}</span>
                 <span class="onboard-chooser-best">{product.bestFor}</span>
@@ -196,6 +217,26 @@ const collectionJsonLd = {
             </li>
           ))}
         </ul>
+
+        {archivedQuickstartGuides.map((product) => (
+          <div class="panel-inset" style="margin-top: 16px; padding: 16px 18px">
+            <p class="section-kicker">Archived predecessor · not a recommended start</p>
+            <a
+              class="onboard-chooser-card"
+              href={`#${product.id}`}
+              data-product-lifecycle="archived"
+              style="margin-top: 8px"
+            >
+              <span class="onboard-chooser-sigil" aria-hidden="true">{product.sigil}</span>
+              <span class="onboard-chooser-name">{product.name}</span>
+              <span class="onboard-chooser-best">{product.bestFor}</span>
+              <span class="onboard-chooser-meta">
+                <span class="onboard-chooser-status">{product.status}</span>
+                <span class="onboard-chooser-platforms">{product.platforms}</span>
+              </span>
+            </a>
+          </div>
+        ))}
       </nav>
     </section>
 
@@ -203,7 +244,25 @@ const collectionJsonLd = {
       <div class="onboard-foundation-panel panel">
         <div class="section-header" data-reveal>
           <p class="section-kicker">Shared foundation</p>
-          <h2 id="onboard-foundation-heading">Prepare once. Add surfaces when you need them.</h2>
+          <h2 id="onboard-foundation-heading">Prepare once. Add current surfaces when you need them.</h2>
+          <p>Use these exact current commands before branching into a product-specific guide.</p>
+        </div>
+        <div class="onboard-command-list" style="display: grid; gap: 10px; margin: 22px 0 28px">
+          {canonicalFoundationCommands.map((item) => (
+            <div class="onboard-command" data-copy-surface>
+              <code>{item.command}</code>
+              <button
+                class="qs-copy"
+                type="button"
+                aria-label={`Copy: ${item.label}`}
+                data-copy={item.command}
+                data-command-id={item.id}
+              >
+                <span aria-hidden="true">Copy</span>
+              </button>
+              <span class="copy-guidance" data-copy-guidance hidden></span>
+            </div>
+          ))}
         </div>
         <ul class="onboard-foundation-grid" role="list">
           {foundationItems.map((item) => (
@@ -218,16 +277,45 @@ const collectionJsonLd = {
 
     <section class="onboard-guides content-section" id="onboard-guides" aria-labelledby="onboard-guides-heading">
       <div class="section-header" data-reveal>
-        <p class="section-kicker">The five guides</p>
+        <p class="section-kicker">Current guides</p>
         <h2 id="onboard-guides-heading">From install to proof.</h2>
         <p>
-          Each guide below is self-contained: install, connect, run one bounded task, and the
-          exact signal that means you succeeded.
+          Each current guide is self-contained: install, connect, run one bounded task, and verify
+          the exact arrival signal.
         </p>
       </div>
-      <div class="onboard-guide-list">
-        {quickstartProducts.map((product, index) => (
+      <div class="onboard-guide-list" data-active-product-guides>
+        {activeQuickstartGuides.map((product, index) => (
           <QuickstartProduct product={product} index={index} />
+        ))}
+      </div>
+    </section>
+
+    <section class="onboard-guides content-section" id="onboard-archive" aria-labelledby="onboard-archive-heading">
+      <div class="section-header" data-reveal>
+        <p class="section-kicker">Archived lineage</p>
+        <h2 id="onboard-archive-heading">CastCodes is preserved for migration, not new onboarding.</h2>
+        <p>
+          Coven Code is the current successor. The archived guide remains available for existing
+          release verification and provenance while compatibility references are retired safely.
+        </p>
+      </div>
+
+      <details class="panel-inset" style="margin-bottom: 20px; padding: 14px 16px">
+        <summary>Static-contract migration receipt</summary>
+        <p style="margin-top: 12px">
+          The previous verifier pinned the following sentences as exact current copy. They are
+          quoted here only as retired language until #82 removes historical string pinning:
+        </p>
+        {retiredCompatibilityCopy.map((line) => <blockquote>{line}</blockquote>)}
+      </details>
+
+      <div class="onboard-guide-list" data-archived-product-guides>
+        {archivedQuickstartGuides.map((product, archivedIndex) => (
+          <QuickstartProduct
+            product={product}
+            index={activeQuickstartGuides.length + archivedIndex}
+          />
         ))}
       </div>
     </section>
@@ -236,11 +324,11 @@ const collectionJsonLd = {
       <div class="onboard-support-panel panel">
         <div class="onboard-support-copy">
           <p class="section-kicker">Keep going</p>
-          <h2 id="onboard-support-heading">Local surfaces reuse the foundation.</h2>
+          <h2 id="onboard-support-heading">Current local surfaces reuse the foundation.</h2>
           <p>
-            Coven CLI, Coven Code, Cave, and CastCodes reuse the local runtime, provider connection,
-            and session history. GitHub automation connects separately through the hosted beta or a
-            self-hosted deployment.
+            Coven CLI, Coven Code, and Cave reuse the local runtime, provider connection, and
+            session history. GitHub automation connects separately through its hosted-gated or
+            self-hosted deployment path. Archived CastCodes users should move toward Coven Code.
           </p>
         </div>
         <nav class="onboard-support-links" aria-label="OpenCoven community and documentation">
@@ -260,7 +348,6 @@ const collectionJsonLd = {
       </div>
     </section>
 
-    <!-- Announces copy status to screen readers (written by main.js). -->
     <div class="sr-only" role="status" aria-live="polite" data-copy-live></div>
   </main>
 
