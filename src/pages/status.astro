@@ -1,0 +1,69 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { publicProducts, activeProducts, archivedProducts } from '../data/products.ts';
+
+const title = 'Status and maturity · OpenCoven';
+const description = 'Registry-backed public maturity and availability status for OpenCoven product surfaces.';
+
+const counts = {
+  active: activeProducts.length,
+  archived: archivedProducts.length,
+  total: publicProducts.length,
+};
+---
+
+<SiteLayout title={title} description={description} canonicalPath="/status">
+  <section class="site-shell hero" id="top">
+    <div class="hero__copy">
+      <p class="eyebrow">Generated public maturity surface</p>
+      <h1>Status should come from data, not memory.</h1>
+      <p class="hero__lede">
+        This page renders from the same checked-in public product registry used by the
+        homepage and Quickstart, so availability and successor state have one source in
+        this repository.
+      </p>
+      <div class="button-row">
+        <a class="action action--primary" data-oc-primitive="action" data-oc-state="idle" href="/quickstart">Start with a current product</a>
+        <a class="action" data-oc-primitive="action" data-oc-state="idle" href="https://github.com/OpenCoven/coven-landing/blob/main/src/data/products.ts">Inspect registry source</a>
+      </div>
+    </div>
+    <aside class="evidence-card">
+      <span class="status" data-oc-primitive="status-indicator" data-oc-state="idle">Registry-backed</span>
+      <h2 style="font-size: var(--oc-type-2); margin-top: var(--oc-space-4)">{counts.active} current · {counts.archived} archived</h2>
+      <p class="muted">A product is not promoted here unless the registry carries a current lifecycle, maturity, canonical destination, owner repository, and public action.</p>
+    </aside>
+  </section>
+
+  <section class="band" aria-labelledby="current-heading">
+    <div class="site-shell">
+      <div class="band__intro"><h2 id="current-heading">Current product surfaces.</h2><p>“Available,” “beta,” and “gated beta” are intentionally distinct. A repository being public does not imply a hosted service is generally available.</p></div>
+      <div class="product-grid">
+        {activeProducts.map((product) => (
+          <article class="product-card">
+            <span class:list={["status", `status--${product.maturity}`]} data-oc-primitive="status-indicator" data-oc-state={product.maturity === 'available' ? 'success' : 'unavailable'}>{product.statusLabel}</span>
+            <h3 style="margin-top: var(--oc-space-3)">{product.name}</h3>
+            <p>{product.summary}</p>
+            <p><strong>Platform:</strong> {product.platforms}</p>
+            <p class="mono muted" style="font-size: var(--oc-type--1)">Owner: {product.ownerRepository}</p>
+            <a href={product.primaryAction.href}>{product.primaryAction.label}</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="archive-heading">
+    <div class="site-shell">
+      <div class="band__intro"><h2 id="archive-heading">Archived and successor lineage.</h2><p>Historical products remain visible only where migration or release lineage matters.</p></div>
+      {archivedProducts.map((product) => (
+        <article class="evidence-card" style="margin-top: var(--oc-space-6)">
+          <span class="status" data-oc-primitive="status-indicator" data-oc-state="unavailable">{product.statusLabel}</span>
+          <h3 style="margin-top: var(--oc-space-3)">{product.name}</h3>
+          <p>{product.summary}</p>
+          {product.successorId && <p><strong>Successor registry ID:</strong> <code>{product.successorId}</code></p>}
+          <a href={product.primaryAction.href}>{product.primaryAction.label}</a>
+        </article>
+      ))}
+    </div>
+  </section>
+</SiteLayout>
