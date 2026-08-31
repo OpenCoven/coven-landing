@@ -20,6 +20,12 @@ const allowedMaturities = new Set([
   'archived',
 ]);
 const expectedActiveIds = ['coven-cli', 'coven-code', 'coven-cave', 'github'];
+const expectedActiveNames = [
+  'Coven CLI',
+  'Coven Code',
+  'Coven Cave',
+  'OpenCoven for GitHub',
+];
 const forbiddenDestinations = [
   'https://opencoven.ai/cave',
   'https://opencoven.ai/cli',
@@ -130,68 +136,96 @@ if (canonicalFoundationCommands.some(({ command }) => /\bcoven init\b/i.test(com
   fail('canonical foundation must never contain coven init');
 }
 
+// The procedural guide arrays remain an internal compatibility surface until
+// their legacy data module is removed. They are not the public route source.
 const allGuideIds = allQuickstartGuides.map((guide) => guide.id);
 if (JSON.stringify(allGuideIds) !== JSON.stringify(publicProducts.map((product) => product.id))) {
-  fail('all procedural guides must follow stable registry order');
+  fail('internal procedural guides must follow stable registry order');
 }
 if (
   JSON.stringify(activeQuickstartGuides.map((guide) => guide.id))
   !== JSON.stringify(expectedActiveIds)
 ) {
-  fail('active procedural guides must derive from the active registry set');
+  fail('active internal procedural guides must derive from the active registry set');
 }
 if (
   archivedQuickstartGuides.length !== 1
   || archivedQuickstartGuides[0].id !== 'castcodes'
   || !/Archived/.test(archivedQuickstartGuides[0].status)
 ) {
-  fail('archived procedural guide must be visibly marked as archived');
+  fail('archived internal procedural guide must remain visibly marked as archived');
 }
 
 const pageSource = await readFile(path.join(root, 'src/pages/quickstart.astro'), 'utf8');
 for (const required of [
-  "from '../data/products'",
-  'activeQuickstartGuides.map',
-  'archivedQuickstartGuides.map',
+  "from '../data/products.ts'",
+  'activeProducts.map',
+  'archivedProducts.map',
   'canonicalFoundationCommands.map',
   'data-active-product-grid',
+  'data-archived-product-grid',
   'data-product-lifecycle="archived"',
-  'CastCodes is preserved for migration, not new onboarding.',
+  'Historical lineage stays visible, not recommended.',
 ]) {
   if (!pageSource.includes(required)) {
     fail(`quickstart source is missing registry consumer contract: ${required}`);
   }
 }
-if (pageSource.includes("import { quickstartProducts } from '../data/quickstart'")) {
-  fail('quickstart route must not consume the legacy procedural array directly');
+for (const forbidden of [
+  "import { quickstartProducts } from '../data/quickstart'",
+  'activeQuickstartGuides.map',
+  'archivedQuickstartGuides.map',
+  'allQuickstartGuides.map',
+  'retiredCompatibilityCopy',
+]) {
+  if (pageSource.includes(forbidden)) {
+    fail(`quickstart route retains legacy procedural consumer: ${forbidden}`);
+  }
 }
 
 const builtPath = path.join(root, 'dist', 'quickstart', 'index.html');
 if (existsSync(builtPath)) {
   const html = await readFile(builtPath, 'utf8');
   const activeGrid = html.match(
-    /<ul\s+class="onboard-chooser-grid"[^>]*data-active-product-grid[^>]*>([\s\S]*?)<\/ul>/,
+    /<div\s+class="product-grid"[^>]*data-active-product-grid[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/section>/,
   )?.[1];
-  if (!activeGrid) fail('built quickstart is missing the active product chooser grid');
+  if (!activeGrid) fail('built quickstart is missing the active product grid');
   const activeCards = activeGrid.match(/data-product-lifecycle="active"/g) ?? [];
   if (activeCards.length !== 4) {
-    fail(`built quickstart must contain four active chooser cards; found ${activeCards.length}`);
+    fail(`built quickstart must contain four active cards; found ${activeCards.length}`);
   }
-  if (/href="#castcodes"/.test(activeGrid) || />CastCodes</.test(activeGrid)) {
-    fail('CastCodes must not appear in the active recommended chooser grid');
+  if (/CastCodes/.test(activeGrid)) {
+    fail('CastCodes must not appear in the active recommended product grid');
   }
-  const archiveCards = html.match(/data-product-lifecycle="archived"/g) ?? [];
+
+  const archiveGrid = html.match(
+    /<div\s+class="archive-stack"[^>]*data-archived-product-grid[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/section>/,
+  )?.[1];
+  if (!archiveGrid) fail('built quickstart is missing the archive grid');
+  const archiveCards = archiveGrid.match(/data-product-lifecycle="archived"/g) ?? [];
   if (archiveCards.length !== 1) {
-    fail(`built quickstart must contain one archived chooser record; found ${archiveCards.length}`);
+    fail(`built quickstart must contain one archived record; found ${archiveCards.length}`);
   }
-  const activeGuideStart = html.indexOf('data-active-product-guides');
-  const archiveStart = html.indexOf('id="onboard-archive"');
-  const castArticle = html.indexOf('id="castcodes"');
-  if (!(activeGuideStart >= 0 && archiveStart > activeGuideStart && castArticle > archiveStart)) {
-    fail('CastCodes article must render after the active guides inside the archive section');
+  if (!/CastCodes/.test(archiveGrid) || !/Archived · use Coven Code/.test(archiveGrid)) {
+    fail('built archive record must identify CastCodes and its Coven Code successor');
   }
-  if (!html.includes('Archived · use Coven Code')) {
-    fail('built CastCodes record must show its archive/successor status');
+
+  const jsonBlocks = [...html.matchAll(
+    /<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/g,
+  )].map((match) => JSON.parse(match[1]));
+  const documents = jsonBlocks.flatMap((entry) => (Array.isArray(entry) ? entry : [entry]));
+  const collection = documents.find((entry) => entry['@type'] === 'CollectionPage');
+  if (!collection) fail('built quickstart is missing CollectionPage JSON-LD');
+  const items = collection.mainEntity?.itemListElement;
+  if (!Array.isArray(items) || items.length !== 4) {
+    fail('quickstart CollectionPage JSON-LD must contain exactly four active products');
+  }
+  const jsonNames = items.map((item) => item.name);
+  if (JSON.stringify(jsonNames) !== JSON.stringify(expectedActiveNames)) {
+    fail(`quickstart JSON-LD names drifted: ${jsonNames.join(', ')}`);
+  }
+  if (jsonNames.includes('CastCodes')) {
+    fail('quickstart active JSON-LD must not include CastCodes');
   }
   if (/name="description"[^>]*CastCodes/i.test(html)) {
     fail('current quickstart metadata must not promote CastCodes');
@@ -199,5 +233,5 @@ if (existsSync(builtPath)) {
 }
 
 console.log(
-  'Verified four registry-backed active products, one non-recommended CastCodes archive/successor record, and the canonical three-command foundation.',
+  'Verified four registry-backed active products, one non-recommended CastCodes archive/successor record, active-only JSON-LD, and the canonical three-command foundation.',
 );
