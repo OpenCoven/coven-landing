@@ -7,6 +7,7 @@ const root = process.cwd();
 const outputDir = path.join(root, 'artifacts', 'baseline');
 const screenshotDir = path.join(outputDir, 'screenshots');
 const baseURL = process.env.BASELINE_URL ?? 'http://127.0.0.1:4173';
+const siteOrigin = new URL(baseURL).origin;
 const staticReportPath = path.join(outputDir, 'static.json');
 
 await mkdir(screenshotDir, { recursive: true });
@@ -66,10 +67,11 @@ async function ready(page) {
 }
 
 async function createContext(browser, options) {
-  const context = await browser.newContext(options);
-  await context.addInitScript(({ theme }) => {
+  const { theme = 'system', ...browserOptions } = options;
+  const context = await browser.newContext(browserOptions);
+  await context.addInitScript(({ selectedTheme }) => {
     try {
-      localStorage.setItem('theme', theme);
+      localStorage.setItem('theme', selectedTheme);
     } catch {
       // The page has its own fail-closed theme fallback.
     }
@@ -88,7 +90,7 @@ async function createContext(browser, options) {
     } catch {
       // Long Task API is not available in every engine/context.
     }
-  }, { theme: options.theme ?? 'system' });
+  }, { selectedTheme: theme });
   return context;
 }
 
@@ -328,7 +330,7 @@ try {
   for (const route of report.routes) {
     for (const link of route.links) {
       const url = new URL(link.href, baseURL);
-      if (url.origin !== new URL(baseURL).origin) continue;
+      if (url.origin !== siteOrigin) continue;
       if (url.pathname.startsWith('/download/') || url.pathname.startsWith('/stream/')) continue;
       uniqueLinks.set(url.toString(), link.text);
     }
@@ -341,13 +343,13 @@ try {
       const response = await page.goto(`${target.origin}${target.pathname}${target.search}`, {
         waitUntil: 'domcontentloaded',
       });
-      const selector = `#${CSS.escape(target.hash.slice(1))}`;
-      const exists = await page.locator(selector).count().catch(() => 0);
+      const fragmentId = decodeURIComponent(target.hash.slice(1));
+      const exists = await page.evaluate((id) => Boolean(document.getElementById(id)), fragmentId);
       report.linkChecks.push({
         url,
         text,
         status: response?.status() ?? null,
-        fragmentExists: exists > 0,
+        fragmentExists: exists,
       });
       await page.close();
     } else {
