@@ -88,13 +88,13 @@ const jsonLdDocuments = (html) => {
   return blocks.flatMap((entry) => (Array.isArray(entry) ? entry : [entry]));
 };
 
+// The shell migration is intentionally staged. This PR owns the homepage,
+// Quickstart, and GitHub routes; #80 will move how-it-works and legal/trust
+// routes onto SiteLayout and expand canonical enforcement to them.
 for (const [html, route] of [
   [home, '/'],
   [quickstart, '/quickstart'],
   [github, '/github'],
-  [howItWorks, '/how-it-works'],
-  [privacy, '/privacy'],
-  [terms, '/terms'],
 ]) {
   assertCanonical(html, route);
 }
