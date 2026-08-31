@@ -25,6 +25,9 @@ const EXPECTED_HEADINGS: Record<(typeof PUBLIC_ROUTES)[number], string> = {
   '/terms/': 'Terms of Service',
 };
 
+const canonicalFor = (route: (typeof PUBLIC_ROUTES)[number]) =>
+  new URL(route.replace(/\/$/, '') || '/', 'https://opencoven.ai').toString();
+
 test('all public routes render canonical content without runtime errors', async ({ page }) => {
   const runtimeErrors: string[] = [];
   page.on('pageerror', (error) => runtimeErrors.push(`pageerror: ${error.message}`));
@@ -44,7 +47,7 @@ test('all public routes render canonical content without runtime errors', async 
     await expect(page.locator('main#content')).toBeVisible();
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
-      `${ORIGIN.replace('127.0.0.1:4173', 'opencoven.ai')}${route.replace(/\/$/, '')}`,
+      canonicalFor(route),
     );
 
     const dimensions = await page.evaluate(() => ({
@@ -113,7 +116,7 @@ test('reduced-motion preference preserves complete readable states', async ({ pa
   ).toBe(true);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'A concrete local proof.' })).toBeVisible();
-  await expect(page.getByText('The principal decides.', { exact: false })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'The principal decides.' })).toBeVisible();
 });
 
 test('static public content remains usable when JavaScript is disabled', async ({ browser }) => {
