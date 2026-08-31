@@ -1,13 +1,15 @@
 {
   "schemaVersion": "opencoven.landing-upstream-contracts/v1",
-  "updatedAt": "2026-08-30",
+  "updatedAt": "2026-08-31",
   "brand": {
     "repository": "OpenCoven/brand",
     "revision": "4127be6d402089d15953e76988bbeab2db37df54",
     "profileVersion": "1.0.0",
     "source": "web/profile.css",
     "vendoredPath": "src/styles/tokens.css",
-    "canonicalAsset": "web/assets/mark.svg"
+    "canonicalAsset": "web/assets/mark.svg",
+    "canonicalAssetBlob": "c4817c35d0ea05194396d00e86b4525868f3ad1f",
+    "vendoredAssetPath": "public/assets/opencoven-mark.svg"
   },
   "ui": {
     "repository": "OpenCoven/ui",
@@ -24,7 +26,7 @@
   },
   "updatePolicy": [
     "Pin immutable upstream merge revisions; never track branch heads in production evidence.",
-    "Do not edit canonical token values locally. Update the pinned brand revision and vendored artifact together.",
+    "Do not edit canonical token or mark values locally. Update the pinned brand revision and vendored artifacts together.",
     "Landing-only aliases must describe layout/composition, not redefine brand or status semantics.",
     "UI contract changes must preserve native-first, static-first, non-color state, visible focus, and unsupported-is-not-pass laws.",
     "Run pnpm check and browser validation before accepting a new upstream revision."
