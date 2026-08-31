@@ -1,0 +1,68 @@
+/* OpenCoven canonical web surface profile v1.0.0. Framework-neutral and static-safe. */
+:root,
+:root[data-oc-theme="light"] {
+  color-scheme: light;
+  --oc-bg: #fcfafe; --oc-surface-1: #ffffff; --oc-surface-2: #f6f0fa; --oc-surface-3: #ece3f2;
+  --oc-text: #1a1320; --oc-text-muted: #5d5265; --oc-text-subtle: #74667e;
+  --oc-border: #d8cce0; --oc-border-strong: #b9a8c4;
+  --oc-action: #7a22ee; --oc-action-hover: #6410cc; --oc-on-action: #ffffff; --oc-focus: #6e19da;
+  --oc-presence: #5e2a8a; --oc-on-presence: #ffffff;
+  --oc-success-bg: #e7f6ec; --oc-success-text: #17683a;
+  --oc-pending-bg: #fff4d3; --oc-pending-text: #704b00;
+  --oc-blocked-bg: #fdebec; --oc-blocked-text: #8a1c1c;
+  --oc-evidence-bg: #f2edf5; --oc-evidence-text: #4a3f51;
+  --oc-font-display: Geist, Inter, "SF Pro Display", system-ui, sans-serif;
+  --oc-font-reading: Inter, "SF Pro Text", system-ui, sans-serif;
+  --oc-font-mono: "SFMono-Regular", ui-monospace, Menlo, Monaco, Consolas, monospace;
+  --oc-type--1: clamp(0.875rem, 0.84rem + 0.15vw, 0.95rem);
+  --oc-type-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --oc-type-1: clamp(1.2rem, 1.08rem + 0.55vw, 1.5rem);
+  --oc-type-2: clamp(1.5rem, 1.28rem + 1vw, 2rem);
+  --oc-type-3: clamp(2rem, 1.55rem + 2vw, 3rem);
+  --oc-type-4: clamp(2.75rem, 1.9rem + 3.8vw, 5rem);
+  --oc-leading-reading: 1.62; --oc-leading-heading: 1.05;
+  --oc-reading-measure: 68ch; --oc-technical-measure: 80ch;
+  --oc-tracking-heading: -0.035em; --oc-tracking-label: 0.12em;
+  --oc-space-1: 0.25rem; --oc-space-2: 0.5rem; --oc-space-3: 0.75rem; --oc-space-4: 1rem;
+  --oc-space-6: 1.5rem; --oc-space-8: 2rem; --oc-space-12: 3rem; --oc-space-16: 4rem; --oc-space-24: 6rem;
+  --oc-radius-1: 0.25rem; --oc-radius-2: 0.5rem; --oc-radius-3: 0.75rem; --oc-radius-4: 1rem;
+  --oc-shadow-1: 0 1px 2px rgb(26 19 32 / 0.08); --oc-shadow-2: 0 12px 32px rgb(26 19 32 / 0.12);
+  --oc-focus-ring: 0 0 0 3px color-mix(in srgb, var(--oc-focus) 35%, transparent);
+  --oc-motion-fast: 120ms; --oc-motion-standard: 180ms; --oc-motion-slow: 320ms;
+  --oc-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+:root[data-oc-theme="dark"] {
+  color-scheme: dark;
+  --oc-bg: #050409; --oc-surface-1: #0f0d14; --oc-surface-2: #17131e; --oc-surface-3: #211a2b;
+  --oc-text: #f7f3fa; --oc-text-muted: #cbbfd3; --oc-text-subtle: #a998b5;
+  --oc-border: #3b3146; --oc-border-strong: #5b4b69;
+  --oc-action: #8e3dff; --oc-action-hover: #7a22ee; --oc-on-action: #ffffff; --oc-focus: #c9a7ff;
+  --oc-presence: #b991ff; --oc-on-presence: #050409;
+  --oc-success-bg: #11281b; --oc-success-text: #93e6b4;
+  --oc-pending-bg: #2b210d; --oc-pending-text: #ffd27a;
+  --oc-blocked-bg: #321517; --oc-blocked-text: #ffb4ac;
+  --oc-evidence-bg: #201a25; --oc-evidence-text: #e8e0f0;
+  --oc-shadow-1: 0 1px 2px rgb(0 0 0 / 0.4); --oc-shadow-2: 0 16px 40px rgb(0 0 0 / 0.42);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-oc-theme="light"]) {
+    color-scheme: dark;
+    --oc-bg: #050409; --oc-surface-1: #0f0d14; --oc-surface-2: #17131e; --oc-surface-3: #211a2b;
+    --oc-text: #f7f3fa; --oc-text-muted: #cbbfd3; --oc-text-subtle: #a998b5;
+    --oc-border: #3b3146; --oc-border-strong: #5b4b69;
+    --oc-action: #8e3dff; --oc-action-hover: #7a22ee; --oc-on-action: #ffffff; --oc-focus: #c9a7ff;
+    --oc-presence: #b991ff; --oc-on-presence: #050409;
+    --oc-success-bg: #11281b; --oc-success-text: #93e6b4;
+    --oc-pending-bg: #2b210d; --oc-pending-text: #ffd27a;
+    --oc-blocked-bg: #321517; --oc-blocked-text: #ffb4ac;
+    --oc-evidence-bg: #201a25; --oc-evidence-text: #e8e0f0;
+    --oc-shadow-1: 0 1px 2px rgb(0 0 0 / 0.4); --oc-shadow-2: 0 16px 40px rgb(0 0 0 / 0.42);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --oc-motion-fast: 0.01ms; --oc-motion-standard: 0.01ms; --oc-motion-slow: 0.01ms; }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+@media (forced-colors: active) {
+  :root { --oc-action: LinkText; --oc-action-hover: LinkText; --oc-on-action: Canvas; --oc-focus: Highlight; --oc-border: CanvasText; --oc-border-strong: CanvasText; }
+}
