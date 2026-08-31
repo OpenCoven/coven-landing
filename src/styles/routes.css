@@ -91,19 +91,19 @@
   [data-oc-state="error"] .copy-status {
     color: var(--oc-danger-text, var(--oc-text));
   }
-}
 
-@media (max-width: 40rem) {
-  .copy-control {
-    grid-template-columns: 1fr;
-  }
+  @media (max-width: 40rem) {
+    .copy-control {
+      grid-template-columns: 1fr;
+    }
 
-  .copy-control__actions {
-    min-width: 0;
-    justify-items: start;
-  }
+    .copy-control__actions {
+      min-width: 0;
+      justify-items: start;
+    }
 
-  .copy-status {
-    text-align: left;
+    .copy-status {
+      text-align: left;
+    }
   }
 }
