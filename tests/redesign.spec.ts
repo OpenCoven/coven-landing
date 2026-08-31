@@ -1,61 +1,170 @@
-import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+import { expect, test } from '@playwright/test';
 
-// Browser checks for the redesign. The static preview server does not run the
-// Vercel functions, so API-fed release metadata is asserted through its
-// graceful static fallback. Primary downloads remain real browser-native links.
+const FOUNDATION_COMMANDS = [
+  'npm install -g @opencoven/cli',
+  'coven doctor',
+  'coven',
+];
 
-test('landing renders the hero and adapts the browser-native download link', async ({ page }) => {
-  // Platform retargeting reads navigator.platform first, because Chrome's UA
-  // reduction can freeze the UA string to Windows on every desktop OS. Emulate
-  // the platform so the host running the suite cannot decide the expectation.
-  await page.addInitScript(() => {
-    Object.defineProperty(navigator, 'platform', {
-      get: () => 'Linux x86_64',
-      configurable: true,
-    });
-  });
+const ACTIVE_PRODUCTS = [
+  'Coven CLI',
+  'Coven Code',
+  'Coven Cave',
+  'OpenCoven for GitHub',
+];
 
+test('vNext homepage renders the bounded story and canonical local start', async ({ page }) => {
   await page.goto('/');
+
   await expect(page).toHaveTitle(/OpenCoven/);
-  await expect(page.locator('h1')).toContainText("Stop being your agents' control plane");
+  await expect(page.locator('h1')).toHaveText(
+    'Give your agents continuity. Keep authority local.',
+  );
+  await expect(
+    page.getByRole('heading', { name: 'Identity → authority → continuity.' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'A concrete local proof.' }),
+  ).toBeVisible();
 
-  const link = page.locator('[data-dl-btn]').first();
-  await expect(link).toBeVisible();
-  await expect(link).toHaveAttribute('href', '/download/linux');
-  await expect(link).toHaveAttribute('data-dl-platform', 'linux');
-  await expect(link).not.toHaveAttribute('data-action', 'startDownload');
-  await expect(link.locator('[data-dl-label]')).toHaveText('Download Cave for Linux');
+  await expect(page.locator('.command-row code')).toHaveText(FOUNDATION_COMMANDS);
+  await expect(
+    page.getByRole('link', { name: 'Start locally' }).first(),
+  ).toHaveAttribute('href', '/quickstart');
 });
 
-test('the braid assembles after idle boot', async ({ page }) => {
+test('recommended products come from the active registry and exclude archives', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('warded-braid canvas')).toBeAttached({ timeout: 15_000 });
+
+  const products = page.locator('#products .product-card');
+  await expect(products).toHaveCount(ACTIVE_PRODUCTS.length);
+  await expect(products.locator('h3')).toHaveText(ACTIVE_PRODUCTS);
+  await expect(page.locator('#products')).not.toContainText('CastCodes');
+
+  const statuses = products.locator('[data-oc-primitive="status-indicator"]');
+  await expect(statuses).toHaveCount(ACTIVE_PRODUCTS.length);
+  for (const status of await statuses.all()) {
+    await expect(status).toHaveAttribute(
+      'data-oc-state',
+      /^(success|selected|unavailable)$/,
+    );
+  }
 });
 
-test('theme toggle flips data-theme and persists', async ({ page }) => {
+test('guided proof stays semantic, complete, and ordered without simulated app chrome', async ({ page }) => {
   await page.goto('/');
+
+  const proof = page.locator('[data-oc-primitive="guided-proof"]');
+  await expect(proof).toHaveAttribute('data-oc-state', 'selected');
+  await expect(proof.locator('.proof-step')).toHaveCount(3);
+  await expect(proof.locator('.proof-step h3')).toHaveText([
+    'Two sessions claim the same surface.',
+    'Coven holds the second protected write.',
+    'The principal decides.',
+  ]);
+  await expect(proof.locator('[data-oc-part="evidence-region"]')).toBeVisible();
+});
+
+test('the pinned canonical mark is used by the shell and hero', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page.locator('header .brand-mark--header')).toBeVisible();
+  await expect(page.locator('.hero__mark .brand-mark')).toBeVisible();
+  await expect(page.locator('header img[src="/favicon.svg"]')).toHaveCount(0);
+  await expect(page.locator('.hero__mark img[src="/favicon.svg"]')).toHaveCount(0);
+
+  const maskImage = await page
+    .locator('.hero__mark .brand-mark')
+    .evaluate((element) => getComputedStyle(element).maskImage);
+  expect(maskImage).toContain('/assets/opencoven-mark.svg');
+});
+
+test('three-state theme control applies and persists explicit preferences', async ({ page }) => {
+  await page.goto('/');
+
   const html = page.locator('html');
-  const before = await html.getAttribute('data-theme');
-  await page.locator('[data-action="toggleTheme"]').first().click();
-  const after = await html.getAttribute('data-theme');
-  expect(after).not.toBe(before);
+  const theme = page.locator('[data-theme-select]');
+  await expect(theme).toHaveValue(/^(system|light|dark)$/);
+
+  await theme.selectOption('light');
+  await expect(html).toHaveAttribute('data-oc-theme', 'light');
+  await expect(html).toHaveAttribute('data-theme', 'light');
+  await expect(html).toHaveAttribute('data-theme-pref', 'light');
+
   await page.reload();
-  await expect(html).toHaveAttribute('data-theme', after);
+  await expect(page.locator('[data-theme-select]')).toHaveValue('light');
+  await expect(html).toHaveAttribute('data-oc-theme', 'light');
+
+  await page.locator('[data-theme-select]').selectOption('dark');
+  await expect(html).toHaveAttribute('data-oc-theme', 'dark');
+  await expect(html).toHaveAttribute('data-theme-pref', 'dark');
 });
 
-test('footer hides the Product column until those pages exist', async ({ page }) => {
+test('mobile navigation exposes state, closes on Escape, and restores focus', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
-  const heading = page.locator('span', { hasText: /^Product$/ }).first();
-  await expect(heading).toBeAttached({ timeout: 15_000 });
-  await expect(heading).toBeHidden();
-  await expect(page.locator('span', { hasText: /^Docs$/ }).first()).toBeVisible();
+
+  const disclosure = page.locator('[data-mobile-navigation]');
+  const trigger = disclosure.locator('summary');
+  await expect(disclosure).toHaveAttribute('data-oc-state', 'collapsed');
+  await expect(trigger).toHaveText('Menu');
+  await expect(trigger).toHaveAccessibleName('Menu');
+
+  await trigger.click();
+  await expect(disclosure).toHaveAttribute('data-oc-state', 'expanded');
+  await expect(trigger).toHaveAccessibleName('Menu');
+  await expect(disclosure.getByRole('link', { name: 'Quickstart' })).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(disclosure).toHaveAttribute('data-oc-state', 'collapsed');
+  await expect(trigger).toHaveAccessibleName('Menu');
+  await expect(trigger).toBeFocused();
+
+  await trigger.click();
+  await page.locator('main').click({ position: { x: 8, y: 120 } });
+  await expect(disclosure).toHaveAttribute('data-oc-state', 'collapsed');
+  await expect(trigger).toHaveAccessibleName('Menu');
 });
 
-test('how-it-works renders with its own head and no template bindings', async ({ page }) => {
-  await page.goto('/how-it-works/');
-  await expect(page).toHaveTitle(/How it works/);
-  await expect(page.locator('main')).toBeAttached();
-  await expect(page.locator('h2', { hasText: 'own worktree' })).toBeAttached();
+test('skip link moves keyboard focus to the main content target', async ({ page }) => {
+  await page.goto('/');
+
+  await page.keyboard.press('Tab');
+  const skipLink = page.getByRole('link', { name: 'Skip to content' });
+  await expect(skipLink).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('main#content')).toBeFocused();
+});
+
+test('homepage reflows at 320 CSS pixels without horizontal document overflow', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto('/');
+
+  await expect(page.locator('h1')).toBeVisible();
+  await expect(page.locator('[data-mobile-navigation]')).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    )
+    .toBe(true);
+});
+
+test('homepage shell has no automatically detectable WCAG violations', async ({ page }) => {
+  await page.goto('/');
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+});
+
+test('mobile navigation open state has no automatically detectable WCAG violations', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.locator('[data-mobile-navigation] summary').click();
+
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
 });
 
 test('privacy table remains keyboard accessible on narrow screens', async ({ page }) => {
@@ -64,13 +173,15 @@ test('privacy table remains keyboard accessible on narrow screens', async ({ pag
 
   const table = page.getByRole('region', { name: 'Data collection details' });
   await expect(table).toHaveAttribute('tabindex', '0');
-  await expect.poll(() => table.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  await expect
+    .poll(() => table.evaluate((element) => element.scrollWidth > element.clientWidth))
+    .toBe(true);
 
   await table.focus();
   await expect(table).toBeFocused();
 });
 
-test('no unexpected console errors on the landing page', async ({ page }) => {
+test('no unexpected console errors on the vNext homepage', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(`pageerror: ${error}`));
   page.on('console', (message) => {
@@ -78,61 +189,27 @@ test('no unexpected console errors on the landing page', async ({ page }) => {
     if (message.location().url.includes('/api/')) return;
     errors.push(`console: ${message.text()}`);
   });
+
   await page.goto('/');
-  await expect(page.locator('warded-braid canvas')).toBeAttached({ timeout: 20_000 });
+  await page.locator('#products').scrollIntoViewIfNeeded();
+  await page.locator('[data-theme-select]').selectOption('light');
   expect(errors).toEqual([]);
 });
 
-// The current board demo continues to animate. These tests assert behavior,
-// not animation, so reduced motion keeps actionability deterministic.
-test.describe('interactions with the demo held still', () => {
-  test.use({ reducedMotion: 'reduce' });
+test.describe('static-first homepage without JavaScript', () => {
+  test.use({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
 
-  test('download chooser exposes state, switches tabs, and restores focus on Escape', async ({ page }) => {
+  test('keeps the narrative, proof, products, commands, and navigation available', async ({ page }) => {
     await page.goto('/');
-    const toggle = page.locator('[data-action="toggleDownloads"]').first();
-    const menu = page.locator('[data-dl-menu]').first();
 
-    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    await expect(toggle).toHaveAttribute('aria-controls', /cave-download-options-/);
-    await toggle.click();
-    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    await expect(menu).toBeVisible();
+    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('.proof-step')).toHaveCount(3);
+    await expect(page.locator('#products .product-card')).toHaveCount(4);
+    await expect(page.locator('.command-row code')).toHaveText(FOUNDATION_COMMANDS);
 
-    const winTab = menu.locator('[data-dl-plat="windows"]');
-    const winPanel = menu.locator('[data-dl-pane="windows"]');
-    await winTab.click();
-    await expect(winTab).toHaveAttribute('aria-selected', 'true');
-    await expect(winTab).toHaveAttribute('tabindex', '0');
-    await expect(winPanel).toBeVisible();
-
-    await page.keyboard.press('Escape');
-    await expect(menu).toBeHidden();
-    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    await expect(toggle).toBeFocused();
-  });
-
-  test('download platform tabs support arrow-key navigation', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('[data-action="toggleDownloads"]').first().click();
-    const menu = page.locator('[data-dl-menu]').first();
-    const macTab = menu.locator('[data-dl-plat="mac"]');
-    const windowsTab = menu.locator('[data-dl-plat="windows"]');
-
-    await macTab.focus();
-    await page.keyboard.press('ArrowRight');
-    await expect(windowsTab).toBeFocused();
-    await expect(windowsTab).toHaveAttribute('aria-selected', 'true');
-  });
-
-  test('clicking a session cell opens the familiar inspector window', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('[data-live-board]').scrollIntoViewIfNeeded();
-    const firstRow = page.locator('[data-panel="sessions"] [data-row]').first();
-    await expect(firstRow).toHaveAttribute('data-fam', 'Hexi');
-    await firstRow.locator(':scope > *').first().click();
-    const win = page.locator('[data-win="profile"]');
-    await expect(win).toBeVisible();
-    await expect(win).toContainText('familiar');
+    const disclosure = page.locator('[data-mobile-navigation]');
+    await disclosure.locator('summary').click();
+    await expect(disclosure).toHaveAttribute('open', '');
+    await expect(disclosure.getByRole('link', { name: 'Quickstart' })).toBeVisible();
   });
 });

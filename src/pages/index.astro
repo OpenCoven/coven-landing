@@ -1,86 +1,217 @@
 ---
-import { ogImage } from '../lib/og.js';
-import '@fontsource/eb-garamond/400.css';
-import '@fontsource/eb-garamond/400-italic.css';
-import '@fontsource/eb-garamond/500.css';
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/500.css';
-import '@fontsource/inter/600.css';
-import '@fontsource/jetbrains-mono/400.css';
-import '@fontsource/jetbrains-mono/500.css';
-import '@phosphor-icons/web/regular';
-import '../styles/redesign.css';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import { activeProducts, canonicalFoundationCommands } from '../data/products.ts';
 
-import ThemeInit from '../components/ThemeInit.astro';
-import PosthogSnippet from '../components/redesign/PosthogSnippet.astro';
-import RedesignNav from '../components/redesign/RedesignNav.astro';
-import RedesignHero from '../components/redesign/RedesignHero.astro';
-import BoardSection from '../components/redesign/BoardSection.astro';
-import Outcomes from '../components/redesign/Outcomes.astro';
-import FinalCta from '../components/redesign/FinalCta.astro';
-import RedesignFooter from '../components/redesign/RedesignFooter.astro';
+const title = 'OpenCoven · Continuity for agents. Authority for their principal.';
+const description = 'Identity-preserving familiar infrastructure with local-first runtime authority, inspectable continuity evidence, and human oversight.';
+
+const trustFacts = [
+  ['Local-first', 'Current Coven proof runs at the local project boundary.'],
+  ['Open source', 'Public repositories, schemas, releases, and implementation evidence.'],
+  ['Provider-backed', 'Supported harness sessions sit behind the shared runtime boundary.'],
+  ['Human-approved guards', 'Protected local actions can wait for explicit principal approval.'],
+  ['Verifiable artifacts', 'Cave release evidence links to GitHub attestations.'],
+];
+
+const concepts = [
+  {
+    name: 'Identity',
+    status: 'Protocol direction',
+    state: 'unavailable',
+    className: 'status--direction',
+    body: 'A familiar is intended to have a stable governed root, declared scope and memory boundary, attributable revisions, and explicit principal binding.',
+  },
+  {
+    name: 'Authority',
+    status: 'Implemented proof + protocol work',
+    state: 'success',
+    className: 'status--available',
+    body: 'Today, Coven can hold protected local actions for human approval. The broader principal-authentication and cross-surface authority profile remains ongoing protocol work.',
+  },
+  {
+    name: 'Continuity',
+    status: 'Protocol direction',
+    state: 'unavailable',
+    className: 'status--direction',
+    body: 'Continuity is evidence that a later embodiment or revision is the same familiar, a successor, a fork, a restored state, or a different root—not merely the same prompt or display name.',
+  },
+];
+
+const productUiState = (maturity: string) => {
+  if (maturity === 'available') return 'success';
+  if (maturity === 'gated-beta') return 'unavailable';
+  return 'selected';
+};
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>OpenCoven · Stop being your agents' control plane</title>
-    <meta
-      name="description"
-      content="Coven is a local daemon that coordinates coding agents working in the same repo: claims on surfaces, one shared record, and guards that wait for your yes."
-    />
-    <meta property="og:title" content="OpenCoven · Stop being your agents' control plane" />
-    <meta
-      property="og:description"
-      content="A local daemon coordinating coding agents in one repo: claims on surfaces, one shared record, guards that wait for your yes."
-    />
-    <meta property="og:site_name" content="OpenCoven" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://opencoven.ai/" />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@OpenCvn" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <ThemeInit />
-    <PosthogSnippet />
-    <script type="importmap" is:inline>
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.184.0/build/three.module.min.js",
-        "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
-        "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
-        "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
-      },
-      "integrity": {
-        "https://unpkg.com/three@0.184.0/build/three.module.min.js": "sha384-35WaVqXNGvw49+RCXk67Ci9ebo55/5+CfirDbAVSG21KV8/7gO4xwIkhA5ZRcUHc",
-        "https://unpkg.com/three@0.184.0/build/three.core.min.js": "sha384-/2vXInuUL2LKgd3n86c5RIzG+YC7vk3zYPTknaEkF2H2sauHtaOrS8swZ+MURxU6",
-        "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
-        "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
-        "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
-      }
-    }
-    </script>
-    <script type="module" src="/warded-braid.js?v=7" is:inline></script>
-  </head>
-  <body>
-    <RedesignNav />
-    <main>
-      <div data-screen-label="Landing v10 product surfaces" data-r="shell" style="min-width: 1140px; background: var(--cv-bg-base); padding-top: 116px">
-        <RedesignHero />
-        <BoardSection />
-        <Outcomes />
-        <FinalCta />
+<SiteLayout title={title} description={description} canonicalPath="/">
+  <section class="site-shell hero" id="top">
+    <div class="hero__copy">
+      <p class="eyebrow">Identity-preserving familiar infrastructure</p>
+      <h1>Give your agents continuity. Keep authority local.</h1>
+      <p class="hero__lede">
+        OpenCoven is building governed familiar identities that can carry memory,
+        provenance, and permissions across the surfaces where they work. Today,
+        Coven proves the local foundation through shared claims, durable records,
+        and human-approved guards.
+      </p>
+      <div class="button-row">
+        <a class="action action--primary" data-oc-primitive="action" data-oc-part="label" data-oc-state="idle" href="/quickstart">Start locally</a>
+        <a class="action" data-oc-primitive="action" data-oc-part="label" data-oc-state="idle" href="#how-it-works">See how it works</a>
       </div>
-    </main>
-    <RedesignFooter />
+    </div>
+    <div class="hero__mark" aria-hidden="true">
+      <span class="brand-mark"></span>
+    </div>
+  </section>
 
-    <script>
-      import '../scripts/redesign/landing.js';
-    </script>
-  </body>
-</html>
+  <section class="band" aria-labelledby="trust-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="trust-heading">Trust starts with boundaries.</h2>
+        <p>
+          The landing page is not a protocol authority. It presents only evidence-backed
+          product state and clearly marks category direction that is not yet complete.
+        </p>
+      </div>
+      <div class="trust-rail">
+        {trustFacts.map(([label, detail]) => (
+          <div>
+            <strong>{label}</strong>
+            <span>{detail}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="how-it-works" aria-labelledby="model-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="model-heading">Identity → authority → continuity.</h2>
+        <p>
+          These are separate concerns. Identity describes which familiar is being
+          embodied. Authority governs protected change. Continuity records why a later
+          embodiment should or should not be considered the same familiar.
+        </p>
+      </div>
+      <div class="concept-grid">
+        {concepts.map((concept) => (
+          <article class="concept-card">
+            <span
+              class:list={["status", concept.className]}
+              data-oc-primitive="status-indicator"
+              data-oc-part="label"
+              data-oc-state={concept.state}
+            >{concept.status}</span>
+            <h3>{concept.name}</h3>
+            <p>{concept.body}</p>
+          </article>
+        ))}
+      </div>
+      <div class="architecture" aria-label="OpenCoven architecture in reading order">
+        <ol>
+          <li><strong>Familiar Contract</strong> defines the governed familiar self.</li>
+          <li><strong>Threads / Coven</strong> enforce protected mutation and runtime authority.</li>
+          <li><strong>Psyche</strong> snapshots authorized identity into orchestration.</li>
+          <li><strong>Coven runtime</strong> owns local session persistence and execution.</li>
+          <li><strong>Cave · Code · GitHub · SDK</strong> are product and client surfaces.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="proof-heading" data-oc-primitive="guided-proof" data-oc-state="selected">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="proof-heading">A concrete local proof.</h2>
+        <p>
+          The strongest current story is deliberately smaller than a simulated operating
+          system: two sessions want the same protected surface, Coven holds the conflict,
+          and the principal decides what happens next.
+        </p>
+      </div>
+      <div class="proof-sequence" data-oc-part="evidence-region">
+        <article class="proof-step" id="proof-claim">
+          <div class="proof-step__body">
+            <span class="status status--available" data-oc-primitive="status-indicator" data-oc-part="label" data-oc-state="success">Available today</span>
+            <h3>Two sessions claim the same surface.</h3>
+            <p>The shared local record makes competing intent visible instead of letting one session silently overwrite another.</p>
+            <code>session-a → claim src/auth.ts · session-b → competing claim</code>
+          </div>
+        </article>
+        <article class="proof-step" id="proof-hold">
+          <div class="proof-step__body">
+            <span class="status status--available" data-oc-primitive="status-indicator" data-oc-part="label" data-oc-state="success">Available today</span>
+            <h3>Coven holds the second protected write.</h3>
+            <p>The runtime records why the operation is waiting, preserving an inspectable boundary instead of guessing on behalf of the principal.</p>
+            <code>guard → held · reason: overlapping protected surface</code>
+          </div>
+        </article>
+        <article class="proof-step" id="proof-decision">
+          <div class="proof-step__body">
+            <span class="status status--available" data-oc-primitive="status-indicator" data-oc-part="label" data-oc-state="success">Available today</span>
+            <h3>The principal decides.</h3>
+            <p>Approval, redirection, or rejection remains a human decision; the evidence stays attached to the local workflow for inspection in Cave.</p>
+            <code>principal decision → approve | redirect | reject</code>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="products" aria-labelledby="products-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="products-heading">Choose the surface that matches the job.</h2>
+        <p>
+          Product status and destinations come from the checked-in public registry rather
+          than duplicated homepage strings. Archived predecessors are intentionally omitted
+          from the recommended start path.
+        </p>
+      </div>
+      <div class="product-grid">
+        {activeProducts.map((product) => (
+          <article class="product-card">
+            <span
+              class:list={["status", `status--${product.maturity}`]}
+              data-oc-primitive="status-indicator"
+              data-oc-part="label"
+              data-oc-state={productUiState(product.maturity)}
+            >{product.statusLabel}</span>
+            <p class="eyebrow">{product.eyebrow}</p>
+            <h3>{product.name}</h3>
+            <p>{product.summary}</p>
+            <p><strong>Best for:</strong> {product.bestFor}</p>
+            <p class="muted">{product.platforms}</p>
+            <a class="action" data-oc-primitive="action" data-oc-part="label" data-oc-state="idle" href={product.primaryAction.href}>{product.primaryAction.label}</a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="quickstart-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="quickstart-heading">One canonical local start.</h2>
+        <p>
+          Install the shared runtime, verify the project, then open Coven. Product-specific
+          branches come after this common foundation.
+        </p>
+      </div>
+      <div class="command-block">
+        {canonicalFoundationCommands.map((item, index) => (
+          <div class="command-row">
+            <span>{index + 1}</span>
+            <code>{item.command}</code>
+          </div>
+        ))}
+      </div>
+      <div class="button-row button-row--spaced">
+        <a class="action action--primary" data-oc-primitive="action" data-oc-part="label" data-oc-state="idle" href="/quickstart">Start locally</a>
+        <a class="action" data-oc-primitive="action" data-oc-part="label" data-oc-state="idle" href="https://docs.opencoven.ai">Read the docs</a>
+      </div>
+    </div>
+  </section>
+</SiteLayout>

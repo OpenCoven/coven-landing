@@ -58,13 +58,12 @@ test('the browser-native resolver remains wired to an allowlisted release select
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 
-  test('the primary Cave link is visible and points at the server resolver', async ({ page }) => {
+  test('the vNext homepage keeps the canonical start path usable without restoring a full download chooser', async ({ page }) => {
     await page.goto('/');
-    const link = page.locator('[data-dl-btn]').first();
-    await expect(link).toBeVisible();
-    await expect(link).toHaveAttribute('href', '/download/mac');
-    await expect(link.locator('[data-dl-label]')).toHaveText('Download Cave for macOS');
-    await expect(link).toHaveAttribute('data-dl-platform', 'mac');
-    expect(await link.evaluate((element) => element.tagName)).toBe('A');
+    const start = page.getByRole('link', { name: 'Start locally' }).first();
+    await expect(start).toBeVisible();
+    await expect(start).toHaveAttribute('href', '/quickstart');
+    expect(await start.evaluate((element) => element.tagName)).toBe('A');
+    await expect(page.locator('[data-dl-btn]')).toHaveCount(0);
   });
 });

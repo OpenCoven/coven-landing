@@ -1,0 +1,67 @@
+---
+// Native three-state theme control required by the shared UI contract.
+// Without JavaScript, the document remains on the system preference resolved
+// by CSS. With JavaScript, only system/light/dark may be persisted.
+---
+
+<label
+  class="theme-control"
+  data-oc-primitive="theme-control"
+  data-oc-state="selected"
+>
+  <span class="theme-control__label" data-oc-part="label">Theme</span>
+  <select
+    aria-label="Color theme"
+    data-oc-part="control"
+    data-theme-select
+  >
+    <option value="system">System</option>
+    <option value="light">Light</option>
+    <option value="dark">Dark</option>
+  </select>
+</label>
+
+<script is:inline>
+  (function () {
+    var allowed = ['system', 'light', 'dark'];
+    var media = window.matchMedia
+      ? window.matchMedia('(prefers-color-scheme: light)')
+      : null;
+
+    function resolve(preference) {
+      if (preference === 'light' || preference === 'dark') return preference;
+      return media && media.matches ? 'light' : 'dark';
+    }
+
+    function apply(preference) {
+      var resolved = resolve(preference);
+      var html = document.documentElement;
+      html.dataset.ocTheme = resolved;
+      html.dataset.theme = resolved;
+      html.dataset.themePref = preference;
+    }
+
+    document.querySelectorAll('[data-theme-select]').forEach(function (control) {
+      var preference = document.documentElement.dataset.themePref || 'system';
+      if (!allowed.includes(preference)) preference = 'system';
+      control.value = preference;
+      apply(preference);
+
+      control.addEventListener('change', function () {
+        var next = allowed.includes(control.value) ? control.value : 'system';
+        try {
+          localStorage.setItem('theme', next);
+        } catch (_) {
+          // Persistence is optional; the selected theme still applies now.
+        }
+        apply(next);
+      });
+
+      if (media && typeof media.addEventListener === 'function') {
+        media.addEventListener('change', function () {
+          if (control.value === 'system') apply('system');
+        });
+      }
+    });
+  })();
+</script>

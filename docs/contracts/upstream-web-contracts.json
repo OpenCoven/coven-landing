@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "opencoven.landing-upstream-contracts/v1",
+  "updatedAt": "2026-08-31",
+  "brand": {
+    "repository": "OpenCoven/brand",
+    "revision": "4127be6d402089d15953e76988bbeab2db37df54",
+    "profileVersion": "1.0.0",
+    "source": "web/profile.css",
+    "vendoredPath": "src/styles/tokens.css",
+    "canonicalAsset": "web/assets/mark.svg",
+    "canonicalAssetBlob": "c4817c35d0ea05194396d00e86b4525868f3ad1f",
+    "vendoredAssetPath": "public/assets/opencoven-mark.svg"
+  },
+  "ui": {
+    "repository": "OpenCoven/ui",
+    "revision": "ada9fe474edb8704f7bf860ee0ca829822dbb2e2",
+    "contractVersion": "1.0.0",
+    "interactionSchema": "opencoven.ui-web-interactions/v1",
+    "testVectorSchema": "opencoven.ui-test-vectors/v1",
+    "stableHooks": ["data-oc-primitive", "data-oc-part", "data-oc-state"]
+  },
+  "ownership": {
+    "landing": "Static public-web implementation and route composition only",
+    "brand": "Visual identity, voice, semantic token values, and current mark",
+    "ui": "Framework-neutral interaction semantics and shared test vectors"
+  },
+  "browserValidation": {
+    "requiredModes": ["javascript", "no-javascript", "reduced-motion", "320px", "mobile-navigation-open"],
+    "accessibility": "axe on homepage shell and mobile-navigation open state",
+    "retiredAssertionsForbidden": ["Cave board simulation", "render-required WebGL", "two-state theme toggle"]
+  },
+  "updatePolicy": [
+    "Pin immutable upstream merge revisions; never track branch heads in production evidence.",
+    "Do not edit canonical token or mark values locally. Update the pinned brand revision and vendored artifacts together.",
+    "Landing-only aliases must describe layout/composition, not redefine brand or status semantics.",
+    "UI contract changes must preserve native-first, static-first, non-color state, visible focus, and unsupported-is-not-pass laws.",
+    "Run pnpm check and browser validation before accepting a new upstream revision."
+  ]
+}
