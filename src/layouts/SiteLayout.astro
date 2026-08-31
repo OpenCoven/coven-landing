@@ -48,20 +48,20 @@ const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
           <span>OpenCoven</span>
         </a>
         <nav class="desktop-nav" aria-label="Primary" data-oc-part="primary-links">
-          <a href="/#how-it-works">How it works</a>
-          <a href="/#products">Products</a>
+          <a href="/how-it-works" aria-current={pathname === '/how-it-works' ? 'page' : undefined}>How it works</a>
+          <a href="/protocol" aria-current={pathname === '/protocol' ? 'page' : undefined}>Protocol</a>
           <a href="/quickstart" aria-current={pathname === '/quickstart' ? 'page' : undefined}>Quickstart</a>
-          <a href="/github" aria-current={pathname === '/github' ? 'page' : undefined}>GitHub</a>
+          <a href="/status" aria-current={pathname === '/status' ? 'page' : undefined}>Status</a>
           <a href="https://docs.opencoven.ai">Docs</a>
         </nav>
         <details class="mobile-nav" data-oc-primitive="mobile-navigation">
           <summary aria-label="Open navigation" data-oc-part="trigger">Menu</summary>
           <div class="mobile-nav__panel" data-oc-part="panel">
             <nav aria-label="Mobile primary" data-oc-part="links">
-              <a href="/#how-it-works">How it works</a>
-              <a href="/#products">Products</a>
+              <a href="/how-it-works">How it works</a>
+              <a href="/protocol">Protocol</a>
               <a href="/quickstart">Quickstart</a>
-              <a href="/github">GitHub</a>
+              <a href="/status">Status</a>
               <a href="https://docs.opencoven.ai">Docs</a>
             </nav>
           </div>
@@ -73,6 +73,9 @@ const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
       <div class="site-shell site-footer__inner">
         <span>OpenCoven · identity-preserving familiar infrastructure</span>
         <nav aria-label="Footer">
+          <a href="/protocol">Protocol</a>
+          <a href="/security">Security</a>
+          <a href="/status">Status</a>
           <a href="https://github.com/OpenCoven">GitHub</a>
           <a href="https://docs.opencoven.ai">Docs</a>
           <a href="/privacy">Privacy</a>
