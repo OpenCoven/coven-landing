@@ -53,6 +53,7 @@ test('shared desktop and mobile navigation retain GitHub and expose Protocol', a
   await page.goto('/protocol/');
 
   const desktop = page.locator('.desktop-nav');
+  await expect(desktop).toBeVisible();
   await expect(desktop.getByRole('link', { name: 'Protocol' })).toHaveAttribute(
     'aria-current',
     'page',
@@ -62,7 +63,9 @@ test('shared desktop and mobile navigation retain GitHub and expose Protocol', a
     '/github',
   );
 
+  await page.setViewportSize({ width: 390, height: 844 });
   const mobile = page.locator('[data-mobile-navigation]');
+  await expect(mobile.locator('summary')).toBeVisible();
   await mobile.locator('summary').click();
   await expect(mobile).toHaveAttribute('open', '');
   await expect(mobile.getByRole('link', { name: 'Protocol' })).toHaveAttribute(
@@ -150,21 +153,22 @@ test('terms route preserves the dated governing text during shell migration', as
   await expect(page.getByText('State of Texas', { exact: false })).toBeVisible();
 });
 
-test('trust and legal routes reflow at 320 CSS pixels without document overflow', async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 800 });
-
-  for (const route of ROUTES) {
+for (const route of ROUTES) {
+  test(`${route.path} reflows at 320 CSS pixels without document overflow`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
     await page.goto(route.path);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect
-      .poll(() =>
-        page.evaluate(
-          () => document.documentElement.scrollWidth <= window.innerWidth,
-        ),
-      )
-      .toBe(true);
-  }
-});
+
+    const dimensions = await page.evaluate(() => ({
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+    }));
+    expect(
+      dimensions.scrollWidth,
+      `${route.path} rendered ${dimensions.scrollWidth}px wide in a ${dimensions.clientWidth}px viewport`,
+    ).toBeLessThanOrEqual(dimensions.clientWidth);
+  });
+}
 
 for (const route of ROUTES) {
   test(`${route.path} has no automatically detectable WCAG violations`, async ({ page }) => {
