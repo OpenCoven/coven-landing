@@ -1,0 +1,85 @@
+name: Landing baseline evidence
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/baseline.yml'
+      - 'scripts/baseline/**'
+      - 'src/**'
+      - 'public/**'
+      - 'api/**'
+      - 'workers/**'
+      - 'vercel.json'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+concurrency:
+  group: landing-baseline-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install baseline system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes ffmpeg
+          pnpm exec playwright install --with-deps chromium
+
+      - name: Build the selected baseline
+        run: CI=true pnpm build
+
+      - name: Capture static route, size, redirect, dependency, and truth inventory
+        run: pnpm baseline:static
+
+      - name: Start preview server
+        run: |
+          pnpm preview > /tmp/coven-landing-preview.log 2>&1 &
+          echo $! > /tmp/coven-landing-preview.pid
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --show-error http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/coven-landing-preview.log
+          exit 1
+
+      - name: Capture browser, viewport, accessibility, request, and failure evidence
+        run: pnpm baseline:browser
+
+      - name: Capture mobile and desktop Lighthouse evidence
+        run: pnpm baseline:lighthouse
+
+      - name: Preserve preview log
+        if: always()
+        run: |
+          mkdir -p artifacts/baseline
+          cp /tmp/coven-landing-preview.log artifacts/baseline/preview.log || true
+
+      - name: Upload measured baseline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: landing-baseline-${{ github.event.pull_request.head.sha || github.sha }}
+          path: artifacts/baseline
+          if-no-files-found: error
+          retention-days: 30
