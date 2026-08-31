@@ -9,6 +9,7 @@ artifacts/
 /.superpowers
 /.copilot/
 /playwright-report/
+/playwright-report-release/
 /test-results/
 
 # analytics keys stay local (copy posthog.config.example.json)
