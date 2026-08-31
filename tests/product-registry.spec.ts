@@ -7,6 +7,8 @@ const ACTIVE_NAMES = [
   'OpenCoven for GitHub',
 ];
 
+const ACTIVE_IDS = ['coven-cli', 'coven-code', 'coven-cave', 'github'];
+
 test('quickstart recommends exactly four active products and separates CastCodes', async ({ page }) => {
   await page.goto('/quickstart/');
 
@@ -17,12 +19,26 @@ test('quickstart recommends exactly four active products and separates CastCodes
   await expect(activeCards.locator('h3')).toHaveText(ACTIVE_NAMES);
   await expect(activeGrid).not.toContainText('CastCodes');
 
+  for (const id of ACTIVE_IDS) {
+    await expect(page.locator(`#${id}`)).toHaveCount(1);
+  }
+
   const archiveGrid = page.locator('[data-archived-product-grid]');
   const archiveCards = archiveGrid.locator('[data-product-lifecycle="archived"]');
   await expect(archiveGrid).toBeVisible();
   await expect(archiveCards).toHaveCount(1);
   await expect(archiveCards).toContainText('CastCodes');
   await expect(archiveCards).toContainText('Archived · use Coven Code');
+  await expect(page.locator('#castcodes')).toHaveCount(1);
+});
+
+test('legacy and current product fragments resolve to real targets', async ({ page }) => {
+  for (const id of [...ACTIVE_IDS, 'castcodes']) {
+    await page.goto(`/quickstart/#${id}`);
+    const target = page.locator(`#${id}`);
+    await expect(target).toHaveCount(1);
+    await expect(target).toBeVisible();
+  }
 });
 
 test('quickstart CollectionPage JSON-LD lists active products only', async ({ page }) => {
