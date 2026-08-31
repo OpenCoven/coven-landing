@@ -24,6 +24,11 @@
     "brand": "Visual identity, voice, semantic token values, and current mark",
     "ui": "Framework-neutral interaction semantics and shared test vectors"
   },
+  "browserValidation": {
+    "requiredModes": ["javascript", "no-javascript", "reduced-motion", "320px", "mobile-navigation-open"],
+    "accessibility": "axe on homepage shell and mobile-navigation open state",
+    "retiredAssertionsForbidden": ["Cave board simulation", "render-required WebGL", "two-state theme toggle"]
+  },
   "updatePolicy": [
     "Pin immutable upstream merge revisions; never track branch heads in production evidence.",
     "Do not edit canonical token or mark values locally. Update the pinned brand revision and vendored artifacts together.",
