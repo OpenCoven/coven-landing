@@ -29,15 +29,19 @@ if (!/#0{3,6}/i.test(favicon) || !/#f{3,6}/i.test(favicon)) {
   throw new Error('public/favicon.svg must retain a high-contrast monochrome treatment');
 }
 
-const requiredRoutes = [
-  'index.html',
-  'quickstart/index.html',
-  'github/index.html',
-  'how-it-works/index.html',
-  'privacy/index.html',
-  'terms/index.html',
-];
-for (const route of requiredRoutes) {
+const routeFiles = {
+  home: 'index.html',
+  quickstart: 'quickstart/index.html',
+  github: 'github/index.html',
+  howItWorks: 'how-it-works/index.html',
+  protocol: 'protocol/index.html',
+  security: 'security/index.html',
+  status: 'status/index.html',
+  privacy: 'privacy/index.html',
+  terms: 'terms/index.html',
+};
+
+for (const route of Object.values(routeFiles)) {
   if (!existsSync(path.join(distDir, route))) {
     throw new Error(`Missing built route: dist/${route}`);
   }
@@ -46,10 +50,24 @@ if (!existsSync(path.join(distDir, 'sitemap-index.xml'))) {
   throw new Error('dist/sitemap-index.xml is missing');
 }
 
-const readDist = (route) => readFile(path.join(distDir, route), 'utf8');
-const [home, quickstart, github, howItWorks, privacy, terms] = await Promise.all(
-  requiredRoutes.map(readDist),
+const entries = await Promise.all(
+  Object.entries(routeFiles).map(async ([key, route]) => [
+    key,
+    await readFile(path.join(distDir, route), 'utf8'),
+  ]),
 );
+const pages = Object.fromEntries(entries);
+const {
+  home,
+  quickstart,
+  github,
+  howItWorks,
+  protocol,
+  security,
+  status,
+  privacy,
+  terms,
+} = pages;
 
 const renderedText = (html) =>
   html
@@ -88,15 +106,11 @@ const jsonLdDocuments = (html) => {
   return blocks.flatMap((entry) => (Array.isArray(entry) ? entry : [entry]));
 };
 
-// The shell migration is intentionally staged. This PR owns the homepage,
-// Quickstart, and GitHub routes; #80 will move how-it-works and legal/trust
-// routes onto SiteLayout and expand canonical enforcement to them.
-for (const [html, route] of [
-  [home, '/'],
-  [quickstart, '/quickstart'],
-  [github, '/github'],
-]) {
-  assertCanonical(html, route);
+for (const [key, route] of Object.entries(routeFiles)) {
+  const pathname = route === 'index.html'
+    ? '/'
+    : `/${route.replace(/\/index\.html$/, '')}`;
+  assertCanonical(pages[key], pathname);
 }
 
 const homeText = renderedText(home);
@@ -146,17 +160,19 @@ if (/role="dialog"[^>]*aria-modal="true"/.test(home)) {
   throw new Error('Site navigation must not be exposed as a modal dialog');
 }
 
-const allPages = [home, quickstart, github, howItWorks, privacy, terms];
-for (const [index, html] of allPages.entries()) {
+for (const [key, html] of Object.entries(pages)) {
   if (!/<main\b/.test(html)) {
-    throw new Error(`Built page ${index + 1} has no main landmark`);
+    throw new Error(`Built page ${key} has no main landmark`);
   }
   const h1Count = (html.match(/<h1\b/g) ?? []).length;
   if (h1Count !== 1) {
-    throw new Error(`Built page ${index + 1} must contain exactly one h1; found ${h1Count}`);
+    throw new Error(`Built page ${key} must contain exactly one h1; found ${h1Count}`);
   }
   if (html.includes('fonts.googleapis.com')) {
-    throw new Error(`Built page ${index + 1} loads a remote Google Fonts stylesheet`);
+    throw new Error(`Built page ${key} loads a remote Google Fonts stylesheet`);
+  }
+  if (/\bstyle="/.test(html)) {
+    throw new Error(`Built page ${key} contains inline presentation styles`);
   }
 }
 
@@ -208,6 +224,12 @@ for (const [label, html, budget] of [
   ['Homepage', home, 75 * 1024],
   ['Quickstart', quickstart, 25 * 1024],
   ['GitHub route', github, 20 * 1024],
+  ['How-it-works route', howItWorks, 20 * 1024],
+  ['Protocol route', protocol, 20 * 1024],
+  ['Security route', security, 20 * 1024],
+  ['Status route', status, 20 * 1024],
+  ['Privacy route', privacy, 20 * 1024],
+  ['Terms route', terms, 20 * 1024],
 ]) {
   const javascript = await initialJavascriptGzip(html);
   if (javascript.bytes > budget) {
@@ -224,8 +246,15 @@ const sourceFiles = [
   'src/pages/index.astro',
   'src/pages/quickstart.astro',
   'src/pages/github.astro',
+  'src/pages/how-it-works.astro',
+  'src/pages/protocol.astro',
+  'src/pages/security.astro',
+  'src/pages/status.astro',
+  'src/pages/privacy.astro',
+  'src/pages/terms.astro',
   'src/styles/vnext.css',
   'src/styles/routes.css',
+  'src/styles/legal.css',
   'src/layouts/SiteLayout.astro',
 ];
 for (const relative of sourceFiles) {
@@ -278,6 +307,11 @@ if (activeCards.length !== 4 || archiveCards.length !== 1) {
   throw new Error(
     `Quickstart must render four active cards and one archive record; found ${activeCards.length} active and ${archiveCards.length} archived`,
   );
+}
+for (const productId of ['coven-cli', 'coven-code', 'coven-cave', 'github', 'castcodes']) {
+  if (!quickstart.includes(`id="${productId}"`)) {
+    throw new Error(`Quickstart is missing stable product fragment #${productId}`);
+  }
 }
 if ((quickstart.match(/data-oc-primitive="copy-control"/g) ?? []).length !== 3) {
   throw new Error('Quickstart must render exactly three copy-control primitives');
@@ -341,10 +375,149 @@ if (!github.includes('data-oc-state="success"')) {
   throw new Error('GitHub route must expose the public self-hosted path as success state');
 }
 
-assertContains(renderedText(howItWorks), ['OpenCoven'], 'How-it-works route');
-assertContains(renderedText(privacy), ['Privacy'], 'Privacy route');
-assertContains(renderedText(terms), ['Terms'], 'Terms route');
+const howItWorksText = renderedText(howItWorks);
+assertContains(
+  howItWorksText,
+  [
+    'The local layer your agent sessions share.',
+    'One project, shared local evidence.',
+    'What Coven owns—and what it does not.',
+    'Runtime authority',
+    'Not identity definition',
+    'Not orchestration policy',
+    'npm install -g @opencoven/cli',
+    'coven doctor',
+  ],
+  'How-it-works route',
+);
+for (const forbidden of ['data-r="shell"', 'min-width: 1140px', '<warded-braid', 'OpenClaw']) {
+  if (howItWorks.includes(forbidden)) {
+    throw new Error(`How-it-works route retains legacy implementation content: ${forbidden}`);
+  }
+}
+
+const protocolText = renderedText(protocol);
+assertContains(
+  protocolText,
+  [
+    'Identity is not authority. Continuity is not a copied prompt.',
+    'Familiar Contract',
+    'SPAR Familiar Continuity Profile',
+    'Psyche',
+    'Coven runtime',
+    'Cave',
+    'Mixed maturity',
+    'The term does not imply personhood or independent legal agency.',
+    'A name in configuration is not sufficient authorization.',
+    'It is not a second identity root or ledger.',
+  ],
+  'Protocol route',
+);
+for (const forbidden of ['same AI everywhere', 'never forgets', 'fully compliant', 'IAM replacement']) {
+  if (protocolText.toLowerCase().includes(forbidden.toLowerCase())) {
+    throw new Error(`Protocol route contains prohibited overclaim: ${forbidden}`);
+  }
+}
+
+const securityText = renderedText(security);
+assertContains(
+  securityText,
+  [
+    'Report vulnerabilities privately. Verify what you run.',
+    'privately DM @BunsDev',
+    'Do not post vulnerability details in a public Discord channel.',
+    'Open a private security advisory',
+    'Response targets',
+    'not a contractual service-level agreement',
+    'No public claim of SOC 2, ISO 27001, third-party audit, formal certification, or complete conformance is made here.',
+  ],
+  'Security route',
+);
+if (securityText.includes('open a public GitHub issue')) {
+  throw new Error('Security route suggests public vulnerability disclosure');
+}
+
+const statusText = renderedText(status);
+assertContains(
+  statusText,
+  [
+    'Status should come from data, not memory.',
+    '4 current · 1 archived',
+    'Coven CLI',
+    'Coven Code',
+    'Coven Cave',
+    'OpenCoven for GitHub',
+    'CastCodes',
+    'Successor: Coven Code',
+    'Archived · use Coven Code',
+  ],
+  'Status route',
+);
+if ((status.match(/data-status-active-products/g) ?? []).length !== 1) {
+  throw new Error('Status route must render one active registry surface');
+}
+if ((status.match(/data-product-id=/g) ?? []).length !== 5) {
+  throw new Error('Status route must render four active products and one archive record');
+}
+if (status.includes('successorId')) {
+  throw new Error('Status route retains the nonexistent successorId field');
+}
+
+const privacyText = renderedText(privacy);
+assertContains(
+  privacyText,
+  [
+    'Privacy Policy',
+    'Last updated: August 31, 2026',
+    'Analytics are disabled by default.',
+    'session replay, heatmaps, and broad autocapture are excluded',
+    'The default build does not load the analytics client.',
+    'We do not sell your data.',
+  ],
+  'Privacy route',
+);
+
+const termsText = renderedText(terms);
+assertContains(
+  termsText,
+  [
+    'Terms of Service',
+    'Effective date: May 27, 2026',
+    'Open Source License',
+    'Third-Party AI Providers',
+    'No Warranty',
+    'Limitation of Liability',
+    'State of Texas',
+  ],
+  'Terms route',
+);
+
+const legalRegister = JSON.parse(
+  await readFile(path.join(root, 'docs/legal/document-register.json'), 'utf8'),
+);
+if (legalRegister.schemaVersion !== 'opencoven.legal-document-register/v1') {
+  throw new Error('Legal document register has an unexpected schema version');
+}
+const privacyRecord = legalRegister.documents.find((item) => item.route === '/privacy');
+const termsRecord = legalRegister.documents.find((item) => item.route === '/terms');
+if (privacyRecord?.lastUpdated !== '2026-08-31') {
+  throw new Error('Privacy register date does not match the published policy');
+}
+if (termsRecord?.lastUpdated !== '2026-05-27') {
+  throw new Error('Terms register date does not match the preserved terms text');
+}
+
+for (const requiredHref of ['/how-it-works', '/protocol', '/quickstart', '/github']) {
+  if ((home.match(new RegExp(`href="${requiredHref.replace('/', '\\/')}"`, 'g')) ?? []).length < 2) {
+    throw new Error(`Shared desktop/mobile navigation is missing ${requiredHref}`);
+  }
+}
+for (const footerHref of ['/security', '/status']) {
+  if (!home.includes(`href="${footerHref}"`)) {
+    throw new Error(`Shared footer is missing ${footerHref}`);
+  }
+}
 
 console.log(
-  `Verified ${requiredPublicFiles.length} public assets, ${requiredRoutes.length} active routes, vNext homepage semantics, canonical Quickstart, bounded GitHub delivery, and current static release contracts.`,
+  `Verified ${requiredPublicFiles.length} public assets, ${Object.keys(routeFiles).length} canonical routes, vNext product/runtime/protocol/security/status/legal truth, and current static release contracts.`,
 );
