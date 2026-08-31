@@ -17,7 +17,7 @@ let cfg: LocalConfig = { projectApiKey: '', region: 'us', mode: 'off' };
 try {
   cfg = JSON.parse(
     fs.readFileSync(
-      new URL('../../../analytics/posthog.config.json', import.meta.url),
+      new URL('../../analytics/posthog.config.json', import.meta.url),
       'utf8',
     ),
   );
