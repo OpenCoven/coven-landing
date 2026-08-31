@@ -1,290 +1,203 @@
 ---
-import { ogImage } from '../lib/og.js';
-import '@fontsource-variable/inter/wght.css';
-import '@fontsource-variable/jetbrains-mono/wght.css';
-import '@fontsource-variable/geist/wght.css';
-import '../styles/global.css';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import '../styles/routes.css';
+import { getPublicProduct } from '../data/products.ts';
 
-import ThemeInit from '../components/ThemeInit.astro';
-import Ambient from '../components/Ambient.astro';
-import Header from '../components/Header.astro';
-import MobileNav from '../components/MobileNav.astro';
-import Footer from '../components/Footer.astro';
+const product = getPublicProduct('github');
+if (!product.docsUrl) throw new Error('GitHub product registry record missing docsUrl');
 
-const waitlistBody = `## Hosted beta waitlist
-
-- Org name:
-- Team size:
-- Repos/backlog shape:
-- Model provider (BYOM):
-- What would you assign first?
-`;
+const title = 'OpenCoven for GitHub · Familiar delivery under human oversight';
+const description = product.summary;
+const waitlistBody = `## Hosted beta interest\n\n- Org name:\n- Team size:\n- Repos/backlog shape:\n- Model provider (BYOM):\n- What would you assign first?\n`;
 const waitlistUrl = `https://github.com/OpenCoven/coven-github/issues/new?${new URLSearchParams({
-  title: 'Hosted beta waitlist: <your org>',
+  title: 'Hosted beta interest: <your org>',
   labels: 'hosted-beta-waitlist',
   body: waitlistBody,
 }).toString()}`;
 
-const operatingLoop = [
+const loop = [
   {
-    label: 'Issue assignment',
-    title: 'Assign the work where it already lives.',
-    copy: 'Drop the familiar onto an issue or trigger label with the same GitHub primitives your team already watches.',
+    title: 'Assign bounded work.',
+    body: 'Start from a GitHub issue or the repository trigger configured by the worker.',
   },
   {
-    label: 'Check Run',
-    title: 'Progress becomes inspectable evidence.',
-    copy: 'The adapter opens a Check Run so status, logs, and task state stay attached to the repo.',
+    title: 'Watch the Check Run.',
+    body: 'Status and execution evidence remain attached to the repository instead of disappearing into a private dashboard.',
   },
   {
-    label: 'Familiar-voice status comment',
-    title: 'The update sounds like the teammate doing the work.',
-    copy: 'Your familiar posts concise status in its own voice while following your skills, norms, and review habits.',
+    title: 'Receive familiar status.',
+    body: 'The familiar reports progress while remaining bounded by worker and repository policy.',
   },
   {
-    label: 'Draft PR',
-    title: 'You get a reviewable pull request back.',
-    copy: 'When the branch is ready, OpenCoven opens a draft PR with the reasoning and evidence reviewers need.',
+    title: 'Review the draft pull request.',
+    body: 'When commits exist, delivery returns as a reviewable draft pull request rather than an invisible mutation.',
   },
   {
-    label: 'Cave oversight',
-    title: 'Humans keep the final authority.',
-    copy: 'CovenCave session links make the run observable, interruptible, and easy to hand back to a person.',
+    title: 'Keep Cave oversight.',
+    body: 'Cave remains the human-legible oversight surface for the broader OpenCoven workflow.',
   },
 ];
 
-const tiers = [
-  {
-    name: 'Community',
-    price: 'Free',
-    note: 'self-host',
-    details: ['Run the adapter yourself', 'BYOM at every tier', 'Community support'],
-  },
-  {
-    name: 'Hosted Starter',
-    price: '$99/mo',
-    note: '14-day trial',
-    details: ['Managed queue', 'One familiar', 'Cave oversight links'],
-  },
-  {
-    name: 'Hosted Team',
-    price: '$399/mo',
-    note: 'team memory',
-    details: ['Multi-familiar routing', 'Audit and usage controls', 'Priority queue'],
-  },
-  {
-    name: 'Hosted Dedicated',
-    price: 'Contact for Pricing',
-    note: 'annual',
-    details: ['Dedicated workers', 'Custom retention', 'SLA and onboarding'],
-  },
-];
+const applicationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: product.name,
+  description,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'GitHub; self-hosted worker',
+  url: 'https://opencoven.ai/github',
+  sameAs: [product.repositoryUrl, product.docsUrl],
+};
 ---
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <ThemeInit />
-  <title>OpenCoven for GitHub — Hosted Beta</title>
-  <meta name="description" content="Assign GitHub issues to a trusted OpenCoven familiar and get draft pull requests back under Cave oversight. Join the hosted beta or self-host the adapter." />
-  <meta property="og:title" content="OpenCoven for GitHub" />
-  <meta property="og:description" content="Assign it like a teammate. Get a PR back." />
-  <meta property="og:site_name" content="OpenCoven" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://opencoven.ai/github" />
-  <meta property="og:image" content={ogImage} />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="OpenCoven — Persistent AI Familiars" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@OpenCvn" />
-  <meta name="twitter:title" content="OpenCoven for GitHub" />
-  <meta name="twitter:description" content="Assign it like a teammate. Get a PR back." />
-  <meta name="twitter:image" content={ogImage} />
-  <meta name="twitter:image:alt" content="OpenCoven — Persistent AI Familiars" />
-  <meta name="theme-color" content="#050409" />
-  <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://opencoven.ai/github" />
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-  <script type="application/ld+json" set:html={JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: 'OpenCoven for GitHub',
-    description: 'A GitHub App adapter for assigning issues to trusted OpenCoven familiars and receiving draft pull requests with Cave oversight.',
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'GitHub',
-    url: 'https://opencoven.ai/github',
-    offers: [
-      { '@type': 'Offer', name: 'Community', price: '0', priceCurrency: 'USD' },
-      { '@type': 'Offer', name: 'Hosted Starter', price: '99', priceCurrency: 'USD' },
-      { '@type': 'Offer', name: 'Hosted Team', price: '399', priceCurrency: 'USD' },
-    ],
-    sameAs: [
-      'https://github.com/OpenCoven/coven-github',
-      'https://github.com/OpenCoven/coven-github/blob/main/docs/demo.md',
-    ],
-  })} />
+<SiteLayout title={title} description={description} canonicalPath="/github">
+  <script type="application/ld+json" set:html={JSON.stringify(applicationJsonLd)} />
 
-  <script is:inline>
-    (function () {
-      var html = document.documentElement;
-      html.classList.add('js-on');
-      if (!window.matchMedia || !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        html.classList.add('motion-on');
-      }
-    })();
-  </script>
-</head>
-<body>
-  <Ambient />
-  <Header />
-  <MobileNav />
-
-  <main id="content" tabindex="-1">
-    <section class="github-hero" id="top" aria-label="OpenCoven for GitHub hero">
-      <div class="github-hero-copy" data-reveal>
-        <p class="github-kicker">
-          <span class="github-kicker-beta"><span class="github-beta-dot" aria-hidden="true"></span>hosted beta</span>
-          github-native · BYOM · Cave oversight
-        </p>
-        <h1>Assign it like a teammate. Get a PR back.</h1>
-        <p class="github-hero-lede">
-          OpenCoven lets your team deploy a trusted familiar to GitHub. It knows your repo context,
-          follows your skills and review norms, drafts PRs under Cave oversight, and gets better as it works with your team.
-        </p>
-        <p class="github-promise">
-          Your familiar on your GitHub: the one that already knows your code, your team, and how you ship.
-        </p>
-        <div class="github-hero-actions">
-          <a class="download-primary" href={waitlistUrl} target="_blank" rel="noopener noreferrer">
-            <span class="download-primary-icon" aria-hidden="true">✦</span>
-            <span class="download-primary-text">
-              <span class="download-primary-label">Join the hosted beta</span>
-              <span class="download-primary-sub">GitHub issue waitlist · no third-party form</span>
-            </span>
-          </a>
-          <a class="btn-secondary" href="https://github.com/OpenCoven/coven-github">Self-host the adapter</a>
-        </div>
+  <section class="site-shell hero" id="top">
+    <div class="hero__copy">
+      <p class="eyebrow">GitHub-triggered familiar delivery</p>
+      <h1>Assign bounded work. Get inspectable delivery back.</h1>
+      <p class="hero__lede">
+        OpenCoven for GitHub connects repository work to a familiar execution path with
+        Check Runs, status evidence, draft pull requests when commits exist, and Cave
+        oversight. Hosted access is gated; the self-hosting path is documented publicly.
+      </p>
+      <div class="button-row">
+        <a
+          class="action action--primary"
+          data-oc-primitive="action"
+          data-oc-part="label"
+          data-oc-state="idle"
+          href={waitlistUrl}
+        >Request hosted beta access</a>
+        <a
+          class="action"
+          data-oc-primitive="action"
+          data-oc-part="label"
+          data-oc-state="idle"
+          href={product.docsUrl}
+        >Self-host the worker</a>
       </div>
+    </div>
+    <aside class="evidence-card" aria-labelledby="availability-heading">
+      <span
+        class="status status--gated-beta"
+        data-oc-primitive="status-indicator"
+        data-oc-part="label"
+        data-oc-state="unavailable"
+      >{product.statusLabel}</span>
+      <h2 class="card-heading" id="availability-heading">Availability boundary</h2>
+      <p class="muted">
+        Hosted access is gated. The public repository and self-hosting documentation are
+        available today. No hosted price, trial, service-level, or general-availability
+        promise is represented on this route.
+      </p>
+      <p class="route-meta mono">Owner: {product.ownerRepository}</p>
+    </aside>
+  </section>
 
-      <div class="github-hero-visual" data-reveal>
-        <div class="github-run-card panel" aria-label="GitHub familiar run preview">
-          <div class="github-run-topbar">
-            <div class="github-run-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-            <span class="github-run-label">github · familiar run</span>
-            <span class="github-run-status">queued</span>
-          </div>
-          <div class="github-run-cmdline">
-            <span class="card-prompt" aria-hidden="true">❯</span>
-            <span class="card-cmd">@Forge assigned to issue #128</span>
-            <span class="card-cursor" aria-hidden="true"></span>
-          </div>
-          <ol class="github-run-list">
-            <li class="github-run-row is-complete">
-              <span class="github-run-dot" aria-hidden="true"></span>
-              <span>
-                <strong>Check Run opened</strong>
-                <small>repo context restored · branch prepared</small>
-              </span>
-            </li>
-            <li class="github-run-row is-active">
-              <span class="github-run-dot" aria-hidden="true"></span>
-              <span>
-                <strong>Forge commented in familiar voice</strong>
-                <small>status, next step, Cave session link</small>
-              </span>
-            </li>
-            <li class="github-run-row">
-              <span class="github-run-dot" aria-hidden="true"></span>
-              <span>
-                <strong>Draft PR ready for review</strong>
-                <small>evidence attached · human remains in control</small>
-              </span>
-            </li>
-          </ol>
-          <a class="github-demo-link" href="https://github.com/OpenCoven/coven-github/blob/main/docs/demo.md">
-            Read the demo narrative in docs/demo.md ↗
-          </a>
-        </div>
+  <section class="band" aria-labelledby="loop-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="loop-heading">The work stays legible in GitHub.</h2>
+        <p>
+          The current evidence-backed loop is issue → Check Run → familiar status → draft
+          pull request when commits exist → human oversight. It is not presented as an
+          unrestricted autonomous teammate.
+        </p>
       </div>
-    </section>
-
-    <section class="github-loop-section content-section" id="github-loop" aria-labelledby="github-loop-heading">
-      <div class="section-header section-header--wide" data-reveal>
-        <p class="section-kicker">Operating loop</p>
-        <h2 id="github-loop-heading">The work stays in GitHub. The oversight stays visible.</h2>
-        <p>OpenCoven does not invent a new dashboard for the happy path. It turns familiar work into the GitHub artifacts your team already reviews.</p>
-      </div>
-      <ol class="github-loop reveal-stagger">
-        {operatingLoop.map((step, index) => (
-          <li class="github-loop-step panel-inset is-card" data-reveal>
-            <span class="github-loop-index">{String(index + 1).padStart(2, '0')}</span>
-            <p class="card-kicker">{step.label}</p>
-            <h3>{step.title}</h3>
-            <p>{step.copy}</p>
+      <ol class="proof-sequence" aria-label="GitHub familiar delivery loop">
+        {loop.map((step) => (
+          <li class="proof-step">
+            <div class="proof-step__body">
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </div>
           </li>
         ))}
       </ol>
-    </section>
+    </div>
+  </section>
 
-    <section class="github-pricing-section content-section" id="github-pricing" aria-labelledby="github-pricing-heading">
-      <div class="section-header section-header--wide" data-reveal>
-        <p class="section-kicker">launch pricing</p>
-        <h2 id="github-pricing-heading">Flat tiers while the hosted beta learns real task shape.</h2>
-        <p>Launch pricing keeps Community free for self-hosting, adds hosted reliability for teams, and keeps BYOM at every tier. Hosted plans start with a 14-day trial.</p>
+  <section class="band" aria-labelledby="paths-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="paths-heading">Choose the deployment path you can verify.</h2>
+        <p>
+          Both destinations are first-party and registry-backed. Hosted beta interest uses
+          a prefilled GitHub issue rather than an opaque third-party form.
+        </p>
       </div>
-      <div class="github-pricing-grid reveal-stagger">
-        {tiers.map((tier) => (
-          <article class="github-price-card glass-card" data-reveal>
-            <p class="card-kicker">{tier.name}</p>
-            <h3>{tier.price}</h3>
-            <p class="github-price-note">{tier.note}</p>
-            <ul>
-              {tier.details.map((detail) => <li>{detail}</li>)}
-            </ul>
-          </article>
-        ))}
+      <div class="product-grid">
+        <article class="product-card">
+          <span
+            class="status status--gated-beta"
+            data-oc-primitive="status-indicator"
+            data-oc-part="label"
+            data-oc-state="unavailable"
+          >Hosted access gated</span>
+          <h3 class="card-heading">Hosted beta</h3>
+          <p>
+            Request access for a managed worker path. Submitting interest records a request;
+            it does not imply immediate installation access or general availability.
+          </p>
+          <a
+            class="action"
+            data-oc-primitive="action"
+            data-oc-part="label"
+            data-oc-state="idle"
+            href={waitlistUrl}
+          >Open hosted beta request</a>
+        </article>
+        <article class="product-card">
+          <span
+            class="status status--available"
+            data-oc-primitive="status-indicator"
+            data-oc-part="label"
+            data-oc-state="success"
+          >Public operator path</span>
+          <h3 class="card-heading">Self-hosted worker</h3>
+          <p>
+            Run the worker under infrastructure and provider configuration you control,
+            following the canonical repository documentation.
+          </p>
+          <a
+            class="action"
+            data-oc-primitive="action"
+            data-oc-part="label"
+            data-oc-state="idle"
+            href={product.docsUrl}
+          >Read self-hosting docs</a>
+        </article>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="github-trust-section content-section" aria-labelledby="github-trust-heading">
-      <div class="github-trust-panel panel panel--arrival" data-reveal>
-        <div class="section-header">
-          <p class="section-kicker">Hosted beta waitlist</p>
-          <h2 id="github-trust-heading">Start with the familiar your team already trusts.</h2>
-          <p>The hosted beta is for teams that want managed workers, durable queueing, task history, and Cave links without operating the adapter themselves.</p>
-        </div>
-        <div class="github-trust-grid">
-          <div class="github-trust-copy panel-inset">
-            <h3>GitHub-native signup</h3>
-            <p>The primary CTA opens a prefilled Hosted beta waitlist issue asking for org name, team size, repos/backlog shape, and model provider.</p>
-          </div>
-          <div class="github-trust-copy panel-inset">
-            <h3>Self-host remains first-class</h3>
-            <p>Prefer local control? Self-host the adapter from OpenCoven/coven-github and bring your own model provider from day one.</p>
-          </div>
-        </div>
-        <div class="github-final-actions">
-          <a class="download-primary" href={waitlistUrl} target="_blank" rel="noopener noreferrer">
-            <span class="download-primary-icon" aria-hidden="true">✦</span>
-            <span class="download-primary-text">
-              <span class="download-primary-label">Join the hosted beta</span>
-              <span class="download-primary-sub">opens a prefilled GitHub issue</span>
-            </span>
-          </a>
-          <a class="btn-secondary" href="https://github.com/OpenCoven/coven-github">Self-host the adapter</a>
-        </div>
+  <section class="band" aria-labelledby="evidence-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="evidence-heading">Inspect the implementation evidence.</h2>
+        <p>
+          This route is subordinate to the repository, worker documentation, and checked-in
+          public product registry. Those sources—not landing-page copy—own implementation truth.
+        </p>
       </div>
-    </section>
-  </main>
-
-  <Footer />
-
-  <script>
-    import '../scripts/main.js';
-  </script>
-</body>
-</html>
+      <div class="button-row button-row--spaced">
+        <a
+          class="action action--primary"
+          data-oc-primitive="action"
+          data-oc-part="label"
+          data-oc-state="idle"
+          href={product.repositoryUrl}
+        >Open the repository</a>
+        <a
+          class="action"
+          data-oc-primitive="action"
+          data-oc-part="label"
+          data-oc-state="idle"
+          href="https://github.com/OpenCoven/coven-github/blob/main/docs/demo.md"
+        >Read the demo narrative</a>
+      </div>
+    </div>
+  </section>
+</SiteLayout>
