@@ -1,0 +1,41 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+const title = 'Protocol · OpenCoven';
+const description = 'The OpenCoven identity, authority, orchestration, continuity, and runtime ownership model.';
+---
+
+<SiteLayout title={title} description={description} canonicalPath="/protocol">
+  <section class="site-shell hero" id="top">
+    <div class="hero__copy">
+      <p class="eyebrow">Protocol model</p>
+      <h1>Identity, authority, and continuity stay distinct.</h1>
+      <p class="hero__lede">OpenCoven treats a familiar as a governed identity under a principal’s authority, then lets orchestration and runtime systems consume that identity without becoming its root.</p>
+    </div>
+    <aside class="evidence-card">
+      <span class="status" data-oc-primitive="status-indicator" data-oc-state="idle">Maturity-scoped</span>
+      <h2 class="card-heading">One owner per layer</h2>
+      <p class="muted">Protocol direction and shipped runtime behavior are separated deliberately. This page does not claim universal conformance.</p>
+    </aside>
+  </section>
+
+  <section class="band" aria-labelledby="layers-heading">
+    <div class="site-shell">
+      <div class="band__intro"><h2 id="layers-heading">The ownership map.</h2><p>Each layer has a narrow job so the system can evolve without turning one database, orchestrator, or UI into the source of all authority.</p></div>
+      <div class="concept-grid">
+        <article class="concept-card"><h3>Familiar Contract · identity</h3><p>Defines the governed familiar self, its principal binding, scope, authority expectations, and durable identity semantics.</p></article>
+        <article class="concept-card"><h3>Threads / Coven · authority</h3><p>Own protected mutation and runtime authority decisions, including proposal, hold, permit, and rejection boundaries.</p></article>
+        <article class="concept-card"><h3>Psyche · orchestration</h3><p>Snapshots authorized identity into work and coordinates execution. It consumes identity; it does not create the identity root.</p></article>
+        <article class="concept-card"><h3>SPAR · continuity profile</h3><p>Acts as a Familiar Continuity Profile and query plane over authorized continuity data. It is not a new ledger, IAM root, or replacement database authority.</p></article>
+        <article class="concept-card"><h3>Cave / Code / GitHub · surfaces</h3><p>Make the protocol and runtime legible for humans and workflows without owning the underlying identity or authority semantics.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="language-heading">
+    <div class="site-shell">
+      <div class="band__intro"><h2 id="language-heading">Public language stays bounded.</h2><p>We use principal-bound and authority language precisely instead of implying unrestricted agency, legal personhood, or continuity beyond implemented evidence.</p></div>
+      <div class="architecture"><ol><li>Principal binding is the authority relationship; it is not a claim of legal ownership or personhood.</li><li>SPAR is a continuity profile/query plane, not a sixth canonical ledger or IAM replacement.</li><li>Cross-device and hosted continuity remain maturity-scoped until conformance evidence exists.</li></ol></div>
+    </div>
+  </section>
+</SiteLayout>
