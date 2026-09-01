@@ -10,6 +10,7 @@ const distDir = path.join(root, 'dist');
 const requiredPublicFiles = [
   'favicon.svg',
   'apple-touch-icon.png',
+  'assets/opencoven-mark.svg',
   'og.png',
   'og.svg',
   'robots.txt',
@@ -31,6 +32,7 @@ if (!/#0{3,6}/i.test(favicon) || !/#f{3,6}/i.test(favicon)) {
 
 const routeFiles = {
   home: 'index.html',
+  download: 'download/index.html',
   quickstart: 'quickstart/index.html',
   github: 'github/index.html',
   howItWorks: 'how-it-works/index.html',
@@ -59,6 +61,7 @@ const entries = await Promise.all(
 const pages = Object.fromEntries(entries);
 const {
   home,
+  download,
   quickstart,
   github,
   howItWorks,
@@ -132,6 +135,30 @@ assertContains(
   ],
   'vNext homepage',
 );
+
+const downloadText = renderedText(download);
+assertContains(
+  downloadText,
+  [
+    'Download Coven Cave.',
+    'Choose your platform.',
+    'macOS · Apple silicon',
+    'macOS · Intel',
+    'Windows · x64',
+    'Linux · x64',
+  ],
+  'Download route',
+);
+for (const route of [
+  '/download/mac',
+  '/download/mac-intel',
+  '/download/windows',
+  '/download/linux',
+]) {
+  if (!download.includes(`href="${route}"`)) {
+    throw new Error(`Download route is missing browser-native platform link: ${route}`);
+  }
+}
 
 for (const hook of [
   'data-oc-primitive="global-navigation"',
@@ -222,6 +249,7 @@ async function initialJavascriptGzip(html) {
 
 for (const [label, html, budget] of [
   ['Homepage', home, 75 * 1024],
+  ['Download route', download, 20 * 1024],
   ['Quickstart', quickstart, 25 * 1024],
   ['GitHub route', github, 20 * 1024],
   ['How-it-works route', howItWorks, 20 * 1024],

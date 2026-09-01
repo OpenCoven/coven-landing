@@ -15,21 +15,27 @@ async function filesUnder(directory, suffix) {
   return files;
 }
 
-const [downloader, footer, register, roadmap] = await Promise.all([
-  readFile(path.join(root, 'src/scripts/redesign/downloads.js'), 'utf8'),
-  readFile(path.join(root, 'src/components/redesign/RedesignFooter.astro'), 'utf8'),
+const [downloadPage, products, layout, register, roadmap] = await Promise.all([
+  readFile(path.join(root, 'src/pages/download.astro'), 'utf8'),
+  readFile(path.join(root, 'src/data/products.ts'), 'utf8'),
+  readFile(path.join(root, 'src/layouts/SiteLayout.astro'), 'utf8'),
   readFile(path.join(root, 'docs/public-truth-register.md'), 'utf8'),
   readFile(path.join(root, 'ROADMAP.md'), 'utf8'),
 ]);
 
+const activeDownloadSurface = `${downloadPage}\n${products}\n${layout}`;
 for (const forbidden of [
   'coven init',
   'new Blob',
   '.getReader(',
   'chunks.push',
+  'URL.createObjectURL',
+  'streamDownload',
   "register('startDownload'",
+  "'/stream/",
+  '"/stream/',
 ]) {
-  if (downloader.includes(forbidden)) {
+  if (activeDownloadSurface.includes(forbidden)) {
     throw new Error(`Active downloader retains obsolete behavior/copy: ${forbidden}`);
   }
 }
@@ -39,8 +45,8 @@ for (const deadDestination of [
   'https://opencoven.ai/cli',
   'https://opencoven.ai/code',
 ]) {
-  if (footer.includes(deadDestination)) {
-    throw new Error(`Footer retains nonexistent product destination: ${deadDestination}`);
+  if (activeDownloadSurface.includes(deadDestination)) {
+    throw new Error(`Public navigation retains nonexistent product destination: ${deadDestination}`);
   }
 }
 for (const requiredDestination of [
@@ -48,8 +54,8 @@ for (const requiredDestination of [
   'https://www.npmjs.com/package/@opencoven/cli',
   'https://github.com/OpenCoven/coven-code',
 ]) {
-  if (!footer.includes(requiredDestination)) {
-    throw new Error(`Footer is missing canonical fallback destination: ${requiredDestination}`);
+  if (!activeDownloadSurface.includes(requiredDestination)) {
+    throw new Error(`Public registry is missing canonical fallback destination: ${requiredDestination}`);
   }
 }
 

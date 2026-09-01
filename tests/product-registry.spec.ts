@@ -71,6 +71,13 @@ test('the canonical three-command foundation is visible in registry order', asyn
   await expect(page.locator('#foundation')).not.toContainText('coven init');
 });
 
+test('Cave uses the browser-native platform chooser', async ({ page }) => {
+  await page.goto('/quickstart/');
+  await expect(
+    page.locator('#coven-cave').getByRole('link', { name: 'Download Cave' }),
+  ).toHaveAttribute('href', '/download');
+});
+
 test.describe('registry boundary without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 

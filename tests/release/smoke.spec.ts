@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-const ORIGIN = 'http://127.0.0.1:4173';
 const PUBLIC_ROUTES = [
   '/',
+  '/download/',
   '/quickstart/',
   '/github/',
   '/how-it-works/',
@@ -15,6 +15,7 @@ const PUBLIC_ROUTES = [
 
 const EXPECTED_HEADINGS: Record<(typeof PUBLIC_ROUTES)[number], string> = {
   '/': 'Give your agents continuity. Keep authority local.',
+  '/download/': 'Download Coven Cave.',
   '/quickstart/': 'Start with one local foundation.',
   '/github/': 'Assign bounded work. Get inspectable delivery back.',
   '/how-it-works/': 'The local layer your agent sessions share.',
@@ -119,8 +120,9 @@ test('reduced-motion preference preserves complete readable states', async ({ pa
   await expect(page.getByRole('heading', { name: 'The principal decides.' })).toBeVisible();
 });
 
-test('static public content remains usable when JavaScript is disabled', async ({ browser }) => {
+test('static public content remains usable when JavaScript is disabled', async ({ browser, baseURL }) => {
   const context = await browser.newContext({
+    baseURL,
     javaScriptEnabled: false,
     viewport: { width: 390, height: 844 },
   });
@@ -128,7 +130,7 @@ test('static public content remains usable when JavaScript is disabled', async (
 
   try {
     for (const route of PUBLIC_ROUTES) {
-      const response = await page.goto(`${ORIGIN}${route}`, {
+      const response = await page.goto(route, {
         waitUntil: 'domcontentloaded',
       });
       expect(response?.status()).toBe(200);

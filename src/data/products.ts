@@ -143,7 +143,7 @@ export const publicProducts: readonly PublicProduct[] = [
     ownerRepository: 'OpenCoven/coven-cave',
     primaryAction: {
       label: 'Download Cave',
-      href: 'https://github.com/OpenCoven/coven-cave/releases/latest',
+      href: '/download',
     },
     evidenceUrls: [
       'https://github.com/OpenCoven/coven-cave/releases/latest',

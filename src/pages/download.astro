@@ -1,0 +1,88 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import '../styles/routes.css';
+import { getPublicProduct } from '../data/products.ts';
+
+const cave = getPublicProduct('coven-cave');
+const title = 'Download Coven Cave · OpenCoven';
+const description =
+  'Choose the current Coven Cave installer for macOS, Windows, or Linux.';
+
+const downloads = [
+  {
+    label: 'macOS · Apple silicon',
+    detail: 'Signed DMG for Apple Silicon Macs.',
+    href: '/download/mac',
+  },
+  {
+    label: 'macOS · Intel',
+    detail: 'Signed DMG for Intel Macs.',
+    href: '/download/mac-intel',
+  },
+  {
+    label: 'Windows · x64',
+    detail: 'MSI installer for 64-bit Windows.',
+    href: '/download/windows',
+  },
+  {
+    label: 'Linux · x64',
+    detail: 'AppImage for 64-bit Linux distributions.',
+    href: '/download/linux',
+  },
+] as const;
+---
+
+<SiteLayout title={title} description={description} canonicalPath="/download">
+  <section class="site-shell hero" id="top">
+    <div class="hero__copy">
+      <p class="eyebrow">Coven Cave</p>
+      <h1>Download Coven Cave.</h1>
+      <p class="hero__lede">
+        Choose the installer for the machine where Cave will connect to your
+        local Coven runtime. Each link stays browser-native and resolves to the
+        latest supported release.
+      </p>
+    </div>
+    <aside class="evidence-card" aria-labelledby="platform-heading">
+      <span
+        class="status status--available"
+        data-oc-primitive="status-indicator"
+        data-oc-part="label"
+        data-oc-state="success"
+      >{cave.statusLabel}</span>
+      <h2 class="card-heading" id="platform-heading">Supported desktop builds</h2>
+      <p class="muted">{cave.platforms}</p>
+    </aside>
+  </section>
+
+  <section class="band" aria-labelledby="download-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="download-heading">Choose your platform.</h2>
+        <p>
+          Downloads use normal links, remain available without JavaScript, and
+          fall back to the public release page if an installer cannot be resolved.
+        </p>
+      </div>
+      <div class="product-grid">
+        {downloads.map((download) => (
+          <article class="product-card">
+            <h3>{download.label}</h3>
+            <p>{download.detail}</p>
+            <a
+              class="action action--primary"
+              data-oc-primitive="action"
+              data-oc-part="label"
+              data-oc-state="idle"
+              href={download.href}
+            >Download {download.label}</a>
+          </article>
+        ))}
+      </div>
+      <div class="button-row button-row--spaced">
+        <a href={cave.canonicalUrl}>View every release</a>
+        <a href="https://github.com/OpenCoven/coven-cave/attestations">Verify build provenance</a>
+      </div>
+    </div>
+  </section>
+</SiteLayout>

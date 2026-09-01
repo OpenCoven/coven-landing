@@ -1,12 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
 
-const downloaderSource = readFileSync(
-  new URL('../src/scripts/redesign/downloads.js', import.meta.url),
-  'utf8',
-);
-const componentSource = readFileSync(
-  new URL('../src/components/redesign/DownloadCta.astro', import.meta.url),
+const activeDownloadSource = [
+  '../src/pages/index.astro',
+  '../src/pages/quickstart.astro',
+  '../src/pages/download.astro',
+  '../src/layouts/SiteLayout.astro',
+].map((relative) => readFileSync(new URL(relative, import.meta.url), 'utf8')).join('\n');
+const productsSource = readFileSync(
+  new URL('../src/data/products.ts', import.meta.url),
   'utf8',
 );
 const vercelConfig = readFileSync(
@@ -34,12 +36,11 @@ test('landing source never owns the installer binary', () => {
     '"/stream/',
     'coven init',
   ]) {
-    expect(downloaderSource, `downloads.js contains forbidden binary path: ${forbidden}`).not.toContain(forbidden);
+    expect(activeDownloadSource, `active download source contains forbidden binary path: ${forbidden}`).not.toContain(forbidden);
   }
 
-  expect(componentSource).toContain('href="/download/mac"');
-  expect(componentSource).not.toContain('data-action="startDownload"');
-  expect(componentSource).not.toContain('data-dl-url=');
+  expect(productsSource).toContain("label: 'Download Cave'");
+  expect(productsSource).toContain("href: '/download'");
 });
 
 test('the browser-native resolver remains wired to an allowlisted release selector', () => {
@@ -65,5 +66,18 @@ test.describe('without JavaScript', () => {
     await expect(start).toHaveAttribute('href', '/quickstart');
     expect(await start.evaluate((element) => element.tagName)).toBe('A');
     await expect(page.locator('[data-dl-btn]')).toHaveCount(0);
+  });
+
+  test('the Cave product action reaches a browser-native platform chooser', async ({ page }) => {
+    await page.goto('/quickstart/');
+    const cave = page.locator('#coven-cave');
+    await expect(cave.getByRole('link', { name: 'Download Cave' })).toHaveAttribute('href', '/download');
+
+    await page.goto('/download/');
+    await expect(page.getByRole('heading', { level: 1, name: 'Download Coven Cave.' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /macOS.*Apple silicon/ })).toHaveAttribute('href', '/download/mac');
+    await expect(page.getByRole('link', { name: /macOS.*Intel/ })).toHaveAttribute('href', '/download/mac-intel');
+    await expect(page.getByRole('link', { name: /Windows/ })).toHaveAttribute('href', '/download/windows');
+    await expect(page.getByRole('link', { name: /Linux/ })).toHaveAttribute('href', '/download/linux');
   });
 });
