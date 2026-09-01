@@ -1,6 +1,6 @@
 # coven-landing
 
-Landing page for OpenCoven / Coven, built with [Astro](https://astro.build).
+Landing page for OpenCoven built with [Astro](https://astro.build).
 
 ## Develop
 
