@@ -49,7 +49,7 @@ test('the browser-native resolver remains wired to an allowlisted release select
     source: '/download/:platform',
     destination: '/api/download?platform=:platform',
   });
-  expect(resolverSource).toContain("import { MATCHERS, RELEASES_PAGE, REPO } from './_shared.js'");
+  expect(resolverSource).toContain("import { MATCHERS, RELEASES_PAGE, REPO, WINDOWS_FALLBACK_TAG } from './_shared.js'");
   expect(resolverSource).toContain('const match = MATCHERS[platform]');
   expect(resolverSource).toContain('res.writeHead(302, { Location: asset.browser_download_url })');
   expect(resolverSource).toContain('workerDownloadUrl(platform)');

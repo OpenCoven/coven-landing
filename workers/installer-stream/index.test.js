@@ -82,6 +82,25 @@ test('pickAsset never returns .sig sidecars or unknown platforms', () => {
   assert.equal(pickAsset([{ name: 'readme.txt' }], 'mac'), null);
 });
 
+test('Windows streams the last available MSI when latest has none', async () => {
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    calls.push(url);
+    if (url.endsWith('/releases/latest')) {
+      return new Response(JSON.stringify({ assets: [{ name: 'CovenCave-v0.5.8-aarch64.dmg' }] }));
+    }
+    if (url.endsWith('/releases/tags/v0.5.7')) {
+      return new Response(JSON.stringify({ assets: [{ name: 'CovenCave_0.5.7_x64_en-US.msi', browser_download_url: 'https://github.com/OpenCoven/coven-cave/releases/download/v0.5.7/CovenCave_0.5.7_x64_en-US.msi' }] }));
+    }
+    return new Response('INSTALLER', { status: 200 });
+  };
+  const res = await get('/windows');
+  assert.equal(res.status, 200);
+  assert.equal(await res.text(), 'INSTALLER');
+  assert.match(res.headers.get('Content-Disposition'), /CovenCave_0\.5\.7_x64_en-US\.msi/);
+  assert.equal(calls.length, 3);
+});
+
 test('streams the installer body straight through with download headers', async () => {
   stubFetch({
     asset: new Response('INSTALLER-BYTES', {

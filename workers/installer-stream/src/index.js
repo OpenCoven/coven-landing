@@ -25,6 +25,7 @@
 
 const REPO = 'OpenCoven/coven-cave';
 const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`;
+const WINDOWS_FALLBACK_TAG = 'v0.5.7'; // Keep in sync with api/_shared.js.
 const UA = 'opencoven-landing';
 
 // platform → predicate that picks its installer asset from the release.
@@ -178,7 +179,14 @@ export async function handleRequest(request, env) {
 
   try {
     const release = await latestRelease(env);
-    const asset = pickAsset(release.assets, platform);
+    let asset = pickAsset(release.assets, platform);
+    if (!asset && platform === 'windows') {
+      const headers = { Accept: 'application/vnd.github+json', 'User-Agent': UA };
+      if (env && env.GITHUB_TOKEN) headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
+      const fallback = await fetch(`https://api.github.com/repos/${REPO}/releases/tags/${WINDOWS_FALLBACK_TAG}`, { headers });
+      if (!fallback.ok) throw new Error(`Windows fallback ${fallback.status}`);
+      asset = pickAsset((await fallback.json()).assets, platform);
+    }
     if (!asset || !asset.browser_download_url) {
       throw new Error(`no asset for ${platform}`);
     }
