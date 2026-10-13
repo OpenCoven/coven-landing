@@ -19,6 +19,7 @@
 
 const REPO = 'OpenCoven/coven-cave';
 const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`;
+const WINDOWS_FALLBACK_TAG = 'v0.5.7'; // Keep in sync with api/_shared.js.
 const USER_AGENT = 'opencoven-download-worker';
 
 // platform → predicate that picks its installer asset from the release.
@@ -89,7 +90,12 @@ async function resolveAsset(platform, env) {
   );
   if (!response.ok) throw new Error(`GitHub API ${response.status}`);
   const release = await response.json();
-  const asset = pickAsset(release.assets, platform);
+  let asset = pickAsset(release.assets, platform);
+  if (!asset && platform === 'windows') {
+    const fallback = await fetch(`https://api.github.com/repos/${REPO}/releases/tags/${WINDOWS_FALLBACK_TAG}`, { headers });
+    if (!fallback.ok) throw new Error(`Windows fallback ${fallback.status}`);
+    asset = pickAsset((await fallback.json()).assets, platform);
+  }
   if (!asset || !asset.browser_download_url) {
     throw new Error(`no asset for ${platform}`);
   }

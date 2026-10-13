@@ -3,6 +3,7 @@
 
 export const REPO = 'OpenCoven/coven-cave';
 export const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`;
+export const WINDOWS_FALLBACK_TAG = 'v0.5.7';
 
 // platform → predicate that picks its installer asset from the release.
 // Order matters only within a platform; each predicate must be unique
