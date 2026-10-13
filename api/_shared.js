@@ -3,6 +3,8 @@
 
 export const REPO = 'OpenCoven/coven-cave';
 export const RELEASES_PAGE = `https://github.com/${REPO}/releases/latest`;
+// Last release confirmed to carry an MSI while newer partial cuts are repaired.
+export const WINDOWS_FALLBACK_TAG = 'v0.5.7';
 
 // platform → predicate that picks its installer asset from the release.
 // Order matters only within a platform; each predicate must be unique

@@ -16,7 +16,7 @@
 //
 // Routed via vercel.json rewrites: /stream/:platform → /api/stream?platform=:platform
 
-import { MATCHERS, RELEASES_PAGE, REPO, pickAsset } from './_shared.js';
+import { MATCHERS, RELEASES_PAGE, REPO, WINDOWS_FALLBACK_TAG, pickAsset } from './_shared.js';
 
 export const config = { runtime: 'edge' };
 
@@ -55,7 +55,14 @@ export default async function handler(request) {
 
   try {
     const release = await latestRelease();
-    const asset = pickAsset(release.assets, platform);
+    let asset = pickAsset(release.assets, platform);
+    if (!asset && platform === 'windows') {
+      const fallback = await fetch(`https://api.github.com/repos/${REPO}/releases/tags/${WINDOWS_FALLBACK_TAG}`, {
+        headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'opencoven-landing' },
+      });
+      if (!fallback.ok) throw new Error(`Windows fallback ${fallback.status}`);
+      asset = pickAsset((await fallback.json()).assets, platform);
+    }
     if (!asset || !asset.browser_download_url) {
       throw new Error(`no asset for ${platform}`);
     }
