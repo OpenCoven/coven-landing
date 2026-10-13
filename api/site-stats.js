@@ -9,7 +9,7 @@
 // aggregate to everyone (s-maxage 2h, a day of stale-while-revalidate).
 // Honours GITHUB_TOKEN if configured, same as api/download.js.
 
-import { REPO } from './_shared.js';
+import { REPO, WINDOWS_FALLBACK_TAG } from './_shared.js';
 
 const ORG = 'OpenCoven';
 const GUILD_ID = '1469169435095990448';
@@ -71,6 +71,20 @@ export default async function handler(req, res) {
         digest: typeof a.digest === 'string' ? a.digest : '',
       })),
     };
+    if (!out.release.assets.some((a) => /_x64_.*\.msi$/.test(a.name))) {
+      const windows = await gh(`/repos/${REPO}/releases/tags/${WINDOWS_FALLBACK_TAG}`, headers);
+      const fallbackAssets = (windows && windows.assets || []).filter((a) => /_x64_.*\.msi(\.sig)?$/.test(a.name));
+      if (fallbackAssets.some((a) => a.name.endsWith('.msi'))) {
+        out.release.windows_tag = WINDOWS_FALLBACK_TAG;
+        out.release.assets.push(...fallbackAssets.map((a) => ({
+          name: a.name,
+          size: a.size,
+          browser_download_url: a.browser_download_url,
+          download_count: a.download_count,
+          digest: typeof a.digest === 'string' ? a.digest : '',
+        })));
+      }
+    }
     const arm = out.release.assets.find((a) => /-aarch64\.dmg$/.test(a.name));
     if (arm && arm.digest) {
       const att = await gh(`/repos/${REPO}/attestations/${arm.digest}`, headers);

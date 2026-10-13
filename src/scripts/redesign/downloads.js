@@ -290,11 +290,14 @@ export function loadArtifacts() {
       if (!assets.length) return;
       const tag = rel.tag_name || '';
       if (tag) document.querySelectorAll('[data-art-ver]').forEach((el) => { el.textContent = tag; });
+      if (rel.windows_tag) {
+        document.querySelectorAll('[data-dl-pane="windows"] [data-art-ver]').forEach((el) => { el.textContent = rel.windows_tag; });
+      }
       // the primary button hands out the visitor's platform build (Apple silicon by default)
       const os = detectOs();
       const primaryMatch = os === 'windows' ? /_x64_.*\.msi$/ : os === 'linux' ? /_amd64\.AppImage$/ : /-aarch64\.dmg$/;
       const primaryLabel = os === 'windows' ? 'Download Cave for Windows' : os === 'linux' ? 'Download Cave for Linux' : 'Download Cave for macOS';
-      const primary = assets.find((a) => primaryMatch.test(a.name) && !/\.sig$/.test(a.name)) || assets.find((a) => /-aarch64\.dmg$/.test(a.name));
+      const primary = assets.find((a) => primaryMatch.test(a.name) && !/\.sig$/.test(a.name));
       if (primary) {
         document.querySelectorAll('[data-dl-btn]').forEach((btn) => {
           // stream same-origin so progress works (direct GitHub fetch dies on
