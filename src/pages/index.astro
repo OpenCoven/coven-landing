@@ -11,6 +11,7 @@ import '@fontsource/jetbrains-mono/500.css';
 import '@phosphor-icons/web/regular';
 import '../styles/redesign.css';
 
+import Analytics from '@vercel/analytics/astro';
 import ThemeInit from '../components/ThemeInit.astro';
 import PosthogSnippet from '../components/redesign/PosthogSnippet.astro';
 import RedesignNav from '../components/redesign/RedesignNav.astro';
@@ -48,6 +49,7 @@ import RedesignFooter from '../components/redesign/RedesignFooter.astro';
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <ThemeInit />
     <PosthogSnippet />
+    <Analytics />
     <script type="importmap" is:inline>
     {
       "imports": {
