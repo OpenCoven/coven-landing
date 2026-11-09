@@ -1,0 +1,17 @@
+# OpenCoven
+
+> A local daemon that coordinates coding agents working in the same repo: claims on surfaces, one shared record, and guards that wait for your yes.
+
+OpenCoven acts as a local coordination layer so that multiple AI coding agents (Claude Code, Codex, Cursor, Hermes, OpenClaw, Grok Build, etc.) can work on the same codebase simultaneously without clobbering each other or conflicting on files.
+
+## Documentation and Key Links
+
+- [OpenCoven Website](https://opencoven.ai)
+- [How It Works](https://opencoven.ai/how-it-works)
+- [Quickstart Guide](https://opencoven.ai/quickstart)
+- [GitHub App Integration](https://opencoven.ai/github)
+- [Documentation](https://docs.opencoven.ai/docs/guide/getting-started)
+- [GitHub Repository](https://github.com/OpenCoven/coven)
+- [Discord Community](https://discord.gg/opencoven)
+- [X / Twitter](https://x.com/opencvn)
+

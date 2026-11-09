@@ -19,6 +19,81 @@ import BoardSection from '../components/redesign/BoardSection.astro';
 import Outcomes from '../components/redesign/Outcomes.astro';
 import FinalCta from '../components/redesign/FinalCta.astro';
 import RedesignFooter from '../components/redesign/RedesignFooter.astro';
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'OpenCoven',
+    alternateName: ['Coven', 'Open Coven'],
+    url: 'https://opencoven.ai/',
+    description:
+      'Open-source local coordination layer for multi-agent AI coding. Coordinate Claude Code, Codex, Cursor, and custom coding agents in the same repository.',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://docs.opencoven.ai/search?q={search_term_string}',
+      'query-input': 'required name=search_term_string',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'OpenCoven',
+    applicationCategory: 'DeveloperApplication',
+    operatingSystem: 'macOS, Windows, Linux',
+    description:
+      'A local daemon that coordinates coding agents working in the same repo: claims on surfaces, one shared record, and guards that wait for your yes.',
+    url: 'https://opencoven.ai/',
+    downloadUrl: 'https://opencoven.ai/#download',
+    softwareVersion: '0.5.13',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+    },
+    author: {
+      '@type': 'Organization',
+      name: 'OpenCoven',
+      url: 'https://opencoven.ai',
+      logo: 'https://opencoven.ai/assets/opencoven-mark.svg',
+      sameAs: [
+        'https://github.com/OpenCoven',
+        'https://x.com/opencvn',
+        'https://discord.gg/opencoven',
+      ],
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is OpenCoven?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'OpenCoven is a local daemon and coordination protocol that prevents AI coding agents (such as Claude Code, OpenAI Codex, and Cursor) from overwriting each other when working in the same repository.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How does OpenCoven handle multi-agent conflicts?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'OpenCoven manages atomic claims on file surfaces and maintains a shared journal record across sessions so that concurrent agents wait their turn and respect developer-approved boundaries.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'Which operating systems and agents are supported?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'OpenCoven runs on macOS (Apple Silicon and Intel), Windows (x64), and Linux. It supports any agent conforming to the OpenCoven adapter contract including Claude, OpenAI, and local custom harnesses.',
+        },
+      },
+    ],
+  },
+];
 ---
 
 <!doctype html>
@@ -26,15 +101,24 @@ import RedesignFooter from '../components/redesign/RedesignFooter.astro';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>OpenCoven · Stop being your agents' control plane</title>
+    <title>OpenCoven · Multi-Agent AI Coding Daemon & Control Plane</title>
     <meta
       name="description"
-      content="Coven is a local daemon that coordinates coding agents working in the same repo: claims on surfaces, one shared record, and guards that wait for your yes."
+      content="Stop being your agents' control plane. OpenCoven coordinates Claude Code, Codex, and AI coding agents in one repo with surface claims, shared memory, and human guards."
     />
-    <meta property="og:title" content="OpenCoven · Stop being your agents' control plane" />
+    <meta
+      name="keywords"
+      content="OpenCoven, AI coding agents, multi-agent coordination, Claude Code, OpenAI Codex, developer tools, AI pair programming, git worktree alternative, code claims daemon"
+    />
+    <meta name="author" content="OpenCoven" />
+    <link rel="canonical" href="https://opencoven.ai/" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="OpenCoven · Multi-Agent AI Coding Daemon & Control Plane" />
     <meta
       property="og:description"
-      content="A local daemon coordinating coding agents in one repo: claims on surfaces, one shared record, guards that wait for your yes."
+      content="Coordinate AI coding agents working in the same repo: claims on surfaces, one shared record, and guards that keep humans in control."
     />
     <meta property="og:site_name" content="OpenCoven" />
     <meta property="og:type" content="website" />
@@ -42,10 +126,28 @@ import RedesignFooter from '../components/redesign/RedesignFooter.astro';
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="OpenCoven · Multi-Agent AI Coding Control Plane" />
+    
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@OpenCvn" />
+    <meta name="twitter:creator" content="@OpenCvn" />
+    <meta name="twitter:title" content="OpenCoven · Multi-Agent AI Coding Daemon" />
+    <meta
+      name="twitter:description"
+      content="Coordinate AI coding agents working in the same repo: claims on surfaces, one shared record, and human approval guards."
+    />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content="OpenCoven · Multi-Agent AI Coding Control Plane" />
+    
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- Structured Data JSON-LD -->
+    {structuredData.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+    
     <ThemeInit />
     <PosthogSnippet />
     <script type="importmap" is:inline>
