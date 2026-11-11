@@ -10,6 +10,8 @@ const PUBLIC_ROUTES = [
   '/security/',
   '/status/',
   '/privacy/',
+  '/remote/privacy/',
+  '/remote/support/',
   '/terms/',
 ] as const;
 
