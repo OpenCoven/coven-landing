@@ -10,6 +10,8 @@ const PUBLIC_ROUTES = [
   '/security/',
   '/status/',
   '/privacy/',
+  '/remote/privacy/',
+  '/remote/support/',
   '/terms/',
 ] as const;
 
@@ -23,6 +25,8 @@ const EXPECTED_HEADINGS: Record<(typeof PUBLIC_ROUTES)[number], string> = {
   '/security/': 'Report vulnerabilities privately. Verify what you run.',
   '/status/': 'Status should come from data, not memory.',
   '/privacy/': 'Privacy Policy',
+  '/remote/privacy/': 'Privacy Policy',
+  '/remote/support/': 'Your Mac, within reach.',
   '/terms/': 'Terms of Service',
 };
 

@@ -19,6 +19,20 @@
       "contentChangeInThisMigration": false,
       "owner": "OpenCoven maintainers / scoped legal-compliance process",
       "status": "published-text-preserved"
+    },
+    {
+      "route": "/remote/privacy",
+      "title": "Coven Remote Privacy Policy",
+      "effectiveDate": "2026-11-11",
+      "lastUpdated": "2026-11-11",
+      "contentChangeInThisMigration": true,
+      "owner": "OpenCoven / Coven Remote implementation",
+      "status": "reconciled-to-direct-client-no-collection-contract",
+      "sourceEvidence": [
+        "Coven Remote VNCSession.pasteToMac and CredentialPolicy",
+        "HostStore and KeychainStore",
+        "PrivacyInfo.xcprivacy and local diagnostics/clipboard helpers"
+      ]
     }
   ],
   "privacyReconciliation": {
