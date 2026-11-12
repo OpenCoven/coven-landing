@@ -876,7 +876,7 @@ summary:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--
 }
 
 /* H2: column descriptions show on hover and on keyboard focus; board.js adds tap and Escape */
-[data-col-desc] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 100ms ease-out, visibility 100ms }
+[data-col-desc] { opacity: 0; visibility: hidden; pointer-events: auto; transition: opacity 100ms ease-out, visibility 100ms }
 [data-col]:hover > [data-col-desc],
 [data-col-btn]:focus-visible + [data-col-desc],
 [data-col][data-open] > [data-col-desc] { opacity: 1; visibility: visible }
@@ -915,3 +915,10 @@ summary:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--
   /* the wordmark gives way to the menu button; it is still the link's accessible name */
   [data-r~="wordmark"] { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important }
 }
+
+/* Keep hover help reachable across the visual gap below its trigger. */
+[data-col-desc]::before { content: ''; position: absolute; left: 0; right: 0; top: -8px; height: 8px }
+/* Reserve the numeric slots before network proof arrives, including on phones. */
+[data-proof-count] { display: inline-block; width: 7ch; margin-right: 0.6ch; text-align: right; font-variant-numeric: tabular-nums }
+/* The warning chip's tinted fill needs a stronger foreground than plain text. */
+[data-attention] { color: color-mix(in oklch, var(--cv-warning) 90%, var(--cv-text-primary)) !important }

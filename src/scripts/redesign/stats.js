@@ -12,7 +12,6 @@ function fmtProof(n) {
 // opacity 0 to 1 over 150ms, ease-out; reduced motion shows the figure at once
 function fadeIn(el, text) {
   el.textContent = text;
-  el.style.marginRight = '0.6ch';
   el.style.fontVariantNumeric = 'tabular-nums';
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   el.style.opacity = '0';

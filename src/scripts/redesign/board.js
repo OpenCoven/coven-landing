@@ -348,9 +348,11 @@ function runTicks() {
     const target = Number(el.dataset.tick);
     const prefix = el.dataset.prefix || '+';
     if (reduce) { el.textContent = prefix + target; return; }
-    const t0 = Date.now();
+    let elapsed = 0;
     const id = every(() => {
-      const p = Math.min(1, (Date.now() - t0) / 1100);
+      if (_paused) return;
+      elapsed += 40;
+      const p = Math.min(1, elapsed / 1100);
       el.textContent = prefix + String(Math.round(target * (1 - Math.pow(1 - p, 3))));
       if (p === 1) clearInterval(id);
     }, 40);
@@ -402,7 +404,7 @@ function runBoard() {
       i += 1;
       if (i >= lines.length) return;
       el.style.opacity = '0';
-      later(() => {
+      step(() => {
         el.textContent = lines[i];
         if (lines[i].indexOf('overlap') === 0 || lines[i].indexOf('guard') === 0) {
           el.style.color = 'var(--cv-warning)';

@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from '@playwright/test';
 
 // Browser checks for the redesign. The preview server has no /api functions,
@@ -157,6 +158,7 @@ test('no unexpected console errors on the landing page', async ({ page }) => {
 // settles at once and each click lands on the frame it is issued.
 test.describe('interactions with the demo held still', () => {
   test.use({ reducedMotion: 'reduce' });
+  test.beforeEach(async ({ page }) => { await page.emulateMedia({ reducedMotion: 'reduce' }); });
 
   test('download menu opens, switches platform tabs, and closes on Escape', async ({ page }) => {
     await page.goto('/');
@@ -183,7 +185,7 @@ test.describe('interactions with the demo held still', () => {
     await expect(page.locator('[data-overlap-banner]')).toBeVisible();
 
     const header = page.locator('[data-col-btn]').first();
-    await expect(header).toHaveAccessibleDescription('A named agent working in this project.');
+    await expect(header).toHaveAccessibleDescription('The familiar attributed to this example session.');
     await header.focus();
     await page.keyboard.press('Tab');
     await page.keyboard.press('Shift+Tab');
@@ -230,4 +232,61 @@ test.describe('interactions with the demo held still', () => {
     await expect(win).toBeVisible();
     await expect(win).toContainText('familiar');
   });
+});
+
+test('pausing the demo freezes counters and logs until resume', async ({ page }) => {
+  await page.goto('/');
+  const pause = page.getByRole('button', { name: 'Pause demo' });
+  await pause.click();
+  await expect(pause).toHaveAttribute('aria-pressed', 'true');
+  const read = () => page.locator('[data-board] [data-tick], [data-board] [data-log]').allTextContents();
+  const frozen = await read();
+  await page.waitForTimeout(4500);
+  expect(await read()).toEqual(frozen);
+  await pause.click();
+  await expect(page.locator('[data-state-text]')).toHaveText('holding', { timeout: 10000 });
+});
+
+test('column help stays visible when the pointer moves onto it', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('[data-col-btn]').first().hover();
+  const tooltip = page.locator('#board-col-familiar');
+  await expect(tooltip).toBeVisible();
+  const box = await tooltip.boundingBox();
+  await page.mouse.move(box!.x + 10, box!.y + 10, { steps: 10 });
+  await page.waitForTimeout(200);
+  await expect(tooltip).toBeVisible();
+});
+
+test('successful stats do not move mobile content', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  let release!: () => void;
+  const ready = new Promise<void>(resolve => { release = resolve; });
+  await page.route('**/api/site-stats', async route => {
+    await ready;
+    await route.fulfill({ json: { stars: 12345, downloads: 54321, discord: { count: 1234, label: 'members' } } });
+  });
+  await page.goto('/');
+  const row = page.locator('[data-r="proofrow"]');
+  const initial = await row.boundingBox();
+  release();
+  await expect(page.locator('[data-stars-count]')).toHaveText('12k');
+  const populated = await row.boundingBox();
+  expect(populated!.height).toBe(initial!.height);
+});
+
+for (const width of [320, 500, 720, 1040, 1366, 1440]) {
+  test(`current homepage reflows at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
+  });
+}
+
+test('current homepage has no serious or critical accessibility violations', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations.filter(v => ['serious', 'critical'].includes(v.impact || ''))).toEqual([]);
 });
