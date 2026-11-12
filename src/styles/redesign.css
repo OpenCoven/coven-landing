@@ -15,7 +15,7 @@
   --cv-bg-sunken: oklch(0.912 0.014 291);
   --cv-text-primary: oklch(0.26 0.020 291);
   --cv-text-secondary: oklch(0.44 0.016 291);
-  --cv-text-muted: oklch(0.515 0.014 291);
+  --cv-text-muted: oklch(0.47 0.014 291);
   --cv-border-hairline: oklch(0.26 0.020 291 / 14%);
   --cv-border-strong: oklch(0.26 0.020 291 / 34%);
   --cv-accent: #6859ac;
@@ -41,7 +41,7 @@
   --cv-bg-sunken: oklch(0.185 0.006 291);
   --cv-text-primary: oklch(0.96 0.004 291);
   --cv-text-secondary: oklch(0.72 0.012 291);
-  --cv-text-muted: oklch(0.645 0.010 291);
+  --cv-text-muted: oklch(0.68 0.010 291);
   --cv-border-hairline: oklch(0.96 0.004 291 / 13%);
   --cv-border-strong: oklch(0.96 0.004 291 / 36%);
   --cv-accent: #a99ce4;
@@ -325,7 +325,7 @@ warded-braid canvas {
   --cv-bg-hover: oklch(0.925 0.014 291);
   --cv-text-primary: oklch(0.26 0.020 291);
   --cv-text-secondary: oklch(0.44 0.016 291);
-  --cv-text-muted: oklch(0.515 0.014 291);
+  --cv-text-muted: oklch(0.47 0.014 291);
   --cv-border-hairline: oklch(0.26 0.020 291 / 14%);
   --cv-accent: #6859ac;
   --cv-accent-hover: #58499b;
@@ -350,7 +350,7 @@ warded-braid canvas {
   --cv-bg-hover: oklch(0.305 0.009 291);
   --cv-text-primary: oklch(0.96 0.004 291);
   --cv-text-secondary: oklch(0.72 0.012 291);
-  --cv-text-muted: oklch(0.645 0.010 291);
+  --cv-text-muted: oklch(0.68 0.010 291);
   --cv-border-hairline: oklch(0.96 0.004 291 / 13%);
   --cv-accent: #a99ce4;
   --cv-accent-hover: #bab0ef;
@@ -521,7 +521,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cv-accent); out
   --cv-bg-sunken: oklch(0.912 0.014 291);
   --cv-text-primary: oklch(0.26 0.020 291);
   --cv-text-secondary: oklch(0.44 0.016 291);
-  --cv-text-muted: oklch(0.515 0.014 291);
+  --cv-text-muted: oklch(0.47 0.014 291);
   --cv-border-hairline: oklch(0.26 0.020 291 / 14%);
   --cv-border-strong: oklch(0.26 0.020 291 / 34%);
   --cv-accent: #6859ac;
@@ -547,7 +547,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cv-accent); out
   --cv-bg-sunken: oklch(0.185 0.006 291);
   --cv-text-primary: oklch(0.96 0.004 291);
   --cv-text-secondary: oklch(0.72 0.012 291);
-  --cv-text-muted: oklch(0.645 0.010 291);
+  --cv-text-muted: oklch(0.68 0.010 291);
   --cv-border-hairline: oklch(0.96 0.004 291 / 13%);
   --cv-border-strong: oklch(0.96 0.004 291 / 36%);
   --cv-accent: #a99ce4;
@@ -568,10 +568,10 @@ body { margin: 0; background: var(--cv-bg-base); color: var(--cv-text-primary); 
 a { color: var(--cv-text-primary); text-decoration: none; transition: color 180ms cubic-bezier(0.2,0,0,1), background-color 180ms cubic-bezier(0.2,0,0,1), border-color 180ms cubic-bezier(0.2,0,0,1); }
 a:hover { color: var(--cv-accent); }
 ::selection { background: var(--cv-accent-soft); }
-/* every view shares the board's box: the shell's height is set by the board (429px) and the
+/* every view shares the board's box: the shell's height is set by the board (--cv-board-h) and the
    detail views scroll inside it rather than making the component taller. Root cause of the jump
    was each [data-win] being content-sized, so the shell followed whichever view was showing. */
-[data-view="board"], [data-win] { height: 429px; box-sizing: border-box }
+[data-view="board"], [data-win] { height: var(--cv-board-h); box-sizing: border-box }
 [data-win] { overflow-y: auto; overscroll-behavior: contain }
 [data-win] > [data-win-head] { position: sticky; top: 0; z-index: 6 }
 @media (max-width: 719px) {
@@ -608,7 +608,7 @@ a:hover { color: var(--cv-accent); }
   [data-win] [style*="padding: 18px"] { padding: 15px !important }
   /* the rail becomes a chip row above the table here, so its height is additive: the views size
      to their content instead of being held at the desktop constant */
-  [data-view="board"], [data-win] { height: auto !important; min-height: 429px }
+  [data-view="board"], [data-win] { height: auto !important; min-height: calc(var(--cv-board-h) + 52px) }
   [data-win] { overflow-y: visible !important }
   [style*="1.5fr 0.85fr 1.35fr"],
   [style*="292px minmax(0,1fr)"], [style*="292px minmax(0px, 1fr)"],
@@ -845,4 +845,73 @@ a:hover { color: var(--cv-accent); }
    nav on the same breakpoint the shell uses. */
 @media (max-width: 1139px) {
   [data-nav] { min-width: 0 !important }
+}
+
+
+/* ══ landing handoff, H1–H12 ══
+   Appended last on purpose: the sections above are concatenated per page and repeat some
+   selectors, so these rules have to follow all of them. New rules key off data-r tokens and
+   data attributes, never off serialized inline styles. */
+
+/* the session table is sized to its rows: header 43 + four rows of 64 + the decision bar 51 */
+:root { --cv-board-h: 350px }
+
+/* visually hidden, still read by assistive technology */
+.cv-sr { position: absolute !important; width: 1px !important; height: 1px !important; margin: -1px !important; padding: 0 !important; overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important; border: 0 !important }
+
+/* focus: 2px ring in the primary colour, 2px offset, on every control that is not a native
+   link or button */
+summary:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--cv-accent); outline-offset: 2px }
+[data-cell-btn]:focus-visible { border-radius: 6px }
+
+/* H10: the copy cue is visible at rest at every width, not only on hover */
+[data-copy] [data-copy-label] { opacity: 1 !important; max-width: 60px !important; margin-left: 9px !important; transition: none }
+
+/* H4: narrow-width menu */
+[data-nav-menu] > summary::-webkit-details-marker { display: none }
+@keyframes cvMenuIn { from { opacity: 0 } to { opacity: 1 } }
+[data-nav-menu][open] > [data-nav-menu-panel] { animation: cvMenuIn 150ms ease-out }
+@media (pointer: coarse) {
+  [data-r~="themebtn"], [data-nav-menu] > summary { width: 44px !important; height: 44px !important }
+}
+
+/* H2: column descriptions show on hover and on keyboard focus; board.js adds tap and Escape */
+[data-col-desc] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 100ms ease-out, visibility 100ms }
+[data-col]:hover > [data-col-desc],
+[data-col-btn]:focus-visible + [data-col-desc],
+[data-col][data-open] > [data-col-desc] { opacity: 1; visibility: visible }
+[data-col][data-dismissed] > [data-col-desc] { opacity: 0 !important; visibility: hidden !important }
+
+/* H12: a paused demo holds every animation inside the table on its current frame */
+[data-board][data-paused] *, [data-board][data-paused] *::before, [data-board][data-paused] *::after { animation-play-state: paused !important }
+
+/* H8: the markup is the finished overlap frame. Where motion is allowed the script rewinds it
+   before playing, so hold the two "needs you" signals back until the script has taken over.
+   This is time-boxed, not script-dependent: if the script never runs they appear anyway. */
+@keyframes cvHoldBack { from { visibility: hidden } to { visibility: visible } }
+[data-motion="ok"] [data-board]:not([data-board-ready]) [data-attention],
+[data-motion="ok"] [data-board]:not([data-board-ready]) [data-overlap-banner] { animation: cvHoldBack 2.5s steps(1, end) both }
+
+@media (max-width: 1079px) {
+  [data-r~="headline"] { max-width: none !important }
+}
+@media (max-width: 719px) {
+  /* H3: the headline starts 28px under the 60px nav */
+  [data-r~="hero"] { padding-top: 28px !important }
+  /* H2: phones keep the longer line that also explains the install command */
+  [data-r~="caveline"] { display: none !important }
+  [data-r~="navmenu"] { display: block !important }
+  [data-r~="navtools"] { gap: 10px !important }
+  /* H6: the session cell has to stay a real box to take focus, so it is a subgrid of the
+     card instead of display: contents */
+  @supports (grid-template-columns: subgrid) {
+    [data-row] > *:nth-child(2) { position: relative; z-index: 1 }
+    [data-row] > *:nth-child(3) { display: grid !important; grid-template-columns: subgrid !important; grid-template-rows: subgrid !important; grid-column: 2 / -1 !important; grid-row: 2 / 4 !important; gap: 7px 10px !important }
+    [data-row] > *:nth-child(3) > *:nth-child(1) { grid-column: 2 !important; grid-row: 1 !important; justify-self: end !important }
+    [data-row] > *:nth-child(3) > *:nth-child(2) { grid-column: 1 / -1 !important; grid-row: 2 !important }
+  }
+}
+@media (max-width: 399px) {
+  /* the wordmark gives way to the menu button; it is still the link's accessible name */
+  [data-r~="wordmark"] { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important }
 }

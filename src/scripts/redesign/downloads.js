@@ -208,22 +208,48 @@ function toggleDownloads(e) {
   setDownloads(!open, menu);
 }
 
+// one polite live region for every copy button on the page, so "Copied" is
+// announced without moving focus or re-reading the button
+let copyLive = null;
+function announceCopy(text) {
+  if (!copyLive) {
+    copyLive = document.createElement('span');
+    copyLive.className = 'cv-sr';
+    copyLive.setAttribute('role', 'status');
+    copyLive.setAttribute('aria-live', 'polite');
+    document.body.appendChild(copyLive);
+  }
+  copyLive.textContent = '';
+  setTimeout(() => { copyLive.textContent = text; }, 50);
+}
+
 function copy(e) {
   const btn = e.currentTarget;
   const text = btn.dataset.copy || '';
+  // the label swaps instantly and holds for two seconds
   const flash = () => {
+    announceCopy('Copied');
     const label = btn.querySelector('[data-copy-label]');
     if (!label) return;
     if (!label.dataset.idle) label.dataset.idle = label.textContent;
     label.textContent = 'copied';
-    label.style.opacity = '1';
     label.style.color = 'var(--cv-accent)';
     clearTimeout(copyT);
     copyT = setTimeout(() => {
       label.textContent = label.dataset.idle || 'copy';
-      label.style.opacity = '';
       label.style.color = '';
-    }, 1500);
+    }, 2000);
+  };
+  // nothing could write to the clipboard: select the visible command instead of
+  // claiming success, so it can be copied by hand
+  const selectByHand = () => {
+    const target = btn.querySelector('[data-copy-text]');
+    const sel = window.getSelection ? window.getSelection() : null;
+    if (!target || !sel) return;
+    const range = document.createRange();
+    range.selectNodeContents(target);
+    sel.removeAllRanges();
+    sel.addRange(range);
   };
   const fallback = () => {
     const ta = document.createElement('textarea');
@@ -232,9 +258,11 @@ function copy(e) {
     ta.style.top = '-1000px';
     document.body.appendChild(ta);
     ta.select();
-    try { document.execCommand('copy'); } catch (err) { /* clipboard unavailable */ }
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (err) { /* clipboard unavailable */ }
     document.body.removeChild(ta);
-    flash();
+    if (ok) flash();
+    else selectByHand();
   };
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(flash, fallback);

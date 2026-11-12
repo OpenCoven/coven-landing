@@ -22,6 +22,14 @@ let _overlapSnap = null;
 let _overlapShown = false;
 let _attT = null;
 
+// pause control: the walkthrough's own timers park here while paused, and the
+// CSS pulses stop through [data-board][data-paused]
+let _paused = false;
+let _replayOnResume = false;
+const _parked = [];
+const step = (fn, ms) => later(() => { if (_paused) _parked.push(fn); else fn(); }, ms);
+let _opener = null;
+
 // ── board reveal (diff ticks + the scrolling tool logs) ──────────────────
 let _ticksRan = false;
 let _feedT = null;
@@ -351,14 +359,44 @@ function runTicks() {
 
 
 
-function runBoard(instant) {
+// The markup is the finished overlap frame, so the page reads correctly with
+// no script and with reduced motion. When motion is allowed, the script winds
+// the board back to its first frame and plays the walkthrough from there.
+function rewindBoard() {
+  _overlapShown = false;
+  document.querySelectorAll('[data-log]').forEach((el) => {
+    const lines = (el.dataset.lines || '').split('|').filter(Boolean);
+    if (!lines.length) return;
+    el.textContent = lines[0];
+    el.style.color = 'var(--cv-text-secondary)';
+  });
+  document.querySelectorAll('[data-row-overlap]').forEach((row) => { row.style.background = 'transparent'; });
+  document.querySelectorAll('[data-claim-overlap]').forEach((chip) => {
+    chip.style.color = 'var(--cv-text-secondary)';
+    chip.style.borderColor = 'var(--cv-border-hairline)';
+    chip.style.background = 'transparent';
+  });
+  const cell = document.querySelector('[data-state-cell]');
+  if (cell) {
+    cell.style.color = 'var(--cv-success)';
+    const dot = cell.querySelector('[data-state-dot]');
+    const txt = cell.querySelector('[data-state-text]');
+    if (dot) { dot.style.background = 'var(--cv-success)'; dot.style.animation = 'cvLive 2.2s ease-out infinite'; }
+    if (txt) txt.textContent = 'working';
+  }
+  const banner = document.querySelector('[data-overlap-banner]');
+  if (banner) { banner.style.opacity = '0'; banner.style.transform = 'translateY(8px)'; }
+  const chip = document.querySelector('[data-attention]');
+  if (chip) { chip.style.opacity = '0'; chip.style.display = 'none'; chip.style.pointerEvents = 'none'; }
+}
+
+function runBoard() {
   const logs = Array.from(document.querySelectorAll('[data-log]'));
-  const step = 1900;
+  const pace = 1900;
 
   logs.forEach((el) => {
     const lines = (el.dataset.lines || '').split('|').filter(Boolean);
     if (!lines.length) return;
-    if (instant) { el.textContent = lines[lines.length - 1]; return; }
     let i = 0;
     const advance = () => {
       i += 1;
@@ -370,15 +408,13 @@ function runBoard(instant) {
           el.style.color = 'var(--cv-warning)';
         }
         el.style.opacity = '1';
-        if (i < lines.length - 1) later(advance, step);
+        if (i < lines.length - 1) step(advance, pace);
       }, 240);
     };
-    later(advance, step);
+    step(advance, pace);
   });
 
-  const settle = instant ? 0 : step * 2 + 400;
-
-  later(() => {
+  step(() => {
     if (_resolved) return;
     document.querySelectorAll('[data-row-overlap]').forEach((row) => {
       row.style.background = 'color-mix(in oklch, var(--cv-warning) 8%, transparent)';
@@ -397,11 +433,42 @@ function runBoard(instant) {
       if (txt) txt.textContent = 'holding';
     }
     _overlapShown = true;
-    setAttention(true);
+    setAttention(_proj === 'opencoven');
     const banner = document.querySelector('[data-overlap-banner]');
     if (banner) { banner.style.opacity = '1'; banner.style.transform = 'none'; }
-  }, settle);
+  }, pace * 2 + 400);
 }
+
+// The pause button stops the walkthrough on its current frame and freezes the
+// status pulses; pressing it again carries on. It keeps one name ("Pause
+// demo") and reports its state through aria-pressed.
+function setBoardPaused(paused) {
+  _paused = paused;
+  const board = document.querySelector('[data-board]');
+  if (board) {
+    if (paused) board.setAttribute('data-paused', '');
+    else board.removeAttribute('data-paused');
+  }
+  const btn = document.querySelector('[data-board-pause]');
+  if (btn) btn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+  const icon = document.querySelector('[data-board-pause-icon]');
+  if (icon) icon.className = 'ph ' + (paused ? 'ph-play' : 'ph-pause');
+  if (!paused) _parked.splice(0).forEach((fn) => fn());
+}
+
+const toggleBoardPause = () => {
+  if (_paused && _replayOnResume) {
+    // reduced motion starts on the finished frame, so the first resume plays it from the top
+    _replayOnResume = false;
+    if (!_resolved) {
+      rewindBoard();
+      setBoardPaused(false);
+      runBoard();
+      return;
+    }
+  }
+  setBoardPaused(!_paused);
+};
 
 // no invented figures: each proof item stays hidden until its own request answers
 
@@ -2554,6 +2621,9 @@ function closeWin() {
   }
   _stack = [];
   showView('board');
+  const opener = _opener;
+  _opener = null;
+  if (opener) later(() => { if (opener.isConnected) opener.focus({ preventScroll: true }); }, 560);
 }
 
 // the session view: bars scale to the real numbers, the footer says what is owed
@@ -2948,7 +3018,7 @@ function runFeed(win, lines, since) {
     clock += 37;
   };
   paint();
-  _feedT = setInterval(paint, 2400);
+  _feedT = setInterval(() => { if (!_paused) paint(); }, 2400);
 }
 
 
@@ -3024,11 +3094,14 @@ function wireCellHover(cell, ci) {
     dot.style.cssText = 'position: absolute; left: 9px; top: 50%; width: 5px; height: 5px; margin-top: -2.5px; border-radius: 999px; background: ' + ACC + '; opacity: 0; transform: scale(0.4); transition: opacity 170ms, transform 200ms cubic-bezier(0.2,0,0,1)';
     pill.style.position = 'relative';
     pill.appendChild(dot);
-    const base = pill.style.background;
-    const baseBorder = pill.style.borderColor;
+    // read when the hover starts: the pill's resting look changes with the overlap state
+    let base = '';
+    let baseBorder = '';
     // clearing the longhand would drop the shorthand's padding too, so keep the real value
     const basePad = getComputedStyle(pill).paddingLeft;
     on = () => {
+      base = pill.style.background;
+      baseBorder = pill.style.borderColor;
       pill.style.background = 'color-mix(in oklch, ' + ACC + ' 14%, transparent)';
       pill.style.borderColor = 'color-mix(in oklch, ' + ACC + ' 48%, transparent)';
       pill.style.paddingLeft = '20px';
@@ -3100,6 +3173,9 @@ function wireCellHover(cell, ci) {
 
   cell.addEventListener('mouseenter', on);
   cell.addEventListener('mouseleave', off);
+  // keyboard focus gets the same treatment as the pointer
+  cell.addEventListener('focus', on);
+  cell.addEventListener('blur', off);
 }
 
 
@@ -3120,8 +3196,24 @@ function initWindows() {
     Array.from(row.children).forEach((cell, ci) => {
       if (!COLS[ci]) return;
       cell.style.cursor = 'pointer';
-      cell.title = 'Open the ' + COLS[ci] + ' view';
       wireCellHover(cell, ci);
+      // Button semantics: reachable by Tab, announced as a button, and named for its row
+      // ("Hexi, ui/composer, open the surface view"). The name is built from hidden text
+      // around the live content rather than an aria-label, so the content is still read.
+      cell.setAttribute('role', 'button');
+      cell.tabIndex = 0;
+      cell.setAttribute('data-cell-btn', COLS[ci]);
+      const say = (text) => {
+        const el = document.createElement('span');
+        el.className = 'cv-sr';
+        el.textContent = text;
+        return el;
+      };
+      // the session cell's two children are placed on the card grid by position on phones,
+      // and its log line is rewritten as it plays, so its hidden text lives in the state label
+      const host = ci === 2 ? cell.firstElementChild || cell : cell;
+      if (ci !== 0) host.insertBefore(say(name + ', '), host.firstChild);
+      host.appendChild(say(', open the ' + COLS[ci] + ' view'));
     });
   });
 
@@ -3131,10 +3223,20 @@ function initWindows() {
       const cells = Array.from(row.children);
       const cell = cells.filter((c) => c.contains(e.target))[0];
       const idx = cells.indexOf(cell);
-      const txt = (n) => (cells[n] ? cells[n].textContent.trim().replace(/\s+/g, ' ') : '');
+      // the visible text only: the hidden button-name fragments are not part of the cell's value
+      const txt = (n) => {
+        if (!cells[n]) return '';
+        const copy = cells[n].cloneNode(true);
+        copy.querySelectorAll('.cv-sr').forEach((el) => el.remove());
+        return copy.textContent.trim().replace(/\s+/g, ' ');
+      };
       if (COLS[idx]) {
         _ctx = { proj: row.dataset.proj, surface: txt(1), doing: txt(2), diff: txt(3) };
+        _opener = cell;
         openWin(COLS[idx], row.dataset.fam);
+        // the view replaces the table, so focus follows it to the view's back button
+        const back = document.querySelector('[data-win="' + COLS[idx] + '"] [data-win-close]');
+        if (back) later(() => back.focus({ preventScroll: true }), 560);
         return;
       }
     }
@@ -3145,6 +3247,15 @@ function initWindows() {
     const close = e.target.closest ? e.target.closest('[data-win-close]') : null;
     if (close) closeWin();
   };
+  // Enter and Space activate a cell exactly as a click does
+  const cellKey = (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const cell = e.target.closest ? e.target.closest('[data-cell-btn]') : null;
+    if (!cell || cell !== e.target) return;
+    e.preventDefault();
+    cell.click();
+  };
+  document.addEventListener('keydown', cellKey);
   const winKey = (e) => {
     if (e.key === 'Enter' && e.target.matches && e.target.matches('[data-w-input]')) {
       sendNote(e.target.closest('[data-win]'));
@@ -3162,7 +3273,33 @@ function initWindows() {
 
 
 
+// Column header descriptions. CSS shows one on hover and on keyboard focus;
+// this adds what CSS cannot: a tap toggles it (touch has no hover), and Escape
+// dismisses it without moving focus. Blur or pointer-leave clears both states.
+function initColumnHelp() {
+  const cols = Array.from(document.querySelectorAll('[data-col]'));
+  const clear = (col) => { col.removeAttribute('data-open'); col.removeAttribute('data-dismissed'); };
+  cols.forEach((col) => {
+    const btn = col.querySelector('[data-col-btn]');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const open = col.hasAttribute('data-open');
+      cols.forEach(clear);
+      if (!open) col.setAttribute('data-open', '');
+    });
+    btn.addEventListener('blur', () => clear(col));
+    col.addEventListener('mouseleave', () => col.removeAttribute('data-dismissed'));
+    btn.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      col.removeAttribute('data-open');
+      col.setAttribute('data-dismissed', '');
+      e.stopPropagation();
+    });
+  });
+}
+
 export function initBoard() {
+  register('toggleBoardPause', toggleBoardPause);
   register('resolveOverlap', resolveOverlap);
   register('openConflict', openConflict);
   register('pickConflictTab', pickConflictTab);
@@ -3174,17 +3311,32 @@ export function initBoard() {
   const root = document.querySelector('[data-live-board]');
   if (!root) return;
 
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pause = document.querySelector('[data-board-pause]');
+  if (pause) pause.style.display = 'inline-flex';
+  if (reduce) {
+    // reduced motion: stay on the finished overlap frame, paused, decision bar showing
+    _overlapShown = true;
+    _replayOnResume = true;
+    setBoardPaused(true);
+  } else {
+    rewindBoard();
+  }
+  const board = document.querySelector('[data-board]');
+  if (board) board.setAttribute('data-board-ready', '');
+
   pickProjectId('opencoven');
   initRailSwipe();
   initWindows();
-  let boardRan = false;
+  initColumnHelp();
+  let boardRan = reduce;
   const boardWatch = () => {
     const el = document.querySelector('[data-live-board]');
     if (!el) return;
     const r = el.getBoundingClientRect();
     if (r.top < window.innerHeight * 0.92 && r.bottom > -40 && !boardRan) {
       boardRan = true;
-      runBoard(false);
+      runBoard();
       runTicks();
     }
   };
