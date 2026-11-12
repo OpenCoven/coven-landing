@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from '@playwright/test';
 
 // Browser checks for the redesign. The preview server has no /api functions,
@@ -23,9 +24,68 @@ test('landing renders the hero and adapts the download button', async ({ page })
   await expect(btn).toHaveAttribute('data-dl-url', '/stream/linux');
 });
 
-test('the braid assembles after idle boot', async ({ page }) => {
+// Landing handoff H1/H2/H9: the session table is the hero visual, the dial is
+// gone, Cave is defined under the primary button, and the stats links hold
+// their place whether or not /api/site-stats answers (the preview server has
+// no /api functions, so this is the failure state).
+test('hero is a single column with the session table above the fold', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
-  await expect(page.locator('warded-braid canvas')).toBeAttached({ timeout: 15_000 });
+
+  await expect(page.locator('[data-action="togglePower"]')).toHaveCount(0);
+  await expect(page.locator('warded-braid')).toHaveCount(0);
+  await expect(page.getByText('Cave is the desktop app for Coven.')).toBeVisible();
+
+  const proof = page.locator('[data-r="proofrow"] a');
+  await expect(proof).toHaveCount(3);
+  for (const link of await proof.all()) await expect(link).toBeVisible();
+  await expect(page.locator('[data-proof-count]').first()).toHaveText('');
+
+  // header row and at least three session rows show without scrolling
+  await expect(page.locator('[data-board][data-board-ready]')).toBeAttached();
+  const bottoms = await page
+    .locator('[data-panel="sessions"] [data-row][data-proj="opencoven"]')
+    .evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().bottom));
+  expect(bottoms.filter((bottom) => bottom <= 900).length).toBeGreaterThanOrEqual(3);
+});
+
+// H4: Docs sits between How it works and GitHub; below 720px the three links
+// move into a menu that Escape closes, handing focus back to its button.
+test('nav carries Docs and collapses into a menu on narrow screens', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('[data-r="navlinks"] a')).toHaveText(['How it works', 'Docs', 'GitHub']);
+  await expect(page.locator('[data-nav-menu]')).toBeHidden();
+
+  await page.setViewportSize({ width: 500, height: 900 });
+  const button = page.locator('[data-nav-menu] > summary');
+  await expect(button).toBeVisible();
+  await expect(button).toHaveAccessibleName('Menu');
+  await button.click();
+  const items = page.locator('[data-nav-menu-panel] a');
+  await expect(items).toHaveText(['How it works', 'Docs', 'GitHub']);
+  await expect(items.first()).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(items.first()).toBeHidden();
+  await expect(button).toBeFocused();
+});
+
+// H8 and the no-JavaScript edge case: the markup itself is the finished
+// overlap frame, so nothing depends on a script or an animation to be read.
+test.describe('without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('the page reads as a static overlap frame', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('[data-overlap-banner]')).toBeVisible();
+    await expect(page.locator('[data-attention]')).toBeVisible();
+    await expect(page.locator('[data-state-text]')).toHaveText('holding');
+    await expect(page.locator('[data-tick]').first()).toHaveText('+86');
+    await expect(page.locator('[data-board-pause]')).toBeHidden();
+    for (const heading of ['One shared record.', 'What changes on day one', 'Install Cave, then open a repo.']) {
+      await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+    }
+  });
 });
 
 test('theme toggle flips data-theme and persists', async ({ page }) => {
@@ -79,11 +139,10 @@ test('no unexpected console errors on the landing page', async ({ page }) => {
     errors.push(`console: ${msg.text()}`);
   });
   await page.goto('/');
-  // Replaces a fixed 4s sleep. The braid boots on idle and its canvas appears
-  // around 5.5s, so that sleep returned before the slowest subsystem had even
-  // started — errors thrown during braid boot fell outside the window.
-  // Waiting on the canvas is deterministic and covers strictly more.
-  await expect(page.locator('warded-braid canvas')).toBeAttached({ timeout: 20_000 });
+  // Replaces a fixed sleep. The slowest thing on the page is the session
+  // table's walkthrough, which ends when the overlap is raised, so waiting for
+  // the "needs you" chip covers every script that runs before it.
+  await expect(page.locator('[data-attention]')).toBeVisible({ timeout: 20_000 });
   expect(errors).toEqual([]);
 });
 
@@ -99,6 +158,7 @@ test('no unexpected console errors on the landing page', async ({ page }) => {
 // settles at once and each click lands on the frame it is issued.
 test.describe('interactions with the demo held still', () => {
   test.use({ reducedMotion: 'reduce' });
+  test.beforeEach(async ({ page }) => { await page.emulateMedia({ reducedMotion: 'reduce' }); });
 
   test('download menu opens, switches platform tabs, and closes on Escape', async ({ page }) => {
     await page.goto('/');
@@ -116,6 +176,48 @@ test.describe('interactions with the demo held still', () => {
     await expect(menu).toBeHidden();
   });
 
+  // H2/H6/H12: with reduced motion the demo starts paused on the overlap frame;
+  // headers describe themselves, and every cell is a keyboard-operable button.
+  test('session table is paused, described, and keyboard operable', async ({ page }) => {
+    await page.goto('/');
+    const pause = page.getByRole('button', { name: 'Pause demo' });
+    await expect(pause).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[data-overlap-banner]')).toBeVisible();
+
+    const header = page.locator('[data-col-btn]').first();
+    await expect(header).toHaveAccessibleDescription('The familiar attributed to this example session.');
+    await header.focus();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Shift+Tab');
+    await expect(page.locator('#board-col-familiar')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#board-col-familiar')).toBeHidden();
+
+    const cell = page.locator('[data-panel="sessions"] [data-row]').first().locator('[data-cell-btn="surface"]');
+    await expect(cell).toHaveRole('button');
+    await expect(cell).toHaveAccessibleName(/^Hexi, .*open the surface view$/);
+    await cell.focus();
+    await page.keyboard.press('Enter');
+    const win = page.locator('[data-win="surface"]');
+    await expect(win).toBeVisible();
+    await expect(win.locator('[data-win-close]')).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(cell).toBeFocused();
+  });
+
+  test('the npm chip shows its copy cue at rest and confirms a copy', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto('/');
+    const chip = page.locator('[data-hero] [data-r="copybtn"]');
+    const label = chip.locator('[data-copy-label]');
+    await expect(label).toBeVisible();
+    await expect(label).toHaveText('copy');
+    await chip.click();
+    await expect(label).toHaveText('copied');
+    await expect(page.locator('.cv-sr[role="status"]')).toHaveText('Copied');
+    await expect(label).toHaveText('copy', { timeout: 4_000 });
+  });
+
   test('clicking a session cell opens the familiar inspector window', async ({ page }) => {
     await page.goto('/');
     await page.locator('[data-live-board]').scrollIntoViewIfNeeded();
@@ -130,4 +232,61 @@ test.describe('interactions with the demo held still', () => {
     await expect(win).toBeVisible();
     await expect(win).toContainText('familiar');
   });
+});
+
+test('pausing the demo freezes counters and logs until resume', async ({ page }) => {
+  await page.goto('/');
+  const pause = page.getByRole('button', { name: 'Pause demo' });
+  await pause.click();
+  await expect(pause).toHaveAttribute('aria-pressed', 'true');
+  const read = () => page.locator('[data-board] [data-tick], [data-board] [data-log]').allTextContents();
+  const frozen = await read();
+  await page.waitForTimeout(4500);
+  expect(await read()).toEqual(frozen);
+  await pause.click();
+  await expect(page.locator('[data-state-text]')).toHaveText('holding', { timeout: 10000 });
+});
+
+test('column help stays visible when the pointer moves onto it', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('[data-col-btn]').first().hover();
+  const tooltip = page.locator('#board-col-familiar');
+  await expect(tooltip).toBeVisible();
+  const box = await tooltip.boundingBox();
+  await page.mouse.move(box!.x + 10, box!.y + 10, { steps: 10 });
+  await page.waitForTimeout(200);
+  await expect(tooltip).toBeVisible();
+});
+
+test('successful stats do not move mobile content', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 900 });
+  let release!: () => void;
+  const ready = new Promise<void>(resolve => { release = resolve; });
+  await page.route('**/api/site-stats', async route => {
+    await ready;
+    await route.fulfill({ json: { stars: 12345, downloads: 54321, discord: { count: 1234, label: 'members' } } });
+  });
+  await page.goto('/');
+  const row = page.locator('[data-r="proofrow"]');
+  const initial = await row.boundingBox();
+  release();
+  await expect(page.locator('[data-stars-count]')).toHaveText('12k');
+  const populated = await row.boundingBox();
+  expect(populated!.height).toBe(initial!.height);
+});
+
+for (const width of [320, 500, 720, 1040, 1366, 1440]) {
+  test(`current homepage reflows at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
+  });
+}
+
+test('current homepage has no serious or critical accessibility violations', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations.filter(v => ['serious', 'critical'].includes(v.impact || ''))).toEqual([]);
 });

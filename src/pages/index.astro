@@ -47,30 +47,17 @@ import RedesignFooter from '../components/redesign/RedesignFooter.astro';
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <ThemeInit />
-    <PosthogSnippet />
-    <script type="importmap" is:inline>
-    {
-      "imports": {
-        "three": "https://unpkg.com/three@0.184.0/build/three.module.min.js",
-        "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
-        "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
-        "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
-      },
-      "integrity": {
-        "https://unpkg.com/three@0.184.0/build/three.module.min.js": "sha384-35WaVqXNGvw49+RCXk67Ci9ebo55/5+CfirDbAVSG21KV8/7gO4xwIkhA5ZRcUHc",
-        "https://unpkg.com/three@0.184.0/build/three.core.min.js": "sha384-/2vXInuUL2LKgd3n86c5RIzG+YC7vk3zYPTknaEkF2H2sauHtaOrS8swZ+MURxU6",
-        "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
-        "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
-        "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
-      }
-    }
+    <!-- Tells CSS whether motion is allowed before first paint, so the session table's
+         finished frame can be held back only where the script is about to replay it. -->
+    <script is:inline>
+      document.documentElement.dataset.motion = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduce' : 'ok';
     </script>
-    <script type="module" src="/warded-braid.js?v=7" is:inline></script>
+    <PosthogSnippet />
   </head>
   <body>
     <RedesignNav />
     <main>
-      <div data-screen-label="Landing v10 product surfaces" data-r="shell" style="min-width: 1140px; background: var(--cv-bg-base); padding-top: 116px">
+      <div data-screen-label="Landing v10 product surfaces" data-r="shell" style="min-width: 1140px; background: var(--cv-bg-base); padding-top: 60px">
         <RedesignHero />
         <BoardSection />
         <Outcomes />
