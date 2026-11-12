@@ -1,12 +1,10 @@
 ---
+import HeroSculpture from './HeroSculpture.astro';
 import DownloadCta from './DownloadCta.astro';
 ---
-<!-- Single-column hero (handoff H1/H3): the session table below is the hero visual, so
-     nothing here reserves a second column. Order: headline, subhead, button row, Cave line,
-     stats row. -->
-<header id="top" data-r="hero" style="position: relative; max-width: 1140px; margin: 0 auto; padding: 64px 32px 16px; text-align: left">
-  <div data-hero="" data-dl-scope="" style="position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 20px">
-    <h1 data-r="headline" style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 72px; line-height: 0.98; letter-spacing: -0.028em; margin: 0; max-width: 760px; text-wrap: balance">Stop being your agents' control plane.</h1>
+<header id="top" data-r="hero" class="landing-container hero">
+  <div data-hero="" data-dl-scope="" class="hero__copy">
+    <h1 data-r="headline" class="hero__headline">Stop being your agents' control plane.</h1>
     <p style="font-size: 18px; line-height: 1.6; color: var(--cv-text-secondary); max-width: 60ch; margin: 0; text-wrap: pretty">When two agents reach for the same files, one loses the work. Coven decides who waits, and keeps the record of why.</p>
     <div data-r="ctarow" style="display: flex; align-items: center; gap: 18px; margin-top: 4px">
       <DownloadCta />
@@ -27,6 +25,7 @@ import DownloadCta from './DownloadCta.astro';
       <a data-proof="discord" href="https://discord.gg/opencoven" style="display: inline-flex; align-items: center; color: var(--cv-text-secondary)" class="rh1"><i class="ph ph-discord-logo" aria-hidden="true" style="font-size: 14px; line-height: 1; margin-right: 5px"></i><span style="white-space: nowrap"><span class="cv-sr">Discord </span><span data-proof-count="" data-discord-count=""></span><span data-discord-label="">members</span></span></a>
     </div>
   </div>
+  <HeroSculpture />
 </header>
 
 

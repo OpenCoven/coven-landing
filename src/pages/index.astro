@@ -10,6 +10,8 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
 import '@phosphor-icons/web/regular';
 import '../styles/redesign.css';
+import '../styles/hero.css';
+import '@fontsource-variable/geist';
 
 import ThemeInit from '../components/ThemeInit.astro';
 import PosthogSnippet from '../components/redesign/PosthogSnippet.astro';
@@ -54,7 +56,7 @@ import RedesignFooter from '../components/redesign/RedesignFooter.astro';
     </script>
     <PosthogSnippet />
   </head>
-  <body>
+  <body class="landing-home">
     <RedesignNav />
     <main>
       <div data-screen-label="Landing v10 product surfaces" data-r="shell" style="min-width: 1140px; background: var(--cv-bg-base); padding-top: 60px">

@@ -28,7 +28,7 @@ test('landing renders the hero and adapts the download button', async ({ page })
 // gone, Cave is defined under the primary button, and the stats links hold
 // their place whether or not /api/site-stats answers (the preview server has
 // no /api functions, so this is the failure state).
-test('hero is a single column with the session table above the fold', async ({ page }) => {
+test('hero pairs copy with a sculpture and keeps the session table above the fold', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
 

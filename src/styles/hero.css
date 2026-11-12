@@ -1,0 +1,48 @@
+.landing-home .landing-container { max-width: 1504px }
+/* Landing composition. Named containers replace the former fixed-width staging. */
+.hero { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); align-items: center; gap: clamp(24px, 4vw, 72px); padding-block: 28px 6px }
+.hero__copy { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; min-width: 0 }
+.hero__headline { font-family: 'Geist Variable', 'Inter', system-ui, sans-serif; font-weight: 550; font-size: clamp(48px, 4.6vw, 72px); line-height: 1.02; letter-spacing: -0.055em; margin: 0; max-width: 14ch; text-wrap: balance }
+.hero__copy > p { text-wrap: pretty }
+.hero [data-r="ctarow"] { gap: 12px !important; flex-wrap: wrap }
+.hero [data-r="copybtn"] { padding-inline: 12px !important }
+.hero-sculpture { margin: 0; position: relative; min-width: 0; align-self: stretch; display: flex; flex-direction: column; justify-content: center }
+.hero-sculpture__viewport { position: relative; width: 100%; height: 344px; isolation: isolate }
+.hero-sculpture__poster, .hero-sculpture canvas { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain }
+.hero-sculpture canvas { opacity: 0; transition: opacity 240ms ease-out }
+.hero-sculpture[data-state="live"] canvas, .hero-sculpture[data-state="paused"] canvas { opacity: 1 }
+.hero-sculpture[data-state="live"] .hero-sculpture__poster, .hero-sculpture[data-state="paused"] .hero-sculpture__poster { visibility: hidden }
+.hero-sculpture__caption { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 32px; font: 10px/1.5 'JetBrains Mono', monospace; color: var(--cv-text-muted) }
+.hero-sculpture__caption > span { display: inline-flex; align-items: center; gap: 8px }
+.hero-sculpture__rule { width: 18px; height: 1px; background: var(--cv-accent); display: inline-block }
+.hero-sculpture__pause { display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; min-height: 32px; padding: 4px 8px; border: 1px solid var(--cv-border-hairline); border-radius: 8px; color: var(--cv-text-secondary); background: var(--cv-bg-raised); font: inherit; cursor: pointer }
+.hero-sculpture__pause[hidden] { display: none }
+.hero-sculpture__pause:hover { border-color: var(--cv-accent) }
+#board.landing-container { padding-top: 18px !important; padding-bottom: 56px !important }
+#board > [data-anim] { margin-top: 28px !important }
+@media (min-width: 1600px) { .hero { padding-top: 28px } }
+@media (max-width: 1079px) {
+  .hero { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 24px }
+  .hero__headline { font-size: clamp(44px, 5.2vw, 56px) }
+  .hero [data-r="ctarow"] { flex-direction: column; align-items: stretch; width: 100% }
+  .hero-sculpture__caption { font-size: 9px }
+  .hero-sculpture__caption > span { max-width: 18ch }
+}
+@media (max-width: 719px) {
+  .hero { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding-block: 28px 0 }
+  .hero__copy { gap: 16px; order: 0 !important }
+  .hero__headline { font-size: clamp(40px, 8.8vw, 56px); max-width: 16ch; line-height: 1.04 }
+  .hero-sculpture { order: 1; align-self: center; width: min(100%, 340px) }
+  .hero-sculpture__viewport { height: 210px; aspect-ratio: auto }
+  .hero-sculpture__caption { justify-content: center; min-height: 24px }
+  .hero-sculpture__caption > span { max-width: none }
+  #board.landing-container { padding-top: 16px }
+}
+@media (forced-colors: active) { .hero-sculpture__rule { background: CanvasText } }
+
+/* CSS also protects the poster while a media-change callback is pending. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-sculpture canvas { display: none }
+  .hero-sculpture .hero-sculpture__poster { visibility: visible }
+  .hero-sculpture__pause { display: none }
+}

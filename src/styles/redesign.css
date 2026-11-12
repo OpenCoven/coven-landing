@@ -922,3 +922,7 @@ summary:focus-visible, [role="button"]:focus-visible { outline: 2px solid var(--
 [data-proof-count] { display: inline-block; width: 7ch; margin-right: 0.6ch; text-align: right; font-variant-numeric: tabular-nums }
 /* The warning chip's tinted fill needs a stronger foreground than plain text. */
 [data-attention] { color: color-mix(in oklch, var(--cv-warning) 90%, var(--cv-text-primary)) !important }
+
+/* Shared content alignment for the landing and its secondary routes. */
+.landing-container { box-sizing: border-box; width: 100%; max-width: 1204px; margin-inline: auto; padding-inline: 32px }
+@media (max-width: 719px) { .landing-container { padding-inline: 20px } }

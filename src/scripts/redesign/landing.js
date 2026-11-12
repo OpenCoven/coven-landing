@@ -1,6 +1,5 @@
-// Landing page entry — wires every behavior module in the order the original
-// component mounted them. The hero has no script of its own any more: the
-// interactive dial was removed, and the session table is the hero visual.
+// Landing entry: shared navigation, actions, proof and product-board behavior.
+// HeroSculpture initializes its optional renderer through its own Astro script.
 
 import { initActions } from './actions.js';
 import { initTheme } from './theme.js';
