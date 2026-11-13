@@ -1,89 +1,138 @@
 # OpenCoven analytics kit (PostHog)
 
-Everything needed to stand up analytics for the site — snippet, actions,
-funnels, dashboards, heatmaps, session replay — parameterized by API keys.
-Swap in your keys, run two commands, deploy.
+The landing site is **analytics-off by default**. A PostHog project key alone
+never activates tracking. The only approved launch profile is an explicit,
+allowlisted event mode with autocapture, heatmaps, exception capture, page-leave
+capture, and session replay disabled.
+
+The source of truth for the emitted client configuration is
+`src/components/redesign/PosthogSnippet.astro`. The provisioning script creates
+matching actions, dashboards, and project settings without turning broad
+capture features back on.
+
+## Operating modes
+
+| Mode | Behavior |
+|---|---|
+| `off` | Default. No PostHog script is emitted, even when a key is present. |
+| `events` | Emits the snippet and accepts only the named events and bounded properties in `PosthogSnippet.astro`. |
+
+Any other mode fails the Astro build. `events` also fails the build when no
+project key is configured.
+
+## Approved event contract
+
+The initial allowlist is:
+
+- `page_viewed` — `path` only; query strings and fragments are excluded
+- `hero_primary_clicked`
+- `hero_secondary_clicked`
+- `principle_opened` — bounded `principle` identifier
+- `guided_demo_started`
+- `guided_demo_completed` — bounded `resolution` identifier
+- `product_selected` — bounded `product_id`
+- `quickstart_command_copied` — bounded `command_id`, never command text
+- `download_menu_opened`
+- `download_platform_selected` — `mac`, `windows`, `linux`, or `ios`
+- `download_started` — approved platform only
+- `download_fallback_used` — approved platform and delivery tier only
+- `docs_clicked`
+- `github_clicked`
+- `discord_clicked`
+
+Unknown events are rejected by the client wrapper. Unknown properties are
+dropped. The contract must never include command or prompt contents, clipboard
+values, filenames, repository names, local file paths, arbitrary URLs, user
+input, embedded product/demo contents, or raw errors.
 
 ## One-time setup
 
-1. Create a PostHog account/project (US or EU cloud — note which).
-2. Fill `posthog.config.json` (this folder never deploys; see `.vercelignore`):
+1. Create a PostHog project in the intended US or EU region.
+2. Copy `posthog.config.example.json` to the gitignored
+   `posthog.config.json`.
+3. Fill only the required values:
+   - `mode` — keep `off` while configuring; use `events` only after approval
    - `region` — `us` or `eu`
-   - `projectApiKey` — Settings → Project → "Project API key" (`phc_…`, public,
-     ends up in the page)
-   - `personalApiKey` — Settings → Personal API keys → create with scopes
-     `action:write`, `insight:write`, `dashboard:write`, `project:write`
-     (`phx_…`, secret, never leaves this machine)
-   - `projectId` — the number in the PostHog URL: `app.posthog.com/project/<id>`
-   - `siteUrl` — the deployed origin (used to authorize the heatmap toolbar)
+   - `projectApiKey` — public `phc_…` project key used by the page
+   - `personalApiKey` — secret `phx_…` key used only by the provisioner
+   - `projectId` — numeric PostHog project id
+   - `siteUrl` — deployed origin retained in the project URL allowlist
+4. Run the local mock test before touching a real workspace:
 
-## Enabling the snippet in production
+   ```bash
+   python3 analytics/test-provision.py
+   ```
 
-The tracking snippet is emitted at build time. Vercel git deploys never see
-the gitignored config, so for production set two project env vars instead:
+5. Preview the intended API changes:
 
-- `PUBLIC_POSTHOG_KEY` — the project API key (`phc_…`, public by design)
-- `PUBLIC_POSTHOG_REGION` — `us` or `eu`
+   ```bash
+   python3 analytics/provision.py --dry-run
+   ```
 
-Env vars win over the config file when both exist. The config file remains
-the local path (and the only home of the secret personal key, which is used
-by the provisioner below and never by the site build).
+6. Apply them deliberately:
 
-## Run
+   ```bash
+   python3 analytics/provision.py
+   ```
 
-```bash
-# 1. create/refresh actions, funnels, dashboards, project settings (idempotent)
-python3 analytics/provision.py            # add --dry-run to preview
+The provisioner is idempotent by object name. It disables replay, heatmaps, and
+autocaptured web vitals at project level and provisions only explicit-event
+actions and dashboards.
 
-# 2. inject the tracking snippet into index.html + how-it-works.html (idempotent)
-python3 analytics/inject-snippet.py
+## Enabling event mode in a deployment
 
-# 3. ship
-vercel --prod
-```
+For a Vercel/git deployment, set all three variables:
 
-`migrate.py` re-runs the snippet injection automatically after every design
-migration, so a new export never silently drops analytics.
+- `PUBLIC_POSTHOG_MODE=events`
+- `PUBLIC_POSTHOG_KEY=phc_…`
+- `PUBLIC_POSTHOG_REGION=us` or `eu`
+
+The gitignored local config is never required by a normal production build.
+Environment variables take precedence over it.
+
+A key without `PUBLIC_POSTHOG_MODE=events` remains inert. An unsupported mode,
+or `events` without a key, fails the build rather than silently choosing a
+tracking profile.
 
 ## What gets provisioned
 
-- **Project settings**: session replay on (inputs masked), heatmaps on,
-  web vitals autocapture on, site URL authorized for the toolbar.
-- **Actions**: Download clicked, per-platform artifact downloads (msi / dmg
-  arm+intel / AppImage), install-command copies, "See it hold a claim",
-  how-it-works views, outbound GitHub/Discord.
-- **Dashboards**: `OpenCoven · Traffic` (pageviews + uniques, referrers,
-  devices, countries, browsers) and `OpenCoven · Conversion` (downloads over
-  time, visit→download funnel, visit→how-it-works→download funnel, copies).
+- **Project settings:** session recording off, heatmaps off, autocaptured web
+  vitals off, and the configured site URL preserved alongside existing URLs.
+- **Actions:** durable names mapped to the explicit allowlisted events.
+- **Traffic dashboard:** explicit page events and route breakdown only.
+- **Conversion dashboard:** product selection, command-copy, download, and
+  visit-to-download signals based on explicit events.
 
-## Verify after shipping
+No selector-based `$autocapture` action, replay workspace, or heatmap toolbar is
+part of the approved launch profile.
 
-1. Visit the live site, click around, then check PostHog → Activity: events
-   should appear within seconds ($pageview, $autocapture, web vitals).
-2. Heatmaps: PostHog → Heatmaps → enter the site URL (or launch the toolbar
-   from PostHog on the live site). Click/scroll maps accrue with traffic.
-3. Session replay: Recordings tab fills as visitors arrive.
-4. Dashboards populate as events accumulate — funnels need at least a few
-   conversions before they render anything meaningful.
+## Verification after deployment
 
-## Testing without credentials
+1. View built page source and confirm PostHog is absent in `off` mode.
+2. In `events` mode, inspect the network payloads and confirm only allowlisted
+   event names and properties appear.
+3. Confirm query strings, fragments, local context, command text, clipboard
+   values, and user content are absent.
+4. Confirm no recorder, heatmap, or broad autocapture script is requested.
+5. Confirm analytics failure does not affect reading, navigation, onboarding,
+   or downloads.
+6. Re-run `pnpm check`, which includes the analytics source/deployment contract
+   and the mock provisioner test.
 
-```bash
-python3 analytics/test-provision.py
-```
+## Removal and rollback
 
-Runs the provisioner three times against a local mock of the PostHog API and
-asserts: every object is created with schema-valid bodies (run 1), re-running
-updates in place with zero duplicates, exercising pagination (run 2), and a
-forced server error on one object reports FAIL + exit 1 while everything else
-still provisions (run 3). Payload shapes are matched against PostHog's API
-docs (actions steps, InsightVizNode/TrendsQuery/FunnelsQuery, project fields).
+Set `PUBLIC_POSTHOG_MODE=off` or remove the mode/key and redeploy. No code
+rollback is needed to stop client analytics. Project-side objects may remain
+for historical reporting; replay and heatmaps remain disabled by the
+provisioner.
 
 ## Notes
 
-- The provisioner is idempotent by object *name* — rename an object in the
-  PostHog UI and the next run will recreate it under the original name.
-- A FAILED line means PostHog's API schema drifted for that one object type;
-  everything else still provisions. Create the straggler by hand or update
-  `provision.py`.
-- Removing analytics: `python3 analytics/inject-snippet.py --remove`, redeploy.
+- The personal API key is secret and must never enter source, build output,
+  client JavaScript, logs, or issue text.
+- A failed provisioner item is reported without aborting unrelated items; fix
+  the named schema drift and rerun.
+- Renaming a managed PostHog object in the UI causes the next run to recreate
+  the canonical name.
+- Changes to the allowlist, property schema, retention, region, or provider
+  require a corresponding public-policy and deployment-contract review.

@@ -53,7 +53,7 @@ export function initSculpture() {
     loading = true;
     try {
       const { mountSculpture } = await import('./sculpture-scene.js');
-      if (ticket !== generation || !eligible()) return;
+      if (ticket !== generation || !eligible() || !visible || document.hidden) return;
       scene = mountSculpture(viewport);
       scene.render(0, pointer);
       button.hidden = false;

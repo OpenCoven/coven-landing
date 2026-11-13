@@ -3,14 +3,14 @@ node_modules/
 dist/
 .astro/
 coverage/
+artifacts/
 *.log
 .comux*
 /.superpowers
 /.copilot/
 /playwright-report/
+/playwright-report-release/
 /test-results/
-.vercel
-.env*
 
 # analytics keys stay local (copy posthog.config.example.json)
 analytics/posthog.config.json

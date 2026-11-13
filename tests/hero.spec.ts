@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
 
-test('large desktop uses a wider hero and keeps the board in the first viewport', async ({ page }) => {
+test('large desktop uses a wider hero and keeps the next section in the first viewport', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 900 });
   await page.goto('/');
-  const hero = await page.locator('[data-r="hero"]').boundingBox();
+  const hero = await page.locator('.hero--architectural').boundingBox();
   expect(hero!.width).toBeGreaterThan(1300);
-  const board = await page.locator('[data-board]').boundingBox();
-  expect(board!.y).toBeLessThan(530);
+  const board = await page.locator('.hero--architectural + .band').boundingBox();
+  expect(board!.y).toBeLessThan(650);
   await expect(page.locator('[data-hero-sculpture]')).toBeVisible();
 });
 
@@ -37,7 +37,7 @@ for (const mode of ['reduce', 'mobile', 'no-script', 'failed-module'] as const) 
     await expect(poster).toBeVisible();
     expect(await poster.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true);
     if (mode !== 'failed-module') expect(requests).toEqual([]);
-    await expect(page.locator('[data-hero] [data-dl-btn]')).toBeVisible();
+    await expect(page.locator('.hero__copy .action--primary')).toBeVisible();
     await context.close();
   });
 }
@@ -68,7 +68,7 @@ test('unavailable WebGL keeps the poster and the primary action usable', async (
   await expect(stage).toHaveAttribute('data-state', 'fallback');
   await expect(stage.locator('img')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Pause 3D motion' })).toBeHidden();
-  await expect(page.locator('[data-hero] [data-dl-btn]')).toBeEnabled();
+  await expect(page.locator('.hero__copy .action--primary')).toBeEnabled();
 });
 
 test('manual pause survives switching between mobile and desktop layouts', async ({ page }) => {
@@ -99,16 +99,38 @@ test('paused sculpture exposes its visible resume action to assistive technology
 test('wider homepage does not expand secondary-page chrome', async ({ page }) => {
   await page.setViewportSize({ width: 1920, height: 900 });
   await page.goto('/privacy');
-  const nav = await page.locator('[data-nav] > .landing-container').boundingBox();
-  expect(nav!.width).toBe(1204);
+  const nav = await page.locator('.site-header__inner').boundingBox();
+  expect(nav!.width).toBe(1184);
 });
 
 test('phone users reach the headline and primary action before the illustration', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
-  const action = await page.locator('[data-hero] [data-dl-btn]').boundingBox();
+  const action = await page.locator('.hero__copy .action--primary').boundingBox();
   const art = await page.locator('[data-hero-sculpture]').boundingBox();
   expect(action!.y + action!.height).toBeLessThan(art!.y);
   expect(action!.y + action!.height).toBeLessThan(600);
+});
+
+test('pending import does not mount offscreen and retries when visible', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  let release!: () => void;
+  let requested!: () => void;
+  const pending = new Promise<void>(resolve => { release = resolve; });
+  const started = new Promise<void>(resolve => { requested = resolve; });
+  await page.route('**/*sculpture-scene*', async route => { requested(); await pending; await route.continue(); });
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await started;
+  const stage = page.locator('[data-hero-sculpture]');
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await expect(stage).not.toBeInViewport();
+  await page.waitForTimeout(100);
+  const loaded = page.waitForResponse(response => response.url().includes('sculpture-scene'));
+  release();
+  await loaded;
+  await page.waitForTimeout(300);
+  await expect(stage.locator('canvas')).toHaveCount(0);
+  await page.evaluate(() => scrollTo(0, 0));
+  await expect(stage).toHaveAttribute('data-state', 'live');
 });

@@ -1,0 +1,28 @@
+name = "coven-installer-stream"
+main = "src/index.js"
+compatibility_date = "2025-08-01"
+
+# Deployment is maintainer-owned: put CLOUDFLARE_API_TOKEN and
+# CLOUDFLARE_ACCOUNT_ID in the GitHub repository secrets (the deploy workflow
+# uses them), then `wrangler secret put GITHUB_TOKEN` once for the higher
+# GitHub API rate limit. See README.md for the full setup and rollback steps.
+
+[vars]
+# Exact-match CORS allowlist — replaces the in-code defaults when set.
+# Production landing origin plus local dev (astro dev :4321) and preview
+# (:4173) ports. Never a wildcard.
+ALLOWED_ORIGINS = "https://opencoven.ai,https://www.opencoven.ai,http://localhost:4321,http://127.0.0.1:4321,http://localhost:4173,http://127.0.0.1:4173"
+# How long the latest-release lookup is memoized per isolate, in ms. Keeps
+# warm traffic off the unauthenticated GitHub API (60 req/hr per IP).
+RELEASE_TTL_MS = "300000"
+# If the Worker cannot resolve or stream an asset, send the browser to this
+# site's existing compatibility stream; that endpoint falls back to GitHub.
+FALLBACK_ORIGIN = "https://opencoven.ai"
+
+# Serve on a dedicated hostname (recommended, matches
+# DOWNLOAD_STREAM_ORIGIN) — enable a route after the zone is on
+# Cloudflare, or publish the workers.dev URL and configure that origin:
+#
+# routes = [
+#   { pattern = "downloads.opencoven.ai", custom_domain = true }
+# ]

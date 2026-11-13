@@ -1,0 +1,147 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import '../styles/routes.css';
+
+const title = 'OpenCoven Protocol · Identity, authority, continuity';
+const description =
+  'A concise, maturity-labeled map of the OpenCoven identity, authority, continuity, orchestration, runtime, and oversight architecture.';
+
+const layers = [
+  {
+    name: 'Familiar Contract',
+    body: 'Defines the governed familiar self: protected identity fields, scope and memory boundaries, attributable revisions, and principal binding.',
+    maturity: 'Protocol work',
+    state: 'unavailable',
+    href: 'https://github.com/OpenCoven/familiar-contract',
+  },
+  {
+    name: 'Threads + runtime authority',
+    body: 'Protected mutation decisions and local enforcement remain authority concerns. Context or possession of state does not itself confer authorization.',
+    maturity: 'Implemented proof + protocol work',
+    state: 'selected',
+    href: 'https://github.com/OpenCoven/coven-threads',
+  },
+  {
+    name: 'SPAR Familiar Continuity Profile',
+    body: 'Continuity and query semantics for revisions, embodiments, receipts, temporal relationships, staleness, replay, revocation, and reconstruction. It is not a second identity root or ledger.',
+    maturity: 'Protocol direction',
+    state: 'unavailable',
+    href: 'https://github.com/OpenCoven/familiar-contract',
+  },
+  {
+    name: 'Psyche',
+    body: 'Correlates tasks, lanes, leases, approvals, receipts, recovery, and authorized familiar snapshots without creating identity authority from task text.',
+    maturity: 'Protocol work',
+    state: 'unavailable',
+    href: 'https://github.com/OpenCoven/psyche',
+  },
+  {
+    name: 'Coven runtime',
+    body: 'Owns durable local session state, claims, persistence, execution, and enforcement at the project boundary.',
+    maturity: 'Available today',
+    state: 'success',
+    href: 'https://github.com/OpenCoven/coven',
+  },
+  {
+    name: 'Cave',
+    body: 'Makes projects, sessions, approvals, evidence, provenance, and developing continuity state legible to the human principal.',
+    maturity: 'Available today',
+    state: 'success',
+    href: 'https://github.com/OpenCoven/coven-cave',
+  },
+] as const;
+---
+
+<SiteLayout title={title} description={description} canonicalPath="/protocol">
+  <section class="site-shell hero" id="top">
+    <div class="hero__copy">
+      <p class="eyebrow">Protocol and ownership map</p>
+      <h1>Identity is not authority. Continuity is not a copied prompt.</h1>
+      <p class="hero__lede">
+        OpenCoven separates which familiar is being embodied, who may authorize protected
+        change, how historical sameness is evidenced, how work is orchestrated, and where
+        runtime state is enforced. Each layer has one canonical owner.
+      </p>
+      <div class="button-row">
+        <a class="action action--primary" data-oc-primitive="action" data-oc-state="idle" href="https://docs.opencoven.ai">Read canonical docs</a>
+        <a class="action" data-oc-primitive="action" data-oc-state="idle" href="/how-it-works">See current runtime behavior</a>
+      </div>
+    </div>
+    <aside class="evidence-card" aria-labelledby="protocol-reading-heading">
+      <span class="status" data-oc-primitive="status-indicator" data-oc-state="unavailable">Mixed maturity</span>
+      <h2 class="card-heading" id="protocol-reading-heading">Reading rule</h2>
+      <p class="muted">
+        This page mixes implemented runtime proof with protocol direction. Every layer
+        carries an explicit maturity label; no single “OpenCoven compliant” claim collapses
+        those distinctions.
+      </p>
+    </aside>
+  </section>
+
+  <section class="band" aria-labelledby="defs-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="defs-heading">Three definitions do most of the work.</h2>
+        <p>Product language stays useful only when the technical boundary is immediately clear.</p>
+      </div>
+      <div class="concept-grid">
+        <article class="concept-card">
+          <h3>Familiar</h3>
+          <p>A governed agent identity with a stable root, bounded scope and capabilities, attributable revisions, and explicit binding to the principal authorized for protected change. The term does not imply personhood or independent legal agency.</p>
+        </article>
+        <article class="concept-card">
+          <h3>Principal</h3>
+          <p>The authenticated human or organization whose authority governs protected familiar identity and actions. A name in configuration is not sufficient authorization.</p>
+        </article>
+        <article class="concept-card">
+          <h3>Continuity</h3>
+          <p>Evidence that a later embodiment or revision is the same familiar, a successor, a fork, a restored historical state, or a different root—not simply the same display name, memory file, model state, or prompt.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="layers-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="layers-heading">One owner per semantic layer.</h2>
+        <p>The landing site summarizes these boundaries; it does not become a normative protocol repository.</p>
+      </div>
+      <div class="proof-sequence">
+        {layers.map((layer) => (
+          <article class="proof-step">
+            <div class="proof-step__body">
+              <span
+                class:list={["status", { "status--available": layer.state === 'success', "status--beta": layer.state !== 'success' }]}
+                data-oc-primitive="status-indicator"
+                data-oc-state={layer.state}
+              >{layer.maturity}</span>
+              <h3>{layer.name}</h3>
+              <p>{layer.body}</p>
+              <a href={layer.href}>Inspect canonical repository</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="flow-heading">
+    <div class="site-shell">
+      <div class="band__intro">
+        <h2 id="flow-heading">Accessible architecture text.</h2>
+        <p>The ownership graph in linear form, without requiring a visual diagram.</p>
+      </div>
+      <div class="architecture">
+        <ol>
+          <li>Familiar Contract defines the governed familiar self.</li>
+          <li>Threads and Coven authority mechanisms govern protected mutation and local enforcement.</li>
+          <li>SPAR continuity semantics describe revision and embodiment lineage without replacing identity or authority.</li>
+          <li>Psyche snapshots authorized identity into orchestrated tasks and recovery flows.</li>
+          <li>Coven owns durable local runtime and session execution state.</li>
+          <li>Cave, Code, GitHub, and SDK expose constrained product and client surfaces.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</SiteLayout>

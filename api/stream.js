@@ -1,17 +1,14 @@
-// Same-origin streaming proxy — tier 2 of the download cascade.
+// Same-origin streaming proxy — the optional Vercel fallback for the
+// browser-native download route.
 //
-// The landing page's in-button progress UI needs to read installer bytes
-// with fetch + ReadableStream, which GitHub's asset hosting blocks
-// cross-origin (no CORS headers on any redirect hop). This edge function
-// fetches the asset server-side and passes the body through same-origin,
-// so no CORS applies at all.
+// The primary CTA points at /download/:platform, which normally redirects
+// straight to the current GitHub release asset. If the optional Cloudflare
+// Worker cannot resolve or stream an installer, it may redirect here through
+// FALLBACK_ORIGIN; this endpoint passes the body through same-origin and
+// redirects to the GitHub Releases page on failure.
 //
-// Cascade (src/scripts/reforged.js): the Cloudflare worker
-// (workers/download-proxy, free egress) is tried first when configured;
-// this endpoint is the zero-setup fallback; plain /download/:platform
-// navigation is the last resort. Each download's bytes count against
-// Vercel data transfer — if the plan's cap pauses functions, this tier
-// starts failing and clicks degrade to the native download on their own.
+// Each stream served here counts against Vercel data transfer. It remains a
+// compatibility endpoint and is not fetched by landing-page JavaScript.
 //
 // Edge runtime, not Node: an in-flight streaming response has no
 // wall-clock cap here, while Node functions are killed at maxDuration —
@@ -60,9 +57,9 @@ export default async function handler(request) {
     const release = await latestRelease();
     let asset = pickAsset(release.assets, platform);
     if (!asset && platform === 'windows') {
-      const headers = { Accept: 'application/vnd.github+json', 'User-Agent': 'opencoven-landing' };
-      if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-      const fallback = await fetch(`https://api.github.com/repos/${REPO}/releases/tags/${WINDOWS_FALLBACK_TAG}`, { headers });
+      const fallback = await fetch(`https://api.github.com/repos/${REPO}/releases/tags/${WINDOWS_FALLBACK_TAG}`, {
+        headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'opencoven-landing' },
+      });
       if (!fallback.ok) throw new Error(`Windows fallback ${fallback.status}`);
       asset = pickAsset((await fallback.json()).assets, platform);
     }

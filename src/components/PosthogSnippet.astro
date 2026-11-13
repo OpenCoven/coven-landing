@@ -1,0 +1,118 @@
+---
+// PostHog is disabled by default. A project key alone is intentionally not
+// enough to activate tracking: PUBLIC_POSTHOG_MODE=events (or local
+// config.mode=events) must also be present. Only explicit allowlisted events
+// may be emitted; autocapture, page-leave capture, heatmaps, exception capture,
+// and session recording remain disabled in this launch profile.
+import fs from 'node:fs';
+
+type AnalyticsMode = 'off' | 'events';
+type LocalConfig = {
+  projectApiKey?: string;
+  region?: string;
+  mode?: AnalyticsMode | string;
+};
+
+let cfg: LocalConfig = { projectApiKey: '', region: 'us', mode: 'off' };
+try {
+  cfg = JSON.parse(
+    fs.readFileSync(
+      new URL('../../analytics/posthog.config.json', import.meta.url),
+      'utf8',
+    ),
+  );
+} catch {
+  // Local analytics config is optional and gitignored.
+}
+
+const key = (import.meta.env.PUBLIC_POSTHOG_KEY || cfg.projectApiKey || '').trim();
+const rawRegion = (import.meta.env.PUBLIC_POSTHOG_REGION || cfg.region || 'us')
+  .trim()
+  .toLowerCase();
+const region = rawRegion === 'eu' ? 'eu' : 'us';
+const rawMode = (import.meta.env.PUBLIC_POSTHOG_MODE || cfg.mode || 'off')
+  .trim()
+  .toLowerCase();
+
+if (rawMode !== 'off' && rawMode !== 'events') {
+  throw new Error(
+    `Unsupported PUBLIC_POSTHOG_MODE=${JSON.stringify(rawMode)}; expected "off" or "events".`,
+  );
+}
+if (rawMode === 'events' && !key) {
+  throw new Error('PUBLIC_POSTHOG_MODE=events requires PUBLIC_POSTHOG_KEY.');
+}
+
+const mode = rawMode as AnalyticsMode;
+const enabled = mode === 'events' && Boolean(key);
+const ingest = `https://${region}.i.posthog.com`;
+---
+{enabled && (
+  <script is:inline define:vars={{ key, ingest }}>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+
+    const id = /^[a-z0-9._-]{1,64}$/i;
+    const path = /^\/[a-z0-9/_.-]{0,95}$/i;
+    const platform = /^(mac|windows|linux|ios)$/;
+    const tier = /^(direct|vercel|worker|github)$/;
+    const schemas = Object.freeze({
+      page_viewed: { path },
+      hero_primary_clicked: {},
+      hero_secondary_clicked: {},
+      principle_opened: { principle: id },
+      guided_demo_started: {},
+      guided_demo_completed: { resolution: id },
+      product_selected: { product_id: id },
+      quickstart_command_copied: { command_id: id },
+      download_menu_opened: {},
+      download_platform_selected: { platform },
+      download_started: { platform },
+      download_fallback_used: { platform, tier },
+      docs_clicked: {},
+      github_clicked: {},
+      discord_clicked: {},
+    });
+
+    function sanitize(name, properties) {
+      const schema = schemas[name];
+      if (!schema) return null;
+      const safe = {};
+      const supplied = properties && typeof properties === 'object' ? properties : {};
+      for (const [property, pattern] of Object.entries(schema)) {
+        const value = supplied[property];
+        if (typeof value === 'string' && pattern.test(value)) safe[property] = value;
+      }
+      return safe;
+    }
+
+    const analytics = Object.freeze({
+      capture(name, properties) {
+        const safe = sanitize(name, properties);
+        if (safe === null) return false;
+        window.posthog.capture(name, safe);
+        return true;
+      },
+    });
+
+    Object.defineProperty(window, 'opencovenAnalytics', {
+      value: analytics,
+      configurable: false,
+      enumerable: false,
+      writable: false,
+    });
+
+    window.posthog.init(key, {
+      api_host: ingest,
+      defaults: '2025-05-24',
+      autocapture: false,
+      capture_pageview: false,
+      capture_pageleave: false,
+      capture_heatmaps: false,
+      capture_exceptions: false,
+      disable_session_recording: true,
+      session_recording: { enabled: false, maskAllInputs: true },
+    });
+
+    analytics.capture('page_viewed', { path: window.location.pathname });
+  </script>
+)}

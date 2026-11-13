@@ -1,0 +1,75 @@
+@layer components {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :root,
+    body,
+    .site-header,
+    .mobile-nav__panel,
+    .concept-card,
+    .product-card,
+    .proof-step,
+    .evidence-card,
+    .command-block,
+    .architecture,
+    .legal-table,
+    .legal-highlight {
+      background: Canvas;
+      color: CanvasText;
+    }
+
+    .site-header,
+    .mobile-nav__panel,
+    .concept-card,
+    .product-card,
+    .proof-step,
+    .evidence-card,
+    .command-block,
+    .legal-tablewrap,
+    .action,
+    .theme-control select,
+    .mobile-nav > summary {
+      border-color: CanvasText;
+    }
+
+    .action,
+    .action--primary,
+    .status,
+    .status--available,
+    .status--beta,
+    .status--direction,
+    .status--gated-beta {
+      background: ButtonFace;
+      color: ButtonText;
+      border: 1px solid ButtonText;
+      forced-color-adjust: auto;
+    }
+
+    .action:hover,
+    .action--primary:hover,
+    .action:focus-visible,
+    .mobile-nav > summary:focus-visible,
+    .theme-control select:focus-visible {
+      background: Highlight;
+      color: HighlightText;
+    }
+
+    .brand-mark {
+      background: CanvasText;
+    }
+
+    :focus-visible {
+      outline-color: Highlight;
+    }
+  }
+}
