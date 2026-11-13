@@ -66,17 +66,12 @@ test('guided proof stays semantic, complete, and ordered without simulated app c
   await expect(proof.locator('[data-oc-part="evidence-region"]')).toBeVisible();
 });
 
-test('the pinned canonical mark is used by the shell and hero', async ({ page }) => {
+test('the pinned canonical mark stays flat while the hero uses a separate illustration', async ({ page }) => {
   await page.goto('/');
 
   await expect(page.locator('header .brand-mark--header')).toBeVisible();
-  await expect(page.locator('.hero__mark .brand-mark')).toBeVisible();
-  await expect(page.locator('header img[src="/favicon.svg"]')).toHaveCount(0);
-  await expect(page.locator('.hero__mark img[src="/favicon.svg"]')).toHaveCount(0);
-
-  const maskImage = await page
-    .locator('.hero__mark .brand-mark')
-    .evaluate((element) => getComputedStyle(element).maskImage);
+  await expect(page.locator('[data-hero-sculpture]')).toBeVisible();
+  const maskImage = await page.locator('header .brand-mark--header').evaluate(element => getComputedStyle(element).maskImage);
   expect(maskImage).toContain('/assets/opencoven-mark.svg');
 });
 

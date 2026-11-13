@@ -1,4 +1,6 @@
 ---
+import HeroSculpture from '../components/redesign/HeroSculpture.astro';
+import '../styles/hero.css';
 import SiteLayout from '../layouts/SiteLayout.astro';
 import { activeProducts, canonicalFoundationCommands } from '../data/products.ts';
 
@@ -44,10 +46,10 @@ const productUiState = (maturity: string) => {
 };
 ---
 
-<SiteLayout title={title} description={description} canonicalPath="/">
-  <section class="site-shell hero" id="top">
+<SiteLayout wide title={title} description={description} canonicalPath="/">
+  <section class="site-shell hero hero--architectural" id="top">
     <div class="hero__copy">
-      <p class="eyebrow">Identity-preserving familiar infrastructure</p>
+      <p class="eyebrow"><span class="brand-mark" aria-hidden="true"></span>Identity-preserving familiar infrastructure</p>
       <h1>Give your agents continuity. Keep authority local.</h1>
       <p class="hero__lede">
         OpenCoven is building governed familiar identities that can carry memory,
@@ -60,9 +62,7 @@ const productUiState = (maturity: string) => {
         <a class="action" data-oc-primitive="action" data-oc-part="label" data-oc-state="idle" href="#how-it-works">See how it works</a>
       </div>
     </div>
-    <div class="hero__mark" aria-hidden="true">
-      <span class="brand-mark"></span>
-    </div>
+    <HeroSculpture />
   </section>
 
   <section class="band" aria-labelledby="trust-heading">

@@ -11,6 +11,7 @@ import PosthogSnippet from '../components/PosthogSnippet.astro';
 import { ogImage } from '../lib/og.js';
 
 interface Props {
+  wide?: boolean;
   title: string;
   description: string;
   canonicalPath?: string;
@@ -20,6 +21,7 @@ interface Props {
 }
 
 const {
+  wide = false,
   title,
   description,
   canonicalPath = Astro.url.pathname,
@@ -99,7 +101,7 @@ const structuredData = [
     <ThemeInit />
     <PosthogSnippet />
   </head>
-  <body>
+  <body class:list={{ 'home--architectural': wide }}>
     <a class="skip-link" href="#content">Skip to content</a>
     <header
       class="site-header"
