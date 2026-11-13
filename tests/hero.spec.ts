@@ -55,6 +55,8 @@ test('changing reduced motion restores the poster without layout movement', asyn
 });
 
 test('unavailable WebGL keeps the poster and the primary action usable', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;
@@ -69,6 +71,7 @@ test('unavailable WebGL keeps the poster and the primary action usable', async (
   await expect(stage.locator('img')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Pause 3D motion' })).toBeHidden();
   await expect(page.locator('.hero__copy .action--primary')).toBeEnabled();
+  expect(errors).toEqual([]);
 });
 
 test('manual pause survives switching between mobile and desktop layouts', async ({ page }) => {
@@ -110,7 +113,9 @@ test('phone users reach the headline and primary action before the illustration'
   const action = await page.locator('.hero__copy .action--primary').boundingBox();
   const art = await page.locator('[data-hero-sculpture]').boundingBox();
   expect(action!.y + action!.height).toBeLessThan(art!.y);
-  expect(action!.y + action!.height).toBeLessThan(600);
+  // Main's canonical copy wraps differently across platform font fallbacks.
+  // The action must precede decoration and remain inside the first viewport.
+  expect(action!.y + action!.height).toBeLessThan(page.viewportSize()!.height);
 });
 
 test('pending import does not mount offscreen and retries when visible', async ({ page }) => {

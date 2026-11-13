@@ -18,7 +18,13 @@ function roundedRect(path, width, height, radius) {
 }
 
 export function mountSculpture(viewport) {
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+  const canvas = document.createElement('canvas');
+  const attributes = { alpha: true, antialias: true, powerPreference: 'low-power' };
+  const context = canvas.getContext('webgl2', attributes);
+  // Optional graphics can be unavailable by browser or device policy. Probe
+  // before Three attaches its context-error logger, and retain the poster.
+  if (!context) throw new Error('WebGL2 unavailable');
+  const renderer = new THREE.WebGLRenderer({ canvas, context, ...attributes });
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
   renderer.setClearColor(0x000000, 0);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
