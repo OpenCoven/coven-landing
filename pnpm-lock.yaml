@@ -35,9 +35,6 @@ importers:
       astro:
         specifier: ^5.0.0
         version: 5.18.2(@types/node@24.13.3)(rollup@4.60.4)(typescript@5.9.3)
-      three:
-        specifier: 0.187.0
-        version: 0.187.0
     devDependencies:
       '@axe-core/playwright':
         specifier: 4.12.1
@@ -1839,9 +1836,6 @@ packages:
 
   third-party-web@0.29.2:
     resolution: {integrity: sha512-fegtha91tq2DHphyoiBXVHjVi2YG9zFaRnboT9C28tO1en9Y3wJsfspuy40F+u5wl3hHVbw7cnd1b67kEGHb8g==}
-
-  three@0.187.0:
-    resolution: {integrity: sha512-Qiu7R+Cmh8CstZsY1uJOSWnVlfo7ZtNLV7mF8Jltk3LB3AtDu9cRZlcnRKkAk8Y4z6KKw35z7Y7Urd7jWY8etA==}
 
   tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
@@ -4215,8 +4209,6 @@ snapshots:
       sax: 1.6.0
 
   third-party-web@0.29.2: {}
-
-  three@0.187.0: {}
 
   tiny-inflate@1.0.3: {}
 

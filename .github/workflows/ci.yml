@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: read
-
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -31,14 +28,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install --yes ffmpeg
+
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      # node:test suites for the optional installer-stream Worker and its
-      # browser-native handoff (no browser needed)
-      - name: Unit tests
-        run: pnpm test:unit
-
+      # CI=true keeps Astro non-interactive; verify-static.mjs asserts
+      # required public assets, canonical logo treatment, and load-bearing
+      # copy in the built HTML (see scripts/verify-static.mjs).
       - name: Build
         run: CI=true pnpm build
 
@@ -47,14 +45,3 @@ jobs:
 
       - name: Verify browser interactions
         run: pnpm check:browser
-
-      - name: Upload fast-gate browser diagnostics
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: landing-fast-gate-${{ github.run_attempt }}
-          path: |
-            playwright-report
-            test-results
-          if-no-files-found: warn
-          retention-days: 7

@@ -1,3 +1,5 @@
+import { DOWNLOAD_ROUTES, detectPlatform } from './download-platform.js';
+
 (function wireHeader() {
   var header = document.querySelector('.site-header');
   if (!header) return;
@@ -266,11 +268,8 @@
   // download treatments that share this script. Server-rendered defaults
   // remain usable without JS.
   //
-  // Detection order:
-  //   1. UA-string OS markers (most intentional; matches UA overrides)
-  //   2. UA-Client-Hints `platform` (Chromium)
-  //   3. `navigator.platform` fallback
-  //   4. Default fallback: macOS
+  // Detection lives in download-platform.js (shared with the reforged
+  // landing) so both CTAs resolve the visitor's platform identically.
   (function () {
     var cta = document.querySelector('[data-download-cta]');
     if (!cta) return;
@@ -280,53 +279,9 @@
     var subEl = cta.querySelector('[data-download-sub]');
     if (!primary) return;
 
-    // Stable download routes → direct installer files. A serverless
-    // function (api/download.js) resolves the latest release per request,
-    // so these paths never change and there's nothing to bump per release.
-    var DOWNLOAD = { mac: '/download/mac', win: '/download/windows', linux: '/download/linux' };
+    var DOWNLOAD = DOWNLOAD_ROUTES;
     var testflightUrl = cta.getAttribute('data-testflight-url');
-
-    var ua = navigator.userAgent || '';
-    var rawPlatform = (navigator.platform || '').toLowerCase();
-    var uaPlatform = '';
-    try {
-      // UA-Client-Hints (Chromium-based browsers). High-entropy
-      // hints would be more accurate but require a Permissions-Policy
-      // header; the low-entropy 'platform' string is fine for our
-      // four-bucket detection.
-      if (navigator.userAgentData && navigator.userAgentData.platform) {
-        uaPlatform = String(navigator.userAgentData.platform).toLowerCase();
-      }
-    } catch (_) {}
-
-    // iPad on iOS 13+ reports as Mac in UA + platform. Disambiguate
-    // by checking for multi-touch capability (Macs report 0).
-    var isIOSDevice = /iPhone|iPad|iPod/i.test(ua) ||
-                      (rawPlatform === 'macintel' && navigator.maxTouchPoints > 1);
-
-    // Order: explicit UA-string markers > UA-Client-Hints > navigator.platform.
-    // The UA string is what dev tools / mobile sites set, and it's the most
-    // intentional signal. Client hints + navigator.platform come from the OS
-    // and can't always be overridden, so they go last.
-    var detected = 'mac';
-    if (isIOSDevice) {
-      detected = 'ios';
-    } else if (/Windows/i.test(ua)) {
-      detected = 'win';
-    } else if (/Linux|X11|CrOS|Android/i.test(ua) && !/Mac/i.test(ua)) {
-      // Android browsers report "Linux" too — we don't ship Android yet,
-      // so steering them to the Linux/CLI path is the least-bad option.
-      detected = 'linux';
-    } else if (/Mac OS X|Macintosh/i.test(ua)) {
-      detected = 'mac';
-    } else if (uaPlatform.indexOf('win') >= 0 || rawPlatform.indexOf('win') >= 0) {
-      detected = 'win';
-    } else if (uaPlatform.indexOf('linux') >= 0 || rawPlatform.indexOf('linux') >= 0 ||
-               uaPlatform.indexOf('chromeos') >= 0) {
-      detected = 'linux';
-    } else if (uaPlatform.indexOf('mac') >= 0 || rawPlatform.indexOf('mac') >= 0) {
-      detected = 'mac';
-    }
+    var detected = detectPlatform();
 
     var COPY = {
       mac: { label: 'Download Coven Cave for macOS', sub: 'CovenCave · .dmg · signed · free', href: DOWNLOAD.mac },
