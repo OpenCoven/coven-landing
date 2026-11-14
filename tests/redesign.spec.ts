@@ -104,7 +104,10 @@ test('footer hides the Product column until those pages exist', async ({ page })
   const heading = page.locator('span', { hasText: /^Product$/ }).first();
   await expect(heading).toBeAttached({ timeout: 15_000 });
   await expect(heading).toBeHidden();
-  await expect(page.locator('span', { hasText: /^Docs$/ }).first()).toBeVisible();
+  await expect(page.locator('[data-r="footcols"] .footer-column')).toHaveCount(4);
+  for (const column of await page.locator('.footer-column').all()) {
+    await expect(column.locator('a')).toHaveCount(4);
+  }
 });
 
 test('how-it-works renders with its own head and no template bindings', async ({ page }) => {

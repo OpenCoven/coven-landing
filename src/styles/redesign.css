@@ -499,12 +499,12 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--cv-accent); out
 [data-theme="dark"] [data-daytona-logo="light"] { display: none !important }
 [data-theme="dark"] [data-daytona-logo="dark"] { display: block !important }
 @media (max-width: 1079px) {
-  [data-r="footcols"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 44px 32px !important; padding-top: 64px !important }
+  [data-r="footcols"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 32px !important; padding-top: 40px !important }
   [data-r="footmark"] { height: 150px !important }
   [data-r="footmark"] > div { font-size: min(150px, calc((100vw - 68px) / 5.65)) !important }
 }
 @media (max-width: 719px) {
-  [data-r="footcols"] { grid-template-columns: minmax(0, 1fr) !important; padding: 48px 20px 44px !important }
+  [data-r="footcols"] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 28px 20px !important; padding: 32px 20px !important }
   [data-r="footrow"] { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; padding: 20px !important }
   [data-r="footmark"] { height: 96px !important }
   [data-r="footmark"] > div { font-size: min(88px, calc((100vw - 44px) / 5.65)) !important; padding: 0 20px !important }
