@@ -1,7 +1,6 @@
 # coven-landing
 
-Public website and product landing experience for OpenCoven, built with
-[Astro](https://astro.build).
+Landing page for OpenCoven built with [Astro](https://astro.build).
 
 ## Develop
 
@@ -12,122 +11,93 @@ pnpm dev
 
 Then open <http://localhost:4321>.
 
-## Build and preview
+## Build + preview
 
 ```sh
-pnpm build      # outputs static pages to dist/
-pnpm preview    # serves dist/ on http://127.0.0.1:4173
+pnpm build      # outputs static site to dist/
+pnpm preview    # serves dist/ on http://localhost:4173
 ```
 
-In non-interactive shells and CI, run `CI=true pnpm build`. Keep the
-`allowBuilds` entries for `esbuild` and `sharp` in `pnpm-workspace.yaml`;
-without them pnpm blocks those packages' install scripts and the build fails.
+In non-interactive shells (CI, agents), run `CI=true pnpm build`. Keep the
+`allowBuilds` entries for `esbuild`/`sharp` in `pnpm-workspace.yaml` — without
+them pnpm blocks those packages' install scripts and the build fails.
 
 ## Verify
 
 ```sh
-pnpm check
-pnpm check:browser
+pnpm check      # verify-static sanity checks (run after `pnpm build`)
 ```
 
-`pnpm check` verifies required public assets, canonical logo treatment, built
-HTML contracts, current public copy, and other deterministic source/build
-invariants. Playwright drives the shipped interaction and fallback paths.
-
-## Browser-native Cave downloads
-
-The primary Cave CTA is a normal link:
-
-```text
-/download/mac
-/download/mac-intel
-/download/windows
-/download/linux
-```
-
-`vercel.json` rewrites that route to `api/download.js`. The function resolves
-an allowlisted installer from the latest `OpenCoven/coven-cave` release and
-returns a cached redirect to the asset. The browser download manager owns the
-binary transfer, retry behavior, and disk write.
-
-The landing page deliberately does **not** fetch the installer into JavaScript,
-accumulate chunks, construct an installer-sized `Blob`, or simulate
-stream-to-disk progress. Downloads therefore remain usable with JavaScript
-disabled and do not consume 100–200 MB of page memory.
-
-The adjacent disclosure is progressive enhancement only. It fetches the small
-`/api/site-stats` JSON response to decorate static latest-release links with
-current version, filename, size, digest, signature, and attestation metadata.
-When that API is unavailable, the static GitHub Releases links remain usable.
-
-`/stream/:platform` remains a compatibility API while downstream references are
-audited. It is not used by the current primary landing CTA and can be retired
-separately after the release/redirect safety gate.
+`verify-static.mjs` confirms required public assets exist, the canonical OpenCoven logo treatment is used in `favicon.svg` and `og.svg`, and that built HTML still contains load-bearing copy.
 
 ## Layout
 
-```text
-public/         Static assets served from /
-api/            Vercel functions
-                download.js — browser-native latest-installer resolver
-                stream.js — compatibility streaming endpoint, not the page CTA
-                site-stats.js — CDN-cached release/community metadata
-workers/        Optional Cloudflare Worker installer stream
+```
+public/         Static assets served at /        (favicon, og image, logos; warded-braid.js is
+                                                  the retired WebGL hero dial, no longer
+                                                  referenced by any page)
+api/            Vercel serverless functions      (download.js — latest-installer 302;
+                                                  stream.js — same-origin streaming proxy;
+                                                  site-stats.js — CDN-cached GitHub/Discord stats)
 src/
-  pages/        Astro routes
+  pages/        Astro routes                     (index + how-it-works are the redesign;
+                                                  github, quickstart, privacy, terms predate it)
   components/
-    redesign/   Current landing, footer, download, and proof components
-    …           Earlier secondary-page components pending consolidation
+    redesign/   Redesign sections                (Hero, Board, DownloadCta, Outcomes, Footer, …)
+    …           Pre-redesign components          (used by the secondary pages)
   scripts/
-    redesign/   Theme, navigation, metadata decoration, motion, hero, and board
-  styles/       Current and historical page styles pending vNext consolidation
-scripts/        Build-time verification contracts
-analytics/      Optional analytics provisioning kit; never contains secrets
-                 in deployed source
-tests/          Playwright interaction, fallback, and no-JavaScript coverage
+    redesign/   Redesign behavior modules        (theme, nav, downloads, stats, motion, board)
+  styles/       Stylesheets                      (redesign.css — tokens + page/component CSS)
+scripts/        Build-time sanity checks         (verify-static.mjs)
+analytics/      PostHog provisioning kit         (never deployed; see analytics/README.md)
+tests/          Playwright suite                 (redesign.spec.ts)
 ```
 
-The current redesign pages are ordinary Astro components and plain JavaScript
-modules. The warded-braid hero remains a framework-free custom element in
-`public/warded-braid.js` pending its progressive-enhancement refactor.
+The redesign pages were ported from Claude Design exports into ordinary Astro
+components and plain script modules; design iteration now happens in this
+repo. The landing hero is a single column whose visual is the session table; the
+earlier interactive dial (`public/warded-braid.js`) is kept in the repo but unused.
 
-Vercel auto-detects Astro and serves `dist/`. `vercel.json` also owns the
-`/party` and `/weekly` Discord redirects.
+Vercel auto-detects Astro (pnpm via `pnpm-lock.yaml`) and serves `dist/`.
+`vercel.json` adds the `/party` and `/weekly` Discord redirects and rewrites
+`/download/:platform` to `api/download.js`, which 302s to the latest installer
+asset on GitHub Releases, and `/stream/:platform` to `api/stream.js` (see
+below).
 
-## Optional Cloudflare Worker download tier
+## Download pipeline
 
-The browser-native Cave link always starts at `/download/:platform`. When the
-Vercel runtime variable `DOWNLOAD_STREAM_ORIGIN` is set, `api/download.js`
-redirects that link to the matching route on the optional Worker first. The
-Worker streams `upstream.body` directly, so installer bytes never enter page
-JavaScript or an installer-sized `Blob`. The primary path is a normal browser
-navigation and does not require CORS.
+The hero's primary download card detects the visitor's platform
+(`src/scripts/download-platform.js`, shared with the classic landing) and
+streams the installer in-page with progress rendered in the button itself
+(`src/scripts/reforged.js`). Streaming needs byte access via fetch, which
+GitHub's asset hosting blocks cross-origin, so the client walks a cascade
+at click time — whichever source works first wins, and every failure mode
+degrades one tier without user-visible errors:
 
-If the Worker cannot resolve or stream an asset, its `FALLBACK_ORIGIN` sends the
-browser to the site's `/stream/:platform` compatibility endpoint; that
-endpoint falls back to the GitHub Releases page. With the Worker variable
-unset, the existing Vercel resolver selects the current allowlisted asset and
-redirects directly to GitHub. No production enablement is required for the
-site to work.
+1. **Cloudflare Worker** (`workers/download-proxy/`) — CORS streaming
+   proxy with free egress. Tried first when `PUBLIC_DOWNLOAD_STREAM_ORIGIN`
+   is set at build time. Deployed automatically by
+   `.github/workflows/deploy-download-worker.yml` on pushes to `main`.
+2. **Vercel edge proxy** (`api/stream.js`, same-origin `/stream/:platform`)
+   — zero-setup fallback; bytes count against Vercel data transfer, so if
+   a usage cap pauses functions this tier fails and the cascade moves on.
+3. **Native navigation** (`/download/:platform` → `api/download.js` 302) —
+   always works, and is also the server-rendered no-JS default.
 
-### Setup
+Tiers 2 and 3 need no configuration — they deploy with the site. Tier 1
+is opt-in for maintainers (until the secrets below exist, the deploy
+workflow skips green and the cascade simply starts at tier 2). The worker
+must run on the project's own Cloudflare account: whoever controls it
+controls the bytes visitors save as an installer. One-time setup:
 
-1. Deploy `workers/installer-stream/` with `npx wrangler deploy`.
-2. Set `FALLBACK_ORIGIN` to the site origin and keep `ALLOWED_ORIGINS` as an
-   exact-match list. The optional `GITHUB_TOKEN` Worker secret raises the
-   GitHub API rate limit.
-3. Set the Vercel runtime variable `DOWNLOAD_STREAM_ORIGIN` to the Worker's
-   HTTPS origin, then redeploy the site. (The older
-   `PUBLIC_DOWNLOAD_STREAM_ORIGIN` name is accepted as a compatibility alias.)
-4. Verify the browser-native link with JavaScript disabled and exercise both
-   the Worker and fallback routes before enabling it for all traffic.
+1. Cloudflare dashboard → API token with **Workers Scripts: Edit**; add it
+   and the account ID as repo secrets `CLOUDFLARE_API_TOKEN` /
+   `CLOUDFLARE_ACCOUNT_ID`, then run the deploy workflow once.
+2. Set `PUBLIC_DOWNLOAD_STREAM_ORIGIN` in Vercel to the worker URL
+   (e.g. `https://coven-download.<account>.workers.dev`) and redeploy.
+3. Optional: `wrangler secret put GITHUB_TOKEN` (worker) and a
+   `GITHUB_TOKEN` env var (Vercel) raise the GitHub API rate limit for
+   release resolution; both endpoints cache lookups regardless.
 
-Cloudflare deployment credentials are operator-owned: use
-`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repository/deployment
-secrets. The Worker may also be deployed manually with Wrangler.
-
-### Rollback
-
-Unset `DOWNLOAD_STREAM_ORIGIN` (and the compatibility alias, if used) in Vercel
-and redeploy. The page immediately returns to the existing Vercel resolver;
-the Worker can remain deployed or be deleted independently.
+Worker unit tests: `node --test "workers/download-proxy/test/*.test.mjs"`
+(also run by the deploy workflow before deploying).

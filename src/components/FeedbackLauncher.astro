@@ -1,0 +1,59 @@
+<a
+  class="feedback-launcher"
+  href="https://discord.gg/opencoven"
+  data-feedback-launcher
+>
+  <span aria-hidden="true">✦</span>
+  <span data-feedback-label>Feedback</span>
+</a>
+<span
+  class="sr-only"
+  role="status"
+  aria-live="polite"
+  data-feedback-status
+></span>
+
+<style>
+  .feedback-launcher {
+    position: fixed;
+    right: max(18px, env(safe-area-inset-right));
+    bottom: max(18px, env(safe-area-inset-bottom));
+    z-index: 80;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 7px;
+    padding: 0 14px;
+    border: 1px solid var(--border-v);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--white);
+    box-shadow: 0 18px 50px -24px rgba(0, 0, 0, 0.7);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .feedback-launcher[aria-busy='true'] {
+    cursor: wait;
+    opacity: 0.72;
+  }
+
+  .feedback-launcher[data-feedback-state='failed'] {
+    max-width: 220px;
+    border-radius: 10px;
+  }
+
+  @media (max-width: 520px) {
+    .feedback-launcher {
+      position: static;
+      display: flex;
+      width: fit-content;
+      margin:
+        18px
+        max(12px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        auto;
+    }
+  }
+</style>
