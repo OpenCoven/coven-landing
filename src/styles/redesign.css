@@ -568,16 +568,11 @@ body { margin: 0; background: var(--cv-bg-base); color: var(--cv-text-primary); 
 a { color: var(--cv-text-primary); text-decoration: none; transition: color 180ms cubic-bezier(0.2,0,0,1), background-color 180ms cubic-bezier(0.2,0,0,1), border-color 180ms cubic-bezier(0.2,0,0,1); }
 a:hover { color: var(--cv-accent); }
 ::selection { background: var(--cv-accent-soft); }
-/* every view shares the board's box: the shell's height is set by the board (--cv-board-h) and the
-   detail views scroll inside it rather than making the component taller. Root cause of the jump
-   was each [data-win] being content-sized, so the shell followed whichever view was showing. */
-[data-view="board"], [data-win] { height: var(--cv-board-h); box-sizing: border-box }
-[data-win] { overflow-y: auto; overscroll-behavior: contain }
-[data-win] > [data-win-head] { position: sticky; top: 0; z-index: 6 }
-@media (max-width: 719px) {
-  [data-view="board"], [data-win] { height: auto !important; overflow: visible !important }
-  [data-win] > [data-win-head] { position: static !important }
-}
+/* Views share a generous minimum, while open details grow with their content.
+   The document owns scrolling; nested viewports must not hide the demo. */
+[data-view="board"], [data-win] { height: auto; min-height: var(--cv-board-h); box-sizing: border-box }
+[data-win] { overflow: visible }
+[data-win] > [data-win-head] { position: static }
 @keyframes cvSpin { to { transform: rotate(360deg) } }
 @keyframes cvNudge { 0%,100% { transform: translateY(0) } 50% { transform: translateY(2.5px) } }
 @keyframes cvHalo { 0% { box-shadow: 0 0 0 0 color-mix(in oklch, var(--cv-accent) 40%, transparent) } 70%,100% { box-shadow: 0 0 0 9px color-mix(in oklch, var(--cv-accent) 0%, transparent) } }
@@ -593,14 +588,14 @@ a:hover { color: var(--cv-accent); }
 /* ── responsive ─────────────────────────────────────────────────────────
    phone < 720 · tablet 720–1079 · desktop ≥ 1080. Inline styles carry the
    desktop layout, so overrides key off a data-r token or an inline-style
-   substring. Desktop rendering is byte-identical to CovenBoard v1. */
+   substring. Opened views grow naturally with their contents. */
 @media (max-width: 1079px) {
   [data-r~="boardgrid"] { display: block !important }
-  [data-r~="rail"] { flex-direction: row !important; overflow-x: auto !important; overflow-y: hidden !important; border-right: none !important; border-bottom: 1px solid var(--cv-border-hairline) !important; scrollbar-width: none; scroll-snap-type: x proximity; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch }
+  [data-r~="rail"] { flex-direction: row !important; flex-wrap: wrap !important; overflow: visible !important; border-right: none !important; border-bottom: 1px solid var(--cv-border-hairline) !important; scrollbar-width: none; scroll-snap-type: x proximity; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch }
   [data-board-proj] { scroll-snap-align: start }
   [data-r~="rail"]::-webkit-scrollbar { display: none }
   [data-r~="railhead"] { display: none !important }
-  [data-board-proj] { width: auto !important; flex: none !important; height: 52px !important; border-bottom: none !important; border-right: 1px solid var(--cv-border-hairline) !important; padding: 0 15px !important; gap: 10px !important }
+  [data-board-proj] { width: auto !important; flex: 1 1 auto !important; min-width: 0 !important; height: 52px !important; border-bottom: none !important; border-right: 1px solid var(--cv-border-hairline) !important; padding: 0 15px !important; gap: 10px !important }
   [data-board-proj] [style*="font-size: 10px; color: var(--cv-text-muted)"] { display: none !important }
   [data-board-proj] [style*="display: flex; gap: 4px"] { display: none !important }
   [data-board-proj] [data-board-bar] { margin: 10px 0 !important }
@@ -615,6 +610,7 @@ a:hover { color: var(--cv-accent); }
   [style*="repeat(4, minmax(0,1fr))"], [style*="repeat(4, minmax(0px, 1fr))"] { grid-template-columns: repeat(2, minmax(0px, 1fr)) !important }
 }
 @media (max-width: 719px) {
+  [data-board-proj] { flex-basis: calc(50% - 1px) !important; }
   /* one card per session: familiar and diff on the first line, the claim
      under it, the live log across the full width */
   [data-r~="thead"] { display: none !important }
@@ -635,11 +631,9 @@ a:hover { color: var(--cv-accent); }
   [data-overlap-banner] > div { margin-left: 0 !important; display: grid !important; grid-template-columns: repeat(2, minmax(0px, 1fr)) !important; gap: 8px !important }
   [data-overlap-banner] > div > button:first-child { grid-column: 1 / -1 !important; justify-self: start !important; padding-left: 0 !important }
   [data-overlap-banner] > div > button { padding-top: 9px !important; padding-bottom: 9px !important }
-  /* detail views: one column, tabs scroll sideways */
+  /* Detail views use one column and wrap their tabs. */
   [data-win-head] { flex-wrap: wrap !important; gap: 8px 10px !important; padding: 10px 13px !important }
-  [data-win] [style*="gap: 22px; padding: 0 16px"], [data-win] [style*="gap: 22px; padding: 0px 16px"] { gap: 18px !important; padding: 0 13px !important; overflow-x: auto !important; scrollbar-width: none }
-  [data-win] [style*="gap: 22px; padding: 0 16px"]::-webkit-scrollbar, [data-win] [style*="gap: 22px; padding: 0px 16px"]::-webkit-scrollbar { display: none }
-  [data-win] [style*="padding: 15px; max-height"] { padding: 13px !important }
+  [data-board-tabs] { flex-wrap: wrap; gap: 12px 18px !important; padding: 0 13px !important; }
   [style*="1.5fr 0.85fr 1.35fr"],
   [style*="1.25fr 0.8fr"],
   [style*="292px minmax(0,1fr)"], [style*="292px minmax(0px, 1fr)"],
@@ -853,8 +847,9 @@ a:hover { color: var(--cv-accent); }
    selectors, so these rules have to follow all of them. New rules key off data-r tokens and
    data attributes, never off serialized inline styles. */
 
-/* the session table is sized to its rows: header 43 + four rows of 64 + the decision bar 51 */
-:root { --cv-board-h: 350px }
+/* Desktop body: header 43 + four rows of 114 + decision bar 51 = 550px.
+   Including outer chrome, the board grows from 403px to 603px. */
+:root { --cv-board-h: 550px; --cv-board-row-h: 114px }
 
 /* visually hidden, still read by assistive technology */
 .cv-sr { position: absolute !important; width: 1px !important; height: 1px !important; margin: -1px !important; padding: 0 !important; overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important; border: 0 !important }

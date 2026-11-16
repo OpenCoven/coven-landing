@@ -4,10 +4,10 @@ import DownloadCta from './DownloadCta.astro';
 <!-- Single-column hero (handoff H1/H3): the session table below is the hero visual, so
      nothing here reserves a second column. Order: headline, subhead, button row, Cave line,
      stats row. -->
-<header id="top" data-r="hero" style="position: relative; max-width: 1140px; margin: 0 auto; padding: 64px 32px 16px; text-align: left">
+<header id="top" data-r="hero" style="position: relative; max-width: 1140px; margin: 0 auto; padding: 48px 32px 16px; text-align: left">
   <div data-hero="" data-dl-scope="" style="position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 20px">
-    <h1 data-r="headline" style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 72px; line-height: 0.98; letter-spacing: -0.028em; margin: 0; max-width: 760px; text-wrap: balance">Stop being your agents' control plane.</h1>
-    <p style="font-size: 18px; line-height: 1.6; color: var(--cv-text-secondary); max-width: 60ch; margin: 0; text-wrap: pretty">When two agents reach for the same files, one loses the work. Coven decides who waits, and keeps the record of why.</p>
+    <h1 data-r="headline" style="font-family: 'EB Garamond', serif; font-weight: 400; line-height: 0.98; letter-spacing: -0.028em; margin: 0; text-wrap: balance">Stop being your agents' control plane.</h1>
+    <p class="hero-lede" style="line-height: 1.6; color: var(--cv-text-secondary); margin: 0; text-wrap: pretty">When two agents reach for the same files, one loses the work. Coven decides who waits, and keeps the record of why.</p>
     <div data-r="ctarow" style="display: flex; align-items: center; gap: 18px; margin-top: 4px">
       <DownloadCta />
       <button type="button" data-copy="npm install -g @opencoven/cli" data-action="copy" data-r="copybtn" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12.5px; color: var(--cv-text-secondary); background: var(--cv-bg-raised); border: 1px solid var(--cv-border-hairline); border-radius: 8px; padding: 12px 14px; cursor: pointer; white-space: nowrap; box-sizing: border-box; align-self: stretch; display: inline-flex; align-items: center; gap: 0; transition: background-color 160ms cubic-bezier(0.2,0,0,1), color 160ms cubic-bezier(0.2,0,0,1)" class="rh0"><span data-copy-text="">npm i -g @opencoven/cli</span><span data-copy-label="" style="letter-spacing: 0.06em; text-transform: uppercase; font-size: 9.5px">copy</span></button>
@@ -31,3 +31,15 @@ import DownloadCta from './DownloadCta.astro';
 
 
 <!-- The live board -->
+
+<style>
+  [data-r="headline"] { font-size: clamp(72px, 6.7vw, 104px); max-width: 1040px; }
+  .hero-lede { font-size: clamp(18px, 1.4vw, 20px); max-width: 68ch; }
+  @media (max-width: 1079px) {
+    [data-r="headline"] { font-size: 56px; }
+    .hero-lede { font-size: 18px; max-width: 60ch; }
+  }
+  @media (max-width: 719px) {
+    [data-r="headline"] { font-size: 40px; max-width: 17ch; }
+  }
+</style>

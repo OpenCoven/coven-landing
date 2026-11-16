@@ -25,7 +25,7 @@ const columns = [
     <div data-r="boardgrid" style="display: grid; grid-template-columns: 260px minmax(0, 1fr)">
       <div data-r="rail" style="border-right: 1px solid var(--cv-border-hairline); background: var(--cv-bg-panel); display: flex; flex-direction: column">
         <div data-r="railhead" style="height: 43px; box-sizing: border-box; display: flex; align-items: center; padding: 0 16px; background: var(--cv-bg-sunken); border-bottom: 1px solid var(--cv-border-hairline); font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Projects</div>
-        <button type="button" data-board-proj="opencoven" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: 64px; text-align: left; padding: 0 16px; background: var(--cv-accent-soft); border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
+        <button type="button" data-board-proj="opencoven" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: var(--cv-board-row-h); text-align: left; padding: 0 16px; background: var(--cv-accent-soft); border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
           <span data-board-bar="" style="width: 2px; align-self: stretch; margin: 12px 0; background: var(--cv-accent); border-radius: 2px; transition: background-color 240ms"></span>
           <span style="flex: 1; min-width: 0">
             <span style="display: block; font-size: 13.5px; font-weight: 500; color: var(--cv-text-primary)">opencoven</span>
@@ -34,7 +34,7 @@ const columns = [
           <span style="display: flex; gap: 4px"><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/openai.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span></span>
           <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted); width: 14px; text-align: right">4</span>
         </button>
-        <button type="button" data-board-proj="coven-cave" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: 64px; text-align: left; padding: 0 16px; background: none; border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
+        <button type="button" data-board-proj="coven-cave" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: var(--cv-board-row-h); text-align: left; padding: 0 16px; background: none; border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
           <span data-board-bar="" style="width: 2px; align-self: stretch; margin: 12px 0; background: transparent; border-radius: 2px; transition: background-color 240ms"></span>
           <span style="flex: 1; min-width: 0">
             <span style="display: block; font-size: 13.5px; font-weight: 500; color: var(--cv-text-primary)">coven-cave</span>
@@ -43,7 +43,7 @@ const columns = [
           <span style="display: flex; gap: 4px"><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/openai.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span></span>
           <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted); width: 14px; text-align: right">2</span>
         </button>
-        <button type="button" data-board-proj="castcodes" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: 64px; text-align: left; padding: 0 16px; background: none; border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
+        <button type="button" data-board-proj="castcodes" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: var(--cv-board-row-h); text-align: left; padding: 0 16px; background: none; border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
           <span data-board-bar="" style="width: 2px; align-self: stretch; margin: 12px 0; background: transparent; border-radius: 2px; transition: background-color 240ms"></span>
           <span style="flex: 1; min-width: 0">
             <span style="display: block; font-size: 13.5px; font-weight: 500; color: var(--cv-text-primary)">castcodes</span>
@@ -52,7 +52,7 @@ const columns = [
           <span style="display: flex; gap: 4px"><span style="width: 20px; height: 20px; border-radius: 6px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden"><img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="11" height="11" style="width: 11px; height: 11px; display: block; filter: var(--cv-logo-filter)" /></span></span>
           <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10.5px; color: var(--cv-text-muted); width: 14px; text-align: right">1</span>
         </button>
-        <button type="button" data-board-proj="grimoire" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: 64px; text-align: left; padding: 0 16px; background: none; border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
+        <button type="button" data-board-proj="grimoire" data-action="pickProject" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; height: var(--cv-board-row-h); text-align: left; padding: 0 16px; background: none; border: none; border-bottom: 1px solid var(--cv-border-hairline); cursor: pointer; font-family: inherit; transition: background-color 240ms cubic-bezier(0.2,0,0,1)">
           <span data-board-bar="" style="width: 2px; align-self: stretch; margin: 12px 0; background: transparent; border-radius: 2px; transition: background-color 240ms"></span>
           <span style="flex: 1; min-width: 0">
             <span style="display: block; font-size: 13.5px; font-weight: 500; color: var(--cv-text-primary)">grimoire</span>
@@ -74,7 +74,7 @@ const columns = [
         ))}
       </div>
 
-      <div data-row="" data-proj="opencoven" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+      <div data-row="" data-proj="opencoven" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: var(--cv-board-row-h); padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
         <div style="display: flex; align-items: center; gap: 10px">
           <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
             <img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)">
@@ -92,7 +92,7 @@ const columns = [
         <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px"><span data-tick="86" style="color: var(--cv-success)">+86</span> <span data-tick="41" data-prefix="-" style="color: var(--cv-danger)">-41</span></span>
       </div>
 
-      <div data-row="" data-proj="opencoven" data-row-overlap="" style="background: color-mix(in oklch, var(--cv-warning) 8%, transparent); display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+      <div data-row="" data-proj="opencoven" data-row-overlap="" style="background: color-mix(in oklch, var(--cv-warning) 8%, transparent); display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: var(--cv-board-row-h); padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
         <div style="display: flex; align-items: center; gap: 10px">
           <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
             <img src="https://opencoven.ai/logos/openai.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)">
@@ -110,7 +110,7 @@ const columns = [
         <span data-sage-diff="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-muted); transition: color 300ms">no diff yet</span>
       </div>
 
-      <div data-row="" data-proj="opencoven" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center">
+      <div data-row="" data-proj="opencoven" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: var(--cv-board-row-h); padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center">
         <div style="display: flex; align-items: center; gap: 10px">
           <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
             <img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)">
@@ -128,7 +128,7 @@ const columns = [
         <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px"><span data-tick="142" style="color: var(--cv-success)">+142</span> <span data-tick="38" data-prefix="-" style="color: var(--cv-danger)">-38</span></span>
       </div>
 
-      <div data-row="" data-proj="opencoven" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center">
+      <div data-row="" data-proj="opencoven" style="display: grid; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: var(--cv-board-row-h); padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center">
         <div style="display: flex; align-items: center; gap: 10px">
           <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
             <img src="https://opencoven.ai/logos/openai.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)">
@@ -146,7 +146,7 @@ const columns = [
         <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-muted)">held</span>
       </div>
 
-      <div data-row="" data-proj="coven-cave" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+      <div data-row="" data-proj="coven-cave" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: var(--cv-board-row-h); padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
         <div style="display: flex; align-items: center; gap: 10px">
           <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
             <img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
@@ -163,7 +163,7 @@ const columns = [
         </div>
         <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">+51 −9</span>
       </div>
-      <div data-row="" data-proj="coven-cave" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+      <div data-row="" data-proj="coven-cave" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: var(--cv-board-row-h); padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
         <div style="display: flex; align-items: center; gap: 10px">
           <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
             <img src="https://opencoven.ai/logos/openai.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
@@ -180,7 +180,7 @@ const columns = [
         </div>
         <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">+18 −4</span>
       </div>
-      <div data-row="" data-proj="castcodes" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+      <div data-row="" data-proj="castcodes" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: var(--cv-board-row-h); padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
         <div style="display: flex; align-items: center; gap: 10px">
           <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
             <img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
@@ -198,7 +198,7 @@ const columns = [
         <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">+96 −31</span>
       </div>
 
-      <div data-row="" data-proj="grimoire" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+      <div data-row="" data-proj="grimoire" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: var(--cv-board-row-h); padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
         <div style="display: flex; align-items: center; gap: 10px">
           <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
             <img src="https://opencoven.ai/logos/anthropic.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
@@ -215,7 +215,7 @@ const columns = [
         </div>
         <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 12px; color: var(--cv-text-secondary)">+74 −22</span>
       </div>
-      <div data-row="" data-proj="grimoire" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: 64px; padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
+      <div data-row="" data-proj="grimoire" style="display: none; grid-template-columns: 190px 168px 1fr 132px; gap: 20px; box-sizing: border-box; height: var(--cv-board-row-h); padding: 0 20px; border-bottom: 1px solid var(--cv-border-hairline); align-items: center; transition: background-color 300ms cubic-bezier(0.2,0,0,1), box-shadow 300ms cubic-bezier(0.2,0,0,1)">
         <div style="display: flex; align-items: center; gap: 10px">
           <span style="width: 24px; height: 24px; border-radius: 7px; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); display: inline-flex; align-items: center; justify-content: center; overflow: hidden">
             <img src="https://opencoven.ai/logos/openai.svg" alt="" width="13" height="13" style="width: 13px; height: 13px; display: block; filter: var(--cv-logo-filter)" />
@@ -265,7 +265,7 @@ const columns = [
     <button type="button" data-wp-tab="research" style="display: none; padding: 11px 0; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--cv-text-muted); cursor: pointer; border-bottom: 2px solid transparent">Research</button>
   </div>
 
-  <div style="padding: 15px; max-height: 68vh; overflow: auto">
+  <div style="padding: 15px">
     <div data-wp-panel="profile">
       <div style="display: grid; grid-template-columns: 1.5fr 0.85fr 1.35fr; gap: 12px">
 
@@ -285,7 +285,7 @@ const columns = [
           <div data-wp-tags="" style="display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding-top: 12px; border-top: 1px solid var(--cv-border-hairline)"></div>
           <div data-wp-rolemenu="" style="display: none; position: absolute; left: 14px; right: 14px; top: calc(100% - 6px); z-index: 90; background: var(--cv-bg-elevated); border: 1px solid var(--cv-border-hairline); border-radius: 10px; box-shadow: 0 1px 2px oklch(0.1 0.02 291 / 14%), 0 18px 40px oklch(0.1 0.02 291 / 26%); padding: 8px">
             <input type="text" data-wp-rolefilter="" placeholder="Find or name a role" style="width: 100%; box-sizing: border-box; font-family: inherit; font-size: 12.5px; color: var(--cv-text-primary); background: var(--cv-bg-raised); border: 1px solid var(--cv-border-hairline); border-radius: 7px; padding: 7px 9px; margin-bottom: 6px" />
-            <div data-wp-roleopts="" style="display: flex; flex-direction: column; gap: 2px; max-height: 154px; overflow: auto"></div>
+            <div data-wp-roleopts="" style="display: flex; flex-direction: column; gap: 2px"></div>
           </div>
         </div>
 
@@ -326,7 +326,7 @@ const columns = [
         <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted)">Where it works</span>
         <span data-wp-projcount="" style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 10px; color: var(--cv-text-muted)"></span>
       </div>
-      <div data-wp-projects="" style="position: relative; height: 268px; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 10px"></div>
+      <div data-wp-projects="" style="position: relative; display: flex; flex-direction: column; gap: 10px"></div>
     </div>
 
     <div data-wp-panel="memory" style="display: none">
@@ -380,7 +380,7 @@ const columns = [
     <button type="button" data-wp-tab="history" style="padding: 11px 0; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--cv-text-muted); cursor: pointer; border-bottom: 2px solid transparent">History</button>
   </div>
 
-  <div style="padding: 15px; max-height: 68vh; overflow: auto">
+  <div style="padding: 15px">
     <div data-wp-panel="claim">
       <div style="display: grid; grid-template-columns: 1.25fr 0.8fr; gap: 12px">
         <div style="border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-elevated); padding: 15px; display: flex; flex-direction: column; gap: 12px">
@@ -706,7 +706,7 @@ const columns = [
     <span style="font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 11px; color: var(--cv-text-muted)">research</span>
   </div>
 
-  <div style="max-height: 76vh; overflow: auto">
+  <div data-board-content="">
     <div style="padding: 26px 30px 22px; border-bottom: 1px solid var(--cv-border-hairline); background: var(--cv-bg-elevated)">
       <div data-wr-meta="" style="display: flex; flex-wrap: wrap; gap: 14px; font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cv-text-muted); margin-bottom: 12px"></div>
       <h2 data-wr-title="" style="font-family: 'EB Garamond', serif; font-weight: 400; font-size: 38px; line-height: 1.05; letter-spacing: -0.018em; margin: 0 0 12px; text-wrap: balance">Pill radius across the ecosystem</h2>

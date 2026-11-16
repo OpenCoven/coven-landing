@@ -2380,7 +2380,10 @@ function paintProjects(win, d) {
   d.projects.forEach((p) => {
     const card = el('div', 'border: 1px solid var(--cv-border-hairline); border-radius: 11px; background: var(--cv-bg-elevated); overflow: hidden; transition: border-color 200ms cubic-bezier(0.2,0,0,1)');
 
-    const head = el('div', 'display: flex; align-items: center; gap: 14px; padding: 14px 15px; cursor: pointer');
+    const head = el('button', 'display: flex; align-items: center; gap: 14px; padding: 14px 15px; cursor: pointer; width: 100%; border: 0; background: none; color: inherit; font: inherit; text-align: left');
+    head.type = 'button';
+    head.dataset.projToggle = '';
+    head.setAttribute('aria-expanded', 'false');
     head.onmouseenter = () => { card.style.borderColor = 'var(--cv-border-strong)'; };
     head.onmouseleave = () => { card.style.borderColor = 'var(--cv-border-hairline)'; };
 
@@ -2445,10 +2448,11 @@ function paintProjects(win, d) {
       // one card open at a time, so the region's content can only ever be heads plus one body
       host.querySelectorAll('[data-proj-body]').forEach((b) => { b.style.display = 'none'; });
       host.querySelectorAll('[data-proj-caret]').forEach((c) => { c.style.transform = 'none'; });
+      host.querySelectorAll('[data-proj-toggle]').forEach((toggle) => toggle.setAttribute('aria-expanded', 'false'));
       if (wasOpen) return;
       body.style.display = 'block';
       caret.style.transform = 'rotate(90deg)';
-      scrollHostTo(host, Math.min(card.offsetTop, host.scrollHeight - host.clientHeight));
+      head.setAttribute('aria-expanded', 'true');
     });
 
     card.appendChild(head);
@@ -2456,24 +2460,6 @@ function paintProjects(win, d) {
     host.appendChild(card);
   });
 }
-
-
-// the opened card climbs to the top of the region, pushing the ones above it out of view
-
-
-function scrollHostTo(host, to) {
-  const from = host.scrollTop;
-  if (Math.abs(to - from) < 2) return;
-  const t0 = Date.now();
-  const dur = 320;
-  const step = () => {
-    const p = Math.min(1, (Date.now() - t0) / dur);
-    host.scrollTop = from + (to - from) * (1 - Math.pow(1 - p, 3));
-    if (p < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-}
-
 
 
 function openWin(kind, name, idx) {
@@ -2547,7 +2533,9 @@ function showView(kind) {
       table.style.transition = 'none';
       rail.style.transition = animate ? 'opacity 260ms ' + CUB + ', max-height 420ms ' + CUB : 'none';
       rail.style.opacity = folded ? '0' : '1';
-      rail.style.maxHeight = folded ? '0px' : '80px';
+      // Let the visible rail use its natural height, including wrapped rows.
+      // Measuring a hidden board returns zero and cached heights go stale.
+      rail.style.maxHeight = folded ? '0px' : '';
       return;
     }
     rail.style.maxHeight = '';
@@ -2580,8 +2568,9 @@ function showView(kind) {
   incoming.style.transition = 'none';
   incoming.style.opacity = '0';
   incoming.style.transform = 'translateY(10px)';
-  if (kind === 'board') railFold(true, false);
+  if (kind === 'board') railFold(false, false);
   const h1 = titleH + incoming.offsetHeight;
+  if (kind === 'board') railFold(true, false);
 
   outgoing.style.position = 'absolute';
   outgoing.style.left = '0';
