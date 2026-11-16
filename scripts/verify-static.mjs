@@ -820,3 +820,20 @@ for (const { id, name } of productContracts.filter(({ id }) =>
 console.log(
   `Verified quickstart content, five product contracts, discovery links, navigation, command portability, and structured data in dist/quickstart/index.html.`,
 );
+
+// These product URLs are App Store metadata and must survive landing redesigns.
+for (const [route, required] of [
+  ['remote/privacy', ['Coven Remote', 'StoreKit', 'Keychain', 'hello@opencoven.ai', 'https://www.apple.com/legal/privacy/']],
+  ['remote/support', ['Screen Sharing', 'Restore Purchases', 'weekly subscription', '/remote/privacy', 'hello@opencoven.ai']],
+]) {
+  const file = path.join(distDir, route, 'index.html');
+  if (!existsSync(file)) throw new Error(`Missing public app route: /${route}`);
+  const html = await readFile(file, 'utf8');
+  for (const text of required) {
+    if (!html.includes(text)) throw new Error(`/${route} is missing required support/privacy information: ${text}`);
+  }
+  if (html.includes('github.com/OpenCoven/coven-remote')) {
+    throw new Error(`/${route} must not send customers to the private app repository`);
+  }
+}
+console.log('Verified Coven Remote public policy and support routes.');
