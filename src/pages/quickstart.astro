@@ -5,6 +5,7 @@ import '@fontsource-variable/jetbrains-mono/wght.css';
 import '@fontsource-variable/geist/wght.css';
 import '../styles/global.css';
 
+import Analytics from '@vercel/analytics/astro';
 import ThemeInit from '../components/ThemeInit.astro';
 import Ambient from '../components/Ambient.astro';
 import Header from '../components/Header.astro';
@@ -86,6 +87,7 @@ const collectionJsonLd = {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <ThemeInit />
+  <Analytics />
   <title>OpenCoven Quickstart — Choose Your First Product</title>
   <meta name="description" content="Choose an OpenCoven product and follow a verified path to your first successful Coven CLI, Coven Code, Cave, CastCodes, or GitHub run." />
   <meta property="og:title" content="OpenCoven Quickstart" />
