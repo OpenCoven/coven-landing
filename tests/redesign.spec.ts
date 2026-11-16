@@ -28,7 +28,7 @@ test('landing renders the hero and adapts the download button', async ({ page })
 // gone, Cave is defined under the primary button, and the stats links hold
 // their place whether or not /api/site-stats answers (the preview server has
 // no /api functions, so this is the failure state).
-test('hero is a single column with the session table above the fold', async ({ page }) => {
+test('larger hero keeps the taller session board within reach', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
 
@@ -41,12 +41,15 @@ test('hero is a single column with the session table above the fold', async ({ p
   for (const link of await proof.all()) await expect(link).toBeVisible();
   await expect(page.locator('[data-proof-count]').first()).toHaveText('');
 
-  // header row and at least three session rows show without scrolling
+  // The requested taller rows retain the first session above the fold; all
+  // four sessions fit inside the larger board without a nested viewport.
   await expect(page.locator('[data-board][data-board-ready]')).toBeAttached();
   const bottoms = await page
     .locator('[data-panel="sessions"] [data-row][data-proj="opencoven"]')
     .evaluateAll((rows) => rows.map((row) => row.getBoundingClientRect().bottom));
-  expect(bottoms.filter((bottom) => bottom <= 900).length).toBeGreaterThanOrEqual(3);
+  expect(bottoms.filter((bottom) => bottom <= 900).length).toBeGreaterThanOrEqual(1);
+  const board = await page.locator('[data-board]').boundingBox();
+  expect(Math.max(...bottoms)).toBeLessThanOrEqual(board!.y + board!.height);
 });
 
 // H4: Docs sits between How it works and GitHub; below 720px the three links
