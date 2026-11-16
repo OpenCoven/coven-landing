@@ -33,8 +33,9 @@ pnpm check      # verify-static sanity checks (run after `pnpm build`)
 ## Layout
 
 ```
-public/         Static assets served at /        (favicon, og image, logos, warded-braid.js —
-                                                  the WebGL hero, a vanilla custom element)
+public/         Static assets served at /        (favicon, og image, logos; warded-braid.js is
+                                                  the retired WebGL hero dial, no longer
+                                                  referenced by any page)
 api/            Vercel serverless functions      (download.js — latest-installer 302;
                                                   stream.js — same-origin streaming proxy;
                                                   site-stats.js — CDN-cached GitHub/Discord stats)
@@ -45,7 +46,7 @@ src/
     redesign/   Redesign sections                (Hero, Board, DownloadCta, Outcomes, Footer, …)
     …           Pre-redesign components          (used by the secondary pages)
   scripts/
-    redesign/   Redesign behavior modules        (theme, nav, downloads, stats, motion, hero, board)
+    redesign/   Redesign behavior modules        (theme, nav, downloads, stats, motion, board)
   styles/       Stylesheets                      (redesign.css — tokens + page/component CSS)
 scripts/        Build-time sanity checks         (verify-static.mjs)
 analytics/      PostHog provisioning kit         (never deployed; see analytics/README.md)
@@ -54,7 +55,8 @@ tests/          Playwright suite                 (redesign.spec.ts)
 
 The redesign pages were ported from Claude Design exports into ordinary Astro
 components and plain script modules; design iteration now happens in this
-repo. The hero braid stays a framework-free custom element in `public/`.
+repo. The landing hero is a single column whose visual is the session table; the
+earlier interactive dial (`public/warded-braid.js`) is kept in the repo but unused.
 
 Vercel auto-detects Astro (pnpm via `pnpm-lock.yaml`) and serves `dist/`.
 `vercel.json` adds the `/party` and `/weekly` Discord redirects and rewrites

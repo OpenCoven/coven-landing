@@ -16,7 +16,7 @@ export function initMotion() {
       el.style.opacity = '1';
       el.style.transform = 'none';
     });
-    q('[data-tick]').forEach((el) => {
+    q('[data-tick]').filter((el) => !el.closest('[data-board]')).forEach((el) => {
       el.textContent = (el.dataset.prefix || '+') + el.dataset.tick;
     });
     return;
@@ -57,7 +57,7 @@ export function initMotion() {
     onceVisible(el, () => later(() => { el.style.transform = 'scaleX(1)'; }, 150));
   });
 
-  q('[data-tick]').forEach((el) => {
+  q('[data-tick]').filter((el) => !el.closest('[data-board]')).forEach((el) => {
     const target = Number(el.dataset.tick);
     const prefix = el.dataset.prefix || '+';
     el.textContent = prefix + '0';

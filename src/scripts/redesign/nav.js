@@ -13,7 +13,9 @@ export function navScroll() {
   const last = navY === undefined ? y : navY;
   const down = y > last + 2;
   const up = y < last - 2;
-  if (y <= 10) hidden = false;
+  // an open menu pins the bar: hiding it would take the menu's own button away
+  const menu = nav.querySelector('[data-nav-menu]');
+  if (y <= 10 || (menu && menu.open)) hidden = false;
   else if (down && y > 90) hidden = true;
   else if (up) hidden = false;
   navY = y;
@@ -26,8 +28,35 @@ export function navScroll() {
   if (onScrollExtra) onScrollExtra();
 }
 
+// The narrow-width menu is a native <details>, so it opens and closes with no
+// script at all. This adds what a disclosure does not do on its own: Escape
+// and an outside tap close it and hand focus back to its button, following a
+// link closes it, and it never stays open once the desktop links return.
+function initNavMenu() {
+  const menu = document.querySelector('[data-nav-menu]');
+  if (!menu) return;
+  const button = menu.querySelector('summary');
+  const close = (refocus) => {
+    if (!menu.open) return;
+    menu.open = false;
+    if (refocus && button) button.focus();
+  };
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu.open) close(true);
+  });
+  document.addEventListener('click', (e) => {
+    if (!menu.open) return;
+    if (!menu.contains(e.target)) close(true);
+    else if (e.target.closest && e.target.closest('[data-nav-menu-panel] a')) close(false);
+  });
+  window.matchMedia('(min-width: 720px)').addEventListener('change', (e) => {
+    if (e.matches) close(false);
+  });
+}
+
 export function initNav(extra) {
   onScrollExtra = extra || null;
+  initNavMenu();
   navScroll();
   window.addEventListener('scroll', navScroll, { passive: true });
 }

@@ -1,41 +1,29 @@
 // Live proof numbers (stars, downloads, Discord members) from the CDN-cached
 // /api/site-stats endpoint — one same-origin call, no per-visitor GitHub
-// traffic. Each item stays hidden until its figure arrives.
+// traffic. The three links are in the markup from the start and their row
+// height is reserved, so a figure arriving (or never arriving) cannot move
+// the hero. A missing or zero figure is unknown, not zero: the link simply
+// keeps its label.
 
-function fmtProof(n, target) {
-  // the whole ramp is formatted the way the TARGET is, so a 12,000 figure
-  // counts 0k..12k and never renders wider than the box was sized for
-  const t = target === undefined ? n : target;
-  return t >= 10000 ? Math.round(n / 1000) + 'k' : Math.round(n).toLocaleString();
+function fmtProof(n) {
+  return n >= 10000 ? Math.round(n / 1000) + 'k' : Math.round(n).toLocaleString();
 }
 
-function rollTo(el, n) {
-  const final = fmtProof(n);
-  el.style.display = 'inline-block';
-  el.style.width = final.length + 'ch';
-  el.style.textAlign = 'right';
+// opacity 0 to 1 over 150ms, ease-out; reduced motion shows the figure at once
+function fadeIn(el, text) {
+  el.textContent = text;
   el.style.fontVariantNumeric = 'tabular-nums';
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = final; return; }
-  const t0 = Date.now();
-  const dur = 900;
-  const tick = () => {
-    const p = Math.min(1, (Date.now() - t0) / dur);
-    const e = 1 - Math.pow(1 - p, 3);
-    el.textContent = fmtProof(n * e, n);
-    if (p < 1) requestAnimationFrame(tick);
-    else el.textContent = final;
-  };
-  requestAnimationFrame(tick);
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  el.style.opacity = '0';
+  el.style.transition = 'opacity 150ms ease-out';
+  requestAnimationFrame(() => requestAnimationFrame(() => { el.style.opacity = '1'; }));
 }
 
 function showProof(key, n, label) {
   if (!n) return;
   const item = document.querySelector('[data-proof="' + key + '"]');
-  const sep = document.querySelector('[data-proof-sep="' + key + '"]');
-  if (item) item.style.display = item.dataset.proofDisplay || 'inline';
-  if (sep) sep.style.display = 'inline';
-  const num = item && item.querySelector('[data-stars-count], [data-discord-count], [data-dlcount]');
-  if (num) rollTo(num, n);
+  const num = item && item.querySelector('[data-proof-count]');
+  if (num) fadeIn(num, fmtProof(n));
   if (label) {
     const el = item && item.querySelector('[data-discord-label]');
     if (el) el.textContent = label;
@@ -46,7 +34,10 @@ function fillStarSplit(rows) {
   const box = document.querySelector('[data-stars-rows]');
   const pop = document.querySelector('[data-stars-pop]');
   if (!box || !pop) return;
+  // the popover is display:none in the markup, so a failed request never leaves an
+  // empty "Across the org" card behind the stars link
   if (!rows.length) { pop.style.display = 'none'; return; }
+  pop.style.display = 'flex';
   const top = rows.slice(0, 6);
   const rest = rows.slice(6);
   const line = (name, stars) =>

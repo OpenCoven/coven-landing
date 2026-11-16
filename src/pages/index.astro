@@ -48,7 +48,11 @@ import RedesignFooter from '../components/redesign/RedesignFooter.astro';
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <ThemeInit />
-    <PosthogSnippet />
+    <!-- Tells CSS whether motion is allowed before first paint, so the session table's
+         finished frame can be held back only where the script is about to replay it. -->
+    <script is:inline>
+      document.documentElement.dataset.motion = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduce' : 'ok';
+    </script>
     <Analytics />
     <script type="importmap" is:inline>
     {
@@ -67,12 +71,12 @@ import RedesignFooter from '../components/redesign/RedesignFooter.astro';
       }
     }
     </script>
-    <script type="module" src="/warded-braid.js?v=7" is:inline></script>
+    <PosthogSnippet />
   </head>
   <body>
     <RedesignNav />
     <main>
-      <div data-screen-label="Landing v10 product surfaces" data-r="shell" style="min-width: 1140px; background: var(--cv-bg-base); padding-top: 116px">
+      <div data-screen-label="Landing v10 product surfaces" data-r="shell" style="min-width: 1140px; background: var(--cv-bg-base); padding-top: 60px">
         <RedesignHero />
         <BoardSection />
         <Outcomes />

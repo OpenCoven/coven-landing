@@ -265,7 +265,7 @@ if (existsSync(distIndex)) {
     previousPosition = position;
   }
 
-  // The redesign ships an interactive product board and a WebGL hero, so the
+  // The redesign ships an interactive product board, so the
   // budget is wider than the old landing's — but still a hard ceiling so a
   // dependency cannot creep in unnoticed.
   const javascriptBudget = await getInitialJavascriptBudget(html);
@@ -292,7 +292,8 @@ if (existsSync(distIndex)) {
     'npm i -g @opencoven/cli',
     'https://discord.gg/opencoven',
     'https://testflight.apple.com/join/61Dqw8y4',
-    '/warded-braid.js',
+    'Cave is the desktop app for Coven.',
+    'https://docs.opencoven.ai/docs/guide/getting-started',
     'data-art="win-x64"',
     'data-art="mac-arm64"',
     'data-art="linux-amd64"',
@@ -310,7 +311,6 @@ if (existsSync(distIndex)) {
     ['assets/opencoven-mark-line.svg', '/assets/opencoven-mark-line.svg'],
     ['logos/anthropic.svg', '/logos/anthropic.svg'],
     ['logos/openai.svg', '/logos/openai.svg'],
-    ['warded-braid.js', '/warded-braid.js'],
   ];
   for (const [file, ref] of redesignAssets) {
     if (!existsSync(path.join(publicDir, file))) {
@@ -329,6 +329,13 @@ if (existsSync(distIndex)) {
   }
 
   for (const forbidden of [
+    // the hero dial was removed (landing handoff H1): neither its control, its caption,
+    // nor its WebGL dependency may come back onto the homepage
+    'data-action="togglePower"',
+    'click to power',
+    '/warded-braid.js',
+    'unpkg.com/three',
+    'How the runtime does this',
     'support.js',
     'fonts.googleapis.com',
     'api.github.com',
