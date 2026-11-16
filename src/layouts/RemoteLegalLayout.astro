@@ -1,0 +1,37 @@
+---
+import '@fontsource/eb-garamond/400.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/600.css';
+import '@phosphor-icons/web/regular';
+import '../styles/redesign.css';
+import ThemeInit from '../components/ThemeInit.astro';
+import RedesignNav from '../components/redesign/RedesignNav.astro';
+import RedesignFooter from '../components/redesign/RedesignFooter.astro';
+const { title, description, canonicalPath } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={`https://opencoven.dev${canonicalPath}`} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <ThemeInit />
+  </head>
+  <body>
+    <RedesignNav brandHref="/" ctaHref="/#get" />
+    <main><slot /></main>
+    <RedesignFooter />
+    <script>import '../scripts/redesign/legal.js';</script>
+  </body>
+</html>
+<style>
+  main { width: min(100% - 32px, 52rem); margin-inline: auto; padding-block: 64px; }
+  main :global(.legal-head) { margin-bottom: 32px; }
+  main :global(.legal-head h1) { font-size: clamp(2.25rem, 8vw, 4rem); line-height: 1.1; margin-block: 16px; }
+  main :global(.legal-panel) { margin-block: 24px; }
+  main :global(p), main :global(li) { line-height: 1.7; overflow-wrap: anywhere; }
+  main :global(a) { text-decoration: underline; text-underline-offset: 0.2em; }
+</style>
