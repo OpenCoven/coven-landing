@@ -18,6 +18,10 @@ pnpm build      # outputs static site to dist/
 pnpm preview    # serves dist/ on http://localhost:4173
 ```
 
+`pnpm check:browser` reuses whatever is already listening on 4173 locally. If
+another project's preview holds that port, the suite tests the wrong site — run
+`PLAYWRIGHT_PORT=4317 pnpm check:browser` to use a free port instead.
+
 In non-interactive shells (CI, agents), run `CI=true pnpm build`. Keep the
 `allowBuilds` entries for `esbuild`/`sharp` in `pnpm-workspace.yaml` — without
 them pnpm blocks those packages' install scripts and the build fails.
