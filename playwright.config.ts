@@ -1,5 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// 4173 is Vite/Astro's shared preview default, so another project's preview
+// server is often already listening there. `reuseExistingServer` would then
+// silently run this suite against that site. Set PLAYWRIGHT_PORT to move the
+// suite onto a free port, e.g. `PLAYWRIGHT_PORT=4317 pnpm check:browser`.
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 4173);
+const origin = `http://127.0.0.1:${port}`;
+
 export default defineConfig({
   testDir: './tests',
   outputDir: 'test-results',
@@ -15,13 +22,13 @@ export default defineConfig({
     ? [['line'], ['html', { open: 'never' }]]
     : [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: origin,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
   webServer: {
-    command: 'pnpm preview',
-    url: 'http://127.0.0.1:4173',
+    command: `pnpm astro preview --host 127.0.0.1 --port ${port}`,
+    url: origin,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
