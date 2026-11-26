@@ -14,6 +14,7 @@ import '@fontsource/jetbrains-mono/500.css';
 import '@phosphor-icons/web/regular';
 import '../styles/redesign.css';
 
+import Analytics from '@vercel/analytics/astro';
 import ThemeInit from '../components/ThemeInit.astro';
 import PosthogSnippet from '../components/redesign/PosthogSnippet.astro';
 import RedesignNav from '../components/redesign/RedesignNav.astro';
@@ -62,6 +63,7 @@ const num = (i: number) => String(i + 1).padStart(2, '0');
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <ThemeInit />
   <PosthogSnippet />
+  <Analytics />
 </head>
 <body>
   <RedesignNav brandHref="/" ctaHref="/#get" />

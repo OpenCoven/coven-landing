@@ -11,6 +11,7 @@ import '@fontsource/jetbrains-mono/500.css';
 import '@phosphor-icons/web/regular';
 import '../styles/redesign.css';
 
+import Analytics from '@vercel/analytics/astro';
 import ThemeInit from '../components/ThemeInit.astro';
 import PosthogSnippet from '../components/redesign/PosthogSnippet.astro';
 import Board from '../components/redesign/Board.astro';
@@ -45,6 +46,7 @@ import RedesignFooter from '../components/redesign/RedesignFooter.astro';
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <ThemeInit />
     <PosthogSnippet />
+    <Analytics />
   </head>
   <body>
     <nav data-nav="" style="position: sticky; top: 0; z-index: 60; background: transparent; border-bottom: 1px solid transparent; will-change: transform; transition: transform 300ms cubic-bezier(0.2,0,0,1), background-color 220ms cubic-bezier(0.2,0,0,1), border-color 220ms cubic-bezier(0.2,0,0,1)">
